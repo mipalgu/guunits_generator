@@ -56,8 +56,26 @@
  *
  */
 
-struct FunctionHelpers {
+struct FunctionHelpers<Unit: UnitProtocol> {
     
+    func functionName(forUnit unit: Unit, to otherUnit: Unit) -> String {
+        return "\(unit)_to_\(otherUnit)"
+    }
     
+    func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
+        let functionName = self.functionName(forUnit: unit, to: otherUnit)
+        return "\(otherUnit)_\(sign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit), \(otherUnit)_\(sign.rawValue) \(otherUnit))"
+    }
+    
+    func modify(value: Int, forSign sign: Signs) -> String {
+        switch sign {
+        case .float:
+            return "\(value).0f"
+        case .double:
+            return "\(value).0"
+        default:
+            return "\(value)"
+        }
+    }
     
 }

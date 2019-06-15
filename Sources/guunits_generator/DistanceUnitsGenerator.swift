@@ -61,6 +61,8 @@ import Foundation
 struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == Int {
 
     fileprivate(set) var unitDifference: [Unit: Int]
+    
+    let helpers: FunctionHelpers<Unit> = FunctionHelpers()
 
     func generate(forUnits units: [Unit]) -> String? {
         var hashSet = Set<Unit>()
@@ -113,8 +115,8 @@ struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == I
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         print("unit: \(unit), otherUnit: \(otherUnit), cases: \(cases), allCases: \(allCases)")
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
-        let value = self.modify(value: difference, forSign: sign)
-        let definition = self.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
+        let value = self.helpers.modify(value: difference, forSign: sign)
+        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
         return increasing
             ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: value)
             : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: difference)
@@ -145,7 +147,7 @@ struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == I
         guard let lastSign: Signs = Signs.allCases.last else {
             fatalError("Signs is empty.")
         }
-        let lastValue = self.modify(value: value, forSign: lastSign)
+        let lastValue = self.helpers.modify(value: value, forSign: lastSign)
         if sign == lastSign {
             return """
                 \(definition)
@@ -160,26 +162,6 @@ struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == I
                 return (\(otherUnit)_\(sign.rawValue)) round((\(unit)_\(lastSign.rawValue) \(unit)) * \(lastValue));
             }
             """
-    }
-    
-    fileprivate func functionName(forUnit unit: Unit, to otherUnit: Unit) -> String {
-        return "\(unit)_to_\(otherUnit)"
-    }
-    
-    fileprivate func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
-        let functionName = self.functionName(forUnit: unit, to: otherUnit)
-        return "\(otherUnit)_\(sign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit), \(otherUnit)_\(sign.rawValue) \(otherUnit))"
-    }
-    
-    fileprivate func modify(value: Int, forSign sign: Signs) -> String {
-        switch sign {
-        case .float:
-            return "\(value).0f"
-        case .double:
-            return "\(value).0"
-        default:
-            return "\(value)"
-        }
     }
 
 }
