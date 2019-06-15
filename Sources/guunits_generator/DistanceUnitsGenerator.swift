@@ -130,7 +130,7 @@ struct DistanceUnitsGenerator<Unit: Hashable> where Unit: CustomStringConvertibl
         return """
             \(definition)
             {
-                return ((\(otherUnit)_\(sign.rawValue)) \(unit)) * \(value);
+                return ((\(otherUnit)_\(sign.rawValue)) \(unit)) / \(value);
             }
             """
     }
@@ -150,14 +150,14 @@ struct DistanceUnitsGenerator<Unit: Hashable> where Unit: CustomStringConvertibl
             return """
                 \(definition)
                 {
-                    return ((\(otherUnit)_\(sign.rawValue)) \(unit)) / \(lastValue);
+                    return ((\(otherUnit)_\(sign.rawValue)) \(unit)) * \(lastValue);
                 }
                 """
         }
         return """
             \(definition)
             {
-                return (\(otherUnit)_\(sign.rawValue)) round((\(unit)_\(lastSign.rawValue) \(unit)) / \(lastValue));
+                return (\(otherUnit)_\(sign.rawValue)) round((\(unit)_\(lastSign.rawValue) \(unit)) * \(lastValue));
             }
             """
     }
