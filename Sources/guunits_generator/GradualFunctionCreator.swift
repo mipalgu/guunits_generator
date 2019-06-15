@@ -99,7 +99,7 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         return """
         \(definition)
         {
-        return ((\(otherUnit)_\(sign.rawValue)) \(unit)) / \(value);
+            return ((\(otherUnit)_\(sign.rawValue)) \(unit)) / \(value);
         }
         """
     }
