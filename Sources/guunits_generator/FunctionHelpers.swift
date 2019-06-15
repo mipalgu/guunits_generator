@@ -64,7 +64,7 @@ struct FunctionHelpers<Unit: UnitProtocol> {
     
     func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let functionName = self.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
-        return "\(otherUnit)_\(sign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit))"
+        return "\(otherUnit)_\(otherSign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit))"
     }
     
     func modify(value: Int, forSign sign: Signs) -> String {
