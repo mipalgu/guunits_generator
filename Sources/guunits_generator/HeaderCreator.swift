@@ -147,21 +147,9 @@ struct HeaderCreator {
             ("// Angle Units.", Array(AngleUnits.allCases))
         ]
         let signs = Signs.allCases
-        func signType(_ sign: Signs) -> String {
-            switch sign {
-            case .int:
-                return "int"
-            case .uint:
-                return "unsigned int"
-            case .float:
-                return "float"
-            case .double:
-                return "double"
-            }
-        }
         let typeDefs = units.flatMap { (comment, units) in
             ["", comment] + units.flatMap { unit in
-                signs.map { "typedef \(signType($0)) \(unit)_\($0.rawValue);" }
+                signs.map { "typedef \($0.type) \(unit)_\($0.rawValue);" }
             }
         }
         guard let first = typeDefs.first else {
