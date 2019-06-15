@@ -60,6 +60,7 @@ import Foundation
 
 typealias DistanceUnitsGenerator = UnitsGenerator<GradualFunctionCreator<DistanceUnits>>
 typealias TimeUnitsGenerator = UnitsGenerator<GradualFunctionCreator<TimeUnits>>
+typealias AngleUnitsGenerator = UnitsGenerator<AngleFunctionCreator>
 
 struct UnitsGenerator<Creator: FunctionCreator> {
 
@@ -113,6 +114,15 @@ extension UnitsGenerator where Creator == GradualFunctionCreator<TimeUnits> {
     
     init(unitDifference: [Creator.Unit: Int]) {
         self.creator = GradualFunctionCreator(unitDifference: unitDifference)
+    }
+    
+}
+
+extension UnitsGenerator where Creator == AngleFunctionCreator {
+    
+    
+    init(creator: AngleFunctionCreator = AngleFunctionCreator()) {
+        self.creator = creator
     }
     
 }

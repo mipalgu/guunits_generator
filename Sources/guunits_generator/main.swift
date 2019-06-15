@@ -10,5 +10,8 @@ let timeGenerator = TimeUnitsGenerator(unitDifference: [
     .milliseconds: 1000
 ])
 
+let angleGenerator = AngleUnitsGenerator()
+
 print(distanceGenerator.generate(forUnits: Array(DistanceUnits.allCases)) ?? "")
 print(timeGenerator.generate(forUnits: Array(TimeUnits.allCases)) ?? "")
+print(angleGenerator.generate(forUnits: Array(AngleUnits.allCases)) ?? "")
