@@ -129,7 +129,7 @@ struct HeaderCreator {
             """
     }
     
-    var suffix: String {
+    fileprivate var suffix: String {
         return """
             #ifdef __cplusplus
             };
@@ -139,9 +139,40 @@ struct HeaderCreator {
             """
     }
     
+    fileprivate var typeDefs: String {
+        let units: [(String, [CustomStringConvertible])] = [
+            ("// Distance Units.", Array(DistanceUnits.allCases)),
+            ("// Time Units.", Array(TimeUnits.allCases)),
+            ("// Angle Units.", Array(AngleUnits.allCases))
+        ]
+        let signs = Signs.allCases
+        func signType(_ sign: Signs) -> String {
+            switch sign {
+            case .int:
+                return "int"
+            case .uint:
+                return "unsigned int"
+            case .float:
+                return "float"
+            case .double:
+                return "double"
+            }
+        }
+        let typeDefs = units.flatMap { (comment, units) in
+            ["", comment] + units.flatMap { unit in
+                signs.map { "typedef \(signType($0)) \(unit)_\($0.rawValue);" }
+            }
+        }
+        guard let first = typeDefs.first else {
+            return ""
+        }
+        return typeDefs.dropFirst().reduce(first) { $0 + "\n" + $1 }
+    }
+    
+    
     func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
         let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator)
-        return self.prefix + "\n\n" + content + "\n\n" + self.suffix
+        return self.prefix + "\n" + self.typeDefs + "\n\n" + content + "\n\n" + self.suffix
     }
     
     fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
