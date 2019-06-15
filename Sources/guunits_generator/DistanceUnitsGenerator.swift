@@ -93,27 +93,27 @@ struct DistanceUnitsGenerator {
     }
 
     func generate(unit: DistanceUnits, to otherUnit: DistanceUnits, sign: String) -> String {
-            let allCases = DistanceUnits.allCases
-            if unit == otherUnit {
-                fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
+        let allCases = DistanceUnits.allCases
+        if unit == otherUnit {
+            fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
+        }
+        guard
+            let unitIndex = allCases.firstIndex(where: { $0 == unit }),
+            let otherUnitIndex = allCases.firstIndex(where: { $0 == otherUnit })
+        else {
+            fatalError("Unable to fetch index of \(unit) or \(otherUnit)")
+        }
+        let increasing = unitIndex < otherUnitIndex
+        let smallest = increasing ? unitIndex : otherUnitIndex
+        let biggest = increasing ? otherUnitIndex : unitIndex
+        let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest - 1)
+        let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
+        return """
+            \(otherUnit.rawValue) \(unit.rawValue)_to_\(otherUnit.rawValue)(\(unit.rawValue)_\(sign) \(unit.rawValue), \(otherUnit.rawValue)_\(sign) \(otherUnit.rawValue))
+            {
+                return \(unit.rawValue) \(increasing ? "*" : "/") \(difference);
             }
-            guard
-                let unitIndex = allCases.firstIndex(where: { $0 == unit }),
-                let otherUnitIndex = allCases.firstIndex(where: { $0 == otherUnit })
-            else {
-                fatalError("Unable to fetch index of \(unit) or \(otherUnit)")
-            }
-            let increasing = unitIndex < otherUnitIndex
-            let cases = increasing
-                            ? Array(allCases.dropFirst(unitIndex + 1))
-                            : Array(allCases.dropLast(allCases.count - otherUnitIndex - 1).reversed())
-            let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
-            return """
-                \(otherUnit.rawValue) \(unit.rawValue)_to_\(otherUnit.rawValue)(\(unit.rawValue)_\(sign) \(unit.rawValue), \(otherUnit.rawValue)_\(sign) \(otherUnit.rawValue))
-                {
-                    return \(unit.rawValue) \(increasing ? "*" : "/") \(difference);
-                }
-                """
+            """
     }
 
 }
