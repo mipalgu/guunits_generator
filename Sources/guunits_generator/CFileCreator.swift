@@ -132,7 +132,7 @@ struct CFileCreator {
         return ""
     }
     
-    func generateHeader(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
+    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
         let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator)
         return self.prefix + "\n\n" + content + "\n\n" + self.suffix
     }
