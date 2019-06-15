@@ -78,7 +78,7 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         let value = self.helpers.modify(value: difference, forSign: sign)
-        let definition = self.createFunctionDeclaration(unit: unit, to: otherUnit, sign: sign)
+        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
         return increasing
             ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: value)
             : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: difference)
