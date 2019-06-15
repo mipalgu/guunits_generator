@@ -61,7 +61,7 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
     fileprivate(set) var unitDifference: [Unit: Int]
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
     
-    func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
+    func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let allCases = Unit.allCases
         if unit == otherUnit {
             fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
@@ -78,14 +78,14 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         let value = self.helpers.modify(value: difference, forSign: sign)
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
+        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         return increasing
             ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: value)
             : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: difference)
     }
     
-    func createFunctionDeclaration(unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign) + ";"
+    func createFunctionDeclaration(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign) + ";"
     }
     
     fileprivate func increasingFunc(

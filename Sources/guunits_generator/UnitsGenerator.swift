@@ -101,11 +101,12 @@ struct UnitsGenerator<Creator: FunctionCreator> {
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
         let fun = includeImplementation ? self.creator.createFunction : self.creator.createFunctionDeclaration
         return Signs.allCases.flatMap { sign in
-            allUnits.flatMap { (unit) -> [String] in
-                let differentUnits = allUnits.lazy.filter { $0 != unit }
-                let increasing = differentUnits.map { fun(unit, $0, sign) }
-                let decreasing = differentUnits.map { fun($0, unit, sign) }
-                return Array(increasing) + Array(decreasing)
+            Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
+                allUnits.flatMap { (unit) -> [String] in
+                    let increasing = allUnits.map { fun(unit, $0, sign, otherSign) }
+                    let decreasing = allUnits.map { fun($0, unit, sign, otherSign) }
+                    return Array(increasing) + Array(decreasing)
+                }
             }
         }
     }

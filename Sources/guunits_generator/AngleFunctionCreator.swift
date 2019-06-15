@@ -60,21 +60,21 @@ struct AngleFunctionCreator: FunctionCreator {
     
     fileprivate let helpers = FunctionHelpers<AngleUnits>()
     
-    func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs) -> String {
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
+    func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
+        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         switch (unit, otherUnit) {
         case (.degrees, .radians):
             return """
             \(definition)
             {
-                return ((\(otherUnit)_\(sign.rawValue)) (((double) \(unit)) * M_PI / 180.0));
+                return ((\(otherUnit)_\(otherSign.rawValue)) (((double) \(unit)) * M_PI / 180.0));
             }
             """
         case (.radians, .degrees):
             return """
             \(definition)
             {
-                return ((\(otherUnit)_\(sign.rawValue)) (180.0 / M_PI * ((double) \(unit))));
+                return ((\(otherUnit)_\(otherSign.rawValue)) (180.0 / M_PI * ((double) \(unit))));
             }
             """
         default:
@@ -82,8 +82,8 @@ struct AngleFunctionCreator: FunctionCreator {
         }
     }
     
-    func createFunctionDeclaration(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign) + ";"
+    func createFunctionDeclaration(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
+        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign) + ";"
     }
     
 }
