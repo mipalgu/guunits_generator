@@ -1,8 +1,8 @@
 /*
- * Signs.swift 
- * guunits_generator 
+ * SignConverter.swift
+ * guunits_generator
  *
- * Created by Callum McColl on 15/06/2019.
+ * Created by Callum McColl on 15/6/19.
  * Copyright © 2019 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,32 +56,35 @@
  *
  */
 
-enum Signs: String {
+struct SignConverter {
     
-    case int = "t"
-    case uint = "u"
-    case float = "f"
-    case double = "d"
-
-}
-
-extension Signs {
-    
-    var type: String {
-        switch self {
-        case .int:
-            return "int"
-        case .uint:
-            return "unsigned int"
-        case .float:
-            return "float"
-        case .double:
-            return "double"
+    func convert<Unit: UnitProtocol>(unit: Unit, from sign: Signs, to otherSign: Signs) -> String {
+        switch (sign, otherSign) {
+        case (.int, .uint):
+            return self.cast("\(unit) < 0 ? 0 : \(unit)", to: "\(unit)_\(otherSign.rawValue)")
+        case (.uint, .int):
+            let uint: Signs = .uint
+            let intMax = self.cast("INT_MAX", to: uint.type)
+            return self.cast("\(unit) > \(intMax) ? \(intMax) : \(unit)", to: "\(unit)_\(otherSign.rawValue)")
+        default:
+            let allCases = Array(Signs.allCases)
+            guard
+                let signIndex = allCases.firstIndex(where: { $0 == sign }),
+                let otherSignIndex = allCases.firstIndex(where: { $0 == otherSign })
+            else {
+                fatalError("Unable to cast \(sign) to \(otherSign)")
+            }
+            let increasing = signIndex < otherSignIndex
+            if increasing {
+                return self.cast("\(unit)", to: "\(unit)_\(otherSign.rawValue)")
+            }
+            let toDouble = self.cast("\(unit)", to: "double")
+            return self.cast("round(\(toDouble))", to: "\(unit)_\(otherSign.rawValue)")
         }
     }
     
+    fileprivate func cast(_ str: String, to type: String) -> String {
+        return "((\(type)) \(str))"
+    }
+    
 }
-
-extension Signs: CaseIterable {}
-
-extension Signs: Hashable {}
