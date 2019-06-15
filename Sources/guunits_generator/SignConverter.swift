@@ -61,11 +61,13 @@ struct SignConverter {
     func convert<Unit: UnitProtocol>(unit: Unit, from sign: Signs, to otherSign: Signs) -> String {
         switch (sign, otherSign) {
         case (.int, .uint):
-            return self.cast("\(unit) < 0 ? 0 : \(unit)", to: "\(unit)_\(otherSign.rawValue)")
+            return "return " + self.cast("\(unit) < 0 ? 0 : \(unit)", to: "\(unit)_\(otherSign.rawValue)") + ";"
         case (.uint, .int):
             let uint: Signs = .uint
             let intMax = self.cast("INT_MAX", to: uint.type)
-            return self.cast("\(unit) > \(intMax) ? \(intMax) : \(unit)", to: "\(unit)_\(otherSign.rawValue)")
+            return "return " + self.cast("\(unit) > \(intMax) ? \(intMax) : \(unit)", to: "\(unit)_\(otherSign.rawValue)") + ";"
+        case (.double, .float), (.float, .double):
+            return "return " + self.cast("\(unit)", to: "\(unit)_\(otherSign.rawValue)") + ";"
         default:
             let allCases = Array(Signs.allCases)
             guard
@@ -76,15 +78,15 @@ struct SignConverter {
             }
             let increasing = signIndex < otherSignIndex
             if increasing {
-                return self.cast("\(unit)", to: "\(unit)_\(otherSign.rawValue)")
+                return "return " + self.cast("\(unit)", to: "\(unit)_\(otherSign.rawValue)") + ";"
             }
             let toDouble = self.cast("\(unit)", to: "double")
-            return self.cast("round(\(toDouble))", to: "\(unit)_\(otherSign.rawValue)")
+            return "return " + self.cast("round(\(toDouble))", to: "\(unit)_\(otherSign.rawValue)") + ";"
         }
     }
     
     fileprivate func cast(_ str: String, to type: String) -> String {
-        return "((\(type)) \(str))"
+        return "((\(type)) (\(str)))"
     }
     
 }
