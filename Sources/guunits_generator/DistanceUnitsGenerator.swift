@@ -109,12 +109,61 @@ struct DistanceUnitsGenerator {
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest - 1)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         let value = self.modify(value: difference, forSign: sign)
+        let definition = self.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
+        return increasing
+            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: value)
+            : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: difference)
+    }
+    
+    fileprivate func increasingFunc(
+        forUnit unit: DistanceUnits,
+        to otherUnit: DistanceUnits,
+        sign: Signs,
+        withDefinition definition: String,
+        andValue value: String
+    ) -> String {
         return """
-            \(otherUnit.rawValue)\(sign.rawValue) \(unit.rawValue)_to_\(otherUnit.rawValue)(\(unit.rawValue)_\(sign.rawValue) \(unit.rawValue), \(otherUnit.rawValue)_\(sign.rawValue) \(otherUnit.rawValue))
+            \(definition)
             {
-                return \(unit.rawValue) \(increasing ? "*" : "/") \(value);
+                return ((\(otherUnit)_\(sign.rawValue)) \(unit.rawValue)) * \(value);
             }
             """
+    }
+    
+    fileprivate func decreasingFunc(
+        forUnit unit: DistanceUnits,
+        to otherUnit: DistanceUnits,
+        sign: Signs,
+        withDefinition definition: String,
+        andValue value: Int
+    ) -> String {
+        guard let lastSign: Signs = Signs.allCases.last else {
+            fatalError("Signs is empty.")
+        }
+        let lastValue = self.modify(value: value, forSign: lastSign)
+        if sign == lastSign {
+            return """
+                \(definition)
+                {
+                    return ((\(otherUnit)_\(sign.rawValue)) \(unit.rawValue)) / \(lastValue);
+                }
+                """
+        }
+        return """
+            \(definition)
+            {
+                return (\(otherUnit)_\(sign.rawValue)) round((\(unit)_\(lastSign.rawValue) \(unit)) / \(lastValue));
+            }
+            """
+    }
+    
+    fileprivate func functionName(forUnit unit: DistanceUnits, to otherUnit: DistanceUnits) -> String {
+        return "\(unit.rawValue)_to_\(otherUnit.rawValue)"
+    }
+    
+    fileprivate func functionDefinition(forUnit unit: DistanceUnits, to otherUnit: DistanceUnits, sign: Signs) -> String {
+        let functionName = self.functionName(forUnit: unit, to: otherUnit)
+        return "\(otherUnit.rawValue)\(sign.rawValue) \(functionName)(\(unit.rawValue)_\(sign.rawValue) \(unit.rawValue), \(otherUnit.rawValue)_\(sign.rawValue) \(otherUnit.rawValue))"
     }
     
     fileprivate func modify(value: Int, forSign sign: Signs) -> String {
