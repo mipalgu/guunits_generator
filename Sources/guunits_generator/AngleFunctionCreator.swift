@@ -59,6 +59,7 @@
 struct AngleFunctionCreator: FunctionCreator {
     
     fileprivate let helpers = FunctionHelpers<AngleUnits>()
+    fileprivate let signConverter: SignConverter = SignConverter()
     
     func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
         let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
@@ -78,8 +79,17 @@ struct AngleFunctionCreator: FunctionCreator {
             }
             """
         default:
-            fatalError("Cannot create function for \(unit) to \(otherUnit)")
+            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign, withDefinition: definition)
         }
+    }
+    
+    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
+        return """
+            \(definition)
+            {
+                \(self.signConverter.convert(unit: unit, from: sign, to: otherSign))
+            }
+            """
     }
     
     func createFunctionDeclaration(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {

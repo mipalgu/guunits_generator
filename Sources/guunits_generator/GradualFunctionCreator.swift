@@ -60,11 +60,13 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
     
     fileprivate(set) var unitDifference: [Unit: Int]
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+    fileprivate let signConverter: SignConverter = SignConverter()
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let allCases = Unit.allCases
+        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         if unit == otherUnit {
-            fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
+            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign, withDefinition: definition)
         }
         guard
             let unitIndex = allCases.firstIndex(where: { $0 == unit }),
@@ -78,10 +80,19 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         let value = self.helpers.modify(value: difference, forSign: sign)
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+        
         return increasing
             ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: value)
             : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: difference)
+    }
+    
+    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
+        return """
+            \(definition)
+            {
+                \(self.signConverter.convert(unit: unit, from: sign, to: otherSign))
+            }
+            """
     }
     
     func createFunctionDeclaration(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
