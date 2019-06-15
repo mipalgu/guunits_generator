@@ -1,11 +1,11 @@
 print("Hello, world!")
 
-let distanceGenerator = DistanceUnitsGenerator<DistanceUnits>(unitDifference: [
+let distanceGenerator = DistanceUnitsGenerator(unitDifference: [
     .millimetres: 10,
     .centimetres: 100
 ])
 
-let timeGenerator = DistanceUnitsGenerator<TimeUnits>(unitDifference: [
+let timeGenerator = TimeUnitsGenerator(unitDifference: [
     .microseconds: 1000,
     .milliseconds: 1000
 ])

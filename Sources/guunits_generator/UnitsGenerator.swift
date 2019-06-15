@@ -1,5 +1,5 @@
 /*
- * DistanceUnitsGenerator.swift 
+ * UnitsGenerator.swift
  * guunits_generator 
  *
  * Created by Callum McColl on 15/06/2019.
@@ -58,7 +58,10 @@
 
 import Foundation
 
-struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == Int {
+typealias DistanceUnitsGenerator = UnitsGenerator<DistanceUnits>
+typealias TimeUnitsGenerator = UnitsGenerator<TimeUnits>
+
+struct UnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == Int {
 
     fileprivate(set) var unitDifference: [Unit: Int]
     
@@ -87,7 +90,7 @@ struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == I
         return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
-    func generate(unit: Unit, against allUnits: [Unit]) -> [String] {
+    fileprivate func generate(unit: Unit, against allUnits: [Unit]) -> [String] {
         return Signs.allCases.flatMap { sign in
             allUnits.flatMap { (unit) -> [String] in
                 let differentUnits = allUnits.lazy.filter { $0 != unit }
@@ -98,7 +101,7 @@ struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == I
         }
     }
 
-    func generate(unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
+    fileprivate func generate(unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
         let allCases = Unit.allCases
         if unit == otherUnit {
             fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
