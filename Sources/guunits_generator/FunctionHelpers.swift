@@ -58,12 +58,12 @@
 
 struct FunctionHelpers<Unit: UnitProtocol> {
     
-    func functionName(forUnit unit: Unit, to otherUnit: Unit) -> String {
-        return "\(unit)_to_\(otherUnit)"
+    func functionName(forUnit unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
+        return "\(unit)_\(sign.rawValue)_to_\(otherUnit)_\(sign.rawValue)"
     }
     
     func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
-        let functionName = self.functionName(forUnit: unit, to: otherUnit)
+        let functionName = self.functionName(forUnit: unit, to: otherUnit, sign: sign)
         return "\(otherUnit)_\(sign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit), \(otherUnit)_\(sign.rawValue) \(otherUnit))"
     }
     
