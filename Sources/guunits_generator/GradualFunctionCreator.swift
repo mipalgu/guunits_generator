@@ -59,7 +59,7 @@
 struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.AllCases.Index == Int {
     
     fileprivate(set) var unitDifference: [Unit: Int]
-    let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+    fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
         let allCases = Unit.allCases
