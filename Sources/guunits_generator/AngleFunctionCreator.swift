@@ -61,7 +61,7 @@ struct AngleFunctionCreator: FunctionCreator {
     fileprivate let helpers = FunctionHelpers<AngleUnits>()
     
     func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs) -> String {
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
+        let definition = self.createFunctionDeclaration(unit: unit, to: otherUnit, sign: sign)
         switch (unit, otherUnit) {
         case (.degrees, .radians):
             return """
@@ -80,6 +80,10 @@ struct AngleFunctionCreator: FunctionCreator {
         default:
             fatalError("Cannot create function for \(unit) to \(otherUnit)")
         }
+    }
+    
+    func createFunctionDeclaration(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs) -> String {
+        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign) + ";"
     }
     
 }

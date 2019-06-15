@@ -12,6 +12,6 @@ let timeGenerator = TimeUnitsGenerator(unitDifference: [
 
 let angleGenerator = AngleUnitsGenerator()
 
-print(distanceGenerator.generate(forUnits: Array(DistanceUnits.allCases)) ?? "")
-print(timeGenerator.generate(forUnits: Array(TimeUnits.allCases)) ?? "")
-print(angleGenerator.generate(forUnits: Array(AngleUnits.allCases)) ?? "")
+print(distanceGenerator.generateDeclarations(forUnits: Array(DistanceUnits.allCases)) ?? "")
+print(timeGenerator.generateDeclarations(forUnits: Array(TimeUnits.allCases)) ?? "")
+print(angleGenerator.generateDeclarations(forUnits: Array(AngleUnits.allCases)) ?? "")

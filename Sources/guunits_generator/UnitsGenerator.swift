@@ -66,7 +66,15 @@ struct UnitsGenerator<Creator: FunctionCreator> {
 
     let creator: Creator
     
-    func generate(forUnits units: [Creator.Unit]) -> String? {
+    func generateDeclarations(forUnits units: [Creator.Unit]) -> String? {
+        return self.generate(forUnits: units, includeImplementation: false)
+    }
+    
+    func generateImplementations(forUnits units: [Creator.Unit]) -> String? {
+        return self.generate(forUnits: units, includeImplementation: true)
+    }
+    
+    fileprivate func generate(forUnits units: [Creator.Unit], includeImplementation: Bool) -> String? {
         var hashSet = Set<Creator.Unit>()
         var unique: [Creator.Unit] = []
         unique.reserveCapacity(units.count)
@@ -77,7 +85,7 @@ struct UnitsGenerator<Creator: FunctionCreator> {
             hashSet.insert($0)
             unique.append($0)
         }
-        let functions = Set<String>(unique.flatMap { self.generate(unit: $0, against: unique) })
+        let functions = Set<String>(unique.flatMap { self.generate(unit: $0, against: unique, includeImplementation: includeImplementation) })
         let sorted = functions.sorted(by: { (lhs: String, rhs: String) -> Bool in
             let first: String = lhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
             let second: String = rhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
@@ -89,12 +97,13 @@ struct UnitsGenerator<Creator: FunctionCreator> {
         return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
-    fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit]) -> [String] {
+    fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
+        let fun = includeImplementation ? self.creator.createFunction : self.creator.createFunctionDeclaration
         return Signs.allCases.flatMap { sign in
             allUnits.flatMap { (unit) -> [String] in
                 let differentUnits = allUnits.lazy.filter { $0 != unit }
-                let increasing = differentUnits.map { self.creator.createFunction(unit: unit, to: $0, sign: sign) }
-                let decreasing = differentUnits.map { self.creator.createFunction(unit: $0, to: unit, sign: sign) }
+                let increasing = differentUnits.map { fun(unit, $0, sign) }
+                let decreasing = differentUnits.map { fun($0, unit, sign) }
                 return Array(increasing) + Array(decreasing)
             }
         }
