@@ -85,14 +85,14 @@ struct DistanceUnitsGenerator {
         return Signs.allCases.flatMap { sign in
             allUnits.flatMap { (unit) -> [String] in
                 let differentUnits = allUnits.lazy.filter { $0 != unit }
-                let increasing = differentUnits.map { self.generate(unit: unit, to: $0, sign: sign.rawValue) }
-                let decreasing = differentUnits.map { self.generate(unit: $0, to: unit, sign: sign.rawValue) }
+                let increasing = differentUnits.map { self.generate(unit: unit, to: $0, sign: sign) }
+                let decreasing = differentUnits.map { self.generate(unit: $0, to: unit, sign: sign) }
                 return Array(increasing) + Array(decreasing)
             }
         }
     }
 
-    func generate(unit: DistanceUnits, to otherUnit: DistanceUnits, sign: String) -> String {
+    func generate(unit: DistanceUnits, to otherUnit: DistanceUnits, sign: Signs) -> String {
         let allCases = DistanceUnits.allCases
         if unit == otherUnit {
             fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
@@ -108,12 +108,24 @@ struct DistanceUnitsGenerator {
         let biggest = increasing ? otherUnitIndex : unitIndex
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest - 1)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
+        let value = self.modify(value: difference, forSign: sign)
         return """
-            \(otherUnit.rawValue) \(unit.rawValue)_to_\(otherUnit.rawValue)(\(unit.rawValue)_\(sign) \(unit.rawValue), \(otherUnit.rawValue)_\(sign) \(otherUnit.rawValue))
+            \(otherUnit.rawValue)\(sign.rawValue) \(unit.rawValue)_to_\(otherUnit.rawValue)(\(unit.rawValue)_\(sign.rawValue) \(unit.rawValue), \(otherUnit.rawValue)_\(sign.rawValue) \(otherUnit.rawValue))
             {
-                return \(unit.rawValue) \(increasing ? "*" : "/") \(difference);
+                return \(unit.rawValue) \(increasing ? "*" : "/") \(value);
             }
             """
+    }
+    
+    fileprivate func modify(value: Int, forSign sign: Signs) -> String {
+        switch sign {
+        case .float:
+            return "\(value).0f"
+        case .double:
+            return "\(value).0"
+        default:
+            return "\(value)"
+        }
     }
 
 }
