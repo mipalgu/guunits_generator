@@ -58,7 +58,7 @@
 
 import Foundation
 
-struct DistanceUnitsGenerator<Unit: Hashable> where Unit: CustomStringConvertible, Unit: CaseIterable, Unit.AllCases.Index == Int {
+struct DistanceUnitsGenerator<Unit: UnitProtocol> where Unit.AllCases.Index == Int {
 
     fileprivate(set) var unitDifference: [Unit: Int]
 

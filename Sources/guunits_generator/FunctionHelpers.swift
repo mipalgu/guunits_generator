@@ -1,8 +1,8 @@
 /*
- * DistanceUnits.swift 
- * guunits_generator 
+ * FunctionHelpers.swift
+ * guunits_generator
  *
- * Created by Callum McColl on 15/06/2019.
+ * Created by Callum McColl on 15/6/19.
  * Copyright © 2019 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,18 +56,8 @@
  *
  */
 
-enum DistanceUnits: String {
-
-    case millimetres = "millimetres"
-    case centimetres = "centimetres"
-    case metres = "metres"
-
-}
-
-extension DistanceUnits: UnitProtocol {
+struct FunctionHelpers {
     
-    var description: String {
-        return self.rawValue
-    }
+    
     
 }

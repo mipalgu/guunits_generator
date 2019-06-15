@@ -63,6 +63,10 @@ enum AngleUnits: String {
 
 }
 
-extension AngleUnits: CaseIterable {}
-
-extension AngleUnits: Hashable {}
+extension AngleUnits: UnitProtocol {
+    
+    var description: String {
+        return self.rawValue
+    }
+    
+}
