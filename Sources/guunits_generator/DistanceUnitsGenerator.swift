@@ -56,6 +56,8 @@
  *
  */
 
+import Foundation
+
 struct DistanceUnitsGenerator {
 
     fileprivate let unitDifference: [DistanceUnits: Int] = [
@@ -74,11 +76,16 @@ struct DistanceUnitsGenerator {
             hashSet.insert($0)
             unique.append($0)
         }
-        let functions = unique.flatMap { self.generate(unit: $0, against: unique) }
-        guard let firstFunction = functions.first else {
+        let functions = Set<String>(unique.flatMap { self.generate(unit: $0, against: unique) })
+        let sorted = functions.sorted(by: { (lhs: String, rhs: String) -> Bool in
+            let first: String = lhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
+            let second: String = rhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
+            return first < second
+        })
+        guard let firstFunction = sorted.first else {
             return nil
         }
-        return functions.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
+        return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
     func generate(unit: DistanceUnits, against allUnits: [DistanceUnits]) -> [String] {
@@ -106,7 +113,8 @@ struct DistanceUnitsGenerator {
         let increasing = unitIndex < otherUnitIndex
         let smallest = increasing ? unitIndex : otherUnitIndex
         let biggest = increasing ? otherUnitIndex : unitIndex
-        let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest - 1)
+        let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
+        print("unit: \(unit), otherUnit: \(otherUnit), cases: \(cases), allCases: \(allCases)")
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         let value = self.modify(value: difference, forSign: sign)
         let definition = self.functionDefinition(forUnit: unit, to: otherUnit, sign: sign)
@@ -163,7 +171,7 @@ struct DistanceUnitsGenerator {
     
     fileprivate func functionDefinition(forUnit unit: DistanceUnits, to otherUnit: DistanceUnits, sign: Signs) -> String {
         let functionName = self.functionName(forUnit: unit, to: otherUnit)
-        return "\(otherUnit.rawValue)\(sign.rawValue) \(functionName)(\(unit.rawValue)_\(sign.rawValue) \(unit.rawValue), \(otherUnit.rawValue)_\(sign.rawValue) \(otherUnit.rawValue))"
+        return "\(otherUnit.rawValue)_\(sign.rawValue) \(functionName)(\(unit.rawValue)_\(sign.rawValue) \(unit.rawValue), \(otherUnit.rawValue)_\(sign.rawValue) \(otherUnit.rawValue))"
     }
     
     fileprivate func modify(value: Int, forSign sign: Signs) -> String {
