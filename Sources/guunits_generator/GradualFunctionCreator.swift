@@ -79,9 +79,8 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         let biggest = increasing ? otherUnitIndex : unitIndex
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
-        let value = self.helpers.modify(value: difference, forSign: sign)
         return increasing
-            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: value)
+            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
             : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
     }
     
@@ -104,9 +103,14 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         sign: Signs,
         otherSign: Signs,
         withDefinition definition: String,
-        andValue value: String
+        andValue value: Int
     ) -> String {
-        let body = sign == otherSign ? "\(unit)" : self.signConverter.convert("\(unit) / \(value)", otherUnit: otherUnit, from: sign, to: otherSign)
+        guard let lastSign: Signs = Signs.allCases.last else {
+            fatalError("Signs is empty.")
+        }
+        let lastValue = self.helpers.modify(value: value, forSign: lastSign)
+        let calculate: String = self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: lastSign) + " / \(lastValue)"
+        let body = self.signConverter.convert(calculate, otherUnit: otherUnit, from: lastSign, to: otherSign)
         return """
         \(definition)
         {
@@ -121,22 +125,14 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         sign: Signs,
         otherSign: Signs,
         withDefinition definition: String,
-        andValue value: Int
+        andValue difference: Int
     ) -> String {
-        guard let lastSign: Signs = Signs.allCases.last else {
-            fatalError("Signs is empty.")
-        }
-        let lastValue = self.helpers.modify(value: value, forSign: lastSign)
-        let body: String
-        if sign == lastSign {
-            body = "\(unit) * \(lastValue)"
-        } else {
-            body = "((\(unit)_\(lastSign.rawValue)) \(unit)) * \(lastValue)"
-        }
+        let value = self.helpers.modify(value: difference, forSign: sign)
+        let body = self.signConverter.convert("\(unit) * \(value)", otherUnit: otherUnit, from: sign, to: otherSign)
         return """
             \(definition)
             {
-                return \(self.signConverter.convert(body, otherUnit: otherUnit, from: sign, to: otherSign));
+                return \(body);
             }
             """
     }

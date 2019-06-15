@@ -61,11 +61,11 @@ struct SignConverter {
     func convert<Unit: UnitProtocol>(_ str: String, otherUnit: Unit, from sign: Signs, to otherSign: Signs) -> String {
         switch (sign, otherSign) {
         case (.int, .uint):
-            return self.cast("\(str) < 0 ? 0 : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
+            return self.cast("(\(str)) < 0 ? 0 : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         case (.uint, .int):
             let uint: Signs = .uint
             let intMax = self.cast("INT_MAX", to: uint.type)
-            return self.cast("\(str) > \(intMax) ? \(intMax) : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
+            return self.cast("(\(str)) > \(intMax) ? \(intMax) : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         case (.double, .float), (.float, .double):
             return self.cast("\(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         default:
