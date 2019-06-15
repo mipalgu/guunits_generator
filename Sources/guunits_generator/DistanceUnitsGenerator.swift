@@ -58,16 +58,13 @@
 
 import Foundation
 
-struct DistanceUnitsGenerator {
+struct DistanceUnitsGenerator<Unit: Hashable> where Unit: CustomStringConvertible, Unit: CaseIterable, Unit.AllCases.Index == Int {
 
-    fileprivate let unitDifference: [DistanceUnits: Int] = [
-        .millimetres: 10,
-        .centimetres: 100
-    ]
+    fileprivate(set) var unitDifference: [Unit: Int]
 
-    func generate(forUnits units: [DistanceUnits]) -> String? {
-        var hashSet = Set<DistanceUnits>()
-        var unique: [DistanceUnits] = []
+    func generate(forUnits units: [Unit]) -> String? {
+        var hashSet = Set<Unit>()
+        var unique: [Unit] = []
         unique.reserveCapacity(units.count)
         units.forEach {
             if hashSet.contains($0) {
@@ -88,7 +85,7 @@ struct DistanceUnitsGenerator {
         return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
-    func generate(unit: DistanceUnits, against allUnits: [DistanceUnits]) -> [String] {
+    func generate(unit: Unit, against allUnits: [Unit]) -> [String] {
         return Signs.allCases.flatMap { sign in
             allUnits.flatMap { (unit) -> [String] in
                 let differentUnits = allUnits.lazy.filter { $0 != unit }
@@ -99,8 +96,8 @@ struct DistanceUnitsGenerator {
         }
     }
 
-    func generate(unit: DistanceUnits, to otherUnit: DistanceUnits, sign: Signs) -> String {
-        let allCases = DistanceUnits.allCases
+    func generate(unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
+        let allCases = Unit.allCases
         if unit == otherUnit {
             fatalError("Unable to generate functions from \(unit) to \(otherUnit)")
         }
@@ -124,8 +121,8 @@ struct DistanceUnitsGenerator {
     }
     
     fileprivate func increasingFunc(
-        forUnit unit: DistanceUnits,
-        to otherUnit: DistanceUnits,
+        forUnit unit: Unit,
+        to otherUnit: Unit,
         sign: Signs,
         withDefinition definition: String,
         andValue value: String
@@ -133,14 +130,14 @@ struct DistanceUnitsGenerator {
         return """
             \(definition)
             {
-                return ((\(otherUnit)_\(sign.rawValue)) \(unit.rawValue)) * \(value);
+                return ((\(otherUnit)_\(sign.rawValue)) \(unit)) * \(value);
             }
             """
     }
     
     fileprivate func decreasingFunc(
-        forUnit unit: DistanceUnits,
-        to otherUnit: DistanceUnits,
+        forUnit unit: Unit,
+        to otherUnit: Unit,
         sign: Signs,
         withDefinition definition: String,
         andValue value: Int
@@ -153,7 +150,7 @@ struct DistanceUnitsGenerator {
             return """
                 \(definition)
                 {
-                    return ((\(otherUnit)_\(sign.rawValue)) \(unit.rawValue)) / \(lastValue);
+                    return ((\(otherUnit)_\(sign.rawValue)) \(unit)) / \(lastValue);
                 }
                 """
         }
@@ -165,13 +162,13 @@ struct DistanceUnitsGenerator {
             """
     }
     
-    fileprivate func functionName(forUnit unit: DistanceUnits, to otherUnit: DistanceUnits) -> String {
-        return "\(unit.rawValue)_to_\(otherUnit.rawValue)"
+    fileprivate func functionName(forUnit unit: Unit, to otherUnit: Unit) -> String {
+        return "\(unit)_to_\(otherUnit)"
     }
     
-    fileprivate func functionDefinition(forUnit unit: DistanceUnits, to otherUnit: DistanceUnits, sign: Signs) -> String {
+    fileprivate func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs) -> String {
         let functionName = self.functionName(forUnit: unit, to: otherUnit)
-        return "\(otherUnit.rawValue)_\(sign.rawValue) \(functionName)(\(unit.rawValue)_\(sign.rawValue) \(unit.rawValue), \(otherUnit.rawValue)_\(sign.rawValue) \(otherUnit.rawValue))"
+        return "\(otherUnit)_\(sign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit), \(otherUnit)_\(sign.rawValue) \(otherUnit))"
     }
     
     fileprivate func modify(value: Int, forSign sign: Signs) -> String {

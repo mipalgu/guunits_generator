@@ -67,3 +67,11 @@ enum TimeUnits: String {
 extension TimeUnits: CaseIterable {}
 
 extension TimeUnits: Hashable {}
+
+extension TimeUnits: CustomStringConvertible {
+    
+    var description: String {
+        return self.rawValue
+    }
+    
+}

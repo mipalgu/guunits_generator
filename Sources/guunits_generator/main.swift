@@ -1,5 +1,14 @@
 print("Hello, world!")
 
-let generator = DistanceUnitsGenerator()
+let distanceGenerator = DistanceUnitsGenerator<DistanceUnits>(unitDifference: [
+    .millimetres: 10,
+    .centimetres: 100
+])
 
-print(generator.generate(forUnits: Array(DistanceUnits.allCases)) ?? "")
+let timeGenerator = DistanceUnitsGenerator<TimeUnits>(unitDifference: [
+    .microseconds: 1000,
+    .milliseconds: 1000
+])
+
+print(distanceGenerator.generate(forUnits: Array(DistanceUnits.allCases)) ?? "")
+print(timeGenerator.generate(forUnits: Array(TimeUnits.allCases)) ?? "")

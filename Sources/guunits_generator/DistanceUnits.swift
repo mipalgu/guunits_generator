@@ -67,3 +67,11 @@ enum DistanceUnits: String {
 extension DistanceUnits: CaseIterable {}
 
 extension DistanceUnits: Hashable {}
+
+extension DistanceUnits: CustomStringConvertible {
+    
+    var description: String {
+        return self.rawValue
+    }
+    
+}
