@@ -1,8 +1,8 @@
 /*
- * UnitsGenerator.swift
- * guunits_generator 
+ * FunctionCreator.swift
+ * guunits_generator
  *
- * Created by Callum McColl on 15/06/2019.
+ * Created by Callum McColl on 15/6/19.
  * Copyright © 2019 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,63 +56,10 @@
  *
  */
 
-import Foundation
-
-typealias DistanceUnitsGenerator = UnitsGenerator<GradualFunctionCreator<DistanceUnits>>
-typealias TimeUnitsGenerator = UnitsGenerator<GradualFunctionCreator<TimeUnits>>
-
-struct UnitsGenerator<Creator: FunctionCreator> {
-
-    let creator: Creator
+protocol FunctionCreator {
     
-    func generate(forUnits units: [Creator.Unit]) -> String? {
-        var hashSet = Set<Creator.Unit>()
-        var unique: [Creator.Unit] = []
-        unique.reserveCapacity(units.count)
-        units.forEach {
-            if hashSet.contains($0) {
-                return
-            }
-            hashSet.insert($0)
-            unique.append($0)
-        }
-        let functions = Set<String>(unique.flatMap { self.generate(unit: $0, against: unique) })
-        let sorted = functions.sorted(by: { (lhs: String, rhs: String) -> Bool in
-            let first: String = lhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
-            let second: String = rhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
-            return first < second
-        })
-        guard let firstFunction = sorted.first else {
-            return nil
-        }
-        return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
-    }
-
-    fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit]) -> [String] {
-        return Signs.allCases.flatMap { sign in
-            allUnits.flatMap { (unit) -> [String] in
-                let differentUnits = allUnits.lazy.filter { $0 != unit }
-                let increasing = differentUnits.map { self.creator.createFunction(unit: unit, to: $0, sign: sign) }
-                let decreasing = differentUnits.map { self.creator.createFunction(unit: $0, to: unit, sign: sign) }
-                return Array(increasing) + Array(decreasing)
-            }
-        }
-    }
-
-}
-
-extension UnitsGenerator where Creator == GradualFunctionCreator<DistanceUnits> {
+    associatedtype Unit: UnitProtocol
     
-    init(unitDifference: [Creator.Unit: Int]) {
-        self.creator = GradualFunctionCreator(unitDifference: unitDifference)
-    }
-    
-}
-
-extension UnitsGenerator where Creator == GradualFunctionCreator<TimeUnits> {
-    
-    init(unitDifference: [Creator.Unit: Int]) {
-        self.creator = GradualFunctionCreator(unitDifference: unitDifference)
-    }
+    func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs) -> String
     
 }
