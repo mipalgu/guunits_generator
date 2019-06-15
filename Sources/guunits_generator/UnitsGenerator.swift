@@ -94,7 +94,8 @@ struct UnitsGenerator<Creator: FunctionCreator> {
         guard let firstFunction = sorted.first else {
             return nil
         }
-        return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
+        let gap = includeImplementation ? "\n\n" : "\n"
+        return sorted.dropFirst().reduce(firstFunction) { $0 + gap + $1 }
     }
 
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
