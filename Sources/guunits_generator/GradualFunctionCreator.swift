@@ -80,17 +80,16 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         let value = self.helpers.modify(value: difference, forSign: sign)
-        
         return increasing
-            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: value)
-            : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, withDefinition: definition, andValue: difference)
+            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: value)
+            : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
     }
     
     func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
         return """
             \(definition)
             {
-                \(self.signConverter.convert(unit: unit, from: sign, to: otherSign))
+                return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));
             }
             """
     }
@@ -103,13 +102,15 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         forUnit unit: Unit,
         to otherUnit: Unit,
         sign: Signs,
+        otherSign: Signs,
         withDefinition definition: String,
         andValue value: String
-        ) -> String {
+    ) -> String {
+        let body = sign == otherSign ? "\(unit)" : self.signConverter.convert("\(unit) / \(value)", otherUnit: otherUnit, from: sign, to: otherSign)
         return """
         \(definition)
         {
-            return ((\(otherUnit)_\(sign.rawValue)) \(unit)) / \(value);
+            return \(body);
         }
         """
     }
@@ -118,27 +119,26 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         forUnit unit: Unit,
         to otherUnit: Unit,
         sign: Signs,
+        otherSign: Signs,
         withDefinition definition: String,
         andValue value: Int
-        ) -> String {
+    ) -> String {
         guard let lastSign: Signs = Signs.allCases.last else {
             fatalError("Signs is empty.")
         }
         let lastValue = self.helpers.modify(value: value, forSign: lastSign)
+        let body: String
         if sign == lastSign {
-            return """
-            \(definition)
-            {
-                return ((\(otherUnit)_\(sign.rawValue)) \(unit)) * \(lastValue);
-            }
-            """
+            body = "\(unit) * \(lastValue)"
+        } else {
+            body = "((\(unit)_\(lastSign.rawValue)) \(unit)) * \(lastValue)"
         }
         return """
-        \(definition)
-        {
-            return (\(otherUnit)_\(sign.rawValue)) (round(((\(unit)_\(lastSign.rawValue)) \(unit)) * \(lastValue)));
-        }
-        """
+            \(definition)
+            {
+                return \(self.signConverter.convert(body, otherUnit: otherUnit, from: sign, to: otherSign));
+            }
+            """
     }
     
 }

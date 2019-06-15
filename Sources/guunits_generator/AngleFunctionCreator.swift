@@ -87,7 +87,7 @@ struct AngleFunctionCreator: FunctionCreator {
         return """
             \(definition)
             {
-                \(self.signConverter.convert(unit: unit, from: sign, to: otherSign))
+                \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign))
             }
             """
     }
