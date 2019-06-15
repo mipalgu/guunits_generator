@@ -115,14 +115,14 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
             return """
             \(definition)
             {
-            return ((\(otherUnit)_\(sign.rawValue)) \(unit)) * \(lastValue);
+                return ((\(otherUnit)_\(sign.rawValue)) \(unit)) * \(lastValue);
             }
             """
         }
         return """
         \(definition)
         {
-        return (\(otherUnit)_\(sign.rawValue)) round((\(unit)_\(lastSign.rawValue) \(unit)) * \(lastValue));
+            return (\(otherUnit)_\(sign.rawValue)) round((\(unit)_\(lastSign.rawValue) \(unit)) * \(lastValue));
         }
         """
     }
