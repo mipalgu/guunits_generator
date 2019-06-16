@@ -145,9 +145,9 @@ struct CFileCreator {
         else {
             fatalError("Unable to create C file.")
         }
-        return "// Distance Conversion Functions\n" + distances
-            + "\n\n// Time Conversion Functions\n" + times
-            + "\n\n//Angle Conversion Functions\n" + angles
+        return "// Distance Conversion Functions\n\n" + distances
+            + "\n\n// Time Conversion Functions\n\n" + times
+            + "\n\n//Angle Conversion Functions\n\n" + angles
     }
     
 }
