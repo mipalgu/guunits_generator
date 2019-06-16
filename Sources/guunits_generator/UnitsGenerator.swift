@@ -94,12 +94,11 @@ struct UnitsGenerator<Creator: FunctionCreator> {
         guard let firstFunction = sorted.first else {
             return nil
         }
-        let gap = includeImplementation ? "\n\n" : "\n"
-        return sorted.dropFirst().reduce(firstFunction) { $0 + gap + $1 }
+        return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
-        let fun = includeImplementation ? self.creator.createFunction : self.creator.createFunctionDeclaration
+        let fun = self.createFunction(for: includeImplementation ? self.creator.createFunction : self.creator.createFunctionDeclaration)
         return Signs.allCases.flatMap { sign in
             Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
                 allUnits.flatMap { (unit) -> [String] in
@@ -108,6 +107,17 @@ struct UnitsGenerator<Creator: FunctionCreator> {
                     return Array(increasing) + Array(decreasing)
                 }
             }
+        }
+    }
+    
+    fileprivate func createFunction(for fun: @escaping (Creator.Unit, Creator.Unit, Signs, Signs) -> String) -> (Creator.Unit, Creator.Unit, Signs, Signs) -> String {
+        return { (unit, otherUnit, sign, otherSign) in
+            let comment = """
+                /**
+                 * Convert \(unit)_\(sign.rawValue) to \(otherUnit)_\(otherSign.rawValue).
+                 */
+                """
+            return comment + "\n" + fun(unit, otherUnit, sign, otherSign)
         }
     }
 
