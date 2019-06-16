@@ -61,8 +61,8 @@ struct HeaderCreator {
     fileprivate var prefix: String {
         return """
             /*
-            * units.h
-            * Movement
+            * guunits.h
+            * guunits
             *
             * Created by Callum McColl on 05/06/2019.
             * Copyright © 2019 Callum McColl. All rights reserved.
@@ -118,9 +118,10 @@ struct HeaderCreator {
             *
             */
             \("\n")
-            #ifndef UNITS_H
-            #define UNITS_H
+            #ifndef GUUNITS_H
+            #define GUUNITS_H
             \("")
+            #include <math.h>
             #include <stdint.h>
             #include <limits.h>
             \("")
@@ -136,7 +137,7 @@ struct HeaderCreator {
             };
             #endif
             \("")
-            #endif  /* UNITS_H */
+            #endif  /* GUUNITS_H */
             \("")
             """
     }
