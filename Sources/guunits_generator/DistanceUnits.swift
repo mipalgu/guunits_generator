@@ -66,6 +66,17 @@ enum DistanceUnits: String {
 
 extension DistanceUnits: UnitProtocol {
     
+    var abbreviation: String {
+        switch self {
+        case .millimetres:
+            return "mm"
+        case .centimetres:
+            return "cm"
+        case .metres:
+            return "m"
+        }
+    }
+    
     var description: String {
         return self.rawValue
     }

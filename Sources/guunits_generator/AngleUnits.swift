@@ -65,6 +65,15 @@ enum AngleUnits: String {
 
 extension AngleUnits: UnitProtocol {
     
+    var abbreviation: String {
+        switch self {
+        case .degrees:
+            return "deg"
+        case .radians:
+            return "rad"
+        }
+    }
+    
     var description: String {
         return self.rawValue
     }

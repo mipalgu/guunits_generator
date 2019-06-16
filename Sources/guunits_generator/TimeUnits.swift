@@ -66,6 +66,17 @@ enum TimeUnits: String {
 
 extension TimeUnits: UnitProtocol {
     
+    var abbreviation: String {
+        switch self {
+        case .microseconds:
+            return "us"
+        case .milliseconds:
+            return "ms"
+        case .seconds:
+            return "s"
+        }
+    }
+    
     var description: String {
         return self.rawValue
     }

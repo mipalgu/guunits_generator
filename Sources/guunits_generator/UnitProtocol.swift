@@ -56,4 +56,8 @@
  *
  */
 
-protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {}
+protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
+    
+    var abbreviation: String { get }
+    
+}
