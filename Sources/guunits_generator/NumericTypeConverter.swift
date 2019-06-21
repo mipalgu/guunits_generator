@@ -67,7 +67,6 @@ struct NumericTypeConverter {
     }
     
     fileprivate func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes, currentType: String, resultType: String) -> String {
-        print("type: \(type), otherType: \(otherType)")
         if type == otherType {
             return self.cast(str, to: resultType)
         }
