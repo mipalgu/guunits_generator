@@ -1,5 +1,5 @@
 /*
- * NumericTypes.swift
+ * NumericTypeConverter.swift
  * guunits_generator
  *
  * Created by Callum McColl on 21/6/19.
@@ -56,61 +56,10 @@
  *
  */
 
-enum NumericTypes: String {
+struct NumericTypeConverter {
     
-    case int = "int", int8 = "int8_t", int16 = "int16_t", int32 = "int32_t", int64 = "int64_t"
-    case uint = "unsigned int", uint8 = "uint8_t", uint16 = "uint16_t", uint32 = "uint32_t", uint64 = "uint64_t"
-    case float = "float", double = "double"
-    
-}
-
-extension NumericTypes {
-    
-    var isSigned: Bool {
-        switch self {
-        case .int, .int8, .int16, .int32, .int64, .float, .double:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    var isFloat: Bool {
-        switch self {
-        case .float, .double:
-            return true
-        default:
-            return false
-        }
-    }
-    
-    var limits: (String, String) {
-        switch self {
-        case .int, .int32:
-            return ("INT_MIN", "INT_MAX")
-        case .int8:
-            return ("-128", "127")
-        case .int16:
-            return ("SHRT_MIN", "SHRT_MAX")
-        case .int64:
-            return ("LONG_MIN", "LONG_MAX")
-        case .uint, .uint32:
-            return ("0", "UINT_MAX")
-        case .uint8:
-            return ("0", "255")
-        case .uint16:
-            return ("0", "USHRT_MAX")
-        case .uint64:
-            return ("0", "ULONG_MAX")
-        case .float:
-            return ("FLT_MIN", "FLT_MAX")
-        case .double:
-            return ("DBL_MIN", "DBL_MAX")
-        }
+    func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+        
     }
     
 }
-
-extension NumericTypes: CaseIterable {}
-
-extension NumericTypes: Hashable {}
