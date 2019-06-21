@@ -58,25 +58,29 @@
 
 enum Signs: String {
     
-    case int = "t"
-    case uint = "u"
-    case float = "f"
-    case double = "d"
+    case t = "t"
+    case u = "u"
+    case f = "f"
+    case d = "d"
 
 }
 
 extension Signs {
     
     var type: String {
+        return self.numericType.rawValue
+    }
+    
+    var numericType: NumericTypes {
         switch self {
-        case .int:
-            return "int"
-        case .uint:
-            return "unsigned int"
-        case .float:
-            return "float"
-        case .double:
-            return "double"
+        case .t:
+            return .int
+        case .u:
+            return .uint
+        case .f:
+            return .float
+        case .d:
+            return .double
         }
     }
     

@@ -95,7 +95,7 @@ struct AngleFunctionCreator: FunctionCreator {
     }
     
     fileprivate func shouldRound(from sign: Signs, to otherSign: Signs) -> Bool {
-        return (sign == .double || sign == .float) && (otherSign != .double && otherSign != .float)
+        return (sign == .d || sign == .f) && (otherSign != .d && otherSign != .f)
     }
     
 }

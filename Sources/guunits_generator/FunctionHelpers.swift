@@ -68,7 +68,7 @@ struct FunctionHelpers<Unit: UnitProtocol> {
     }
     
     func modify(value: Int, forSign sign: Signs) -> String {
-        switch sign {
+        switch sign.numericType {
         case .float:
             return "\(value).0f"
         case .double:
