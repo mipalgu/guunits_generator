@@ -59,7 +59,38 @@
 struct NumericTypeConverter {
     
     func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
-        
+        if type == otherType {
+            return str
+        }
+        if type.isFloat && otherType.isFloat {
+            return self.cast(str, from: type, to: otherType)
+        }
+        if type.isSigned == otherType.isSigned {
+            return self.cast(self.convertSize(str, from: type, to: otherType), from: type, to: otherType)
+        }
+        let limitSign = self.convertSign(str, from: type, to: otherType)
+        let limitSize = self.convertSize(limitSign, from: type, to: otherType)
+        return self.cast(limitSize, from: type, to: otherType)
+    }
+    
+    fileprivate func cast(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+        return "((\(type.rawValue)) \(str))"
+    }
+    
+    fileprivate func convertSign(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+        let (_, max) = type.limits
+        if type.isSigned {
+            return "MAX(0, \(str))"
+        }
+        return "MIN(\(max), \(str)"
+    }
+    
+    fileprivate func convertSize(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+        if otherType.largerThan(type) {
+            return str
+        }
+        let (min, max) = otherType.limits
+        return "MIN(\(max), MAX(\(min), \(str)))"
     }
     
 }
