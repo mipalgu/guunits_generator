@@ -59,14 +59,14 @@
 struct NumericTypeConverter {
     
     func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
-        return self.convert(str, from: type, to: sign.numericType, resultType: "\(unit)_\(sign.rawValue)")
+        return self.convert(str, from: type, to: sign.numericType, currentType: type.rawValue, resultType: "\(unit)_\(sign.rawValue)")
     }
     
     func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.convert(str, from: sign.numericType, to: type, resultType: type.rawValue)
+        return self.convert(str, from: sign.numericType, to: type, currentType: "\(unit)_\(sign.rawValue)", resultType: type.rawValue)
     }
     
-    fileprivate func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes, resultType: String) -> String {
+    fileprivate func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes, currentType: String, resultType: String) -> String {
         print("type: \(type), otherType: \(otherType)")
         if type == otherType {
             return self.cast(str, to: resultType)
@@ -75,22 +75,22 @@ struct NumericTypeConverter {
             return self.cast(str, to: resultType)
         }
         if type.isFloat != otherType.isFloat {
-            var converted = self.convertFloat(str, from: type, to: otherType)
+            var converted = self.convertFloat(str, from: type, currentType: currentType, to: otherType)
             if type.isFloat {
                 converted = otherType.isSigned
                     ? converted
-                    : self.convertSign(converted, from: .int, to: otherType)
+                    : self.convertSign(converted, from: .int, currentType: currentType, to: otherType)
             } else {
                 converted = type.isSigned
                     ? converted
-                    : self.convertSign(converted, from: type, to: .int)
+                    : self.convertSign(converted, from: type, currentType: currentType, to: .int)
             }
             return self.cast(converted, to: resultType)
         }
         if type.isSigned == otherType.isSigned {
-            return self.cast(self.convertSize(str, from: type, to: otherType), to: resultType)
+            return self.cast(self.convertSize(str, from: type, currentType: currentType, to: otherType), to: resultType)
         }
-        let limitSign = self.convertSign(str, from: type, to: otherType)
+        let limitSign = self.convertSign(str, from: type, currentType: currentType, to: otherType)
         return self.cast(limitSign, to: resultType)
     }
     
@@ -98,27 +98,27 @@ struct NumericTypeConverter {
         return "((\(type)) (\(str)))"
     }
     
-    fileprivate func convertFloat(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+    fileprivate func convertFloat(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
         if type.isFloat {
-            return "round(\(type != .double ? self.cast(str, to: "double") : str))"
+            return self.cast("round(\(type != .double ? self.cast(str, to: "double") : str))", to: currentType)
         }
         return str
     }
     
-    fileprivate func convertSign(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+    fileprivate func convertSign(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
         let (_, max) = otherType.limits
         if type.isSigned {
-            return "MAX(\(self.cast("0", to: type.rawValue)), \(str))"
+            return "MAX(\(self.cast("0", to: currentType)), \(str))"
         }
-        return "MIN(\(self.cast(max, to: type.rawValue)), \(str)"
+        return "MIN(\(self.cast(max, to: currentType)), \(str))"
     }
     
-    fileprivate func convertSize(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+    fileprivate func convertSize(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
         if otherType.largerThan(type) {
             return str
         }
         let (min, max) = otherType.limits
-        return "MIN(\(self.cast(max, to: type.rawValue)), MAX(\(self.cast(min, to: type.rawValue)), \(str)))"
+        return "MIN(\(self.cast(max, to: currentType)), MAX(\(self.cast(min, to: currentType)), \(str)))"
     }
     
 }
