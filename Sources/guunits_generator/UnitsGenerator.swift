@@ -108,7 +108,8 @@ struct UnitsGenerator<Creator: FunctionCreator> {
 
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
         let signFunc = self.createSignFunction(includeImplementation: includeImplementation)
-        let numFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
+        let toNumFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
+        let fromNumFunc = self.createFromNumericFunction(includeImplementation: includeImplementation)
         return NumericTypes.allCases.flatMap { type in
             Signs.allCases.flatMap { sign in
                 Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
@@ -116,7 +117,8 @@ struct UnitsGenerator<Creator: FunctionCreator> {
                         let increasing = allUnits.map { signFunc(unit, $0, sign, otherSign) }
                         let decreasing = allUnits.map { signFunc($0, unit, sign, otherSign) }
                         var arr: [String] = []
-                        arr.append(numFunc(unit,sign, type))
+                        arr.append(toNumFunc(unit, sign, type))
+                        arr.append(fromNumFunc(type, unit, sign))
                         return Array(increasing) + Array(decreasing) + arr
                     }
                 }
@@ -152,6 +154,22 @@ struct UnitsGenerator<Creator: FunctionCreator> {
                 return comment + "\n" + definition + ";"
             }
             let body = self.numericConverter.convert("\(unit)", from: unit, sign: sign, to: type)
+            return comment + "\n" + definition + "\n{\n" + "    return " + body + ";\n}"
+        }
+    }
+    
+    fileprivate func createFromNumericFunction(includeImplementation: Bool) -> (NumericTypes, Creator.Unit, Signs) -> String {
+        return { (type, unit, sign) in
+            let comment = """
+            /**
+             * Convert \(type.rawValue) to \(unit)_\(sign.rawValue).
+             */
+            """
+            let definition = self.helpers.functionDefinition(from: type, to: unit, sign: sign)
+            if false == includeImplementation {
+                return comment + "\n" + definition + ";"
+            }
+            let body = self.numericConverter.convert("\(unit)", from: type, to: unit, sign: sign)
             return comment + "\n" + definition + "\n{\n" + "    return " + body + ";\n}"
         }
     }
