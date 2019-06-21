@@ -71,11 +71,11 @@ struct AngleFunctionCreator: FunctionCreator {
             return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign)
         }
         let implementation = self.shouldRound(from: sign, to: otherSign) ? "round(\(convert))" : convert
-        return "return ((\(otherUnit)_\(otherSign.rawValue)) (\(implementation)));"
+        return "    return ((\(otherUnit)_\(otherSign.rawValue)) (\(implementation)));"
     }
     
     func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return "return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
+        return "    return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
     }
     
     fileprivate func shouldRound(from sign: Signs, to otherSign: Signs) -> Bool {

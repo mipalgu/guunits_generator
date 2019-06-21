@@ -63,11 +63,17 @@ typealias TimeUnitsGenerator = UnitsGenerator<GradualFunctionCreator<TimeUnits>>
 typealias AngleUnitsGenerator = UnitsGenerator<AngleFunctionCreator>
 
 struct UnitsGenerator<Creator: FunctionCreator> {
-
-    fileprivate let helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
-    fileprivate let numericConverter: NumericTypeConverter = NumericTypeConverter()
     
     let creator: Creator
+    
+    fileprivate let helpers: FunctionHelpers<Creator.Unit>
+    fileprivate let numericConverter: NumericTypeConverter
+    
+    init(creator: Creator, helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: NumericTypeConverter = NumericTypeConverter()) {
+        self.creator = creator
+        self.helpers = helpers
+        self.numericConverter = numericConverter
+    }
     
     func generateDeclarations(forUnits units: [Creator.Unit]) -> String? {
         return self.generate(forUnits: units, includeImplementation: false)
@@ -102,16 +108,16 @@ struct UnitsGenerator<Creator: FunctionCreator> {
 
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
         let signFunc = self.createSignFunction(includeImplementation: includeImplementation)
-        let numFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
+        //let numFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
         return NumericTypes.allCases.flatMap { type in
             Signs.allCases.flatMap { sign in
                 Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
                     allUnits.flatMap { (unit) -> [String] in
                         let increasing = allUnits.map { signFunc(unit, $0, sign, otherSign) }
                         let decreasing = allUnits.map { signFunc($0, unit, sign, otherSign) }
-                        var arr: [String] = []
-                        arr.append(numFunc(unit,sign, type))
-                        return Array(increasing) + Array(decreasing) + arr
+                        //var arr: [String] = []
+                        //arr.append(numFunc(unit,sign, type))
+                        return Array(increasing) + Array(decreasing)// + arr
                     }
                 }
             }
@@ -155,7 +161,7 @@ struct UnitsGenerator<Creator: FunctionCreator> {
 extension UnitsGenerator where Creator == GradualFunctionCreator<DistanceUnits> {
     
     init(unitDifference: [Creator.Unit: Int]) {
-        self.creator = GradualFunctionCreator(unitDifference: unitDifference)
+        self.init(creator: GradualFunctionCreator(unitDifference: unitDifference))
     }
     
 }
@@ -163,7 +169,7 @@ extension UnitsGenerator where Creator == GradualFunctionCreator<DistanceUnits> 
 extension UnitsGenerator where Creator == GradualFunctionCreator<TimeUnits> {
     
     init(unitDifference: [Creator.Unit: Int]) {
-        self.creator = GradualFunctionCreator(unitDifference: unitDifference)
+        self.init(creator: GradualFunctionCreator(unitDifference: unitDifference))
     }
     
 }
@@ -171,8 +177,10 @@ extension UnitsGenerator where Creator == GradualFunctionCreator<TimeUnits> {
 extension UnitsGenerator where Creator == AngleFunctionCreator {
     
     
-    init(creator: AngleFunctionCreator = AngleFunctionCreator()) {
+    init(creator: AngleFunctionCreator = AngleFunctionCreator(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: NumericTypeConverter = NumericTypeConverter()) {
         self.creator = creator
+        self.helpers = helpers
+        self.numericConverter = numericConverter
     }
     
 }
