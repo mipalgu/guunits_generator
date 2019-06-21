@@ -66,6 +66,35 @@ enum NumericTypes: String {
 
 extension NumericTypes {
     
+    var abbreviation: String {
+        switch self {
+        case .int:
+            return "i"
+        case .int8:
+            return "i8"
+        case .int16:
+            return "i16"
+        case .int32:
+            return "i32"
+        case .int64:
+            return "i64"
+        case .uint:
+            return "u"
+        case .uint8:
+            return "u8"
+        case .uint16:
+            return "u16"
+        case .uint32:
+            return "u32"
+        case .uint64:
+            return "u64"
+        case .float:
+            return "f"
+        case .double:
+            return "d"
+        }
+    }
+    
     var isSigned: Bool {
         switch self {
         case .int, .int8, .int16, .int32, .int64, .float, .double:
@@ -81,6 +110,35 @@ extension NumericTypes {
             return true
         default:
             return false
+        }
+    }
+    
+    var opposite: NumericTypes {
+        switch self {
+        case .int:
+            return .uint
+        case .int8:
+            return .uint8
+        case .int16:
+            return .uint16
+        case .int32:
+            return .uint32
+        case .int64:
+            return .uint64
+        case .uint:
+            return .int
+        case .uint8:
+            return .int8
+        case .uint16:
+            return .int16
+        case .uint32:
+            return .int32
+        case .uint64:
+            return .int64
+        case .float:
+            return .float
+        case .double:
+            return .double
         }
     }
     
@@ -110,7 +168,7 @@ extension NumericTypes {
     }
     
     func smallerThan(_ other: NumericTypes) -> Bool {
-        if self.isSigned != other.isSigned || self.isFloat != other.isFloat {
+        if self.isSigned != other.isSigned {
             fatalError("Can only compare numeric types of the same sort (int with other ints, floats with other floats).")
         }
         switch self {
@@ -131,7 +189,7 @@ extension NumericTypes {
         case .uint64:
             return false
         case .float:
-            return other != .float
+            return other != .float && other != .double
         case .double:
             return false
         }

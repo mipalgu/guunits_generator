@@ -108,16 +108,16 @@ struct UnitsGenerator<Creator: FunctionCreator> {
 
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
         let signFunc = self.createSignFunction(includeImplementation: includeImplementation)
-        //let numFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
+        let numFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
         return NumericTypes.allCases.flatMap { type in
             Signs.allCases.flatMap { sign in
                 Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
                     allUnits.flatMap { (unit) -> [String] in
                         let increasing = allUnits.map { signFunc(unit, $0, sign, otherSign) }
                         let decreasing = allUnits.map { signFunc($0, unit, sign, otherSign) }
-                        //var arr: [String] = []
-                        //arr.append(numFunc(unit,sign, type))
-                        return Array(increasing) + Array(decreasing)// + arr
+                        var arr: [String] = []
+                        arr.append(numFunc(unit,sign, type))
+                        return Array(increasing) + Array(decreasing) + arr
                     }
                 }
             }
@@ -144,15 +144,15 @@ struct UnitsGenerator<Creator: FunctionCreator> {
         return { (unit, sign, type) in
             let comment = """
                 /**
-                * Convert \(unit)_\(sign.rawValue) to \(type.rawValue).
-                */
+                 * Convert \(unit)_\(sign.rawValue) to \(type.rawValue).
+                 */
                 """
             let definition = self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type)
             if false == includeImplementation {
                 return comment + "\n" + definition + ";"
             }
             let body = self.numericConverter.convert("\(unit)", from: unit, sign: sign, to: type)
-            return comment + "\n" + definition + "\n{\n" + body + "\n" + "}"
+            return comment + "\n" + definition + "\n{\n" + "    return " + body + ";\n}"
         }
     }
 

@@ -67,30 +67,50 @@ struct NumericTypeConverter {
     }
     
     fileprivate func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes, resultType: String) -> String {
+        print("type: \(type), otherType: \(otherType)")
         if type == otherType {
-            return str
+            return self.cast(str, to: resultType)
         }
         if type.isFloat && otherType.isFloat {
             return self.cast(str, to: resultType)
+        }
+        if type.isFloat != otherType.isFloat {
+            var converted = self.convertFloat(str, from: type, to: otherType)
+            if type.isFloat {
+                converted = otherType.isSigned
+                    ? converted
+                    : self.convertSign(converted, from: .int, to: otherType)
+            } else {
+                converted = type.isSigned
+                    ? converted
+                    : self.convertSign(converted, from: type, to: .int)
+            }
+            return self.cast(converted, to: resultType)
         }
         if type.isSigned == otherType.isSigned {
             return self.cast(self.convertSize(str, from: type, to: otherType), to: resultType)
         }
         let limitSign = self.convertSign(str, from: type, to: otherType)
-        let limitSize = self.convertSize(limitSign, from: type, to: otherType)
-        return self.cast(limitSize, to: resultType)
+        return self.cast(limitSign, to: resultType)
     }
     
     fileprivate func cast(_ str: String, to type: String) -> String {
-        return "((\(type)) \(str))"
+        return "((\(type)) (\(str)))"
+    }
+    
+    fileprivate func convertFloat(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+        if type.isFloat {
+            return "round(\(type != .double ? self.cast(str, to: "double") : str))"
+        }
+        return str
     }
     
     fileprivate func convertSign(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
-        let (_, max) = type.limits
+        let (_, max) = otherType.limits
         if type.isSigned {
-            return "MAX(0, \(str))"
+            return "MAX(\(self.cast("0", to: type.rawValue)), \(str))"
         }
-        return "MIN(\(max), \(str)"
+        return "MIN(\(self.cast(max, to: type.rawValue)), \(str)"
     }
     
     fileprivate func convertSize(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
@@ -98,7 +118,7 @@ struct NumericTypeConverter {
             return str
         }
         let (min, max) = otherType.limits
-        return "MIN(\(max), MAX(\(min), \(str)))"
+        return "MIN(\(self.cast(max, to: type.rawValue)), MAX(\(self.cast(min, to: type.rawValue)), \(str)))"
     }
     
 }
