@@ -67,6 +67,15 @@ struct FunctionHelpers<Unit: UnitProtocol> {
         return "\(otherUnit)_\(otherSign.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit))"
     }
     
+    func functionName(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        return "\(unit.abbreviation)_\(sign.rawValue)_to_\(type.rawValue)"
+    }
+    
+    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        let functionName = self.functionName(forUnit: unit, sign: sign, to: type)
+        return "\(type.rawValue) \(functionName)(\(unit)_\(sign.rawValue) \(unit))"
+    }
+    
     func modify(value: Int, forSign sign: Signs) -> String {
         switch sign.numericType {
         case .float:

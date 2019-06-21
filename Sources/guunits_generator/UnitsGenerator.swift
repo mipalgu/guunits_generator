@@ -64,6 +64,9 @@ typealias AngleUnitsGenerator = UnitsGenerator<AngleFunctionCreator>
 
 struct UnitsGenerator<Creator: FunctionCreator> {
 
+    fileprivate let helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    fileprivate let numericConverter: NumericTypeConverter = NumericTypeConverter()
+    
     let creator: Creator
     
     func generateDeclarations(forUnits units: [Creator.Unit]) -> String? {
@@ -98,26 +101,52 @@ struct UnitsGenerator<Creator: FunctionCreator> {
     }
 
     fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
-        let fun = self.createFunction(for: includeImplementation ? self.creator.createFunction : self.creator.createFunctionDeclaration)
-        return Signs.allCases.flatMap { sign in
-            Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
-                allUnits.flatMap { (unit) -> [String] in
-                    let increasing = allUnits.map { fun(unit, $0, sign, otherSign) }
-                    let decreasing = allUnits.map { fun($0, unit, sign, otherSign) }
-                    return Array(increasing) + Array(decreasing)
+        let signFunc = self.createSignFunction(includeImplementation: includeImplementation)
+        let numFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
+        return NumericTypes.allCases.flatMap { type in
+            Signs.allCases.flatMap { sign in
+                Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
+                    allUnits.flatMap { (unit) -> [String] in
+                        let increasing = allUnits.map { signFunc(unit, $0, sign, otherSign) }
+                        let decreasing = allUnits.map { signFunc($0, unit, sign, otherSign) }
+                        var arr: [String] = []
+                        arr.append(numFunc(unit,sign, type))
+                        return Array(increasing) + Array(decreasing) + arr
+                    }
                 }
             }
         }
     }
     
-    fileprivate func createFunction(for fun: @escaping (Creator.Unit, Creator.Unit, Signs, Signs) -> String) -> (Creator.Unit, Creator.Unit, Signs, Signs) -> String {
+    fileprivate func createSignFunction(includeImplementation: Bool) -> (Creator.Unit, Creator.Unit, Signs, Signs) -> String {
         return { (unit, otherUnit, sign, otherSign) in
             let comment = """
                 /**
                  * Convert \(unit)_\(sign.rawValue) to \(otherUnit)_\(otherSign.rawValue).
                  */
                 """
-            return comment + "\n" + fun(unit, otherUnit, sign, otherSign)
+            let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+            if false == includeImplementation {
+                return comment + "\n" + definition + ";"
+            }
+            let body = self.creator.createFunction(unit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+            return comment + "\n" + definition + "\n{\n" + body + "\n" + "}"
+        }
+    }
+    
+    fileprivate func createToNumericFunction(includeImplementation: Bool) -> (Creator.Unit, Signs, NumericTypes) -> String {
+        return { (unit, sign, type) in
+            let comment = """
+                /**
+                * Convert \(unit)_\(sign.rawValue) to \(type.rawValue).
+                */
+                """
+            let definition = self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type)
+            if false == includeImplementation {
+                return comment + "\n" + definition + ";"
+            }
+            let body = self.numericConverter.convert("\(unit)", from: unit, sign: sign, to: type)
+            return comment + "\n" + definition + "\n{\n" + body + "\n" + "}"
         }
     }
 

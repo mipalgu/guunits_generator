@@ -85,16 +85,7 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
     }
     
     func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
-        return """
-            \(definition)
-            {
-                return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));
-            }
-            """
-    }
-    
-    func createFunctionDeclaration(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign) + ";"
+        return "return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
     }
     
     fileprivate func increasingFunc(
@@ -111,12 +102,7 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
         let lastValue = self.helpers.modify(value: value, forSign: lastSign)
         let calculate: String = self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: lastSign) + " / \(lastValue)"
         let body = self.signConverter.convert(calculate, otherUnit: otherUnit, from: lastSign, to: otherSign)
-        return """
-        \(definition)
-        {
-            return \(body);
-        }
-        """
+        return "return \(body);"
     }
     
     fileprivate func decreasingFunc(
@@ -129,12 +115,7 @@ struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.Al
     ) -> String {
         let value = self.helpers.modify(value: difference, forSign: sign)
         let body = self.signConverter.convert("\(unit) * \(value)", otherUnit: otherUnit, from: sign, to: otherSign)
-        return """
-            \(definition)
-            {
-                return \(body);
-            }
-            """
+        return "return \(body);"
     }
     
 }

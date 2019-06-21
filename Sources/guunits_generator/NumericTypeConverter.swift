@@ -58,23 +58,31 @@
 
 struct NumericTypeConverter {
     
-    func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
+    func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+        return self.convert(str, from: type, to: sign.numericType, resultType: "\(unit)_\(sign.rawValue)")
+    }
+    
+    func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.convert(str, from: sign.numericType, to: type, resultType: type.rawValue)
+    }
+    
+    fileprivate func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes, resultType: String) -> String {
         if type == otherType {
             return str
         }
         if type.isFloat && otherType.isFloat {
-            return self.cast(str, from: type, to: otherType)
+            return self.cast(str, to: resultType)
         }
         if type.isSigned == otherType.isSigned {
-            return self.cast(self.convertSize(str, from: type, to: otherType), from: type, to: otherType)
+            return self.cast(self.convertSize(str, from: type, to: otherType), to: resultType)
         }
         let limitSign = self.convertSign(str, from: type, to: otherType)
         let limitSize = self.convertSize(limitSign, from: type, to: otherType)
-        return self.cast(limitSize, from: type, to: otherType)
+        return self.cast(limitSize, to: resultType)
     }
     
-    fileprivate func cast(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {
-        return "((\(type.rawValue)) \(str))"
+    fileprivate func cast(_ str: String, to type: String) -> String {
+        return "((\(type)) \(str))"
     }
     
     fileprivate func convertSign(_ str: String, from type: NumericTypes, to otherType: NumericTypes) -> String {

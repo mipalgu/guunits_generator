@@ -58,11 +58,9 @@
 
 struct AngleFunctionCreator: FunctionCreator {
     
-    fileprivate let helpers = FunctionHelpers<AngleUnits>()
     fileprivate let signConverter: SignConverter = SignConverter()
     
     func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         let convert: String
         switch (unit, otherUnit) {
         case (.degrees, .radians):
@@ -70,28 +68,14 @@ struct AngleFunctionCreator: FunctionCreator {
         case (.radians, .degrees):
             convert = "180.0 / M_PI * ((double) \(unit))"
         default:
-            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign, withDefinition: definition)
+            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign)
         }
         let implementation = self.shouldRound(from: sign, to: otherSign) ? "round(\(convert))" : convert
-        return """
-            \(definition)
-            {
-                return ((\(otherUnit)_\(otherSign.rawValue)) (\(implementation)));
-            }
-            """
+        return "return ((\(otherUnit)_\(otherSign.rawValue)) (\(implementation)));"
     }
     
-    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
-        return """
-            \(definition)
-            {
-                return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));
-            }
-            """
-    }
-    
-    func createFunctionDeclaration(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign) + ";"
+    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs) -> String {
+        return "return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
     }
     
     fileprivate func shouldRound(from sign: Signs, to otherSign: Signs) -> Bool {

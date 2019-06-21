@@ -61,6 +61,5 @@ protocol FunctionCreator {
     associatedtype Unit: UnitProtocol
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String
-    func createFunctionDeclaration(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String
     
 }
