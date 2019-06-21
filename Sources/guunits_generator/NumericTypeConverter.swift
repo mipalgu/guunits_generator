@@ -110,6 +110,9 @@ struct NumericTypeConverter {
         if type.isSigned {
             return "MAX(\(self.cast("0", to: currentType)), \(str))"
         }
+        if otherType.opposite.largerThan(type) {
+            return str
+        }
         return "MIN(\(self.cast(max, to: currentType)), \(str))"
     }
     
