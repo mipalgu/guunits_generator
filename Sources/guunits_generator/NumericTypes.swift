@@ -109,6 +109,38 @@ extension NumericTypes {
         }
     }
     
+    func smallerThan(_ other: NumericTypes) -> Bool {
+        if self.isSigned != other.isSigned || self.isFloat != other.isFloat {
+            fatalError("Can only compare numeric types of the same sort (int with other ints, floats with other floats).")
+        }
+        switch self {
+        case .int8:
+            return other != .int8
+        case .int16:
+            return other != .int8 && other != .int16
+        case .int32, .int:
+            return other != .int8 && other != .int16 && other != .int32 && other != .int
+        case .int64:
+            return false
+        case .uint8:
+            return true
+        case .uint16:
+            return other != .uint8
+        case .uint32, .uint:
+            return other != .uint8 && other != .uint16 && other != .uint32 && other != .uint
+        case .uint64:
+            return false
+        case .float:
+            return other != .float
+        case .double:
+            return false
+        }
+    }
+        
+    func largerThan(_ other: NumericTypes) -> Bool {
+        return other.smallerThan(self)
+    }
+    
 }
 
 extension NumericTypes: CaseIterable {}
