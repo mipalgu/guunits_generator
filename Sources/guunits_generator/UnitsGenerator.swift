@@ -112,10 +112,10 @@ struct UnitsGenerator<Creator: FunctionCreator> {
         let fromNumFunc = self.createFromNumericFunction(includeImplementation: includeImplementation)
         return NumericTypes.allCases.flatMap { type in
             Signs.allCases.flatMap { sign in
-                Signs.allCases.filter { $0 != sign}.flatMap { otherSign in
+                Signs.allCases.flatMap { otherSign in
                     allUnits.flatMap { (unit) -> [String] in
-                        let increasing = allUnits.map { signFunc(unit, $0, sign, otherSign) }
-                        let decreasing = allUnits.map { signFunc($0, unit, sign, otherSign) }
+                        let increasing = allUnits.compactMap { signFunc(unit, $0, sign, otherSign) }
+                        let decreasing = allUnits.compactMap { signFunc($0, unit, sign, otherSign) }
                         var arr: [String] = []
                         arr.append(toNumFunc(unit, sign, type))
                         arr.append(fromNumFunc(type, unit, sign))
@@ -126,8 +126,11 @@ struct UnitsGenerator<Creator: FunctionCreator> {
         }
     }
     
-    fileprivate func createSignFunction(includeImplementation: Bool) -> (Creator.Unit, Creator.Unit, Signs, Signs) -> String {
+    fileprivate func createSignFunction(includeImplementation: Bool) -> (Creator.Unit, Creator.Unit, Signs, Signs) -> String? {
         return { (unit, otherUnit, sign, otherSign) in
+            if unit == otherUnit && sign == otherSign {
+                return nil
+            }
             let comment = """
                 /**
                  * Convert \(unit)_\(sign.rawValue) to \(otherUnit)_\(otherSign.rawValue).
