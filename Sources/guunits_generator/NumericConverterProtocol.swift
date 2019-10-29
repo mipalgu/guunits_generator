@@ -1,5 +1,5 @@
 /*
- * NumericConverter.swift
+ * NumericConverterProtocol.swift
  * guunits_generator
  *
  * Created by Callum McColl on 29/10/19.
@@ -56,7 +56,7 @@
  *
  */
 
-protocol NumericConverter {
+protocol NumericConverterProtocol {
     
     func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
     

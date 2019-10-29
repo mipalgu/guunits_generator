@@ -57,4 +57,10 @@
  *
  */
 
-protocol FunctionCreator: FunctionDefinitionCreator, FunctionBodyCreator {}
+protocol FunctionCreator: FunctionDefinitionCreator, FunctionBodyCreator {
+    
+    func convert(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
+    
+    func convert(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String
+    
+}

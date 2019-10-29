@@ -56,18 +56,18 @@
  *
  */
 
-struct DelegatingNumericConverter<Unit: UnitProtocol>: NumericConverter {
+struct DelegatingNumericConverter: NumericConverterProtocol {
     
     func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
         let helpers: FunctionHelpers<Unit> = FunctionHelpers()
         let cFunction = helpers.functionName(from: type, to: unit, sign: sign)
-        return cFunction + "(\(str));"
+        return cFunction + "(\(str))"
     }
     
     func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
         let helpers: FunctionHelpers<Unit> = FunctionHelpers()
         let cFunction = helpers.functionName(forUnit: unit, sign: sign, to: type)
-        return cFunction + "(\(str));"
+        return cFunction + "(\(str))"
     }
     
 }

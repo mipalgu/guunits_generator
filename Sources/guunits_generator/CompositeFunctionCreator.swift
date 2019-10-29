@@ -58,17 +58,29 @@
 
 struct CompositeFunctionCreator<
     BodyCreator: FunctionBodyCreator,
-    DefinitionCreator: FunctionDefinitionCreator
+    DefinitionCreator: FunctionDefinitionCreator,
+    NumericConverter: NumericConverterProtocol
 >: FunctionCreator where BodyCreator.Unit == DefinitionCreator.Unit {
+    
     
     typealias Unit = DefinitionCreator.Unit
     
     var bodyCreator: BodyCreator
     var definitionCreator: DefinitionCreator
+    var numericConverter: NumericConverter
     
-    init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator) {
+    init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator, numericConverter: NumericConverter) {
         self.bodyCreator = bodyCreator
         self.definitionCreator = definitionCreator
+        self.numericConverter = numericConverter
+    }
+    
+    func convert(_ str: String, from type: NumericTypes, to unit: DefinitionCreator.Unit, sign: Signs) -> String {
+        return self.numericConverter.convert(str, from: type, to: unit, sign: sign)
+    }
+    
+    func convert(_ str: String, from unit: DefinitionCreator.Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.numericConverter.convert(str, from: unit, sign: sign, to: type)
     }
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
