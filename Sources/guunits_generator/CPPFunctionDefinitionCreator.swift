@@ -64,4 +64,12 @@ struct CPPFunctionDefinitionCreator<Unit: UnitProtocol>: FunctionDefinitionCreat
         return self.helpers.functionDefinition(forUnit: unit, to: otherUnit)
     }
     
+    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.helpers.functionDefinition(forUnit: unit, to: type)
+    }
+    
+    func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+        return self.helpers.functionDefinition(from: type, to: unit)
+    }
+    
 }

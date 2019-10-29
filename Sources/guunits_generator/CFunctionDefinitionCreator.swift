@@ -64,4 +64,12 @@ struct CFunctionDefinitionCreator<Unit: UnitProtocol>: FunctionDefinitionCreator
         return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
     }
     
+    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type)
+    }
+    
+    func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+        return self.helpers.functionDefinition(from: type, to: unit, sign: sign)
+    }
+    
 }

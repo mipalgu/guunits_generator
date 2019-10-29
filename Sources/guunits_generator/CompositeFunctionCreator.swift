@@ -61,7 +61,7 @@ struct CompositeFunctionCreator<
     DefinitionCreator: FunctionDefinitionCreator
 >: FunctionCreator where BodyCreator.Unit == DefinitionCreator.Unit {
     
-    typealias Unit = BodyCreator.Unit
+    typealias Unit = DefinitionCreator.Unit
     
     var bodyCreator: BodyCreator
     var definitionCreator: DefinitionCreator
@@ -72,16 +72,28 @@ struct CompositeFunctionCreator<
     }
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.bodyCreator.createFunction(unit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+        return self.bodyCreator.createFunction(
+            unit: unit as! BodyCreator.Unit,
+            to: otherUnit as! BodyCreator.Unit,
+            sign: sign, otherSign: otherSign
+        )
     }
     
     func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         return self.definitionCreator.functionDefinition(
-            forUnit: unit as! DefinitionCreator.Unit,
-            to: otherUnit as! DefinitionCreator.Unit,
+            forUnit: unit,
+            to: otherUnit,
             sign: sign,
             otherSign: otherSign
         )
+    }
+    
+    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.definitionCreator.functionDefinition(forUnit: unit, sign: sign, to: type)
+    }
+    
+    func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+        return self.definitionCreator.functionDefinition(from: type, to: unit, sign: sign)
     }
     
 }

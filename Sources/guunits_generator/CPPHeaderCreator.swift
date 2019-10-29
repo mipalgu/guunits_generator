@@ -133,12 +133,12 @@ struct CPPHeaderCreator {
     }
     
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
+    func generate(distanceGenerator: CPPDistanceUnitsGenerator, timeGenerator: CPPTimeUnitsGenerator, angleGenerator: CPPAngleUnitsGenerator) -> String {
         let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator)
         return self.prefix + "\n\n" + content + "\n\n" + self.suffix
     }
     
-    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
+    fileprivate func createContent(distanceGenerator: CPPDistanceUnitsGenerator, timeGenerator: CPPTimeUnitsGenerator, angleGenerator: CPPAngleUnitsGenerator) -> String {
         guard
             let distances = distanceGenerator.generateDeclarations(forUnits: DistanceUnits.allCases),
             let times = timeGenerator.generateDeclarations(forUnits: TimeUnits.allCases),

@@ -140,7 +140,7 @@ struct UnitsGenerator<Creator: FunctionCreator> {
                  * Convert \(unit)_\(sign.rawValue) to \(otherUnit)_\(otherSign.rawValue).
                  */
                 """
-            let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+            let definition = self.creator.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
             if false == includeImplementation {
                 return comment + "\n" + definition + ";"
             }
@@ -156,7 +156,7 @@ struct UnitsGenerator<Creator: FunctionCreator> {
                  * Convert \(unit)_\(sign.rawValue) to \(type.rawValue).
                  */
                 """
-            let definition = self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type)
+            let definition = self.creator.functionDefinition(forUnit: unit, sign: sign, to: type)
             if false == includeImplementation {
                 return comment + "\n" + definition + ";"
             }
@@ -172,7 +172,7 @@ struct UnitsGenerator<Creator: FunctionCreator> {
              * Convert \(type.rawValue) to \(unit)_\(sign.rawValue).
              */
             """
-            let definition = self.helpers.functionDefinition(from: type, to: unit, sign: sign)
+            let definition = self.creator.functionDefinition(from: type, to: unit, sign: sign)
             if false == includeImplementation {
                 return comment + "\n" + definition + ";"
             }

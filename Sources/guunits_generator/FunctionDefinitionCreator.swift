@@ -62,4 +62,8 @@ protocol FunctionDefinitionCreator {
     
     func functionDefinition(forUnit: Unit, to: Unit, sign: Signs, otherSign: Signs) -> String
     
+    func functionDefinition(forUnit: Unit, sign: Signs, to: NumericTypes) -> String
+    
+    func functionDefinition(from: NumericTypes, to: Unit, sign: Signs) -> String
+    
 }
