@@ -58,64 +58,11 @@
 
 struct DelegatingFunctionCreator<Unit: UnitProtocol>: FunctionCreator where Unit.AllCases.Index == Int {
     
-    fileprivate(set) var unitDifference: [Unit: Int]
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
-    fileprivate let signConverter: SignConverter = SignConverter()
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        let allCases = Unit.allCases
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
-        if unit == otherUnit {
-            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign, withDefinition: definition)
-        }
-        guard
-            let unitIndex = allCases.firstIndex(where: { $0 == unit }),
-            let otherUnitIndex = allCases.firstIndex(where: { $0 == otherUnit })
-            else {
-                fatalError("Unable to fetch index of \(unit) or \(otherUnit)")
-        }
-        let increasing = unitIndex < otherUnitIndex
-        let smallest = increasing ? unitIndex : otherUnitIndex
-        let biggest = increasing ? otherUnitIndex : unitIndex
-        let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
-        let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
-        return increasing
-            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
-            : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
-    }
-    
-    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
-        return "    return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
-    }
-    
-    fileprivate func increasingFunc(
-        forUnit unit: Unit,
-        to otherUnit: Unit,
-        sign: Signs,
-        otherSign: Signs,
-        withDefinition definition: String,
-        andValue value: Int
-    ) -> String {
-        guard let lastSign: Signs = Signs.allCases.last else {
-            fatalError("Signs is empty.")
-        }
-        let lastValue = self.helpers.modify(value: value, forSign: lastSign)
-        let calculate: String = self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: lastSign) + " / \(lastValue)"
-        let body = self.signConverter.convert(calculate, otherUnit: otherUnit, from: lastSign, to: otherSign)
-        return "    return \(body);"
-    }
-    
-    fileprivate func decreasingFunc(
-        forUnit unit: Unit,
-        to otherUnit: Unit,
-        sign: Signs,
-        otherSign: Signs,
-        withDefinition definition: String,
-        andValue difference: Int
-    ) -> String {
-        let value = self.helpers.modify(value: difference, forSign: sign)
-        let body = self.signConverter.convert("\(unit) * \(value)", otherUnit: otherUnit, from: sign, to: otherSign)
-        return "    return \(body);"
+        let cDefinition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+        return "    return \(cDefinition)(\(unit), \(otherUnit));"
     }
     
 }
