@@ -11,9 +11,13 @@ let timeGenerator = TimeUnitsGenerator(unitDifference: [
 let angleGenerator = AngleUnitsGenerator()
 
 // C++ Variants
-let cppDistanceGenerator = CPPDistanceUnitsGenerator()
-let cppTimeGenerator = CPPTimeUnitsGenerator()
-let cppAngleGenerator = CPPAngleUnitsGenerator()
+let cppHeaderDistanceGenerator = CPPDistanceUnitsGenerator()
+let cppHeaderTimeGenerator = CPPTimeUnitsGenerator()
+let cppHeaderAngleGenerator = CPPAngleUnitsGenerator()
+
+let cppDistanceGenerator = CPPDistanceUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
+let cppTimeGenerator = CPPTimeUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
+let cppAngleGenerator = CPPAngleUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
 
 do {
     try HeaderCreator().generate(
@@ -35,9 +39,9 @@ do {
             encoding: .utf8
         )
     try CPPHeaderCreator().generate(
-        distanceGenerator: cppDistanceGenerator,
-        timeGenerator: cppTimeGenerator,
-        angleGenerator: cppAngleGenerator
+        distanceGenerator: cppHeaderDistanceGenerator,
+        timeGenerator: cppHeaderTimeGenerator,
+        angleGenerator: cppHeaderAngleGenerator
     ).write(
         to: URL(fileURLWithPath: "guunits.hpp", isDirectory: false),
         atomically: false,
@@ -48,7 +52,7 @@ do {
         timeGenerator: cppTimeGenerator,
         angleGenerator: cppAngleGenerator
     ).write(
-        to: URL(fileURLWithPath: "guunits.cc", isDirectory: false),
+        to: URL(fileURLWithPath: "guunits_cpp.cc", isDirectory: false),
         atomically: false,
         encoding: .utf8
     )

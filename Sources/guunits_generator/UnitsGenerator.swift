@@ -231,7 +231,7 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
 
 extension UnitsGenerator where Creator == CompositeFunctionCreator<AngleFunctionCreator, CFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter> {
     
-    init(bodyCreator: AngleFunctionCreator = AngleFunctionCreator(), definitionCreator: CFunctionDefinitionCreator<AngleUnits> = CFunctionDefinitionCreator(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: NumericTypeConverter = NumericTypeConverter()) {
+    init(bodyCreator: AngleFunctionCreator = AngleFunctionCreator(), definitionCreator: CFunctionDefinitionCreator<AngleUnits> = CFunctionDefinitionCreator(), numericConverter: NumericTypeConverter = NumericTypeConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
@@ -243,7 +243,7 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<AngleFunction
 
 extension UnitsGenerator where Creator == CompositeFunctionCreator<AngleFunctionCreator, CPPFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter> {
     
-    init(bodyCreator: AngleFunctionCreator = AngleFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: NumericTypeConverter = NumericTypeConverter()) {
+    init(bodyCreator: AngleFunctionCreator = AngleFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(), numericConverter: NumericTypeConverter = NumericTypeConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
@@ -255,7 +255,7 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<AngleFunction
 
 extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>, CPPFunctionDefinitionCreator<DistanceUnits>, DelegatingNumericConverter> {
     
-    init(bodyCreator: DelegatingFunctionCreator<DistanceUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<DistanceUnits> = CPPFunctionDefinitionCreator(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter()) {
+    init(bodyCreator: DelegatingFunctionCreator<DistanceUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<DistanceUnits> = CPPFunctionDefinitionCreator(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
@@ -267,7 +267,7 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFun
 
 extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>, CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter> {
     
-    init(bodyCreator: DelegatingFunctionCreator<TimeUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<TimeUnits> = CPPFunctionDefinitionCreator(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter()) {
+    init(bodyCreator: DelegatingFunctionCreator<TimeUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<TimeUnits> = CPPFunctionDefinitionCreator(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
@@ -279,7 +279,7 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFun
 
 extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFunctionCreator<AngleUnits>, CPPFunctionDefinitionCreator<AngleUnits>, DelegatingNumericConverter> {
     
-    init(bodyCreator: DelegatingFunctionCreator<AngleUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter()) {
+    init(bodyCreator: DelegatingFunctionCreator<AngleUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,

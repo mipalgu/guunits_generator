@@ -59,17 +59,22 @@
 struct CPPFunctionDefinitionCreator<Unit: UnitProtocol>: FunctionDefinitionCreator {
 
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+    let namespace: String?
+    
+    init(namespace: String? = nil) {
+        self.namespace = namespace
+    }
 
     func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: false)
+        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: false, namespace: self.namespace)
     }
     
     func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type, unique: false)
+        return self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type, unique: false, namespace: self.namespace)
     }
     
     func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
-        return self.helpers.functionDefinition(from: type, to: unit, sign: sign, unique: false)
+        return self.helpers.functionDefinition(from: type, to: unit, sign: sign, unique: false, namespace: self.namespace)
     }
     
 }

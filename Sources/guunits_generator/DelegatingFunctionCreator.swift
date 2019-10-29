@@ -62,7 +62,7 @@ struct DelegatingFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where 
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let cDefinition = self.helpers.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
-        return "    return \(cDefinition)(\(unit));"
+        return "    return ::\(cDefinition)(\(unit));"
     }
     
 }

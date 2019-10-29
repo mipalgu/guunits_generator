@@ -122,11 +122,14 @@ struct CPPHeaderCreator {
             #define GUUNITS_HPP
             \("")
             #include "guunits.h"
+            \("")
+            namespace GU {
             """
     }
     
     fileprivate var suffix: String {
         return """
+            };      /* Namespace GU */
             #endif  /* GUUNITS_HPP */
             \("")
             """
