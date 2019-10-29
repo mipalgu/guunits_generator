@@ -56,7 +56,7 @@
  *
  */
 
-struct NumericTypeConverter {
+struct NumericTypeConverter: NumericConverter {
     
     func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
         return self.convert(str, from: type, to: sign.numericType, currentType: type.rawValue, resultType: "\(unit)_\(sign.rawValue)")
