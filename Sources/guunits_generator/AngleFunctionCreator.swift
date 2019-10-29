@@ -56,7 +56,7 @@
  *
  */
 
-struct AngleFunctionCreator: FunctionCreator {
+struct AngleFunctionCreator: FunctionBodyCreator {
     
     fileprivate let signConverter: SignConverter = SignConverter()
     

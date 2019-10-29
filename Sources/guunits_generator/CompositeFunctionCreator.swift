@@ -1,5 +1,5 @@
 /*
- * DelegatingFunctionCreator.swift
+ * CompositeFunctionCreator.swift
  * guunits_generator
  *
  * Created by Callum McColl on 29/10/19.
@@ -56,13 +56,32 @@
  *
  */
 
-struct DelegatingFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where Unit.AllCases.Index == Int {
+struct CompositeFunctionCreator<
+    BodyCreator: FunctionBodyCreator,
+    DefinitionCreator: FunctionDefinitionCreator
+>: FunctionCreator where BodyCreator.Unit == DefinitionCreator.Unit {
     
-    fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+    typealias Unit = BodyCreator.Unit
+    
+    var bodyCreator: BodyCreator
+    var definitionCreator: DefinitionCreator
+    
+    init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator) {
+        self.bodyCreator = bodyCreator
+        self.definitionCreator = definitionCreator
+    }
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        let cDefinition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
-        return "    return \(cDefinition)(\(unit), \(otherUnit));"
+        return self.bodyCreator.createFunction(unit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+    }
+    
+    func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+        return self.definitionCreator.functionDefinition(
+            forUnit: unit as! DefinitionCreator.Unit,
+            to: otherUnit as! DefinitionCreator.Unit,
+            sign: sign,
+            otherSign: otherSign
+        )
     }
     
 }
