@@ -61,7 +61,7 @@ struct CPPFileCreator {
     fileprivate var prefix: String {
         return """
             /*
-            * guunits.cpp
+            * guunits.cc
             * guunits
             *
             * Created by Callum McColl on 05/06/2019.

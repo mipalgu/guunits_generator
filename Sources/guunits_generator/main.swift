@@ -48,7 +48,7 @@ do {
         timeGenerator: cppTimeGenerator,
         angleGenerator: cppAngleGenerator
     ).write(
-        to: URL(fileURLWithPath: "guunits.cpp", isDirectory: false),
+        to: URL(fileURLWithPath: "guunits.cc", isDirectory: false),
         atomically: false,
         encoding: .utf8
     )
