@@ -43,6 +43,15 @@ do {
         atomically: false,
         encoding: .utf8
     )
+    try CPPFileCreator().generate(
+        distanceGenerator: cppDistanceGenerator,
+        timeGenerator: cppTimeGenerator,
+        angleGenerator: cppAngleGenerator
+    ).write(
+        to: URL(fileURLWithPath: "guunits.cpp", isDirectory: false),
+        atomically: false,
+        encoding: .utf8
+    )
 } catch (let e) {
     fatalError("\(e)")
 }

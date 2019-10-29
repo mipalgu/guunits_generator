@@ -61,8 +61,8 @@ struct DelegatingFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where 
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
     
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        let cDefinition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
-        return "    return \(cDefinition)(\(unit), \(otherUnit));"
+        let cDefinition = self.helpers.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+        return "    return \(cDefinition)(\(unit));"
     }
     
 }
