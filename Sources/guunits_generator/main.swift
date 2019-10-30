@@ -38,7 +38,7 @@ do {
             atomically: false,
             encoding: .utf8
         )
-    try CPPHeaderCreator().generate(
+    /*try CPPHeaderCreator().generate(
         distanceGenerator: cppHeaderDistanceGenerator,
         timeGenerator: cppHeaderTimeGenerator,
         angleGenerator: cppHeaderAngleGenerator
@@ -55,7 +55,7 @@ do {
         to: URL(fileURLWithPath: "guunits_cpp.cc", isDirectory: false),
         atomically: false,
         encoding: .utf8
-    )
+    )*/
 } catch (let e) {
     fatalError("\(e)")
 }
