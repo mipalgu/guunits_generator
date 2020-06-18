@@ -146,7 +146,8 @@ struct HeaderCreator {
             ("// Distance Units.", Array(DistanceUnits.allCases)),
             ("// Time Units.", Array(TimeUnits.allCases)),
             ("// Angle Units.", Array(AngleUnits.allCases)),
-            ("// Image Units.", Array(ImageUnits.allCases))
+            ("// Image Units.", Array(ImageUnits.allCases)),
+            ("// Percent Units.", Array(PercentUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { (comment, units) in
@@ -161,17 +162,18 @@ struct HeaderCreator {
     }
     
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
-        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator)
+    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
+        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator, percentGenerator: percentGenerator)
         return self.prefix + "\n" + self.typeDefs + "\n\n" + content + "\n\n" + self.suffix
     }
     
-    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
+    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
         guard
             let distances = distanceGenerator.generateDeclarations(forUnits: DistanceUnits.allCases),
             let times = timeGenerator.generateDeclarations(forUnits: TimeUnits.allCases),
             let angles = angleGenerator.generateDeclarations(forUnits: AngleUnits.allCases),
-            let images = imageGenerator.generateDeclarations(forUnits: ImageUnits.allCases)
+            let images = imageGenerator.generateDeclarations(forUnits: ImageUnits.allCases),
+            let percentages = percentGenerator.generateDeclarations(forUnits: PercentUnits.allCases)
         else {
             fatalError("Unable to create header.")
         }
@@ -179,6 +181,7 @@ struct HeaderCreator {
             + "\n\n// Time Conversion Functions\n\n" + times
             + "\n\n// Angle Conversion Functions\n\n" + angles
             + "\n\n// Image Conversion Functions\n\n" + images
+            + "\n\n// Percent Conversion Functions\n\n" + percentages
     }
     
 }

@@ -10,6 +10,7 @@ let timeGenerator = TimeUnitsGenerator(unitDifference: [
 ])
 let angleGenerator = AngleUnitsGenerator()
 let imageGenerator = ImageUnitsGenerator(unitDifference: [:])
+let percentGenerator = PercentUnitGenerator(unitDifference: [:])
 
 // C++ Variants
 let cppHeaderDistanceGenerator = CPPDistanceUnitsGenerator()
@@ -25,7 +26,8 @@ do {
             distanceGenerator: distanceGenerator,
             timeGenerator: timeGenerator,
             angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator
+            imageGenerator: imageGenerator,
+            percentGenerator: percentGenerator
         ).write(
             to: URL(fileURLWithPath: "guunits.h", isDirectory: false),
             atomically: false,
@@ -35,7 +37,8 @@ do {
             distanceGenerator: distanceGenerator,
             timeGenerator: timeGenerator,
             angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator
+            imageGenerator: imageGenerator,
+            percentGenerator: percentGenerator
         ).write(
             to: URL(fileURLWithPath: "guunits.c", isDirectory: false),
             atomically: false,

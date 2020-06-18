@@ -133,17 +133,18 @@ struct CFileCreator {
         return ""
     }
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
-        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator)
+    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
+        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator, percentGenerator: percentGenerator)
         return self.prefix + "\n\n" + content + "\n\n" + self.suffix
     }
     
-    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
+    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
         guard
             let distances = distanceGenerator.generateImplementations(forUnits: DistanceUnits.allCases),
             let times = timeGenerator.generateImplementations(forUnits: TimeUnits.allCases),
             let angles = angleGenerator.generateImplementations(forUnits: AngleUnits.allCases),
-            let images = imageGenerator.generateImplementations(forUnits: ImageUnits.allCases)
+            let images = imageGenerator.generateImplementations(forUnits: ImageUnits.allCases),
+            let percentages = percentGenerator.generateImplementations(forUnits: PercentUnits.allCases)
         else {
             fatalError("Unable to create C file.")
         }
@@ -151,6 +152,7 @@ struct CFileCreator {
             + "\n\n// Time Conversion Functions\n\n" + times
             + "\n\n// Angle Conversion Functions\n\n" + angles
             + "\n\n// Image Conversion Functions\n\n" + images
+            + "\n\n// Percent Conversion Functions\n\n" + percentages
     }
     
 }
