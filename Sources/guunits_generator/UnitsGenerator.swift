@@ -61,6 +61,7 @@ import Foundation
 typealias DistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter>>
 typealias TimeUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>, CFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter>>
 typealias AngleUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<AngleFunctionCreator, CFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter>>
+typealias ImageUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter>>
 
 typealias CPPDistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>, CPPFunctionDefinitionCreator<DistanceUnits>, DelegatingNumericConverter>>
 typealias CPPTimeUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>, CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter>>
@@ -194,6 +195,30 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
 }
 
 extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CPPFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
+    
+    init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CPPFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+    
+}
+
+extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
+    
+    init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+    
+}
+
+extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CPPFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
     
     init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(

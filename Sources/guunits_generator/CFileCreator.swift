@@ -133,22 +133,24 @@ struct CFileCreator {
         return ""
     }
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
-        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator)
+    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
+        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator)
         return self.prefix + "\n\n" + content + "\n\n" + self.suffix
     }
     
-    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
+    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
         guard
             let distances = distanceGenerator.generateImplementations(forUnits: DistanceUnits.allCases),
             let times = timeGenerator.generateImplementations(forUnits: TimeUnits.allCases),
-            let angles = angleGenerator.generateImplementations(forUnits: AngleUnits.allCases)
+            let angles = angleGenerator.generateImplementations(forUnits: AngleUnits.allCases),
+            let images = imageGenerator.generateImplementations(forUnits: ImageUnits.allCases)
         else {
             fatalError("Unable to create C file.")
         }
         return "// Distance Conversion Functions\n\n" + distances
             + "\n\n// Time Conversion Functions\n\n" + times
-            + "\n\n//Angle Conversion Functions\n\n" + angles
+            + "\n\n// Angle Conversion Functions\n\n" + angles
+            + "\n\n// Image Conversion Functions\n\n" + images
     }
     
 }

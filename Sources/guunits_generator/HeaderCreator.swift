@@ -145,7 +145,8 @@ struct HeaderCreator {
         let units: [(String, [CustomStringConvertible])] = [
             ("// Distance Units.", Array(DistanceUnits.allCases)),
             ("// Time Units.", Array(TimeUnits.allCases)),
-            ("// Angle Units.", Array(AngleUnits.allCases))
+            ("// Angle Units.", Array(AngleUnits.allCases)),
+            ("// Image Units.", Array(ImageUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { (comment, units) in
@@ -160,22 +161,24 @@ struct HeaderCreator {
     }
     
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
-        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator)
+    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
+        let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator)
         return self.prefix + "\n" + self.typeDefs + "\n\n" + content + "\n\n" + self.suffix
     }
     
-    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator) -> String {
+    fileprivate func createContent(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator) -> String {
         guard
             let distances = distanceGenerator.generateDeclarations(forUnits: DistanceUnits.allCases),
             let times = timeGenerator.generateDeclarations(forUnits: TimeUnits.allCases),
-            let angles = angleGenerator.generateDeclarations(forUnits: AngleUnits.allCases)
+            let angles = angleGenerator.generateDeclarations(forUnits: AngleUnits.allCases),
+            let images = imageGenerator.generateDeclarations(forUnits: ImageUnits.allCases)
         else {
             fatalError("Unable to create header.")
         }
         return "// Distance Conversion Functions\n\n" + distances
             + "\n\n// Time Conversion Functions\n\n" + times
-            + "\n\n//Angle Conversion Functions\n\n" + angles
+            + "\n\n// Angle Conversion Functions\n\n" + angles
+            + "\n\n// Image Conversion Functions\n\n" + images
     }
     
 }

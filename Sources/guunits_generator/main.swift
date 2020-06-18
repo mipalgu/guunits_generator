@@ -9,6 +9,7 @@ let timeGenerator = TimeUnitsGenerator(unitDifference: [
     .milliseconds: 1000
 ])
 let angleGenerator = AngleUnitsGenerator()
+let imageGenerator = ImageUnitsGenerator(unitDifference: [:])
 
 // C++ Variants
 let cppHeaderDistanceGenerator = CPPDistanceUnitsGenerator()
@@ -23,7 +24,8 @@ do {
     try HeaderCreator().generate(
             distanceGenerator: distanceGenerator,
             timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator
+            angleGenerator: angleGenerator,
+            imageGenerator: imageGenerator
         ).write(
             to: URL(fileURLWithPath: "guunits.h", isDirectory: false),
             atomically: false,
@@ -32,7 +34,8 @@ do {
     try CFileCreator().generate(
             distanceGenerator: distanceGenerator,
             timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator
+            angleGenerator: angleGenerator,
+            imageGenerator: imageGenerator
         ).write(
             to: URL(fileURLWithPath: "guunits.c", isDirectory: false),
             atomically: false,
