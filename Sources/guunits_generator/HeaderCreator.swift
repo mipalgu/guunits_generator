@@ -133,7 +133,7 @@ struct HeaderCreator {
     fileprivate var suffix: String {
         return """
             #ifdef __cplusplus
-            };
+            }
             #endif
             \("")
             #endif  /* GUUNITS_H */
