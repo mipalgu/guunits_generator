@@ -167,6 +167,31 @@ extension NumericTypes {
         }
     }
     
+    var swiftType: SwiftNumericTypes {
+        switch self {
+        case .int8:
+            return .Int8
+        case .int16:
+            return .Int16
+        case .int32, .int:
+            return .Int32
+        case .int64:
+            return .Int64
+        case .uint8:
+            return .UInt8
+        case .uint16:
+            return .UInt16
+        case .uint32, .uint:
+            return .UInt32
+        case .uint64:
+            return .UInt64
+        case .float:
+            return .Float
+        case .double:
+            return .Double
+        }
+    }
+    
     func smallerThan(_ other: NumericTypes) -> Bool {
         if self.isSigned != other.isSigned {
             fatalError("Can only compare numeric types of the same sort (int with other ints, floats with other floats).")
