@@ -67,9 +67,9 @@ struct SwiftFileCreator {
         return def + self.indent(cases) + "\n\n" + enddef
     }
     
-    func generate<T: UnitProtocol>(for type: T) -> String {
-        let prefix = self.prefix(name: type.description)
-        let strct = self.generateStruct(for: type, allCases: Set(T.allCases).subtracting(Set([type])).sorted { $0.description < $1.description })
+    func generate<T: UnitProtocol>(for value: T) -> String {
+        let prefix = self.prefix(name: value.description.capitalized)
+        let strct = self.generateStruct(for: value, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
         return prefix + "\n\n" + strct
     }
     

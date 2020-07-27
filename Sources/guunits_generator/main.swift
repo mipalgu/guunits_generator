@@ -21,8 +21,27 @@ let cppDistanceGenerator = CPPDistanceUnitsGenerator(definitionCreator: CPPFunct
 let cppTimeGenerator = CPPTimeUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
 let cppAngleGenerator = CPPAngleUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
 
-print(SwiftFileCreator().generate(for: AngleUnits.degrees))
-fatalError("End")
+let swiftFileCreator = SwiftFileCreator()
+
+do {
+    for unit in DistanceUnits.allCases {
+        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
+    }
+    for unit in TimeUnits.allCases {
+        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
+    }
+    for unit in AngleUnits.allCases {
+        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
+    }
+    for unit in ImageUnits.allCases {
+        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
+    }
+    for unit in PercentUnits.allCases {
+        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
+    }
+} catch let e {
+    fatalError("Unable to write swift file: \(e)")
+}
 
 do {
     try HeaderCreator().generate(
