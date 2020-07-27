@@ -87,4 +87,17 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
         }
     }
     
+    var sign: Signs {
+        switch self {
+        case .Int8, .Int16, .Int32, .Int64, .Int:
+            return .t
+        case .UInt8, .UInt16, .UInt32, .UInt64, .UInt:
+            return .u
+        case .Float:
+            return .f
+        case .Double:
+            return .d
+        }
+    }
+    
 }
