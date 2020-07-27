@@ -139,16 +139,18 @@ struct SwiftFileCreator {
         let def = "public struct \(type.description.capitalized) {"
         let endef = "}"
         let internalRepresentation = self.indent(self.internalEnum)
-        let internalRepresentationProperty = self.indent("private let internalRepresentation: InternalRepresentation")
+        let internalRepresentationProperty = self.indent("internal let internalRepresentation: InternalRepresentation")
         let conversionGetters = self.indent(self.createConversionGetters(from: type, allCases: allCases))
         let numericGetters = self.indent(self.createNumericGetters(from: type))
         let numericInits = self.indent(self.createNumericInits(for: type))
+        let conversionInits = self.indent(self.createConversionInits(for: type, allCases: allCases))
         return def
             + "\n\n" + internalRepresentation
             + "\n\n" + internalRepresentationProperty
             + "\n\n" + conversionGetters
             + "\n\n" + numericGetters
             + "\n\n" + numericInits
+            + "\n\n" + conversionInits
             + "\n\n" + endef
     }
     
@@ -159,6 +161,23 @@ struct SwiftFileCreator {
         }.trimmingCharacters(in: .whitespacesAndNewlines)
         let endef = "}"
         return def + "\n" + caseList + "\n" + endef
+    }
+    
+    private func createConversionInits<T: UnitProtocol>(for value: T, allCases: [T]) -> String {
+        return allCases.reduce("") {
+            $0 + "\n\n" + self.createConversionInit(for: value, from: $1)
+        }.trimmingCharacters(in: .newlines)
+    }
+    
+    private func createConversionInit<T: UnitProtocol>(for value: T, from source: T) -> String {
+        let def = "public init(_ value: " + source.description.capitalized + ") {"
+        let body = self.createSwitch(on: "value", cases: Array(SwiftNumericTypes.allCases)) {
+            let numToSource = $0.numericType.abbreviation + "_to_" + source.abbreviation + "_" + $0.sign.rawValue
+            let sourceToValue = source.abbreviation + "_" + $0.sign.rawValue + "_to_" + value.abbreviation + "_d"
+            return "self.internalRepresentation = .Double(" + sourceToValue + "(" + numToSource + "(value)))"
+        }
+        let endef = "}"
+        return def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createConversionGetters<T: UnitProtocol>(from value: T, allCases: [T]) -> String {
