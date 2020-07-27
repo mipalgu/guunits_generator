@@ -140,7 +140,12 @@ struct SwiftFileCreator {
         let endef = "}"
         let internalRepresentation = self.indent(self.internalEnum)
         let numericGetters = self.indent(self.createNumericGetters(from: type))
-        return def + "\n\n" + internalRepresentation + "\n\n" + numericGetters + "\n\n" + endef
+        let numericInits = self.indent(self.createNumericInits(for: type))
+        return def
+            + "\n\n" + internalRepresentation
+            + "\n\n" + numericGetters
+            + "\n\n" + numericInits
+            + "\n\n" + endef
     }
     
     private func createSwitch<T>(on condition: String, cases: [T], body: (T) -> String) -> String {
@@ -150,6 +155,19 @@ struct SwiftFileCreator {
         }.trimmingCharacters(in: .whitespacesAndNewlines)
         let endef = "}"
         return def + "\n" + caseList + "\n" + endef
+    }
+    
+    private func createNumericInits<T: UnitProtocol>(for value: T) -> String {
+        return SwiftNumericTypes.allCases.reduce("") {
+            return $0 + "\n\n" + self.createNumericInit(for: value, from: $1)
+        }.trimmingCharacters(in: .newlines)
+    }
+    
+    private func createNumericInit<T: UnitProtocol>(for value: T, from numeric: SwiftNumericTypes) -> String {
+        let def = "public init(_ value: " + numeric.rawValue + ") {"
+        let body = "self.internalRepresentation = ." + numeric.rawValue + "(value)"
+        let endef = "}"
+        return def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createNumericGetters<T: UnitProtocol>(from value: T) -> String {

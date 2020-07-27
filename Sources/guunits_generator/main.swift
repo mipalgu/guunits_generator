@@ -21,6 +21,9 @@ let cppDistanceGenerator = CPPDistanceUnitsGenerator(definitionCreator: CPPFunct
 let cppTimeGenerator = CPPTimeUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
 let cppAngleGenerator = CPPAngleUnitsGenerator(definitionCreator: CPPFunctionDefinitionCreator(namespace: "GU::"))
 
+print(SwiftFileCreator().generate(for: AngleUnits.degrees))
+fatalError("End")
+
 do {
     try HeaderCreator().generate(
             distanceGenerator: distanceGenerator,
