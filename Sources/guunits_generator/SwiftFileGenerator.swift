@@ -221,14 +221,16 @@ struct SwiftFileCreator {
     }
     
     private func createConversionGetters<T: UnitProtocol>(from value: T, allCases: [T]) -> String {
-        return allCases.reduce("") {
-            $0 + "\n\n" + self.createConversionGetter(from: value, to: $1)
+        return allCases.reduce("") { (previous, target) in
+            Signs.allCases.reduce(previous) {
+                $0 + "\n\n" + self.createConversionGetter(from: value, to: target, sign: $1)
+            }
         }.trimmingCharacters(in: .newlines)
     }
     
-    private func createConversionGetter<T: UnitProtocol>(from value: T, to target: T) -> String {
+    private func createConversionGetter<T: UnitProtocol>(from value: T, to target: T, sign: Signs) -> String {
         let targetStruct = target.description.capitalized
-        let def = "public var to" + targetStruct + ": " + targetStruct + " {"
+        let def = "public var to" + targetStruct + "_" + sign.rawValue + ": " + targetStruct + " {"
         let swtch = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) {
             let valueStr: String
             if $0 == .Int {
@@ -239,7 +241,7 @@ struct SwiftFileCreator {
                 valueStr = "value"
             }
             let numToValue = $0.numericType.abbreviation + "_to_" + value.abbreviation + "_" + $0.sign.rawValue
-            let valueToTarget = value.abbreviation + "_" + $0.sign.rawValue + "_to_" + target.abbreviation + "_d"
+            let valueToTarget = value.abbreviation + "_" + $0.sign.rawValue + "_to_" + target.abbreviation + "_" + sign.rawValue
             return "return " + targetStruct + "(" + valueToTarget + "(" + numToValue + "(" + valueStr + ")))"
         }
         let endef = "}"
