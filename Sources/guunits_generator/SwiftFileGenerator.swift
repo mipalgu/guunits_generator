@@ -146,7 +146,8 @@ struct SwiftFileCreator {
             signComment = "An unsigned integer"
         }
         let comment = "/// " + signComment + " type for the " + type.description + " unit."
-        let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + " {"
+        let conformingType = "GUUnits" + sign.rawValue.uppercased() + "Type"
+        let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + ": " + conformingType + " {"
         let endef = "}"
         let rawValueProperty = self.indent(self.generateRawProperty(for: type, sign))
         let rawInit = self.indent(self.createRawInit(for: type, sign))
