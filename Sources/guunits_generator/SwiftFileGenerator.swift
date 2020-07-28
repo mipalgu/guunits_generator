@@ -180,6 +180,12 @@ struct SwiftFileCreator {
     }
     
     private func createNumericConversionInit<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T, _ sign: Signs) -> String {
+        let sourceStruct = value.description.capitalized + "_" + sign.rawValue
+        let comment = """
+        /// Create a `\(numericType.rawValue)` by converting a `\(sourceStruct)`.
+        ///
+        /// - Parameter value: A `\(sourceStruct)` value to convert to a `\(numericType.rawValue)`.
+        """
         let def = "init(_ value: " + value.description.capitalized + "_" + sign.rawValue + ") {"
         let valueToNum = value.abbreviation + "_" + sign.rawValue + "_to_" + numericType.numericType.abbreviation
         let conversion: String
@@ -190,7 +196,7 @@ struct SwiftFileCreator {
         }
         let body = "self = " + conversion
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createRawInit<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
