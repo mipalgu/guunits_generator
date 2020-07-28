@@ -147,12 +147,6 @@ struct SwiftFileCreator {
         let endef = "}"
         let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
         let rawInit = self.indent(self.createRawInit(for: type, sign))
-        let conversionGetters: String
-        if allCases.isEmpty {
-            conversionGetters = ""
-        } else {
-            conversionGetters = "\n\n" + self.indent(self.createConversionGetters(from: type, sign, allCases: allCases))
-        }
         let numericGetters = self.indent(self.createNumericGetters(from: type, sign))
         let numericInits = self.indent(self.createNumericInits(for: type, sign))
         let conversionInits: String
@@ -165,7 +159,6 @@ struct SwiftFileCreator {
         return comment + "\n" + def
             + "\n\n" + rawValueProperty
             + "\n\n" + rawInit
-            + conversionGetters
             + "\n\n" + numericGetters
             + "\n\n" + numericInits
             + conversionInits
@@ -206,24 +199,6 @@ struct SwiftFileCreator {
         let def = "public init(_ value: " + sourceStruct + ") {"
         let sourceToValue = source.abbreviation + "_" + sourceSign.rawValue + "_to_" + value.abbreviation + "_" + sign.rawValue
         let body = "self.rawValue = " + sourceToValue + "(value.rawValue)"
-        let endef = "}"
-        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
-    }
-    
-    private func createConversionGetters<T: UnitProtocol>(from value: T, _ sign: Signs, allCases: [T]) -> String {
-        return allCases.reduce("") { (previous, target) in
-            Signs.allCases.reduce(previous) {
-                $0 + "\n\n" + self.createConversionGetter(from: value, sign, to: target, $1)
-            }
-        }.trimmingCharacters(in: .newlines)
-    }
-    
-    private func createConversionGetter<T: UnitProtocol>(from value: T, _ sign: Signs, to target: T, _ targetSign: Signs) -> String {
-        let targetStruct = target.description.capitalized + "_" + targetSign.rawValue
-        let comment = "/// Convert to a `" + targetStruct + "`."
-        let def = "public var to" + targetStruct + ": " + targetStruct + " {"
-        let valueToTarget = value.abbreviation + "_" + sign.rawValue + "_to_" + target.abbreviation + "_" + targetSign.rawValue
-        let body =  "return " + targetStruct + "(" + valueToTarget + "(self.rawValue))"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
