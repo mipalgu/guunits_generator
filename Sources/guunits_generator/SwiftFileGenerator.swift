@@ -134,15 +134,15 @@ struct SwiftFileCreator {
         let signComment: String
         switch sign {
         case .d:
-            signComment = "double"
+            signComment = "A double"
         case .f:
-            signComment = "floating point"
+            signComment = "A floating point"
         case .t:
-            signComment = "signed integer"
+            signComment = "A signed integer"
         case .u:
-            signComment = "unsigned integer"
+            signComment = "An unsigned integer"
         }
-        let comment = "/// A " + signComment + " type in the " + type.description + " unit."
+        let comment = "/// " + signComment + " type for the " + type.description + " unit."
         let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + " {"
         let endef = "}"
         let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
@@ -196,7 +196,7 @@ struct SwiftFileCreator {
     }
     
     private func createConversionInit<T: UnitProtocol>(for value: T, _ sign: Signs, from source: T, _ sourceSign: Signs) -> String {
-        let valueStruct = value.description + "_" + sign.rawValue
+        let valueStruct = value.description.capitalized + "_" + sign.rawValue
         let sourceStruct = source.description.capitalized + "_" + sourceSign.rawValue
         let comment = """
             /// Create a `\(valueStruct)` by converting a `\(sourceStruct)`.
