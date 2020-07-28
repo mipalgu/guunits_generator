@@ -61,17 +61,12 @@ struct SwiftFileCreator {
     func generate<T: UnitProtocol>(for value: T) -> String {
         let prefix = self.prefix(name: value.description.capitalized)
         let structs = Signs.allCases.reduce("") {
-            $0 + "\n\n" + self.generate(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
+            $0 + "\n\n" + self.generateStruct(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
         }
-        return prefix + structs + "\n"
-    }
-    
-    private func generate<T: UnitProtocol>(for value: T, _ sign: Signs, allCases: [T]) -> String {
-        let structDef = self.generateStruct(for: value, sign, allCases: allCases)
-        let extensions = SwiftNumericTypes.uniqueTypes.reduce("") {
-            $0 + "\n\n" + self.generateNumericExtension(for: $1, from: value, sign)
+        let extensionDef = SwiftNumericTypes.uniqueTypes.reduce("") {
+            $0 + "\n\n" + self.generateNumericExtension(for: $1, from: value)
         }
-        return structDef + extensions
+        return prefix + structs + extensionDef + "\n"
     }
     
     private func prefix(name: String) -> String {
@@ -153,7 +148,7 @@ struct SwiftFileCreator {
         let comment = "/// " + signComment + " type for the " + type.description + " unit."
         let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + " {"
         let endef = "}"
-        let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
+        let rawValueProperty = self.indent(self.generateRawProperty(for: type, sign))
         let rawInit = self.indent(self.createRawInit(for: type, sign))
         let numericInits = self.indent(self.createNumericInits(for: type, sign))
         let conversionInits: String
@@ -164,19 +159,35 @@ struct SwiftFileCreator {
         }
         let selfConversions = self.indent(self.createSelfConversionInits(for: type, sign))
         return comment + "\n" + def
+            + "\n\n" + "// MARK: - Converting Between The Underlying guunits C Type"
             + "\n\n" + rawValueProperty
             + "\n\n" + rawInit
+            + "\n\n" + "// MARK: - Converting From Swift Numeric Types"
             + "\n\n" + numericInits
+            + "\n\n" + "// MARK: - Converting From Other Units"
             + conversionInits
+            + "\n\n" + "// MARK: - Converting From Other Precisions"
             + "\n\n" + selfConversions
             + "\n\n" + endef
     }
     
-    private func generateNumericExtension<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T, _ sign: Signs) -> String {
+    private func generateRawProperty<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
+        let comment = "/// Convert to the guunits underlying C type `" + value.description + "_" + sign.rawValue + "`"
+        let def = "public let rawValue: " + value.description + "_" + sign.rawValue
+        return comment + "\n" + def
+    }
+    
+    private func generateNumericExtension<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T) -> String {
         let def = "public extension " + numericType.rawValue + " {"
-        let body = self.createNumericConversionInit(for: numericType, from: value, sign)
+        let mark = "// MARK: - Creating a " + numericType.rawValue + " From The " + value.description.capitalized + " Units"
+        let body = Signs.allCases.reduce("") {
+            $0 + "\n\n" + self.createNumericConversionInit(for: numericType, from: value, $1)
+        }.trimmingCharacters(in: .newlines)
         let endef = "}"
-        return def + "\n\n" + self.indent(body) + "\n\n" + endef
+        return def
+            + "\n\n" + mark
+            + "\n\n" + self.indent(body)
+            + "\n\n" + endef
     }
     
     private func createNumericConversionInit<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T, _ sign: Signs) -> String {
