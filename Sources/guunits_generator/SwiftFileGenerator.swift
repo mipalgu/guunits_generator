@@ -135,18 +135,28 @@ struct SwiftFileCreator {
         let endef = "}"
         let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
         let rawInit = self.indent(self.createRawInit(for: type, sign))
-        let conversionGetters = self.indent(self.createConversionGetters(from: type, sign, allCases: allCases))
+        let conversionGetters: String
+        if allCases.isEmpty {
+            conversionGetters = ""
+        } else {
+            conversionGetters = "\n\n" + self.indent(self.createConversionGetters(from: type, sign, allCases: allCases))
+        }
         let numericGetters = self.indent(self.createNumericGetters(from: type, sign))
         let numericInits = self.indent(self.createNumericInits(for: type, sign))
-        let conversionInits = self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
+        let conversionInits: String
+        if allCases.isEmpty {
+        conversionInits = ""
+        } else {
+            conversionInits = "\n\n" + self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
+        }
         let selfConversions = self.indent(self.createSelfConversionInits(for: type, sign))
         return def
             + "\n\n" + rawValueProperty
             + "\n\n" + rawInit
-            + "\n\n" + conversionGetters
+            + conversionGetters
             + "\n\n" + numericGetters
             + "\n\n" + numericInits
-            + "\n\n" + conversionInits
+            + conversionInits
             + "\n\n" + selfConversions
             + "\n\n" + endef
     }
