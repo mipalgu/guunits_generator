@@ -131,6 +131,18 @@ struct SwiftFileCreator {
     }
     
     private func generateStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
+        let signComment: String
+        switch sign {
+        case .d:
+            signComment = "double"
+        case .f:
+            signComment = "floating point"
+        case .t:
+            signComment = "signed integer"
+        case .u:
+            signComment = "unsigned integer"
+        }
+        let comment = "/// A " + signComment + " type in the " + type.description + " unit."
         let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + " {"
         let endef = "}"
         let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
@@ -150,7 +162,7 @@ struct SwiftFileCreator {
             conversionInits = "\n\n" + self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
         }
         let selfConversions = self.indent(self.createSelfConversionInits(for: type, sign))
-        return def
+        return comment + "\n" + def
             + "\n\n" + rawValueProperty
             + "\n\n" + rawInit
             + conversionGetters
@@ -162,10 +174,11 @@ struct SwiftFileCreator {
     }
     
     private func createRawInit<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
+        let comment = "/// Create a `" + value.description.capitalized + "_" + sign.rawValue + "` from the underlying guunits C type `" + value.description + "_" + sign.rawValue + "`."
         let def = "public init(rawValue: " + value.description + "_" + sign.rawValue + ") {"
         let body = "self.rawValue = rawValue"
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs, allCases: [T]) -> String {
@@ -183,11 +196,18 @@ struct SwiftFileCreator {
     }
     
     private func createConversionInit<T: UnitProtocol>(for value: T, _ sign: Signs, from source: T, _ sourceSign: Signs) -> String {
-        let def = "public init(_ value: " + source.description.capitalized + "_" + sourceSign.rawValue + ") {"
+        let valueStruct = value.description + "_" + sign.rawValue
+        let sourceStruct = source.description.capitalized + "_" + sourceSign.rawValue
+        let comment = """
+            /// Create a `\(valueStruct)` by converting a `\(sourceStruct)`.
+            ///
+            /// - Parameter value: A `\(sourceStruct)` value to convert to a `\(valueStruct)`.
+            """
+        let def = "public init(_ value: " + sourceStruct + ") {"
         let sourceToValue = source.abbreviation + "_" + sourceSign.rawValue + "_to_" + value.abbreviation + "_" + sign.rawValue
         let body = "self.rawValue = " + sourceToValue + "(value.rawValue)"
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createConversionGetters<T: UnitProtocol>(from value: T, _ sign: Signs, allCases: [T]) -> String {
@@ -200,11 +220,12 @@ struct SwiftFileCreator {
     
     private func createConversionGetter<T: UnitProtocol>(from value: T, _ sign: Signs, to target: T, _ targetSign: Signs) -> String {
         let targetStruct = target.description.capitalized + "_" + targetSign.rawValue
+        let comment = "/// Convert to a `" + targetStruct + "`."
         let def = "public var to" + targetStruct + ": " + targetStruct + " {"
         let valueToTarget = value.abbreviation + "_" + sign.rawValue + "_to_" + target.abbreviation + "_" + targetSign.rawValue
         let body =  "return " + targetStruct + "(" + valueToTarget + "(self.rawValue))"
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createNumericInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
@@ -214,6 +235,12 @@ struct SwiftFileCreator {
     }
     
     private func createNumericInit<T: UnitProtocol>(for value: T, _ sign: Signs, from numeric: SwiftNumericTypes) -> String {
+        let sourceStruct = value.description.capitalized + "_" + sign.rawValue
+        let comment = """
+            /// Create a `\(sourceStruct)` by converting a `\(numeric.rawValue)`.
+            ///
+            /// - Parameter value: A `\(numeric.rawValue)` value to convert to a `\(sourceStruct)`.
+            """
         let def = "public init(_ value: " + numeric.rawValue + ") {"
         let valueStr: String
         if numeric == .Int {
@@ -225,7 +252,7 @@ struct SwiftFileCreator {
         }
         let body = "self.rawValue = " + numeric.numericType.abbreviation + "_to_" + value.abbreviation + "_" + sign.rawValue + "(" + valueStr + ")"
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createNumericGetters<T: UnitProtocol>(from value: T, _ sign: Signs) -> String {
@@ -235,10 +262,11 @@ struct SwiftFileCreator {
     }
     
     private func createNumericGetter<T: UnitProtocol>(from value: T, _ sign: Signs, to numericType: SwiftNumericTypes) -> String {
+        let comment = "/// Convert to a `" + numericType.rawValue + "`."
         let def = "public var to" + numericType.rawValue + ": " + numericType.rawValue + " {"
         let body =  numericType.rawValue + "(" + value.abbreviation + "_" + sign.rawValue + "_to_" + numericType.numericType.abbreviation + "(self.rawValue))"
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func indent(_ str: String) -> String {
