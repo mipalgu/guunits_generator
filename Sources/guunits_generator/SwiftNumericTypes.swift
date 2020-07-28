@@ -58,8 +58,8 @@
 
 enum SwiftNumericTypes: String, Hashable, CaseIterable {
     
-    case Int8, Int16, Int32, Int64, Int
-    case UInt8, UInt16, UInt32, UInt64, UInt
+    case Int8, Int16, Int32, Int64, Int, CInt
+    case UInt8, UInt16, UInt32, UInt64, UInt, CUnsignedInt
     case Float, Double
     
     var numericType: NumericTypes {
@@ -73,7 +73,9 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
         case .Int64:
             return .int64
         case .Int:
-            return .int
+            return .int64
+        case .CInt:
+            return .int32
         case .UInt8:
             return .uint8
         case .UInt16:
@@ -82,8 +84,10 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
             return .uint32
         case .UInt64:
             return .uint64
+        case .CUnsignedInt:
+            return .uint32
         case .UInt:
-            return .uint
+            return .uint64
         case .Float:
             return .float
         case .Double:
@@ -93,15 +97,19 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
     
     var sign: Signs {
         switch self {
-        case .Int8, .Int16, .Int32, .Int64, .Int:
+        case .Int8, .Int16, .Int32, .Int64, .Int, .CInt:
             return .t
-        case .UInt8, .UInt16, .UInt32, .UInt64, .UInt:
+        case .UInt8, .UInt16, .UInt32, .UInt64, .UInt, .CUnsignedInt:
             return .u
         case .Float:
             return .f
         case .Double:
             return .d
         }
+    }
+    
+    public static var uniqueTypes: [SwiftNumericTypes] {
+        Array(Set(SwiftNumericTypes.allCases).subtracting([.CInt, .CUnsignedInt]).sorted { $0.rawValue < $1.rawValue })
     }
     
 }

@@ -61,9 +61,17 @@ struct SwiftFileCreator {
     func generate<T: UnitProtocol>(for value: T) -> String {
         let prefix = self.prefix(name: value.description.capitalized)
         let structs = Signs.allCases.reduce("") {
-            $0 + "\n\n" + self.generateStruct(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
+            $0 + "\n\n" + self.generate(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
         }
         return prefix + structs + "\n"
+    }
+    
+    private func generate<T: UnitProtocol>(for value: T, _ sign: Signs, allCases: [T]) -> String {
+        let structDef = self.generateStruct(for: value, sign, allCases: allCases)
+        let extensions = SwiftNumericTypes.uniqueTypes.reduce("") {
+            $0 + "\n\n" + self.generateNumericExtension(for: $1, from: value, sign)
+        }
+        return structDef + extensions
     }
     
     private func prefix(name: String) -> String {
@@ -147,7 +155,6 @@ struct SwiftFileCreator {
         let endef = "}"
         let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
         let rawInit = self.indent(self.createRawInit(for: type, sign))
-        let numericGetters = self.indent(self.createNumericGetters(from: type, sign))
         let numericInits = self.indent(self.createNumericInits(for: type, sign))
         let conversionInits: String
         if allCases.isEmpty {
@@ -159,11 +166,31 @@ struct SwiftFileCreator {
         return comment + "\n" + def
             + "\n\n" + rawValueProperty
             + "\n\n" + rawInit
-            + "\n\n" + numericGetters
             + "\n\n" + numericInits
             + conversionInits
             + "\n\n" + selfConversions
             + "\n\n" + endef
+    }
+    
+    private func generateNumericExtension<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T, _ sign: Signs) -> String {
+        let def = "public extension " + numericType.rawValue + " {"
+        let body = self.createNumericConversionInit(for: numericType, from: value, sign)
+        let endef = "}"
+        return def + "\n\n" + self.indent(body) + "\n\n" + endef
+    }
+    
+    private func createNumericConversionInit<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T, _ sign: Signs) -> String {
+        let def = "init(_ value: " + value.description.capitalized + "_" + sign.rawValue + ") {"
+        let valueToNum = value.abbreviation + "_" + sign.rawValue + "_to_" + numericType.numericType.abbreviation
+        let conversion: String
+        if numericType != numericType.numericType.swiftType {
+            conversion = numericType.rawValue + "(" + valueToNum + "(value.rawValue))"
+        } else {
+            conversion = valueToNum + "(value.rawValue)"
+        }
+        let body = "self = " + conversion
+        let endef = "}"
+        return def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createRawInit<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
@@ -204,7 +231,7 @@ struct SwiftFileCreator {
     }
     
     private func createNumericInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
-        return SwiftNumericTypes.allCases.reduce("") {
+        return SwiftNumericTypes.uniqueTypes.reduce("") {
             return $0 + "\n\n" + self.createNumericInit(for: value, sign, from: $1)
         }.trimmingCharacters(in: .newlines)
     }
@@ -218,10 +245,8 @@ struct SwiftFileCreator {
             """
         let def = "public init(_ value: " + numeric.rawValue + ") {"
         let valueStr: String
-        if numeric == .Int {
-            valueStr = "CInt(value)"
-        } else if numeric == .UInt {
-            valueStr = "CUnsignedInt(value)"
+        if numeric != numeric.numericType.swiftType {
+            valueStr = numeric.numericType.swiftType.rawValue + "(value)"
         } else {
             valueStr = "value"
         }
@@ -230,30 +255,21 @@ struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
-    private func createNumericGetters<T: UnitProtocol>(from value: T, _ sign: Signs) -> String {
-        return SwiftNumericTypes.allCases.reduce("") {
-            $0 + "\n\n" + self.createNumericGetter(from: value, sign, to: $1)
-        }.trimmingCharacters(in: .newlines)
-    }
-    
-    private func createNumericGetter<T: UnitProtocol>(from value: T, _ sign: Signs, to numericType: SwiftNumericTypes) -> String {
-        let comment = "/// Convert to a `" + numericType.rawValue + "`."
-        let def = "public var to" + numericType.rawValue + ": " + numericType.rawValue + " {"
-        let body =  numericType.rawValue + "(" + value.abbreviation + "_" + sign.rawValue + "_to_" + numericType.numericType.abbreviation + "(self.rawValue))"
-        let endef = "}"
-        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
-    }
-    
     private func indent(_ str: String) -> String {
-        return self.prefixLines(str, with: "    ")
+        return self.prefixNonEmptyLines(str, with: "    ")
     }
     
-    private func prefixLines(_ str: String, with prefix: String) -> String {
+    private func prefixNonEmptyLines(_ str: String, with prefix: String) -> String {
         let lines = str.components(separatedBy: .newlines)
         guard let first = lines.first else {
             return prefix
         }
-        return lines.dropFirst().reduce(prefix + first) { $0 + "\n" + prefix + $1 }
+        return lines.dropFirst().reduce(prefix + first) {
+            if $1.isEmpty {
+                return $0 + "\n" + $1
+            }
+            return $0 + "\n" + prefix + $1
+        }
     }
     
 }

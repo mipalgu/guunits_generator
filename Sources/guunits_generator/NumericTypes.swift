@@ -173,18 +173,22 @@ extension NumericTypes {
             return .Int8
         case .int16:
             return .Int16
-        case .int32, .int:
+        case .int32:
             return .Int32
         case .int64:
             return .Int64
+        case .int:
+            return .CInt
         case .uint8:
             return .UInt8
         case .uint16:
             return .UInt16
-        case .uint32, .uint:
+        case .uint32:
             return .UInt32
         case .uint64:
             return .UInt64
+        case .uint:
+            return .CUnsignedInt
         case .float:
             return .Float
         case .double:
