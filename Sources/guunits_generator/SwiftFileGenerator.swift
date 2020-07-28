@@ -59,7 +59,7 @@
 struct SwiftFileCreator {
     
     private var internalEnum: String {
-        let def = "private enum InternalRepresentation {"
+        let def = "enum InternalRepresentation {"
         let cases = SwiftNumericTypes.allCases.reduce("") {
             $0 + "\n\n" + "case \($1.rawValue)(_ value: \($1.rawValue))"
         }
@@ -132,6 +132,8 @@ struct SwiftFileCreator {
             * Fifth Floor, Boston, MA  02110-1301, USA.
             *
             */
+            
+            import CGUUnits
             """
     }
     
@@ -171,10 +173,18 @@ struct SwiftFileCreator {
     
     private func createConversionInit<T: UnitProtocol>(for value: T, from source: T) -> String {
         let def = "public init(_ value: " + source.description.capitalized + ") {"
-        let body = self.createSwitch(on: "value", cases: Array(SwiftNumericTypes.allCases)) {
+        let body = self.createSwitch(on: "value.internalRepresentation", cases: Array(SwiftNumericTypes.allCases)) {
+            let valueStr: String
+            if $0 == .Int {
+                valueStr = "CInt(value)"
+            } else if $0 == .UInt {
+                valueStr = "CUnsignedInt(value)"
+            } else {
+                valueStr = "value"
+            }
             let numToSource = $0.numericType.abbreviation + "_to_" + source.abbreviation + "_" + $0.sign.rawValue
             let sourceToValue = source.abbreviation + "_" + $0.sign.rawValue + "_to_" + value.abbreviation + "_d"
-            return "self.internalRepresentation = .Double(" + sourceToValue + "(" + numToSource + "(value)))"
+            return "self.internalRepresentation = .Double(" + sourceToValue + "(" + numToSource + "(" + valueStr + ")))"
         }
         let endef = "}"
         return def + "\n" + self.indent(body) + "\n" + endef
@@ -190,9 +200,17 @@ struct SwiftFileCreator {
         let targetStruct = target.description.capitalized
         let def = "public var to" + targetStruct + ": " + targetStruct + " {"
         let swtch = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) {
+            let valueStr: String
+            if $0 == .Int {
+                valueStr = "CInt(value)"
+            } else if $0 == .UInt {
+                valueStr = "CUnsignedInt(value)"
+            } else {
+                valueStr = "value"
+            }
             let numToValue = $0.numericType.abbreviation + "_to_" + value.abbreviation + "_" + $0.sign.rawValue
             let valueToTarget = value.abbreviation + "_" + $0.sign.rawValue + "_to_" + target.abbreviation + "_d"
-            return "return " + targetStruct + "(" + valueToTarget + "(" + numToValue + "(value)))"
+            return "return " + targetStruct + "(" + valueToTarget + "(" + numToValue + "(" + valueStr + ")))"
         }
         let endef = "}"
         return def + "\n" + self.indent(swtch) + "\n" + endef
@@ -219,8 +237,8 @@ struct SwiftFileCreator {
     
     private func createNumericGetter<T: UnitProtocol>(from value: T, to numericType: SwiftNumericTypes) -> String {
         let def = "public var to" + numericType.rawValue + ": " + numericType.rawValue + " {"
-        let swtch = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) {
-            return "return " + numericType.rawValue + "(" + value.abbreviation + "_" + $0.numericType.abbreviation + "_to_" + numericType.numericType.abbreviation + "(value))"
+        let swtch = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) { _ in
+            return "return " + numericType.rawValue + "(value)"
         }
         let endef = "}"
         return def + "\n" + self.indent(swtch) + "\n" + endef

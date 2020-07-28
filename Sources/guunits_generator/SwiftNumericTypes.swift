@@ -70,16 +70,20 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
             return .int16
         case .Int32:
             return .int32
-        case .Int64, .Int:
+        case .Int64:
             return .int64
+        case .Int:
+            return .int
         case .UInt8:
             return .uint8
         case .UInt16:
             return .uint16
         case .UInt32:
             return .uint32
-        case .UInt64, .UInt:
+        case .UInt64:
             return .uint64
+        case .UInt:
+            return .uint
         case .Float:
             return .float
         case .Double:
