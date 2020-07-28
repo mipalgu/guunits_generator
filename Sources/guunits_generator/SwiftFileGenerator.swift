@@ -58,19 +58,12 @@
 
 struct SwiftFileCreator {
     
-    private var internalEnum: String {
-        let def = "enum InternalRepresentation {"
-        let cases = SwiftNumericTypes.allCases.reduce("") {
-            $0 + "\n\n" + "case \($1.rawValue)(_ value: \($1.rawValue))"
-        }
-        let enddef = "}"
-        return def + self.indent(cases) + "\n\n" + enddef
-    }
-    
     func generate<T: UnitProtocol>(for value: T) -> String {
         let prefix = self.prefix(name: value.description.capitalized)
-        let strct = self.generateStruct(for: value, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
-        return prefix + "\n\n" + strct
+        let structs = Signs.allCases.reduce("") {
+            $0 + "\n\n" + self.generateStruct(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
+        }
+        return prefix + structs + "\n"
     }
     
     private func prefix(name: String) -> String {
@@ -137,143 +130,105 @@ struct SwiftFileCreator {
             """
     }
     
-    private func generateStruct<T: UnitProtocol>(for type: T, allCases: [T]) -> String {
-        let def = "public struct \(type.description.capitalized) {"
+    private func generateStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
+        let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + " {"
         let endef = "}"
-        let internalRepresentation = self.indent(self.internalEnum)
-        let internalRepresentationProperty = self.indent("internal let internalRepresentation: InternalRepresentation")
-        let conversionGetters = self.indent(self.createConversionGetters(from: type, allCases: allCases))
-        let rawGetters = self.indent(self.createRawGetters(for: type))
-        let numericGetters = self.indent(self.createNumericGetters(from: type))
-        let numericInits = self.indent(self.createNumericInits(for: type))
-        let conversionInits = self.indent(self.createConversionInits(for: type, allCases: allCases))
+        let rawValueProperty = self.indent("public let rawValue: " + type.description + "_" + sign.rawValue)
+        let rawInit = self.indent(self.createRawInit(for: type, sign))
+        let conversionGetters = self.indent(self.createConversionGetters(from: type, sign, allCases: allCases))
+        let numericGetters = self.indent(self.createNumericGetters(from: type, sign))
+        let numericInits = self.indent(self.createNumericInits(for: type, sign))
+        let conversionInits = self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
+        let selfConversions = self.indent(self.createSelfConversionInits(for: type, sign))
         return def
-            + "\n\n" + internalRepresentation
-            + "\n\n" + internalRepresentationProperty
+            + "\n\n" + rawValueProperty
+            + "\n\n" + rawInit
             + "\n\n" + conversionGetters
-            + "\n\n" + rawGetters
             + "\n\n" + numericGetters
             + "\n\n" + numericInits
             + "\n\n" + conversionInits
+            + "\n\n" + selfConversions
             + "\n\n" + endef
     }
     
-    private func createSwitch<T>(on condition: String, cases: [T], body: (T) -> String) -> String {
-        let def = "switch " + condition + " {"
-        let caseList = cases.reduce("") {
-            $0 + "case .\($1)(let value):\n    " + body($1) + "\n"
-        }.trimmingCharacters(in: .whitespacesAndNewlines)
-        let endef = "}"
-        return def + "\n" + caseList + "\n" + endef
-    }
-    
-    private func createRawGetters<T: UnitProtocol>(for value: T) -> String {
-        return Signs.allCases.reduce("") {
-            $0 + "\n\n" + self.createRawGetter(for: value, sign: $1)
-        }.trimmingCharacters(in: .newlines)
-    }
-    
-    private func createRawGetter<T: UnitProtocol>(for value: T, sign: Signs) -> String {
-        let def = "public var " + value.description + "_" + sign.rawValue + ": " + value.description + "_" + sign.rawValue + " {"
-        let body = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) {
-            let valueStr: String
-            if $0 == .Int {
-                valueStr = "CInt(value)"
-            } else if $0 == .UInt {
-                valueStr = "CUnsignedInt(value)"
-            } else {
-                valueStr = "value"
-            }
-            let toType = $0.numericType.abbreviation + "_to_" + value.abbreviation + "_" + $0.sign.rawValue
-            if $0.sign == sign {
-                return "return " + toType + "(" + valueStr + ")"
-            }
-            let toSign = value.abbreviation + "_" + $0.sign.rawValue + "_to_" + value.abbreviation + "_" + sign.rawValue
-            return "return " + toSign + "(" + toType + "(" + valueStr + "))"
-        }
+    private func createRawInit<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
+        let def = "public init(rawValue: " + value.description + "_" + sign.rawValue + ") {"
+        let body = "self.rawValue = rawValue"
         let endef = "}"
         return def + "\n" + self.indent(body) + "\n" + endef
     }
     
-    private func createConversionInits<T: UnitProtocol>(for value: T, allCases: [T]) -> String {
-        return allCases.reduce("") {
-            $0 + "\n\n" + self.createConversionInit(for: value, from: $1)
+    private func createConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs, allCases: [T]) -> String {
+        return allCases.reduce("") { (previous, source) in
+            Signs.allCases.reduce(previous) {
+                $0 + "\n\n" + self.createConversionInit(for: value, sign, from: source, $1)
+            }
         }.trimmingCharacters(in: .newlines)
     }
     
-    private func createConversionInit<T: UnitProtocol>(for value: T, from source: T) -> String {
-        let def = "public init(_ value: " + source.description.capitalized + ") {"
-        let body = self.createSwitch(on: "value.internalRepresentation", cases: Array(SwiftNumericTypes.allCases)) {
-            let valueStr: String
-            if $0 == .Int {
-                valueStr = "CInt(value)"
-            } else if $0 == .UInt {
-                valueStr = "CUnsignedInt(value)"
-            } else {
-                valueStr = "value"
-            }
-            let numToSource = $0.numericType.abbreviation + "_to_" + source.abbreviation + "_" + $0.sign.rawValue
-            let sourceToValue = source.abbreviation + "_" + $0.sign.rawValue + "_to_" + value.abbreviation + "_d"
-            return "self.internalRepresentation = .Double(" + sourceToValue + "(" + numToSource + "(" + valueStr + ")))"
-        }
+    private func createSelfConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
+        return Set(Signs.allCases).subtracting([sign]).sorted { $0.rawValue < $1.rawValue }.reduce("") {
+            $0 + "\n\n" + self.createConversionInit(for: value, sign, from: value, $1)
+        }.trimmingCharacters(in: .newlines)
+    }
+    
+    private func createConversionInit<T: UnitProtocol>(for value: T, _ sign: Signs, from source: T, _ sourceSign: Signs) -> String {
+        let def = "public init(_ value: " + source.description.capitalized + "_" + sourceSign.rawValue + ") {"
+        let sourceToValue = source.abbreviation + "_" + sourceSign.rawValue + "_to_" + value.abbreviation + "_" + sign.rawValue
+        let body = "self.rawValue = " + sourceToValue + "(value.rawValue)"
         let endef = "}"
         return def + "\n" + self.indent(body) + "\n" + endef
     }
     
-    private func createConversionGetters<T: UnitProtocol>(from value: T, allCases: [T]) -> String {
+    private func createConversionGetters<T: UnitProtocol>(from value: T, _ sign: Signs, allCases: [T]) -> String {
         return allCases.reduce("") { (previous, target) in
             Signs.allCases.reduce(previous) {
-                $0 + "\n\n" + self.createConversionGetter(from: value, to: target, sign: $1)
+                $0 + "\n\n" + self.createConversionGetter(from: value, sign, to: target, $1)
             }
         }.trimmingCharacters(in: .newlines)
     }
     
-    private func createConversionGetter<T: UnitProtocol>(from value: T, to target: T, sign: Signs) -> String {
-        let targetStruct = target.description.capitalized
-        let def = "public var to" + targetStruct + "_" + sign.rawValue + ": " + targetStruct + " {"
-        let swtch = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) {
-            let valueStr: String
-            if $0 == .Int {
-                valueStr = "CInt(value)"
-            } else if $0 == .UInt {
-                valueStr = "CUnsignedInt(value)"
-            } else {
-                valueStr = "value"
-            }
-            let numToValue = $0.numericType.abbreviation + "_to_" + value.abbreviation + "_" + $0.sign.rawValue
-            let valueToTarget = value.abbreviation + "_" + $0.sign.rawValue + "_to_" + target.abbreviation + "_" + sign.rawValue
-            return "return " + targetStruct + "(" + valueToTarget + "(" + numToValue + "(" + valueStr + ")))"
-        }
-        let endef = "}"
-        return def + "\n" + self.indent(swtch) + "\n" + endef
-    }
-    
-    private func createNumericInits<T: UnitProtocol>(for value: T) -> String {
-        return SwiftNumericTypes.allCases.reduce("") {
-            return $0 + "\n\n" + self.createNumericInit(for: value, from: $1)
-        }.trimmingCharacters(in: .newlines)
-    }
-    
-    private func createNumericInit<T: UnitProtocol>(for value: T, from numeric: SwiftNumericTypes) -> String {
-        let def = "public init(_ value: " + numeric.rawValue + ") {"
-        let body = "self.internalRepresentation = ." + numeric.rawValue + "(value)"
+    private func createConversionGetter<T: UnitProtocol>(from value: T, _ sign: Signs, to target: T, _ targetSign: Signs) -> String {
+        let targetStruct = target.description.capitalized + "_" + targetSign.rawValue
+        let def = "public var to" + targetStruct + ": " + targetStruct + " {"
+        let valueToTarget = value.abbreviation + "_" + sign.rawValue + "_to_" + target.abbreviation + "_" + targetSign.rawValue
+        let body =  "return " + targetStruct + "(" + valueToTarget + "(self.rawValue))"
         let endef = "}"
         return def + "\n" + self.indent(body) + "\n" + endef
     }
     
-    private func createNumericGetters<T: UnitProtocol>(from value: T) -> String {
+    private func createNumericInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
         return SwiftNumericTypes.allCases.reduce("") {
-            $0 + "\n\n" + self.createNumericGetter(from: value, to: $1)
+            return $0 + "\n\n" + self.createNumericInit(for: value, sign, from: $1)
         }.trimmingCharacters(in: .newlines)
     }
     
-    private func createNumericGetter<T: UnitProtocol>(from value: T, to numericType: SwiftNumericTypes) -> String {
-        let def = "public var to" + numericType.rawValue + ": " + numericType.rawValue + " {"
-        let swtch = self.createSwitch(on: "self.internalRepresentation", cases: SwiftNumericTypes.allCases) { _ in
-            return "return " + numericType.rawValue + "(value)"
+    private func createNumericInit<T: UnitProtocol>(for value: T, _ sign: Signs, from numeric: SwiftNumericTypes) -> String {
+        let def = "public init(_ value: " + numeric.rawValue + ") {"
+        let valueStr: String
+        if numeric == .Int {
+            valueStr = "CInt(value)"
+        } else if numeric == .UInt {
+            valueStr = "CUnsignedInt(value)"
+        } else {
+            valueStr = "value"
         }
+        let body = "self.rawValue = " + numeric.numericType.abbreviation + "_to_" + value.abbreviation + "_" + sign.rawValue + "(" + valueStr + ")"
         let endef = "}"
-        return def + "\n" + self.indent(swtch) + "\n" + endef
+        return def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func createNumericGetters<T: UnitProtocol>(from value: T, _ sign: Signs) -> String {
+        return SwiftNumericTypes.allCases.reduce("") {
+            $0 + "\n\n" + self.createNumericGetter(from: value, sign, to: $1)
+        }.trimmingCharacters(in: .newlines)
+    }
+    
+    private func createNumericGetter<T: UnitProtocol>(from value: T, _ sign: Signs, to numericType: SwiftNumericTypes) -> String {
+        let def = "public var to" + numericType.rawValue + ": " + numericType.rawValue + " {"
+        let body =  numericType.rawValue + "(" + value.abbreviation + "_" + sign.rawValue + "_to_" + numericType.numericType.abbreviation + "(self.rawValue))"
+        let endef = "}"
+        return def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func indent(_ str: String) -> String {
