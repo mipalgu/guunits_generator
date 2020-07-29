@@ -154,9 +154,10 @@ struct SwiftFileCreator {
         let numericInits = self.indent(self.createNumericInits(for: type, sign))
         let conversionInits: String
         if allCases.isEmpty {
-        conversionInits = ""
+            conversionInits = ""
         } else {
-            conversionInits = "\n\n" + self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
+            let conversionInitMark = "// MARK: - Converting From Other Units"
+            conversionInits = "\n\n" + conversionInitMark + "\n\n" + self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
         }
         let selfConversions = self.indent(self.createSelfConversionInits(for: type, sign))
         return comment + "\n" + def
@@ -165,7 +166,6 @@ struct SwiftFileCreator {
             + "\n\n" + rawInit
             + "\n\n" + "// MARK: - Converting From Swift Numeric Types"
             + "\n\n" + numericInits
-            + "\n\n" + "// MARK: - Converting From Other Units"
             + conversionInits
             + "\n\n" + "// MARK: - Converting From Other Precisions"
             + "\n\n" + selfConversions
