@@ -279,12 +279,12 @@ struct SwiftFileCreator {
     
     private func prefixNonEmptyLines(_ str: String, with prefix: String) -> String {
         let lines = str.components(separatedBy: .newlines)
-        guard let first = lines.first else {
-            return prefix
+        guard let first = lines.first?.trimmingCharacters(in: .whitespaces) else {
+            return ""
         }
-        return lines.dropFirst().reduce(prefix + first) {
-            if $1.isEmpty {
-                return $0 + "\n" + $1
+        return lines.dropFirst().reduce(first.isEmpty ? "" : prefix + first) {
+            if $1.trimmingCharacters(in: .whitespaces).isEmpty {
+                return $0 + "\n"
             }
             return $0 + "\n" + prefix + $1
         }
