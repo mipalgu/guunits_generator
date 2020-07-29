@@ -60,4 +60,18 @@ protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
     
     var abbreviation: String { get }
     
+    static var category: String { get }
+    
+}
+
+extension UnitProtocol {
+    
+    static var category: String {
+        let name = "\(Self.self)"
+        if name.hasSuffix("Units") {
+            return String(name.dropLast(5))
+        }
+        return name
+    }
+    
 }

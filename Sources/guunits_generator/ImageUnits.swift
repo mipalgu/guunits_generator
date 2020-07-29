@@ -71,6 +71,10 @@ extension ImageUnits: UnitProtocol {
         }
     }
     
+    static var category: String {
+        "Pixels"
+    }
+    
     var description: String {
         return self.rawValue
     }
