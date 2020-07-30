@@ -61,10 +61,19 @@ struct SwiftFileCreator {
     func generate<T: UnitProtocol>(for type: T.Type) -> String {
         let prefix = self.prefix(name: type.category)
         let categoryStruct = self.generateCategoryStruct(for: type)
+        let allUnits = type.allCases.flatMap { unit in
+            Signs.allCases.map {
+                unit.description.capitalized + "_" + $0.rawValue
+            }
+        }
+        let extensionTypes = SwiftNumericTypes.uniqueTypes.map { $0.rawValue } + allUnits
+        let categoryExtensions = self.createMultiple(for: extensionTypes) {
+            return self.generateCategoryExtension(for: $0, from: type)
+        }
         let unitStruct = self.createMultiple(for: type.allCases) {
             self.generateUnit(for: $0)
         }
-        return prefix + "\n\n" + categoryStruct + "\n\n" + unitStruct
+        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct
     }
     
     private func generateUnit<T: UnitProtocol>(for value: T) -> String {
@@ -143,7 +152,7 @@ struct SwiftFileCreator {
     
     private func generateCategoryStruct<T: UnitProtocol>(for type: T.Type) -> String {
         let _ = Signs.d
-        let def = "public struct " + type.category + " {"
+        let def = "public struct " + type.category + ": GUUnitsDType {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let rawPropertyInit = self.indent(self.generateCategoryRawValueInit(for: type))
         let numericInits = self.indent(self.createCategoryNumericInits(for: type))
@@ -207,6 +216,20 @@ struct SwiftFileCreator {
         let body = "self.rawValue = " + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "(value)"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func generateCategoryExtension<T: UnitProtocol>(for extensionType: String, from type: T.Type) -> String {
+        let category: String = type.category
+        let def = "public extension " + extensionType + " {"
+        let mark = "// MARK: - Creating a " + extensionType + " From `" + category + "`"
+        let initDef = "init(_ value: " + category + ") {"
+        let initBody = "self.init(value.rawValue)"
+        let endef = "}"
+        let body = initDef + "\n" + self.indent(initBody) + "\n" + endef
+        return def
+            + "\n\n" + mark
+            + "\n\n" + self.indent(body)
+            + "\n\n" + endef
     }
     
     private func generateUnitStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
