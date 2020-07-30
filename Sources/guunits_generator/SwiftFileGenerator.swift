@@ -146,6 +146,30 @@ struct SwiftFileCreator {
     
     private func generateCategoryStruct<T: UnitProtocol>(for type: T.Type) -> String {
         let _ = Signs.d
+        let comment = """
+            /// Provides a generic way of working with \(T.category.lowercased()) units.
+            ///
+            /// This type is useful as it allows you to specify that you are
+            /// working with a particular type of unit, without having to
+            /// specify in which units you are working. This type allows you
+            /// to convert to any of the related underlying unit types.
+            ///
+            /// It is recommended that if you are creating a library or public
+            /// api of some sort, then this type should be used in your function
+            /// declaration over the more specific underlying unit types that
+            /// this type can convert to. If you are performing some
+            /// sort of calculations then you obviously need to use one of the
+            /// underlying unit types that this type can convert to; however,
+            /// the public api should take this type which you should then
+            /// convert to the underlying unit type you need.
+            ///
+            /// - Attention: Because this type is numeric, and therefore allows
+            /// you to perform arithmetic, this type must behave like a double
+            /// as a double has the highest precision. If this is not
+            /// necessary, then you may opt to use one of the integer
+            /// variants of the underlying unit types that this type can convert
+            /// to.
+            """
         let def = "public struct " + type.category + ": GUUnitsDType {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let getters = self.indent(self.generateCategoryGetters(for: type))
@@ -153,12 +177,16 @@ struct SwiftFileCreator {
         let numericInits = self.indent(self.createCategoryNumericInits(for: type))
         let conversionInits = self.indent(self.createCategoryConversionInits(for: type))
         let endef = "}"
-        return def
+        return comment + "\n" + def
+            + "\n\n" + "// MARK: - Converting Between The Internal Representation"
             + "\n\n" + rawProperty
-            + "\n\n" + getters
             + "\n\n" + rawPropertyInit
-            + "\n\n" + numericInits
+            + "\n\n" + "// MARK: - Converting To The Underlying Unit Types"
+            + "\n\n" + getters
+            + "\n\n" + "// MARK: - Converting From The Underlying Unit Types"
             + "\n\n" + conversionInits
+            + "\n\n" + "// MARK: - Converting From Swift Numeric Types"
+            + "\n\n" + numericInits
             + "\n\n" + endef
     }
     
@@ -169,10 +197,11 @@ struct SwiftFileCreator {
     }
     
     private func generateCategoryRawValueInit<T: UnitProtocol>(for type: T.Type) -> String {
+        let comment = "/// Initialise `" + type.category + "` from its internally representation."
         let def = "public init(rawValue: " + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + ") {"
         let body = "self.rawValue = rawValue"
         let endef = "}"
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func generateCategoryGetters<T: UnitProtocol>(for type: T.Type) -> String {
@@ -202,6 +231,13 @@ struct SwiftFileCreator {
     }
     
     private func createCategoryConversionInit<T: UnitProtocol>(for type: T.Type, from source: T, _ sign: Signs) -> String {
+        let valueStruct = T.category
+        let sourceStruct = source.description.capitalized + "_" + sign.rawValue
+        let comment = """
+            /// Create a `\(valueStruct)` by converting a `\(sourceStruct)`.
+            ///
+            /// - Parameter value: A `\(sourceStruct)` value to convert to a `\(valueStruct)`.
+            """
         let def = "public init(_ value: " + source.description.capitalized + "_" + sign.rawValue  + ") {"
         let endef = "}"
         let body: String
@@ -210,7 +246,7 @@ struct SwiftFileCreator {
         } else {
             body = "self.rawValue = " + T.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "(value)"
         }
-        return def + "\n" + self.indent(body) + "\n" + endef
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createCategoryNumericInits<T: UnitProtocol>(for type: T.Type) -> String {
