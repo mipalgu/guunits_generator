@@ -271,7 +271,7 @@ struct SwiftFileCreator {
     private func generateCategoryExtension<T: UnitProtocol>(for extensionType: String, from type: T.Type) -> String {
         let category: String = type.category
         let def = "public extension " + extensionType + " {"
-        let mark = "// MARK: - Creating a " + extensionType + " From `" + category + "`"
+        let mark = "// MARK: - Creating a " + extensionType + " From The " + category + " Units"
         let initDef = "init(_ value: " + category + ") {"
         let initBody = "self.init(value.rawValue)"
         let endef = "}"
@@ -329,7 +329,7 @@ struct SwiftFileCreator {
     
     private func generateNumericExtension<T: UnitProtocol>(for numericType: SwiftNumericTypes, from value: T) -> String {
         let def = "public extension " + numericType.rawValue + " {"
-        let mark = "// MARK: - Creating a " + numericType.rawValue + " From The " + value.description.capitalized + " Units"
+        let mark = "// MARK: Creating a " + numericType.rawValue + " From The " + value.description.capitalized + " Units"
         let body = Signs.allCases.reduce("") {
             $0 + "\n\n" + self.createNumericConversionInit(for: numericType, from: value, $1)
         }.trimmingCharacters(in: .newlines)
