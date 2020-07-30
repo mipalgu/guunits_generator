@@ -148,12 +148,14 @@ struct SwiftFileCreator {
         let _ = Signs.d
         let def = "public struct " + type.category + ": GUUnitsDType {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
+        let getters = self.indent(self.generateCategoryGetters(for: type))
         let rawPropertyInit = self.indent(self.generateCategoryRawValueInit(for: type))
         let numericInits = self.indent(self.createCategoryNumericInits(for: type))
         let conversionInits = self.indent(self.createCategoryConversionInits(for: type))
         let endef = "}"
         return def
             + "\n\n" + rawProperty
+            + "\n\n" + getters
             + "\n\n" + rawPropertyInit
             + "\n\n" + numericInits
             + "\n\n" + conversionInits
@@ -171,6 +173,24 @@ struct SwiftFileCreator {
         let body = "self.rawValue = rawValue"
         let endef = "}"
         return def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func generateCategoryGetters<T: UnitProtocol>(for type: T.Type) -> String {
+        return self.createMultiple(for: type.allCases) { value in
+            self.createMultiple(for: Signs.allCases) { sign in
+                self.generateCategoryGetter(to: value, sign)
+            }
+        }
+    }
+    
+    private func generateCategoryGetter<T: UnitProtocol>(to value: T, _ sign: Signs) -> String {
+        let targetStruct = value.description.capitalized + "_" + sign.rawValue
+        let getterName = value.description + "_" + sign.rawValue
+        let comment = "/// Create a `" + targetStruct + "`."
+        let def = "public var " + getterName + ": " + targetStruct + " {"
+        let body = "return " + targetStruct + "(self.rawValue)"
+        let endef = "}"
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createCategoryConversionInits<T: UnitProtocol>(for type: T.Type) -> String {
