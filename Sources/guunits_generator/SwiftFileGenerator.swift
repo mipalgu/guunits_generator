@@ -61,14 +61,8 @@ struct SwiftFileCreator {
     func generate<T: UnitProtocol>(for type: T.Type) -> String {
         let prefix = self.prefix(name: type.category)
         let categoryStruct = self.generateCategoryStruct(for: type)
-        let allUnits = type.allCases.flatMap { unit in
-            Signs.allCases.map {
-                unit.description.capitalized + "_" + $0.rawValue
-            }
-        }
-        let extensionTypes = SwiftNumericTypes.uniqueTypes.map { $0.rawValue } + allUnits
-        let categoryExtensions = self.createMultiple(for: extensionTypes) {
-            return self.generateCategoryExtension(for: $0, from: type)
+        let categoryExtensions = self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
+            return self.generateCategoryExtension(for: $0.rawValue, from: type)
         }
         let unitStruct = self.createMultiple(for: type.allCases) {
             self.generateUnit(for: $0)
@@ -319,11 +313,27 @@ struct SwiftFileCreator {
     }
     
     private func createConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs, allCases: [T]) -> String {
-        return self.createMultiple(for: allCases) { source in
+        let categoryInit = self.createConversionInitFromCategory(for: value, sign)
+        let conversionInits = self.createMultiple(for: allCases) { source in
             self.createMultiple(for: Signs.allCases) {
                 self.createConversionInit(for: value, sign, from: source, $0)
             }
         }
+        return categoryInit + "\n\n" + conversionInits
+    }
+    
+    private func createConversionInitFromCategory<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
+        let valueStruct = value.description.capitalized + "_" + sign.rawValue
+        let sourceStruct = T.category
+        let comment = """
+        /// Create a `\(valueStruct)` by converting a `\(sourceStruct)`.
+        ///
+        /// - Parameter value: A `\(sourceStruct)` value to convert to a `\(valueStruct)`.
+        """
+        let def = "public init(_ value: " + sourceStruct + ") {"
+        let body = "self.init(value.rawValue)"
+        let endef = "}"
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
     
     private func createSelfConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
