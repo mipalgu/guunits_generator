@@ -62,6 +62,8 @@ protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
     
     static var category: String { get }
     
+    static var highestPrecision: Self { get }
+    
 }
 
 extension UnitProtocol {
@@ -72,6 +74,10 @@ extension UnitProtocol {
             return String(name.dropLast(5))
         }
         return name
+    }
+    
+    static var highestPrecision: Self {
+        return allCases.first!
     }
     
 }

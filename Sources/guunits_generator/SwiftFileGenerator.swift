@@ -58,15 +58,23 @@
 
 struct SwiftFileCreator {
     
-    func generate<T: UnitProtocol>(for value: T) -> String {
-        let prefix = self.prefix(name: value.description.capitalized)
-        let structs = Signs.allCases.reduce("") {
-            $0 + "\n\n" + self.generateStruct(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
+    func generate<T: UnitProtocol>(for type: T.Type) -> String {
+        let prefix = self.prefix(name: type.category)
+        let categoryStruct = self.generateCategoryStruct(for: type)
+        let unitStruct = self.createMultiple(for: type.allCases) {
+            self.generateUnit(for: $0)
+        }
+        return prefix + "\n\n" + categoryStruct + "\n\n" + unitStruct
+    }
+    
+    private func generateUnit<T: UnitProtocol>(for value: T) -> String {
+        let unitStruct = Signs.allCases.reduce("") {
+            $0 + "\n\n" + self.generateUnitStruct(for: value, $1, allCases: Set(T.allCases).subtracting(Set([value])).sorted { $0.description < $1.description })
         }
         let extensionDef = SwiftNumericTypes.uniqueTypes.reduce("") {
             $0 + "\n\n" + self.generateNumericExtension(for: $1, from: value)
         }
-        return prefix + structs + extensionDef + "\n"
+        return unitStruct + extensionDef + "\n"
     }
     
     private func prefix(name: String) -> String {
@@ -133,7 +141,75 @@ struct SwiftFileCreator {
             """
     }
     
-    private func generateStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
+    private func generateCategoryStruct<T: UnitProtocol>(for type: T.Type) -> String {
+        let _ = Signs.d
+        let def = "public struct " + type.category + " {"
+        let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
+        let rawPropertyInit = self.indent(self.generateCategoryRawValueInit(for: type))
+        let numericInits = self.indent(self.createCategoryNumericInits(for: type))
+        let conversionInits = self.indent(self.createCategoryConversionInits(for: type))
+        let endef = "}"
+        return def
+            + "\n\n" + rawProperty
+            + "\n\n" + rawPropertyInit
+            + "\n\n" + numericInits
+            + "\n\n" + conversionInits
+            + "\n\n" + endef
+    }
+    
+    private func generateCategoryRawValueProperty<T: UnitProtocol>(for type: T.Type) -> String {
+        let comment = "/// Always store internally as a `" + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "`"
+        let def = "public let rawValue: " + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue
+        return comment + "\n" + def
+    }
+    
+    private func generateCategoryRawValueInit<T: UnitProtocol>(for type: T.Type) -> String {
+        let def = "public init(rawValue: " + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + ") {"
+        let body = "self.rawValue = rawValue"
+        let endef = "}"
+        return def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func createCategoryConversionInits<T: UnitProtocol>(for type: T.Type) -> String {
+        return self.createMultiple(for: T.allCases) { source in
+            return self.createMultiple(for: Signs.allCases) {
+                return self.createCategoryConversionInit(for: type, from: source, $0)
+            }
+        }
+    }
+    
+    private func createCategoryConversionInit<T: UnitProtocol>(for type: T.Type, from source: T, _ sign: Signs) -> String {
+        let def = "public init(_ value: " + source.description.capitalized + "_" + sign.rawValue  + ") {"
+        let endef = "}"
+        let body: String
+        if source == T.highestPrecision && sign == .d {
+            body = "self.rawValue = value"
+        } else {
+            body = "self.rawValue = " + T.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "(value)"
+        }
+        return def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func createCategoryNumericInits<T: UnitProtocol>(for type: T.Type) -> String {
+        return self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
+            return self.createCategoryNumericInit(for: type, from: $0)
+        }
+    }
+    
+    private func createCategoryNumericInit<T: UnitProtocol>(for type: T.Type, from numeric: SwiftNumericTypes) -> String {
+        let sourceStruct = type.category
+        let comment = """
+            /// Create a `\(sourceStruct)` by converting a `\(numeric.rawValue)`.
+            ///
+            /// - Parameter value: A `\(numeric.rawValue)` value to convert to a `\(sourceStruct)`.
+            """
+        let def = "public init(_ value: " + numeric.rawValue + ") {"
+        let body = "self.rawValue = " + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "(value)"
+        let endef = "}"
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func generateUnitStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
         let signComment: String
         switch sign {
         case .d:
@@ -220,17 +296,17 @@ struct SwiftFileCreator {
     }
     
     private func createConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs, allCases: [T]) -> String {
-        return allCases.reduce("") { (previous, source) in
-            Signs.allCases.reduce(previous) {
-                $0 + "\n\n" + self.createConversionInit(for: value, sign, from: source, $1)
+        return self.createMultiple(for: allCases) { source in
+            self.createMultiple(for: Signs.allCases) {
+                self.createConversionInit(for: value, sign, from: source, $0)
             }
-        }.trimmingCharacters(in: .newlines)
+        }
     }
     
     private func createSelfConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
-        return Set(Signs.allCases).subtracting([sign]).sorted { $0.rawValue < $1.rawValue }.reduce("") {
-            $0 + "\n\n" + self.createConversionInit(for: value, sign, from: value, $1)
-        }.trimmingCharacters(in: .newlines)
+        return self.createMultiple(for: Set(Signs.allCases).subtracting([sign]).sorted { $0.rawValue < $1.rawValue }) {
+            return self.createConversionInit(for: value, sign, from: value, $0)
+        }
     }
     
     private func createConversionInit<T: UnitProtocol>(for value: T, _ sign: Signs, from source: T, _ sourceSign: Signs) -> String {
@@ -249,9 +325,9 @@ struct SwiftFileCreator {
     }
     
     private func createNumericInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
-        return SwiftNumericTypes.uniqueTypes.reduce("") {
-            return $0 + "\n\n" + self.createNumericInit(for: value, sign, from: $1)
-        }.trimmingCharacters(in: .newlines)
+        return self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
+            self.createNumericInit(for: value, sign, from: $0)
+        }
     }
     
     private func createNumericInit<T: UnitProtocol>(for value: T, _ sign: Signs, from numeric: SwiftNumericTypes) -> String {
@@ -271,6 +347,10 @@ struct SwiftFileCreator {
         let body = "self.rawValue = " + numeric.numericType.abbreviation + "_to_" + value.abbreviation + "_" + sign.rawValue + "(" + valueStr + ")"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func createMultiple<S: Sequence, T>(for data: S, _ body: (T) -> String) -> String where S.Element == T {
+        return data.reduce("") { $0 + "\n\n" + body($1) }.trimmingCharacters(in: .newlines)
     }
     
     private func indent(_ str: String) -> String {

@@ -24,21 +24,11 @@ let cppAngleGenerator = CPPAngleUnitsGenerator(definitionCreator: CPPFunctionDef
 let swiftFileCreator = SwiftFileCreator()
 
 do {
-    for unit in DistanceUnits.allCases {
-        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
-    }
-    for unit in TimeUnits.allCases {
-        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
-    }
-    for unit in AngleUnits.allCases {
-        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
-    }
-    for unit in ImageUnits.allCases {
-        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
-    }
-    for unit in PercentUnits.allCases {
-        try swiftFileCreator.generate(for: unit).write(toFile: unit.description.capitalized + ".swift", atomically: true, encoding: .utf8)
-    }
+    try swiftFileCreator.generate(for: DistanceUnits.self).write(toFile: DistanceUnits.category + ".swift", atomically: true, encoding: .utf8)
+    try swiftFileCreator.generate(for: TimeUnits.self).write(toFile: TimeUnits.category + ".swift", atomically: true, encoding: .utf8)
+    try swiftFileCreator.generate(for: AngleUnits.self).write(toFile: AngleUnits.category + ".swift", atomically: true, encoding: .utf8)
+    try swiftFileCreator.generate(for: ImageUnits.self).write(toFile: ImageUnits.category + ".swift", atomically: true, encoding: .utf8)
+    try swiftFileCreator.generate(for: PercentUnits.self).write(toFile: PercentUnits.category + ".swift", atomically: true, encoding: .utf8)
 } catch let e {
     fatalError("Unable to write swift file: \(e)")
 }
