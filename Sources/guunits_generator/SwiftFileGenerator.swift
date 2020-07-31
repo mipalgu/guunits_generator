@@ -250,20 +250,28 @@ struct SwiftFileCreator {
     }
     
     private func createCategoryNumericInits<T: UnitProtocol>(for type: T.Type) -> String {
-        return self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
-            return self.createCategoryNumericInit(for: type, from: $0)
+        return self.createMultiple(for: SwiftNumericTypes.uniqueTypes) { numeric in
+            return self.createMultiple(for: type.allCases) {
+                return self.createCategoryNumericInit(for: type, from: numeric, as: $0)
+            }
         }
     }
     
-    private func createCategoryNumericInit<T: UnitProtocol>(for type: T.Type, from numeric: SwiftNumericTypes) -> String {
+    private func createCategoryNumericInit<T: UnitProtocol>(for type: T.Type, from numeric: SwiftNumericTypes, as value: T) -> String {
         let sourceStruct = type.category
         let comment = """
-            /// Create a `\(sourceStruct)` by converting a `\(numeric.rawValue)`.
+            /// Create a `\(sourceStruct)` by converting a `\(numeric.rawValue)` \(value.description) value.
             ///
-            /// - Parameter value: A `\(numeric.rawValue)` value to convert to a `\(sourceStruct)`.
+            /// - Parameter value: A `\(numeric.rawValue)` \(value.description) value to convert to a `\(sourceStruct)`.
             """
-        let def = "public init(_ value: " + numeric.rawValue + ") {"
-        let body = "self.rawValue = " + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "(value)"
+        let def = "public init(" + value.description + " value: " + numeric.rawValue + ") {"
+        let rawValueStruct = type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue
+        let body: String
+        if value == type.highestPrecision && numeric.sign == .d {
+            body = "self.rawValue = " + rawValueStruct + "(value)"
+        } else {
+            body = "self.rawValue = " + rawValueStruct + "(" + value.description.capitalized + "_" + numeric.sign.rawValue + "(value))"
+        }
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
