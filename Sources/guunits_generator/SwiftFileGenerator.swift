@@ -170,7 +170,7 @@ struct SwiftFileCreator {
             /// variants of the underlying unit types that this type can convert
             /// to.
             """
-        let def = "public struct " + type.category + ": GUUnitsDType {"
+        let def = "public struct " + type.category + " {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let getters = self.indent(self.generateCategoryGetters(for: type))
         let rawPropertyInit = self.indent(self.generateCategoryRawValueInit(for: type))
