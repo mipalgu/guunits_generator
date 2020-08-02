@@ -173,6 +173,7 @@ struct SwiftFileCreator {
         let def = "public struct " + type.category + " {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let getters = self.indent(self.generateCategoryGetters(for: type))
+        let staticInits = self.indent(self.createCategoryStaticInits(for: type))
         let rawPropertyInit = self.indent(self.generateCategoryRawValueInit(for: type))
         let numericInits = self.indent(self.createCategoryNumericInits(for: type))
         let conversionInits = self.indent(self.createCategoryConversionInits(for: type))
@@ -186,6 +187,7 @@ struct SwiftFileCreator {
             + "\n\n" + "// MARK: - Converting From The Underlying Unit Types"
             + "\n\n" + conversionInits
             + "\n\n" + "// MARK: - Converting From Swift Numeric Types"
+            + "\n\n" + staticInits
             + "\n\n" + numericInits
             + "\n\n" + endef
     }
@@ -218,6 +220,27 @@ struct SwiftFileCreator {
         let comment = "/// Create a `" + targetStruct + "`."
         let def = "public var " + getterName + ": " + targetStruct + " {"
         let body = "return " + targetStruct + "(self.rawValue)"
+        let endef = "}"
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func createCategoryStaticInits<T: UnitProtocol>(for type: T.Type) -> String {
+        return self.createMultiple(for: SwiftNumericTypes.uniqueTypes) { numeric in
+            return self.createMultiple(for: type.allCases) {
+                return self.createCategoryStaticInit(for: type, from: numeric, as: $0)
+            }
+        }
+    }
+    
+    private func createCategoryStaticInit<T: UnitProtocol>(for type: T.Type, from numeric: SwiftNumericTypes, as value: T) -> String {
+        let sourceStruct = type.category
+        let comment = """
+            /// Create a `\(sourceStruct)` by converting a `\(numeric.rawValue)` \(value.description) value.
+            ///
+            /// - Parameter value: A `\(numeric.rawValue)` \(value.description) value to convert to a `\(sourceStruct)`.
+            """
+        let def = "public static func " + value.description + "(_ value: " + numeric.rawValue + ") -> " + sourceStruct + " {"
+        let body = "return " + sourceStruct + "(" + value.description + ": value)"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
