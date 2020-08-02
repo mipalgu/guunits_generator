@@ -64,6 +64,8 @@ protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
     
     static var highestPrecision: Self { get }
     
+    static var sameZeroPoint: Bool { get }
+    
 }
 
 extension UnitProtocol {
@@ -78,6 +80,10 @@ extension UnitProtocol {
     
     static var highestPrecision: Self {
         return allCases.first!
+    }
+    
+    static var sameZeroPoint: Bool {
+        return true
     }
     
 }

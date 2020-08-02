@@ -173,6 +173,12 @@ struct SwiftFileCreator {
         let def = "public struct " + type.category + " {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let getters = self.indent(self.generateCategoryGetters(for: type))
+        let zeroGetter: String
+        if type.sameZeroPoint {
+            zeroGetter = "\n\n" + self.indent(self.createCategoryZeroStaticGetter(for: type))
+        } else {
+            zeroGetter = ""
+        }
         let staticInits = self.indent(self.createCategoryStaticInits(for: type))
         let rawPropertyInit = self.indent(self.generateCategoryRawValueInit(for: type))
         let numericInits = self.indent(self.createCategoryNumericInits(for: type))
@@ -187,6 +193,7 @@ struct SwiftFileCreator {
             + "\n\n" + "// MARK: - Converting From The Underlying Unit Types"
             + "\n\n" + conversionInits
             + "\n\n" + "// MARK: - Converting From Swift Numeric Types"
+            + zeroGetter
             + "\n\n" + staticInits
             + "\n\n" + numericInits
             + "\n\n" + endef
@@ -220,6 +227,17 @@ struct SwiftFileCreator {
         let comment = "/// Create a `" + targetStruct + "`."
         let def = "public var " + getterName + ": " + targetStruct + " {"
         let body = "return " + targetStruct + "(self.rawValue)"
+        let endef = "}"
+        return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
+    }
+    
+    private func createCategoryZeroStaticGetter<T: UnitProtocol>(for type: T.Type) -> String {
+        let sourceStruct = type.category
+        let comment = """
+            /// Create a `\(sourceStruct)` equal to zero.
+            """
+        let def = "public static var zero: " + sourceStruct + " {"
+        let body = "return " + sourceStruct + "(" + type.highestPrecision.description + ": 0)"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
