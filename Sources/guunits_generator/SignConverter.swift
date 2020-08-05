@@ -66,7 +66,7 @@ struct SignConverter {
             let uint: Signs = .u
             let intMax = self.cast("INT_MAX", to: uint.type)
             return self.cast("(\(str)) > \(intMax) ? \(intMax) : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
-        case (.d, .f), (.f, .d):
+        case (_, .f), (_, .d):
             return self.cast("\(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         default:
             let allCases = Array(Signs.allCases)

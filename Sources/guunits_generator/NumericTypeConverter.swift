@@ -98,7 +98,7 @@ struct NumericTypeConverter: NumericConverterProtocol {
     }
     
     fileprivate func convertFloat(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
-        if type.isFloat {
+        if type.isFloat && !otherType.isFloat {
             return self.cast("round(\(type != .double ? self.cast(str, to: "double") : str))", to: currentType)
         }
         return str
