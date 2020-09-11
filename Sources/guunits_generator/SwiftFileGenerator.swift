@@ -170,7 +170,7 @@ struct SwiftFileCreator {
             /// variants of the underlying unit types that this type can convert
             /// to.
             """
-        let def = "public struct " + type.category + " {"
+        let def = "public struct " + type.category + ": Hashable, Codable {"
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let getters = self.indent(self.generateCategoryGetters(for: type))
         let zeroGetter: String
@@ -344,7 +344,7 @@ struct SwiftFileCreator {
             signComment = "An unsigned integer"
         }
         let comment = "/// " + signComment + " type for the " + type.description + " unit."
-        let conformingType = "GUUnits" + sign.rawValue.uppercased() + "Type"
+        let conformingType = "GUUnits" + sign.rawValue.uppercased() + "Type, Hashable, Codable"
         let def = "public struct " + type.description.capitalized + "_" + sign.rawValue + ": " + conformingType + " {"
         let endef = "}"
         let rawValueProperty = self.indent(self.generateRawProperty(for: type, sign))
