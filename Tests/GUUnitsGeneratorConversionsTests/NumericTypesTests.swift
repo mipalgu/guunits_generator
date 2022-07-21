@@ -196,6 +196,8 @@ final class NumericTypesTests: XCTestCase {
         )
     }
 
+    // swiftlint:disable function_parameter_count
+
     /// Tests all properties of a NumericTypes case.
     /// - Parameters:
     ///   - value: The unit under test.
@@ -232,6 +234,8 @@ final class NumericTypesTests: XCTestCase {
         assert(value: value, smallerThan: smallerThan)
         assert(value: value, largerThan: largerThan)
     }
+
+    // swiftlint:enable function_parameter_count
 
     /// Assert that all types in largerThan or smaller than value.
     /// - Parameters:
