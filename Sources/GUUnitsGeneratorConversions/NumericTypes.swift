@@ -56,16 +56,51 @@
  *
  */
 
+/// The numeric types supported by guunits.
 public enum NumericTypes: String {
-    
-    case int = "int", int8 = "int8_t", int16 = "int16_t", int32 = "int32_t", int64 = "int64_t"
-    case uint = "unsigned int", uint8 = "uint8_t", uint16 = "uint16_t", uint32 = "uint32_t", uint64 = "uint64_t"
-    case float = "float", double = "double"
-    
+
+    /// An integer type.
+    case int = "int"
+
+    /// An 8-bit integer type.
+    case int8 = "int8_t"
+
+    /// A 16-bit integer type.
+    case int16 = "int16_t"
+
+    /// A 32-bit integer type.
+    case int32 = "int32_t"
+
+    /// A 64-bit integer type.
+    case int64 = "int64_t"
+
+    /// An unsigned integer type.
+    case uint = "unsigned int"
+
+    /// An 8-bit unsigned integer type.
+    case uint8 = "uint8_t"
+
+    /// A 16-bit unsigned integer type.
+    case uint16 = "uint16_t"
+
+    /// A 32-bit unsigned integer type.
+    case uint32 = "uint32_t"
+
+    /// A 64-bit unsigned integer type.
+    case uint64 = "uint64_t"
+
+    /// A floating point type.
+    case float = "float"
+
+    /// A double-precision floating point type.
+    case double = "double"
+
 }
 
+/// Helper properties.
 extension NumericTypes {
-    
+
+    /// The guunits abbreviation of the supported types.
     var abbreviation: String {
         switch self {
         case .int:
@@ -94,7 +129,8 @@ extension NumericTypes {
             return "d"
         }
     }
-    
+
+    /// This property returns true when the type is a *signed* type.
     var isSigned: Bool {
         switch self {
         case .int, .int8, .int16, .int32, .int64, .float, .double:
@@ -103,7 +139,8 @@ extension NumericTypes {
             return false
         }
     }
-    
+
+    /// This property returns true when the type is a *floating point* type.
     var isFloat: Bool {
         switch self {
         case .float, .double:
@@ -112,7 +149,9 @@ extension NumericTypes {
             return false
         }
     }
-    
+
+    /// This property will return the opposite type if one is defined. Examples include
+    /// int -> uint, int8 -> uint8, etc. Floating point types do not have an opposite.
     var opposite: NumericTypes {
         switch self {
         case .int:
@@ -141,7 +180,9 @@ extension NumericTypes {
             return .double
         }
     }
-    
+
+    /// The minimum and maximum value a type can represent. This property returns the constraints
+    /// in a tuple as (MIN, MAX).
     var limits: (String, String) {
         switch self {
         case .int, .int32:
@@ -166,7 +207,8 @@ extension NumericTypes {
             return ("DBL_MIN", "DBL_MAX")
         }
     }
-    
+
+    /// The equivalent swift type of the guunits type.
     var swiftType: SwiftNumericTypes {
         switch self {
         case .int8:
@@ -195,10 +237,19 @@ extension NumericTypes {
             return .Double
         }
     }
-    
+
+    /// This function compares self to another guunits type and returns whether
+    /// self is smaller than the other type.
+    /// - Parameter other: The type to compare against.
+    /// - Returns: Whether self is less than other.
     func smallerThan(_ other: NumericTypes) -> Bool {
         if self.isSigned != other.isSigned {
-            fatalError("Can only compare numeric types of the same sort (int with other ints, floats with other floats).")
+            fatalError(
+                """
+                Can only compare numeric types of the same sort
+                (int with other ints, floats with other floats).
+                """
+            )
         }
         switch self {
         case .int8:
@@ -223,11 +274,14 @@ extension NumericTypes {
             return false
         }
     }
-        
+
+    /// This function returns whether self is larger than some other guunits type.
+    /// - Parameter other: The type to compare against.
+    /// - Returns: Whether self is larger than other.
     func largerThan(_ other: NumericTypes) -> Bool {
-        return other.smallerThan(self)
+        other.smallerThan(self)
     }
-    
+
 }
 
 extension NumericTypes: CaseIterable {}
