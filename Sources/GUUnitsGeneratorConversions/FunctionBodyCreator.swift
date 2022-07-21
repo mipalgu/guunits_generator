@@ -56,7 +56,7 @@
  *
  */
 
-protocol FunctionBodyCreator {
+public protocol FunctionBodyCreator {
     
     associatedtype Unit: UnitProtocol
     

@@ -1,8 +1,8 @@
 /*
- * Signs.swift 
- * guunits_generator 
+ * FunctionDefinitionCreator.swift
+ * guunits_generator
  *
- * Created by Callum McColl on 15/06/2019.
+ * Created by Callum McColl on 29/10/19.
  * Copyright © 2019 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,36 +56,14 @@
  *
  */
 
-enum Signs: String {
+public protocol FunctionDefinitionCreator {
     
-    case t = "t"
-    case u = "u"
-    case f = "f"
-    case d = "d"
-
-}
-
-extension Signs {
+    associatedtype Unit: UnitProtocol
     
-    var type: String {
-        return self.numericType.rawValue
-    }
+    func functionDefinition(forUnit: Unit, to: Unit, sign: Signs, otherSign: Signs) -> String
     
-    var numericType: NumericTypes {
-        switch self {
-        case .t:
-            return .int
-        case .u:
-            return .uint
-        case .f:
-            return .float
-        case .d:
-            return .double
-        }
-    }
+    func functionDefinition(forUnit: Unit, sign: Signs, to: NumericTypes) -> String
+    
+    func functionDefinition(from: NumericTypes, to: Unit, sign: Signs) -> String
     
 }
-
-extension Signs: CaseIterable {}
-
-extension Signs: Hashable {}

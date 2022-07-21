@@ -1,5 +1,6 @@
+//
 /*
- * FunctionDefinitionCreator.swift
+ * FunctionCreator.swift
  * guunits_generator
  *
  * Created by Callum McColl on 29/10/19.
@@ -56,14 +57,10 @@
  *
  */
 
-protocol FunctionDefinitionCreator {
+public protocol FunctionCreator: FunctionDefinitionCreator, FunctionBodyCreator {
     
-    associatedtype Unit: UnitProtocol
+    func convert(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
     
-    func functionDefinition(forUnit: Unit, to: Unit, sign: Signs, otherSign: Signs) -> String
-    
-    func functionDefinition(forUnit: Unit, sign: Signs, to: NumericTypes) -> String
-    
-    func functionDefinition(from: NumericTypes, to: Unit, sign: Signs) -> String
+    func convert(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String
     
 }

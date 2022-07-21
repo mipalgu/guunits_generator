@@ -56,13 +56,13 @@
  *
  */
 
-struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where Unit.AllCases.Index == Int {
+public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where Unit.AllCases.Index == Int {
     
     fileprivate(set) var unitDifference: [Unit: Int]
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
     fileprivate let signConverter: SignConverter = SignConverter()
     
-    func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+    public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let allCases = Unit.allCases
         let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         if unit == otherUnit {

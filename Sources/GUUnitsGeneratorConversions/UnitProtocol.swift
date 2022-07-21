@@ -56,7 +56,7 @@
  *
  */
 
-protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
+public protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
     
     var abbreviation: String { get }
     
@@ -70,7 +70,7 @@ protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
 
 extension UnitProtocol {
     
-    static var category: String {
+    public static var category: String {
         let name = "\(Self.self)"
         if name.hasSuffix("Units") {
             return String(name.dropLast(5))
@@ -78,11 +78,11 @@ extension UnitProtocol {
         return name
     }
     
-    static var highestPrecision: Self {
+    public static var highestPrecision: Self {
         return allCases.first!
     }
     
-    static var sameZeroPoint: Bool {
+    public static var sameZeroPoint: Bool {
         return true
     }
     

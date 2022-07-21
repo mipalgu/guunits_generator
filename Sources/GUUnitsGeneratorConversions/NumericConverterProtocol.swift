@@ -1,8 +1,8 @@
 /*
- * FunctionHelpers.swift
+ * NumericConverterProtocol.swift
  * guunits_generator
  *
- * Created by Callum McColl on 15/6/19.
+ * Created by Callum McColl on 29/10/19.
  * Copyright © 2019 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,50 +56,10 @@
  *
  */
 
-struct FunctionHelpers<Unit: UnitProtocol> {
+public protocol NumericConverterProtocol {
     
-    fileprivate func collapse(_ sign: Signs?, prefix: String = "_", suffix: String = "") -> String {
-        return sign.map { prefix + $0.rawValue + suffix} ?? ""
-    }
+    func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
     
-    func functionName(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs, unique: Bool = true) -> String {
-        let uniqueSign = collapse(unique ? sign : nil)
-        return "\(unit.abbreviation)\(uniqueSign)_to_\(otherUnit.abbreviation)\(collapse(otherSign))"
-    }
-    
-    func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs, unique: Bool = true, namespace: String? = nil) -> String {
-        let functionName = self.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: unique)
-        return "\(otherUnit)\(collapse(otherSign)) \(namespace ?? "")\(functionName)(\(unit)\(collapse(sign)) \(unit))"
-    }
-    
-    func functionName(forUnit unit: Unit, sign: Signs, to type: NumericTypes, unique: Bool = true) -> String {
-        return "\(unit.abbreviation)\(collapse(unique ? sign : nil))_to_\(type.abbreviation)"
-    }
-    
-    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes, unique: Bool = true, namespace: String? = nil) -> String {
-        let functionName = self.functionName(forUnit: unit, sign: sign, to: type, unique: unique)
-        return "\(type.rawValue) \(namespace ?? "")\(functionName)(\(unit)\(collapse(sign)) \(unit))"
-    }
-    
-    func functionName(from type: NumericTypes, to unit: Unit, sign: Signs, unique: Bool = true) -> String {
-        let uniquePrefix = unique || type == .int || type == .uint ? "\(type.abbreviation)_to_" : ""
-        return uniquePrefix + "\(unit.abbreviation)\(collapse(sign))"
-    }
-    
-    func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs, unique: Bool = true, namespace: String? = nil) -> String {
-        let functionName = self.functionName(from: type, to: unit, sign: sign, unique: unique)
-        return "\(unit)\(collapse(sign)) \(namespace ?? "")\(functionName)(\(type.rawValue) \(unit))"
-    }
-    
-    func modify(value: Int, forSign sign: Signs) -> String {
-        switch sign.numericType {
-        case .float:
-            return "\(value).0f"
-        case .double:
-            return "\(value).0"
-        default:
-            return "\(value)"
-        }
-    }
+    func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String
     
 }

@@ -56,7 +56,7 @@
  *
  */
 
-enum DistanceUnits: String {
+public enum DistanceUnits: String {
 
     case millimetres = "millimetres"
     case centimetres = "centimetres"
@@ -66,7 +66,7 @@ enum DistanceUnits: String {
 
 extension DistanceUnits: UnitProtocol {
     
-    var abbreviation: String {
+    public var abbreviation: String {
         switch self {
         case .millimetres:
             return "mm"
@@ -77,7 +77,7 @@ extension DistanceUnits: UnitProtocol {
         }
     }
     
-    var description: String {
+    public var description: String {
         return self.rawValue
     }
     

@@ -1,4 +1,5 @@
 import Foundation
+import GUUnitsGeneratorConversions
 
 let distanceGenerator = DistanceUnitsGenerator(unitDifference: [
     .millimetres: 10,

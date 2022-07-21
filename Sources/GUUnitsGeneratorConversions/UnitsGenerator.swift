@@ -58,7 +58,7 @@
 
 import Foundation
 
-typealias DistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter>>
+public typealias DistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter>>
 typealias TimeUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>, CFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter>>
 typealias AngleUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<AngleFunctionCreator, CFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter>>
 typealias ImageUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter>>
@@ -68,13 +68,13 @@ typealias CPPDistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<De
 typealias CPPTimeUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>, CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter>>
 typealias CPPAngleUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<AngleUnits>, CPPFunctionDefinitionCreator<AngleUnits>, DelegatingNumericConverter>>
 
-struct UnitsGenerator<Creator: FunctionCreator> {
+public struct UnitsGenerator<Creator: FunctionCreator> {
     
     let creator: Creator
     
     fileprivate let helpers: FunctionHelpers<Creator.Unit>
     
-    init(creator: Creator, helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
+    public init(creator: Creator, helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.creator = creator
         self.helpers = helpers
     }

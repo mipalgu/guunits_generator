@@ -1,5 +1,5 @@
 /*
- * NumericConverterProtocol.swift
+ * CompositeFunctionCreator.swift
  * guunits_generator
  *
  * Created by Callum McColl on 29/10/19.
@@ -56,10 +56,56 @@
  *
  */
 
-protocol NumericConverterProtocol {
+public struct CompositeFunctionCreator<
+    BodyCreator: FunctionBodyCreator,
+    DefinitionCreator: FunctionDefinitionCreator,
+    NumericConverter: NumericConverterProtocol
+>: FunctionCreator where BodyCreator.Unit == DefinitionCreator.Unit {
     
-    func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
     
-    func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String
+    public typealias Unit = DefinitionCreator.Unit
+    
+    var bodyCreator: BodyCreator
+    var definitionCreator: DefinitionCreator
+    var numericConverter: NumericConverter
+    
+    init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator, numericConverter: NumericConverter) {
+        self.bodyCreator = bodyCreator
+        self.definitionCreator = definitionCreator
+        self.numericConverter = numericConverter
+    }
+    
+    public func convert(_ str: String, from type: NumericTypes, to unit: DefinitionCreator.Unit, sign: Signs) -> String {
+        return self.numericConverter.convert(str, from: type, to: unit, sign: sign)
+    }
+    
+    public func convert(_ str: String, from unit: DefinitionCreator.Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.numericConverter.convert(str, from: unit, sign: sign, to: type)
+    }
+    
+    public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+        return self.bodyCreator.createFunction(
+            unit: unit as! BodyCreator.Unit,
+            to: otherUnit as! BodyCreator.Unit,
+            sign: sign, otherSign: otherSign
+        )
+    }
+    
+    public func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+        return self.definitionCreator.functionDefinition(
+            forUnit: unit,
+            to: otherUnit,
+            sign: sign,
+            otherSign: otherSign
+        )
+    }
+    
+    public func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+        return self.definitionCreator.functionDefinition(forUnit: unit, sign: sign, to: type)
+    }
+    
+    public func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+        return self.definitionCreator.functionDefinition(from: type, to: unit, sign: sign)
+    }
     
 }

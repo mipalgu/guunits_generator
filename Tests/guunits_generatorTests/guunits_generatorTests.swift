@@ -1,47 +1,46 @@
-import XCTest
-import class Foundation.Bundle
+// import class Foundation.Bundle
+// import XCTest
 
-final class guunits_generatorTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
+// /// Test class for guunits_generator
+// final class guunits_generatorTests: XCTestCase {
 
-        // Some of the APIs that we use below are available in macOS 10.13 and above.
-        guard #available(macOS 10.13, *) else {
-            return
-        }
+//     // func testExample() throws {
+//     //     // This is an example of a functional test case.
+//     //     // Use XCTAssert and related functions to verify your tests produce the correct
+//     //     // results.
 
-        let fooBinary = productsDirectory.appendingPathComponent("guunits_generator")
+//     //     // Some of the APIs that we use below are available in macOS 10.13 and above.
+//     //     guard #available(macOS 10.13, *) else {
+//     //         return
+//     //     }
 
-        let process = Process()
-        process.executableURL = fooBinary
+//     //     let fooBinary = productsDirectory.appendingPathComponent("guunits_generator")
 
-        let pipe = Pipe()
-        process.standardOutput = pipe
+//     //     let process = Process()
+//     //     process.executableURL = fooBinary
 
-        try process.run()
-        process.waitUntilExit()
+//     //     let pipe = Pipe()
+//     //     process.standardOutput = pipe
 
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
+//     //     try process.run()
+//     //     process.waitUntilExit()
 
-        XCTAssertEqual(output, "Hello, world!\n")
-    }
+//     //     let data = pipe.fileHandleForReading.readDataToEndOfFile()
+//     //     let output = String(data: data, encoding: .utf8)
 
-    /// Returns path to the built products directory.
-    var productsDirectory: URL {
-      #if os(macOS)
-        for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-            return bundle.bundleURL.deletingLastPathComponent()
-        }
-        fatalError("couldn't find the products directory")
-      #else
-        return Bundle.main.bundleURL
-      #endif
-    }
+//     //     XCTAssertEqual(output, "Hello, world!\n")
+//     // }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
-}
+//     /// Returns path to the built products directory.
+//     var productsDirectory: URL {
+//         #if os(macOS)
+//             for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
+//                 return bundle.bundleURL.deletingLastPathComponent()
+//             }
+//             fatalError("couldn't find the products directory")
+//         #else
+//             return Bundle.main.bundleURL
+//         #endif
+//     }
+
+// }

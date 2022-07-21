@@ -56,13 +56,13 @@
  *
  */
 
-struct NumericTypeConverter: NumericConverterProtocol {
+public struct NumericTypeConverter: NumericConverterProtocol {
     
-    func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+    public func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
         return self.convert(str, from: type, to: sign.numericType, currentType: type.rawValue, resultType: "\(unit)_\(sign.rawValue)")
     }
     
-    func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+    public func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
         return self.convert(str, from: sign.numericType, to: type, currentType: "\(unit)_\(sign.rawValue)", resultType: type.rawValue)
     }
     

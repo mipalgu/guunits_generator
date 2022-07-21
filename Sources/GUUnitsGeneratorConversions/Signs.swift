@@ -1,8 +1,8 @@
 /*
- * CompositeFunctionCreator.swift
- * guunits_generator
+ * Signs.swift 
+ * guunits_generator 
  *
- * Created by Callum McColl on 29/10/19.
+ * Created by Callum McColl on 15/06/2019.
  * Copyright © 2019 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,56 +56,36 @@
  *
  */
 
-struct CompositeFunctionCreator<
-    BodyCreator: FunctionBodyCreator,
-    DefinitionCreator: FunctionDefinitionCreator,
-    NumericConverter: NumericConverterProtocol
->: FunctionCreator where BodyCreator.Unit == DefinitionCreator.Unit {
+public enum Signs: String {
     
+    case t = "t"
+    case u = "u"
+    case f = "f"
+    case d = "d"
+
+}
+
+extension Signs {
     
-    typealias Unit = DefinitionCreator.Unit
-    
-    var bodyCreator: BodyCreator
-    var definitionCreator: DefinitionCreator
-    var numericConverter: NumericConverter
-    
-    init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator, numericConverter: NumericConverter) {
-        self.bodyCreator = bodyCreator
-        self.definitionCreator = definitionCreator
-        self.numericConverter = numericConverter
+    var type: String {
+        return self.numericType.rawValue
     }
     
-    func convert(_ str: String, from type: NumericTypes, to unit: DefinitionCreator.Unit, sign: Signs) -> String {
-        return self.numericConverter.convert(str, from: type, to: unit, sign: sign)
-    }
-    
-    func convert(_ str: String, from unit: DefinitionCreator.Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.numericConverter.convert(str, from: unit, sign: sign, to: type)
-    }
-    
-    func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.bodyCreator.createFunction(
-            unit: unit as! BodyCreator.Unit,
-            to: otherUnit as! BodyCreator.Unit,
-            sign: sign, otherSign: otherSign
-        )
-    }
-    
-    func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.definitionCreator.functionDefinition(
-            forUnit: unit,
-            to: otherUnit,
-            sign: sign,
-            otherSign: otherSign
-        )
-    }
-    
-    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.definitionCreator.functionDefinition(forUnit: unit, sign: sign, to: type)
-    }
-    
-    func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
-        return self.definitionCreator.functionDefinition(from: type, to: unit, sign: sign)
+    var numericType: NumericTypes {
+        switch self {
+        case .t:
+            return .int
+        case .u:
+            return .uint
+        case .f:
+            return .float
+        case .d:
+            return .double
+        }
     }
     
 }
+
+extension Signs: CaseIterable {}
+
+extension Signs: Hashable {}
