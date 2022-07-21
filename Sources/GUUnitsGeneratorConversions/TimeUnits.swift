@@ -56,7 +56,7 @@
  *
  */
 
-enum TimeUnits: String {
+public enum TimeUnits: String {
 
     case microseconds = "microseconds"
     case milliseconds = "milliseconds"
@@ -66,7 +66,7 @@ enum TimeUnits: String {
 
 extension TimeUnits: UnitProtocol {
     
-    var abbreviation: String {
+    public var abbreviation: String {
         switch self {
         case .microseconds:
             return "us"
@@ -77,7 +77,7 @@ extension TimeUnits: UnitProtocol {
         }
     }
     
-    var description: String {
+    public var description: String {
         return self.rawValue
     }
     

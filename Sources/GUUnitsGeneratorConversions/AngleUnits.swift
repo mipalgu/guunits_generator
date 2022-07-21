@@ -56,7 +56,7 @@
  *
  */
 
-enum AngleUnits: String {
+public enum AngleUnits: String {
 
     case degrees = "degrees"
     case radians = "radians"
@@ -65,7 +65,7 @@ enum AngleUnits: String {
 
 extension AngleUnits: UnitProtocol {
     
-    var abbreviation: String {
+    public var abbreviation: String {
         switch self {
         case .degrees:
             return "deg"
@@ -74,7 +74,7 @@ extension AngleUnits: UnitProtocol {
         }
     }
     
-    var description: String {
+    public var description: String {
         return self.rawValue
     }
     

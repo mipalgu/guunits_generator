@@ -56,11 +56,13 @@
  *
  */
 
-struct AngleFunctionCreator: FunctionBodyCreator {
+public struct AngleFunctionCreator: FunctionBodyCreator {
     
     fileprivate let signConverter: SignConverter = SignConverter()
+
+    public init() {}
     
-    func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
+    public func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
         let convert: String
         switch (unit, otherUnit) {
         case (.degrees, .radians):

@@ -56,7 +56,7 @@
  *
  */
 
-enum PercentUnits: String {
+public enum PercentUnits: String {
 
     case percent = "percent"
 
@@ -64,14 +64,14 @@ enum PercentUnits: String {
 
 extension PercentUnits: UnitProtocol {
     
-    var abbreviation: String {
+    public var abbreviation: String {
         switch self {
         case .percent:
             return "pct"
         }
     }
     
-    var description: String {
+    public var description: String {
         return self.rawValue
     }
     

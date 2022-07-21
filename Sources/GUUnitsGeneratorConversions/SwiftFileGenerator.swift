@@ -56,9 +56,11 @@
  *
  */
 
-struct SwiftFileCreator {
+public struct SwiftFileCreator {
+
+    public init() {}
     
-    func generate<T: UnitProtocol>(for type: T.Type) -> String {
+    public func generate<T: UnitProtocol>(for type: T.Type) -> String {
         let prefix = self.prefix(name: type.category)
         let categoryStruct = self.generateCategoryStruct(for: type)
         let categoryExtensions = self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {

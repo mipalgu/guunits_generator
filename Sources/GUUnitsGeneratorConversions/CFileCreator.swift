@@ -56,7 +56,7 @@
  *
  */
 
-struct CFileCreator {
+public struct CFileCreator {
     
     fileprivate var prefix: String {
         return """
@@ -139,8 +139,10 @@ struct CFileCreator {
     var suffix: String {
         return ""
     }
+
+    public init() {}
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
+    public func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
         let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator, percentGenerator: percentGenerator)
         return self.prefix + "\n\n" + content + "\n\n" + self.suffix
     }

@@ -56,7 +56,7 @@
  *
  */
 
-enum ImageUnits: String {
+public enum ImageUnits: String {
 
     case pixels = "pixels"
 
@@ -64,18 +64,18 @@ enum ImageUnits: String {
 
 extension ImageUnits: UnitProtocol {
     
-    var abbreviation: String {
+    public var abbreviation: String {
         switch self {
         case .pixels:
             return "px"
         }
     }
     
-    static var category: String {
+    public static var category: String {
         "Pixels"
     }
     
-    var description: String {
+    public var description: String {
         return self.rawValue
     }
     

@@ -60,6 +60,8 @@ public struct CFunctionDefinitionCreator<Unit: UnitProtocol>: FunctionDefinition
 
     fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
 
+    public init() {}
+
     public func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
     }

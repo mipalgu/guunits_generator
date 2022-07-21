@@ -56,7 +56,7 @@
  *
  */
 
-struct HeaderCreator {
+public struct HeaderCreator {
     
     fileprivate var prefix: String {
         return """
@@ -160,9 +160,11 @@ struct HeaderCreator {
         }
         return typeDefs.dropFirst().reduce(first) { $0 + "\n" + $1 }
     }
+
+    public init() {}
     
     
-    func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
+    public func generate(distanceGenerator: DistanceUnitsGenerator, timeGenerator: TimeUnitsGenerator, angleGenerator: AngleUnitsGenerator, imageGenerator: ImageUnitsGenerator, percentGenerator: PercentUnitGenerator) -> String {
         let content = self.createContent(distanceGenerator: distanceGenerator, timeGenerator: timeGenerator, angleGenerator: angleGenerator, imageGenerator: imageGenerator, percentGenerator: percentGenerator)
         return self.prefix + "\n" + self.typeDefs + "\n\n" + content + "\n\n" + self.suffix
     }

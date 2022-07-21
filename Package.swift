@@ -18,7 +18,7 @@ let package = Package(
             dependencies: ["GUUnitsGeneratorConversions"]),
         .testTarget(
             name: "GUUnitsGeneratorConversionsTests",
-            dependencies: ["GuunitsGeneratorConversions"]
+            dependencies: ["GUUnitsGeneratorConversions"]
         ),
         .testTarget(
             name: "guunits_generatorTests",
