@@ -56,21 +56,32 @@
  *
  */
 
+/// Enum containing the standard guunits signs.
 public enum Signs: String {
-    
-    case t = "t"
-    case u = "u"
-    case f = "f"
-    case d = "d"
+
+    /// Represents a signed integral type.
+    case t
+
+    /// Represents an unsigned integral type.
+    case u
+
+    /// Represents a 32-bit floating point type.
+    case f
+
+    /// Represents a 64-bit floating point type (double).
+    case d
 
 }
 
+/// Adds helper properties.
 extension Signs {
-    
+
+    /// The underlying c-type written as a string.
     var type: String {
-        return self.numericType.rawValue
+        self.numericType.rawValue
     }
-    
+
+    /// The numeric type equivalent of the guunits type.
     var numericType: NumericTypes {
         switch self {
         case .t:
@@ -83,7 +94,7 @@ extension Signs {
             return .double
         }
     }
-    
+
 }
 
 extension Signs: CaseIterable {}
