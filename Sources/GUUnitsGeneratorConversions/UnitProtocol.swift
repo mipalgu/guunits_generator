@@ -56,20 +56,34 @@
  *
  */
 
+/// A protocol for representing unit types that exist within a unit category.
+/// A unit category represents a type of data that can be expressed with different
+/// units. Examples include Distance, Time, Angles, etc. Conforming types might
+/// contain many units for a category, e.g. Distance can have metres, centimetres,
+/// millimetres, etc.
 public protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
-    
-    var abbreviation: String { get }
-    
+
+    /// The category the unit belong to. Eg. radians belongs to the Angle category.
     static var category: String { get }
-    
+
+    /// The unit in the category with the highest precision.
     static var highestPrecision: Self { get }
-    
+
+    /// Whether the units in the category all share the same zero point. An example of this
+    /// would be distance where 0m, 0cm, and 0mm all represent the same point. Whereas a
+    /// contrary example would be Temperature values 0C and 0F which represent different points.
     static var sameZeroPoint: Bool { get }
-    
+
+    /// The abbreviation of the unit. Eg. seconds is abbreviated as s.
+    var abbreviation: String { get }
+
 }
 
+/// Default Implementation of UnitProtocol
 extension UnitProtocol {
-    
+
+    /// By default, the unit category is equal to the conforming type name.
+    /// without a Units suffix.
     public static var category: String {
         let name = "\(Self.self)"
         if name.hasSuffix("Units") {
@@ -77,13 +91,21 @@ extension UnitProtocol {
         }
         return name
     }
-    
+
+    // swiftlint:disable force_unwrapping
+
+    /// By default, the highest precision is the first unit defined
+    /// by conforming types.
     public static var highestPrecision: Self {
-        return allCases.first!
+        allCases.first!
     }
-    
+
+    // swiftlint:enable force_unwrapping
+
+    /// By default, it is assumed that all units in this category share
+    /// the same zero point.
     public static var sameZeroPoint: Bool {
-        return true
+        true
     }
-    
+
 }
