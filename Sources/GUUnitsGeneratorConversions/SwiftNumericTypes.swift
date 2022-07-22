@@ -56,12 +56,65 @@
  *
  */
 
-enum SwiftNumericTypes: String, Hashable, CaseIterable {
-    
-    case Int8, Int16, Int32, Int64, Int, CInt
-    case UInt8, UInt16, UInt32, UInt64, UInt, CUnsignedInt
-    case Float, Double
-    
+/// A type containing Swift-supported types for guunits.
+public enum SwiftNumericTypes: String, Hashable, CaseIterable {
+
+    // swiftlint:disable identifier_name
+
+    /// An 8-bit signed integer.
+    case Int8
+
+    /// A 16-bit signed integer.
+    case Int16
+
+    /// A 32-bit signed integer.
+    case Int32
+
+    /// A 64-bit signed integer.
+    case Int64
+
+    /// A swift signed integer.
+    case Int
+
+    /// A C signed integer.
+    case CInt
+
+    /// An 8-bit unsigned integer.
+    case UInt8
+
+    /// A 16-bit unsigned integer.
+    case UInt16
+
+    /// A 32-bit unsigned integer.
+    case UInt32
+
+    /// A 64-bit unsigned integer.
+    case UInt64
+
+    /// A swift unsigned integer.
+    case UInt
+
+    /// A C unsigned integer.
+    case CUnsignedInt
+
+    /// A swift floating point number.
+    case Float
+
+    /// A swift double-precision floating point number.
+    case Double
+
+    // swiftlint:enable identifier_name
+
+    /// An array of all types unique to the swift programming language.
+    public static var uniqueTypes: [SwiftNumericTypes] {
+        Array(
+            Set(SwiftNumericTypes.allCases)
+                .subtracting([.CInt, .CUnsignedInt])
+                .sorted { $0.rawValue < $1.rawValue }
+        )
+    }
+
+    /// The *NumericTypes* equivalent of this swift type.
     var numericType: NumericTypes {
         switch self {
         case .Int8:
@@ -94,7 +147,8 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
             return .double
         }
     }
-    
+
+    /// The guunits sign for the swift type.
     var sign: Signs {
         switch self {
         case .Int8, .Int16, .Int32, .Int64, .Int, .CInt:
@@ -107,9 +161,5 @@ enum SwiftNumericTypes: String, Hashable, CaseIterable {
             return .d
         }
     }
-    
-    public static var uniqueTypes: [SwiftNumericTypes] {
-        Array(Set(SwiftNumericTypes.allCases).subtracting([.CInt, .CUnsignedInt]).sorted { $0.rawValue < $1.rawValue })
-    }
-    
+
 }
