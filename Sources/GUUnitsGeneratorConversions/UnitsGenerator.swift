@@ -58,6 +58,7 @@
 
 import Foundation
 
+/// Distance Units Generator
 public typealias DistanceUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         GradualFunctionCreator<DistanceUnits>,
@@ -66,6 +67,7 @@ public typealias DistanceUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Time Units Generator
 public typealias TimeUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         GradualFunctionCreator<TimeUnits>,
@@ -74,6 +76,7 @@ public typealias TimeUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Angle Units Generator.
 public typealias AngleUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         AngleFunctionCreator,
@@ -82,6 +85,7 @@ public typealias AngleUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Image Units Generator
 public typealias ImageUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         GradualFunctionCreator<ImageUnits>,
@@ -90,6 +94,7 @@ public typealias ImageUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Percent Units Generator
 public typealias PercentUnitGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         GradualFunctionCreator<PercentUnits>,
@@ -98,6 +103,7 @@ public typealias PercentUnitGenerator = UnitsGenerator<
     >
 >
 
+/// CPP Distance Units Generator
 public typealias CPPDistanceUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         DelegatingFunctionCreator<DistanceUnits>,
@@ -106,6 +112,7 @@ public typealias CPPDistanceUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// CPP Time Units Generator.
 public typealias CPPTimeUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         DelegatingFunctionCreator<TimeUnits>,
@@ -114,6 +121,7 @@ public typealias CPPTimeUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// CPP Angle Units Generator.
 public typealias CPPAngleUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
         DelegatingFunctionCreator<AngleUnits>,
@@ -122,10 +130,13 @@ public typealias CPPAngleUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Struct that generates the code for all the possible conversion functions.
 public struct UnitsGenerator<Creator: FunctionCreator> {
 
+    /// The creator which generators language-specific code for a conversion function.
     let creator: Creator
 
+    /// Helper that creates function names and definitions.
     private let helpers: FunctionHelpers<Creator.Unit>
 
     public init(creator: Creator, helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
@@ -157,11 +168,11 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
                 self.generate(unit: $0, against: unique, includeImplementation: includeImplementation)
             }
         )
-        let sorted = functions.sorted(by: { (lhs: String, rhs: String) -> Bool in
+        let sorted = functions.sorted { (lhs: String, rhs: String) -> Bool in
             let first: String = lhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
             let second: String = rhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
             return first < second
-        })
+        }
         guard let firstFunction = sorted.first else {
             return nil
         }
