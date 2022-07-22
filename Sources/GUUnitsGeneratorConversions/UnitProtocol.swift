@@ -94,8 +94,10 @@ extension UnitProtocol {
 
     // swiftlint:disable force_unwrapping
 
-    /// By default, the highest precision is the first unit defined
+    /// By default, the highest precision is the first unit defined.
     /// by conforming types.
+    /// - Warning: This default implementation assumes that atleast one unit is defined in the conforming
+    ///            type. If this is not the case, then you will encounter runtime errors.
     public static var highestPrecision: Self {
         allCases.first!
     }
