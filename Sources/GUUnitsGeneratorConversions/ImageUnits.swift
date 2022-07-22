@@ -56,27 +56,33 @@
  *
  */
 
+/// Units for representing image data.
 public enum ImageUnits: String {
 
-    case pixels = "pixels"
+    /// Pixels
+    case pixels
 
 }
 
+/// UnitProtocol conformance.
 extension ImageUnits: UnitProtocol {
-    
+
+    /// The category of this unit.
+    public static var category: String {
+        "Pixels"
+    }
+
+    /// The description of this unit.
+    public var description: String {
+        self.rawValue
+    }
+
+    /// The abbreviation of the image unit.
     public var abbreviation: String {
         switch self {
         case .pixels:
             return "px"
         }
     }
-    
-    public static var category: String {
-        "Pixels"
-    }
-    
-    public var description: String {
-        return self.rawValue
-    }
-    
+
 }
