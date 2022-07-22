@@ -56,17 +56,36 @@
  *
  */
 
-public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where Unit.AllCases.Index == Int {
-    
-    fileprivate(set) var unitDifference: [Unit: Int]
-    fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
-    fileprivate let signConverter: SignConverter = SignConverter()
-    
+/// A function body creator that converts between different units by scaling
+/// the magnitude of one unit by a constant value. Examples of this type of
+/// behaviour is seen in SI units where kilo is 1000 times smaller than the
+/// Mega prefix.
+public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
+    where Unit.AllCases.Index == Int {
+
+    /// The magnitude difference between a unit type and the next unit type. Example, for
+    /// a unit type of metres, centimetres should be set to 100 since there
+    /// are 100 centimetres in a metre.
+    private(set) var unitDifference: [Unit: Int]
+
+    /// Helper used to create function definitions.
+    private let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+
+    /// Converter that implements conversion functions for the same unit type.
+    private let signConverter = SignConverter()
+
+    /// Creates a function body for units that are directly related to each through constant magnitude
+    /// changes.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to conver to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The function body that implements the conversion function.
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let allCases = Unit.allCases
-        let definition = self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         if unit == otherUnit {
-            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign, withDefinition: definition)
+            return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign)
         }
         guard
             let unitIndex = allCases.firstIndex(where: { $0 == unit }),
@@ -80,42 +99,79 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator wh
         let cases = allCases.dropFirst(smallest).dropLast(allCases.count - biggest)
         let difference = cases.reduce(1) { $0 * (self.unitDifference[$1] ?? 1) }
         return increasing
-            ? self.increasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
-            : self.decreasingFunc(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, withDefinition: definition, andValue: difference)
+            ? self.increasingFunc(
+                forUnit: unit,
+                to: otherUnit,
+                sign: sign,
+                otherSign: otherSign,
+                andValue: difference
+            )
+            : self.decreasingFunc(
+                forUnit: unit,
+                to: otherUnit,
+                sign: sign,
+                otherSign: otherSign,
+                andValue: difference
+            )
     }
-    
-    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs, withDefinition definition: String) -> String {
-        return "    return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
+
+    /// Helper function for casting within the same unit type.
+    /// - Parameters:
+    ///   - unit: The unit to cast from.
+    ///   - sign: The sign of the unit.
+    ///   - otherSign: The sign to cast too.
+    /// - Returns: The function body for conversions of this type.
+    func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs) -> String {
+        let gen = self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign)
+        return "    return \(gen);"
     }
-    
-    fileprivate func increasingFunc(
+
+    /// Creates a conversion function that performs a cast to a unit with a lower resolution.
+    /// - Parameters:
+    ///   - unit: The unit to cast from.
+    ///   - otherUnit: The unit to cast to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    ///   - value: The literal value to decrease by.
+    /// - Returns: A function body that performs the unit conversion.
+    private func increasingFunc(
         forUnit unit: Unit,
         to otherUnit: Unit,
         sign: Signs,
         otherSign: Signs,
-        withDefinition definition: String,
         andValue value: Int
     ) -> String {
-        guard let lastSign: Signs = Signs.allCases.last else {
+        guard let lastSign = Signs.allCases.last else {
             fatalError("Signs is empty.")
         }
         let lastValue = self.helpers.modify(value: value, forSign: lastSign)
-        let calculate: String = self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: lastSign) + " / \(lastValue)"
+        let calculate: String = self.signConverter.convert(
+            "\(unit)", otherUnit: unit, from: sign, to: lastSign
+        ) + " / \(lastValue)"
         let body = self.signConverter.convert(calculate, otherUnit: otherUnit, from: lastSign, to: otherSign)
         return "    return \(body);"
     }
-    
-    fileprivate func decreasingFunc(
+
+    /// Creates a conversion function that performs a cast to a unit with a higher resolution.
+    /// - Parameters:
+    ///   - unit: The unit to cast from.
+    ///   - otherUnit: The unit to cast to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    ///   - difference: The magnitude difference to the next unit.
+    /// - Returns: 
+    private func decreasingFunc(
         forUnit unit: Unit,
         to otherUnit: Unit,
         sign: Signs,
         otherSign: Signs,
-        withDefinition definition: String,
         andValue difference: Int
     ) -> String {
         let value = self.helpers.modify(value: difference, forSign: sign)
-        let body = self.signConverter.convert("\(unit) * \(value)", otherUnit: otherUnit, from: sign, to: otherSign)
+        let body = self.signConverter.convert(
+            "\(unit) * \(value)", otherUnit: otherUnit, from: sign, to: otherSign
+        )
         return "    return \(body);"
     }
-    
+
 }
