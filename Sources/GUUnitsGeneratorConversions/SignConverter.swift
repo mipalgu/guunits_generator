@@ -56,16 +56,32 @@
  *
  */
 
+/// A struct that creates c-code for converting between different guunits types.
 struct SignConverter {
-    
-    func convert<Unit: UnitProtocol>(_ str: String, otherUnit: Unit, from sign: Signs, to otherSign: Signs) -> String {
+
+    /// Convert some c-code to the corresponding unit.
+    /// - Parameters:
+    ///   - str: The c-code to convert.
+    ///   - otherUnit: The unit to convert into.
+    ///   - sign: The sign of the current c-value.
+    ///   - otherSign: The sign of the new unit.
+    /// - Returns: A string of generated c-code that will convert *str* to another unit.
+    func convert<Unit: UnitProtocol>(
+        _ str: String,
+        otherUnit: Unit,
+        from sign: Signs,
+        to otherSign: Signs
+    ) -> String {
         switch (sign, otherSign) {
         case (.t, .u):
             return self.cast("(\(str)) < 0 ? 0 : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         case (.u, .t):
             let uint: Signs = .u
             let intMax = self.cast("INT_MAX", to: uint.type)
-            return self.cast("(\(str)) > \(intMax) ? \(intMax) : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
+            return self.cast(
+                "(\(str)) > \(intMax) ? \(intMax) : \(str)",
+                to: "\(otherUnit)_\(otherSign.rawValue)"
+            )
         case (_, .f), (_, .d):
             return self.cast("\(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         default:
@@ -84,9 +100,14 @@ struct SignConverter {
             return self.cast("round(\(toDouble))", to: "\(otherUnit)_\(otherSign.rawValue)")
         }
     }
-    
-    fileprivate func cast(_ str: String, to type: String) -> String {
-        return "((\(type)) (\(str)))"
+
+    /// Helper function for doing c-style casts.
+    /// - Parameters:
+    ///   - str: The string to cast.
+    ///   - type: The type to cast str into.
+    /// - Returns: A string of generated c-code that will cast *str* into *type*.
+    private func cast(_ str: String, to type: String) -> String {
+        "((\(type)) (\(str)))"
     }
-    
+
 }
