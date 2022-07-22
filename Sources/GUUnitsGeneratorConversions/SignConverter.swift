@@ -61,7 +61,11 @@
 /// this struct perform a cast into the desired unit without performing any unit conversions.
 struct SignConverter {
 
-    /// Change the sign of some unit..
+    /// Change the sign of some unit. This function assumes you are converting to the same unit
+    /// (eg. centimetres to centimetres). The purpose of this function is to change the
+    /// underlying C-type. A typical use-case is to assist a user who requires more precision; so they
+    /// might need to convert a centimetres_t into a centimetres_d (int to double). This function is
+    /// used to generate the c-style cast for this type of conversion.
     /// - Parameters:
     ///   - str: The unit to convert.
     ///   - otherUnit: The equivalent unit to convert into.
@@ -70,7 +74,7 @@ struct SignConverter {
     /// - Returns: A string of generated c-code that will convert *str* to the correct unit.
     /// - Warning: This function assumes that you are converting to the same unit, just with a different
     ///            type (i.e. there is no unit conversion being performed in this function).
-    ///            The behaviour is undefined if this is not the case.
+    ///            The result of the cast will be incorrect if this is not the case.
     func convert<Unit: UnitProtocol>(
         _ str: String,
         otherUnit: Unit,
