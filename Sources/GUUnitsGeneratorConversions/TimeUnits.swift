@@ -56,16 +56,24 @@
  *
  */
 
+/// A type for representing different time units.
 public enum TimeUnits: String {
 
-    case microseconds = "microseconds"
-    case milliseconds = "milliseconds"
-    case seconds = "seconds"
+    /// Microseconds.
+    case microseconds
+
+    /// Milliseconds.
+    case milliseconds
+
+    /// Seconds
+    case seconds
 
 }
 
+/// UnitProtocol conformance.
 extension TimeUnits: UnitProtocol {
-    
+
+    /// The abbreviation of the time unit.
     public var abbreviation: String {
         switch self {
         case .microseconds:
@@ -76,9 +84,10 @@ extension TimeUnits: UnitProtocol {
             return "s"
         }
     }
-    
+
+    /// The description of the time unit.
     public var description: String {
-        return self.rawValue
+        self.rawValue
     }
-    
+
 }
