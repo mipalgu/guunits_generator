@@ -56,19 +56,71 @@
  *
  */
 
+/// A struct for converting between numeric types and unit types.
 public struct NumericTypeConverter: NumericConverterProtocol {
 
+    /// Default init.
     public init() {}
-    
-    public func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
-        return self.convert(str, from: type, to: sign.numericType, currentType: type.rawValue, resultType: "\(unit)_\(sign.rawValue)")
+
+    /// Convert a numeric typed value into a unit type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - type: The type of the value.
+    ///   - unit: The unit type to convert into.
+    ///   - sign: The sign of the new unit type.
+    /// - Returns: Generated C-code that converts str into the new unit.
+    public func convert<Unit: UnitProtocol>(
+        _ str: String,
+        from type: NumericTypes,
+        to unit: Unit,
+        sign: Signs
+    ) -> String {
+        self.convert(
+            str,
+            from: type,
+            to: sign.numericType,
+            currentType: type.rawValue,
+            resultType: "\(unit)_\(sign.rawValue)"
+        )
     }
-    
-    public func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.convert(str, from: sign.numericType, to: type, currentType: "\(unit)_\(sign.rawValue)", resultType: type.rawValue)
+
+    /// Convert a unit value into an underlying numeric type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - unit: The unit of the value.
+    ///   - sign: The sign of the unit.
+    ///   - type: The numeric type to convert into.
+    /// - Returns: Generated C-code that converts str to the numeric type.
+    public func convert<Unit: UnitProtocol>(
+        _ str: String,
+        from unit: Unit,
+        sign: Signs,
+        to type: NumericTypes
+    ) -> String {
+        self.convert(
+            str,
+            from: sign.numericType,
+            to: type,
+            currentType: "\(unit)_\(sign.rawValue)",
+            resultType: type.rawValue
+        )
     }
-    
-    fileprivate func convert(_ str: String, from type: NumericTypes, to otherType: NumericTypes, currentType: String, resultType: String) -> String {
+
+    /// Helper method that represents both sides of the conversion as numeric types.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - type: The numeric type of the str.
+    ///   - otherType: The numeric type to convert into.
+    ///   - currentType: The c-representation of the current unit type.
+    ///   - resultType: The c-representation of the new result type.
+    /// - Returns: Generated C-code that creates a cast between different types.
+    private func convert(
+        _ str: String,
+        from type: NumericTypes,
+        to otherType: NumericTypes,
+        currentType: String,
+        resultType: String
+    ) -> String {
         if type == otherType {
             return self.cast(str, to: resultType)
         }
@@ -89,24 +141,59 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             return self.cast(converted, to: resultType)
         }
         if type.isSigned == otherType.isSigned {
-            return self.cast(self.convertSize(str, from: type, currentType: currentType, to: otherType), to: resultType)
+            return self.cast(
+                self.convertSize(str, from: type, currentType: currentType, to: otherType), to: resultType
+            )
         }
         let limitSign = self.convertSign(str, from: type, currentType: currentType, to: otherType)
         return self.cast(limitSign, to: resultType)
     }
-    
-    fileprivate func cast(_ str: String, to type: String) -> String {
-        return "((\(type)) (\(str)))"
+
+    /// C-Style cast helper function. This function generates C-code that performs a cast.
+    /// - Parameters:
+    ///   - str: The value to cast.
+    ///   - type: The type to cast into.
+    /// - Returns: The C-code that performs the cast.
+    private func cast(_ str: String, to type: String) -> String {
+        "((\(type)) (\(str)))"
     }
-    
-    fileprivate func convertFloat(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
+
+    /// Method that casts float correctly.
+    /// - Parameters:
+    ///   - str: The value to cast.
+    ///   - type: The numeric type of str.
+    ///   - currentType: The current c-representation of the unit type of str.
+    ///   - otherType: The numeric type to cast into.
+    /// - Returns: The c-code that performs the cast.
+    private func convertFloat(
+        _ str: String,
+        from type: NumericTypes,
+        currentType: String,
+        to otherType: NumericTypes
+    ) -> String {
         if type.isFloat && !otherType.isFloat {
-            return self.cast("round(\(type != .double ? self.cast(str, to: "double") : str))", to: currentType)
+            return self.cast(
+                "round(\(type != .double ? self.cast(str, to: "double") : str))",
+                to: currentType
+            )
         }
         return str
     }
-    
-    fileprivate func convertSign(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
+
+    /// Method for casting signed integer values. This function clamps values within the size of the
+    /// underlying integer type.
+    /// - Parameters:
+    ///   - str: The value to cast.
+    ///   - type: The numeric type of str.
+    ///   - currentType: The c-representation of the type of str.
+    ///   - otherType: The numeric type to cast into.
+    /// - Returns: The C-code that performs the cast.
+    private func convertSign(
+        _ str: String,
+        from type: NumericTypes,
+        currentType: String,
+        to otherType: NumericTypes
+    ) -> String {
         let (_, max) = otherType.limits
         if type.isSigned {
             return "MAX(\(self.cast("0", to: currentType)), \(str))"
@@ -116,13 +203,26 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         }
         return "MIN(\(self.cast(max, to: currentType)), \(str))"
     }
-    
-    fileprivate func convertSize(_ str: String, from type: NumericTypes, currentType: String, to otherType: NumericTypes) -> String {
+
+    /// Method for casting between different sized types. This method clamps the value
+    /// into the bounds of the new type.
+    /// - Parameters:
+    ///   - str: The value to cast.
+    ///   - type: The numeric type of str.
+    ///   - currentType: The c-representation of the type of str.
+    ///   - otherType: The numeric type to cast into.
+    /// - Returns: The generated c-code that performs the cast.
+    private func convertSize(
+        _ str: String,
+        from type: NumericTypes,
+        currentType: String,
+        to otherType: NumericTypes
+    ) -> String {
         if otherType.largerThan(type) {
             return str
         }
         let (min, max) = otherType.limits
         return "MIN(\(self.cast(max, to: currentType)), MAX(\(self.cast(min, to: currentType)), \(str)))"
     }
-    
+
 }

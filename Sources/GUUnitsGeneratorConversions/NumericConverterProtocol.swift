@@ -56,10 +56,37 @@
  *
  */
 
+/// Protocol for conforming types to convert to and from numeric unit types. The
+/// conversion functions generate appropriate code to cast between unit types
+/// and numeric types.
 public protocol NumericConverterProtocol {
-    
-    func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
-    
-    func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String
-    
+
+    /// Convert a numeric typed value into a unit type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - type: The type of the value.
+    ///   - unit: The unit type to convert into.
+    ///   - sign: The sign of the new unit type.
+    /// - Returns: Generated code that converts str into the new unit.
+    func convert<Unit: UnitProtocol>(
+        _ str: String,
+        from type: NumericTypes,
+        to unit: Unit,
+        sign: Signs
+    ) -> String
+
+    /// Convert a unit value into an underlying numeric type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - unit: The unit of the value.
+    ///   - sign: The sign of the unit.
+    ///   - type: The numeric type to convert into.
+    /// - Returns: Generated code that converts str to the numeric type.
+    func convert<Unit: UnitProtocol>(
+        _ str: String,
+        from unit: Unit,
+        sign: Signs,
+        to type: NumericTypes
+    ) -> String
+
 }
