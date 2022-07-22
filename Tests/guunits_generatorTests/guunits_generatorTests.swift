@@ -1,6 +1,8 @@
 import class Foundation.Bundle
 import XCTest
 
+// swiftlint:disable type_name
+
 /// Test class for guunits_generator
 final class guunits_generatorTests: XCTestCase {
 
@@ -44,3 +46,5 @@ final class guunits_generatorTests: XCTestCase {
     }
 
 }
+
+// swiftlint:enable type_name
