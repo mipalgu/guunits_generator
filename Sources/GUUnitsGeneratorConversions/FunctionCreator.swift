@@ -57,10 +57,26 @@
  *
  */
 
+/// A protocol that provides all the functions required to generate a function in
+/// an underlying language.
 public protocol FunctionCreator: FunctionDefinitionCreator, FunctionBodyCreator {
-    
+
+    /// Generate a statement that performs a conversion from a numeric type to a unit type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - type: The type of the value being converted.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: A generated statement that performs the conversion.
     func convert(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String
-    
+
+    /// Generate a statement that performs a conversion from a unit type to a numeric type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - unit: The unit of the value.
+    ///   - sign: The sign of the unit.
+    ///   - type: The type to convert to.
+    /// - Returns: A generated statement that performs the conversion.
     func convert(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String
-    
+
 }
