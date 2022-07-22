@@ -56,16 +56,21 @@
  *
  */
 
-/// A struct that creates c-code for converting between different guunits types.
+/// A struct that creates c-code for converting a unit between it's signed and unsigned variants.
+/// A unit may need to be represented as a different type in the c-implementation. The functions in
+/// this struct perform a cast into the desired unit without performing any unit conversions.
 struct SignConverter {
 
-    /// Convert some c-code to the corresponding unit.
+    /// Change the sign of some unit..
     /// - Parameters:
-    ///   - str: The c-code to convert.
-    ///   - otherUnit: The unit to convert into.
-    ///   - sign: The sign of the current c-value.
+    ///   - str: The unit to convert.
+    ///   - otherUnit: The equivalent unit to convert into.
+    ///   - sign: The sign of the current unit.
     ///   - otherSign: The sign of the new unit.
-    /// - Returns: A string of generated c-code that will convert *str* to another unit.
+    /// - Returns: A string of generated c-code that will convert *str* to the correct unit.
+    /// - Warning: This function assumes that you are converting to the same unit, just with a different
+    ///            type (i.e. there is no unit conversion being performed in this function).
+    ///            The behaviour is undefined if this is not the case.
     func convert<Unit: UnitProtocol>(
         _ str: String,
         otherUnit: Unit,
