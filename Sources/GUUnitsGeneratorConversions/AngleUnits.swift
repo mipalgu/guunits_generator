@@ -56,15 +56,21 @@
  *
  */
 
+/// A unit that represents angles.
 public enum AngleUnits: String {
 
-    case degrees = "degrees"
-    case radians = "radians"
+    /// An angle represented in degrees.
+    case degrees
+
+    /// An angle represented in radians.
+    case radians
 
 }
 
+/// UnitProtocol conformance.
 extension AngleUnits: UnitProtocol {
-    
+
+    /// The abbreviation of the unit.
     public var abbreviation: String {
         switch self {
         case .degrees:
@@ -73,9 +79,10 @@ extension AngleUnits: UnitProtocol {
             return "rad"
         }
     }
-    
+
+    /// The description of the unit.
     public var description: String {
-        return self.rawValue
+        self.rawValue
     }
-    
+
 }
