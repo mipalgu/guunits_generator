@@ -56,20 +56,41 @@
  *
  */
 
+/// Helper struct that generates C function calls that convert between numeric
+/// types and unit types.
 public struct DelegatingNumericConverter: NumericConverterProtocol {
 
+    /// Default init.
     public init() {}
-    
-    public func convert<Unit: UnitProtocol>(_ str: String, from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
+
+    /// Generate the function call that would convert between a numeric type and a unit type.
+    /// - Parameters:
+    ///   - str: The value to convert from.
+    ///   - type: The numeric type of str.
+    ///   - unit: The unit type to convert to.
+    ///   - sign: The sign of the unit type.
+    /// - Returns: The generated c-code for the function call that performs the conversion.
+    public func convert<Unit: UnitProtocol>(
+        _ str: String, from type: NumericTypes, to unit: Unit, sign: Signs
+    ) -> String {
         let helpers: FunctionHelpers<Unit> = FunctionHelpers()
         let cFunction = helpers.functionName(from: type, to: unit, sign: sign)
         return "::" + cFunction + "(\(str))"
     }
-    
-    public func convert<Unit: UnitProtocol>(_ str: String, from unit: Unit, sign: Signs, to type: NumericTypes) -> String {
+
+    /// Generate the function call that would convert between a unit type and a numeric type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - unit: The unit type of the value.
+    ///   - sign: The sign of the unit type.
+    ///   - type: The numeric type to convert into.
+    /// - Returns: The generated C function call that would perform the conversion.
+    public func convert<Unit: UnitProtocol>(
+        _ str: String, from unit: Unit, sign: Signs, to type: NumericTypes
+    ) -> String {
         let helpers: FunctionHelpers<Unit> = FunctionHelpers()
         let cFunction = helpers.functionName(forUnit: unit, sign: sign, to: type)
         return "::" + cFunction + "(\(str))"
     }
-    
+
 }
