@@ -56,15 +56,26 @@
  *
  */
 
-public struct DelegatingFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator where Unit.AllCases.Index == Int {
-    
-    fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+/// A struct which generates function bodies that delegate to the correct conversion function.
+public struct DelegatingFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
+    where Unit.AllCases.Index == Int {
 
+    /// Helper which will generate the function names.
+    private let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+
+    /// Default init.
     public init() {}
-    
+
+    /// Generates the C function body for a conversion function between different unit types.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert into.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The generated function body which calls the correct conversion function.
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        let cDefinition = self.helpers.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+        let cDefinition = helpers.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         return "    return ::\(cDefinition)(\(unit));"
     }
-    
+
 }
