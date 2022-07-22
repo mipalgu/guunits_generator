@@ -56,56 +56,119 @@
  *
  */
 
+/// A function creator that delegates all methods to stored body creators, definition creators,
+/// and numeric converters.
 public struct CompositeFunctionCreator<
     BodyCreator: FunctionBodyCreator,
     DefinitionCreator: FunctionDefinitionCreator,
     NumericConverter: NumericConverterProtocol
 >: FunctionCreator where BodyCreator.Unit == DefinitionCreator.Unit {
-    
-    
+
+    /// The Unit is concistent between the different creators.
     public typealias Unit = DefinitionCreator.Unit
-    
+
+    /// The body creator which will create function bodies.
     var bodyCreator: BodyCreator
+
+    /// The definition creator which will generate function definitions.
     var definitionCreator: DefinitionCreator
+
+    /// The numeric converter which will generate conversion code.
     var numericConverter: NumericConverter
-    
+
+    /// Initialise the creator with delegate objects.
+    /// - Parameters:
+    ///   - bodyCreator: A delegate body creator.
+    ///   - definitionCreator: A delegate definition creator.
+    ///   - numericConverter: A delegate numeric converter.
     init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator, numericConverter: NumericConverter) {
         self.bodyCreator = bodyCreator
         self.definitionCreator = definitionCreator
         self.numericConverter = numericConverter
     }
-    
-    public func convert(_ str: String, from type: NumericTypes, to unit: DefinitionCreator.Unit, sign: Signs) -> String {
-        return self.numericConverter.convert(str, from: type, to: unit, sign: sign)
+
+    /// Generate a statement that converts a numeric typed value to a unit type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - type: The type of the value.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: The statements which converts *str* to a unit.
+    public func convert(
+        _ str: String, from type: NumericTypes, to unit: DefinitionCreator.Unit, sign: Signs
+    ) -> String {
+        numericConverter.convert(str, from: type, to: unit, sign: sign)
     }
-    
-    public func convert(_ str: String, from unit: DefinitionCreator.Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.numericConverter.convert(str, from: unit, sign: sign, to: type)
+
+    /// Generate a statement that converts a unit typed value into a numeric typed value.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - unit: The unit of the current value.
+    ///   - sign: The sign of the unit.
+    ///   - type: The type to convert into.
+    /// - Returns: The statement which performs the conversion.
+    public func convert(
+        _ str: String, from unit: DefinitionCreator.Unit, sign: Signs, to type: NumericTypes
+    ) -> String {
+        numericConverter.convert(str, from: unit, sign: sign, to: type)
     }
-    
+
+    // swiftlint:disable force_cast
+
+    /// Generate a function body that converts a unit into another unit.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The function body which converts the unit.
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.bodyCreator.createFunction(
+        bodyCreator.createFunction(
             unit: unit as! BodyCreator.Unit,
             to: otherUnit as! BodyCreator.Unit,
-            sign: sign, otherSign: otherSign
+            sign: sign,
+            otherSign: otherSign
         )
     }
-    
-    public func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.definitionCreator.functionDefinition(
+
+    // swiftlint:enable force_cast
+
+    /// Generate a function definition for a function that converts a unit into another unit.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The function definition for a function that would perform this conversion.
+    public func functionDefinition(
+        forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs
+    ) -> String {
+        definitionCreator.functionDefinition(
             forUnit: unit,
             to: otherUnit,
             sign: sign,
             otherSign: otherSign
         )
     }
-    
+
+    /// Generate a function definition for a function that converts a unit type into a numeric type.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - type: The numeric type to convert to.
+    /// - Returns: The function definition of this conversion function.
     public func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.definitionCreator.functionDefinition(forUnit: unit, sign: sign, to: type)
+        definitionCreator.functionDefinition(forUnit: unit, sign: sign, to: type)
     }
-    
+
+    /// Generate a function definition for a function that converts a numeric type into a unit type.
+    /// - Parameters:
+    ///   - type: The numeric type to convert from.
+    ///   - unit: The unit type to convert to.
+    ///   - sign: The sign of the unit type.
+    /// - Returns: The function definition for this conversion function.
     public func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
-        return self.definitionCreator.functionDefinition(from: type, to: unit, sign: sign)
+        definitionCreator.functionDefinition(from: type, to: unit, sign: sign)
     }
-    
+
 }
