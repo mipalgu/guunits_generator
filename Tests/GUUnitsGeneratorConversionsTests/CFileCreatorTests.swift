@@ -86,9 +86,60 @@ final class CFileCreatorTests: XCTestCase {
         """
     }
 
+    /// The distance generator.
+    let distanceGenerator = DistanceUnitsGenerator(
+        unitDifference: [
+            .millimetres: 10,
+            .centimetres: 100
+        ]
+    )
+
+    /// The time generator.
+    let timeGenerator = TimeUnitsGenerator(unitDifference: [
+        .microseconds: 1000,
+        .milliseconds: 1000
+    ])
+
+    /// The angle generator.
+    let angleGenerator = AngleUnitsGenerator()
+
+    /// The image generator.
+    let imageGenerator = ImageUnitsGenerator(unitDifference: [:])
+
+    /// The percent generator.
+    let percentGenerator = PercentUnitGenerator(unitDifference: [:])
+
     /// Test computed properties have right values.
     func testComputedProperties() {
         XCTAssertEqual(creator.suffix, "")
+    }
+
+    /// Test generate function creates all c functions.
+    func testGenerate() {
+        let result = creator.generate(
+            distanceGenerator: distanceGenerator,
+            timeGenerator: timeGenerator,
+            angleGenerator: angleGenerator,
+            imageGenerator: imageGenerator,
+            percentGenerator: percentGenerator
+        )
+        guard
+            let distances = distanceGenerator.generateImplementations(forUnits: DistanceUnits.allCases),
+            let times = timeGenerator.generateImplementations(forUnits: TimeUnits.allCases),
+            let angles = angleGenerator.generateImplementations(forUnits: AngleUnits.allCases),
+            let images = imageGenerator.generateImplementations(forUnits: ImageUnits.allCases),
+            let percentages = percentGenerator.generateImplementations(forUnits: PercentUnits.allCases)
+        else {
+            XCTFail("Unable to create C file.")
+            return
+        }
+        let expected = prefix + "\n\n" + "// Distance Conversion Functions\n\n" + distances
+            + "\n\n// Time Conversion Functions\n\n" + times
+            + "\n\n// Angle Conversion Functions\n\n" + angles
+            + "\n\n// Image Conversion Functions\n\n" + images
+            + "\n\n// Percent Conversion Functions\n\n" + percentages
+            + "\n\n"
+        XCTAssertEqual(result, expected)
     }
 
 }
