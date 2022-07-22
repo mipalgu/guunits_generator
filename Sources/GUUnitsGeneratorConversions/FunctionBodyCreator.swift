@@ -56,10 +56,19 @@
  *
  */
 
+/// Protocol that generates the code for the implementation of a conversion function.
 public protocol FunctionBodyCreator {
-    
+
+    /// The Unit category to perform conversions within e.g. Distance, Time, Angle.
     associatedtype Unit: UnitProtocol
-    
+
+    /// Generates the function body that performs the unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to conver to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The generated function body that performs the unit conversion.
     func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String
-    
+
 }
