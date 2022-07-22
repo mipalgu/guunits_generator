@@ -353,7 +353,7 @@ public struct SwiftFileCreator {
             ///
             /// - Parameter value: A `\(sourceStruct)` value to convert to a `\(valueStruct)`.
             """
-        let def = "public init(_ value: " + source.description.capitalized + "_" + sign.rawValue  + ") {"
+        let def = "public init(_ value: " + source.description.capitalized + "_" + sign.rawValue + ") {"
         let endef = "}"
         let body: String
         if source == T.highestPrecision && sign == .d {
@@ -481,6 +481,7 @@ public struct SwiftFileCreator {
             + "\n\n" + endef
     }
 
+    /// Generate a property that creates the underlying C-type.
     private func generateRawProperty<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
         let comment = "/// Convert to the guunits underlying C type `"
             + value.description + "_" + sign.rawValue + "`"
@@ -488,6 +489,7 @@ public struct SwiftFileCreator {
         return comment + "\n" + def
     }
 
+    /// Create an extension that contains an init from the numeric type.
     private func generateNumericExtension<T: UnitProtocol>(
         for numericType: SwiftNumericTypes, from value: T
     ) -> String {
@@ -505,6 +507,7 @@ public struct SwiftFileCreator {
             + "\n\n" + endef
     }
 
+    /// Generate an initialiser that creates a numeric type from a unit type.
     private func createNumericConversionInit<T: UnitProtocol>(
         for numericType: SwiftNumericTypes, from value: T, _ sign: Signs
     ) -> String {
@@ -528,6 +531,7 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Generate an init that takes the underlying unit C-type.
     private func createRawInit<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
         let comment = "/// Create a `" + value.description.capitalized + "_"
             + sign.rawValue + "` from the underlying guunits C type `" + value.description
@@ -538,6 +542,7 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Create all conversion inits that work within the same category.
     private func createConversionInits<T: UnitProtocol>(
         for value: T, _ sign: Signs, allCases: [T]
     ) -> String {
@@ -550,6 +555,7 @@ public struct SwiftFileCreator {
         return categoryInit + "\n\n" + conversionInits
     }
 
+    /// Generate an init that converts from a unit in the same category to Self.
     private func createConversionInitFromCategory<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
         let valueStruct = value.description.capitalized + "_" + sign.rawValue
         let sourceStruct = T.category
@@ -564,6 +570,7 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Create all conversion inits.
     private func createSelfConversionInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
         self.createMultiple(for: Set(Signs.allCases)
             .subtracting([sign]).sorted { $0.rawValue < $1.rawValue }) {
@@ -571,6 +578,7 @@ public struct SwiftFileCreator {
         }
     }
 
+    /// Generate a conversion init.
     private func createConversionInit<T: UnitProtocol>(
         for value: T, _ sign: Signs, from source: T, _ sourceSign: Signs
     ) -> String {
@@ -589,12 +597,14 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Create all inits that take numeric swift types.
     private func createNumericInits<T: UnitProtocol>(for value: T, _ sign: Signs) -> String {
         self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
             self.createNumericInit(for: value, sign, from: $0)
         }
     }
 
+    /// Create an init that takes a numeric swift type.
     private func createNumericInit<T: UnitProtocol>(
         for value: T, _ sign: Signs, from numeric: SwiftNumericTypes
     ) -> String {
@@ -617,16 +627,20 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Converts all elements in a sequence to strings by using a callback. After this conversion,
+    /// all elements are joined into a string separated by `"\n\n"` strings.
     private func createMultiple<S: Sequence, T>(
         for data: S, _ body: (T) -> String
     ) -> String where S.Element == T {
         data.reduce(into: "") { $0 = $0 + "\n\n" + body($1) }.trimmingCharacters(in: .newlines)
     }
 
+    /// An indent is 4 spaces.
     private func indent(_ str: String) -> String {
         self.prefixNonEmptyLines(str, with: "    ")
     }
 
+    /// Adds a prefix to all lines that aren't empty.
     private func prefixNonEmptyLines(_ str: String, with prefix: String) -> String {
         let lines = str.components(separatedBy: .newlines)
         guard let first = lines.first?.trimmingCharacters(in: .whitespaces) else {
