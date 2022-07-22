@@ -48,7 +48,7 @@ final class UnitsGeneratorTests: XCTestCase {
 
     /// Test generate all function declarations.
     func testDeclarations() {
-        let types: [DistanceUnits] = [.millimetres, .centimetres]
+        let types: [DistanceUnits] = [.millimetres, .centimetres, .metres]
         guard let result = generator.generateDeclarations(forUnits: types) else {
             XCTFail("result was nil for declarations")
             return
@@ -65,7 +65,7 @@ final class UnitsGeneratorTests: XCTestCase {
 
     /// Test generate all function definitions.
     func testImplementations() {
-        let types: [DistanceUnits] = [.millimetres, .centimetres]
+        let types: [DistanceUnits] = [.millimetres, .centimetres, .metres]
         guard let result = generator.generateImplementations(forUnits: types) else {
             XCTFail("result was nil for implementations")
             return
@@ -80,6 +80,14 @@ final class UnitsGeneratorTests: XCTestCase {
         }
     }
 
+    // swiftlint:disable function_body_length
+    // swiftlint:disable closure_body_length
+
+    /// Find all function declarations for all the possible conversion functions.
+    /// - Parameters:
+    ///   - types: The types to generate conversion functions for.
+    ///   - withImplementation: True if the function definition includes the functon body.
+    /// - Returns: All the conversion functions for the types.
     private func getAllDeclarations(
         for types: [DistanceUnits], withImplementation: Bool = false
     ) -> [String] {
@@ -169,6 +177,16 @@ final class UnitsGeneratorTests: XCTestCase {
         return allDefinitions
     }
 
+    // swiftlint:enable function_body_length
+    // swiftlint:enable closure_body_length
+
+    /// Generate the function definition for a conversion function and add it to the array of all definitions.
+    /// - Parameters:
+    ///   - comment: The comment above the function.
+    ///   - declaration: The function declaration.
+    ///   - allDefinitions: The array to mutate.
+    ///   - implementation: An optional string representing the function body.
+    ///   - includeSemicolon: Whether the semicolon should be included in the function body.
     private func createDeclaration(
         comment: String,
         declaration: String,
@@ -186,6 +204,11 @@ final class UnitsGeneratorTests: XCTestCase {
         )
     }
 
+    /// Generate the comment which is placed above each conversion function.
+    /// - Parameters:
+    ///   - from: The type to convert from.
+    ///   - to: The type to convert to.
+    /// - Returns: A c-style comment explaining the conversion function.
     private func generateDeclarationComment(from: String, to: String) -> String {
         """
         /**
