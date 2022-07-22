@@ -139,19 +139,36 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
     /// Helper that creates function names and definitions.
     private let helpers: FunctionHelpers<Creator.Unit>
 
+    /// Initialise the UnitsGenerator with a creator and helpers.
+    /// - Parameters:
+    ///   - creator: The creator which will generate function definitions for unit conversions.
+    ///   - helpers: The helper which will generate function definitions for unit and numeric conversions.
     public init(creator: Creator, helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.creator = creator
         self.helpers = helpers
     }
 
+    /// Generates the function declarations for an array of units.
+    /// - Parameter units: The units to generate conversion functions for.
+    /// - Returns: A String representing valid C-code for conversion functions which can be
+    ///            applied to the units.
     func generateDeclarations(forUnits units: [Creator.Unit]) -> String? {
         self.generate(forUnits: units, includeImplementation: false)
     }
 
+    /// Generates the function implementations for an array of units.
+    /// - Parameter units: The units to generate conversion functions for.
+    /// - Returns: A string representing valid C-code for conversion functions with
+    ///            function bodies.
     func generateImplementations(forUnits units: [Creator.Unit]) -> String? {
         self.generate(forUnits: units, includeImplementation: true)
     }
 
+    /// Generates the conversion function definitions for the given units.
+    /// - Parameters:
+    ///   - units: The units to generate functions for.
+    ///   - includeImplementation: Whether these functions should include a function body.
+    /// - Returns: The generated C-code with the conversion function definitions.
     private func generate(forUnits units: [Creator.Unit], includeImplementation: Bool) -> String? {
         var hashSet = Set<Creator.Unit>()
         var unique: [Creator.Unit] = []
@@ -179,6 +196,13 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
         return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
+    /// Generate the conversion functions for a given unit.
+    /// - Parameters:
+    ///   - unit: The unit to generate conversion functions for.
+    ///   - allUnits: The units to convert into.
+    ///   - includeImplementation: Whether the function definition includes the function
+    ///                            body.
+    /// - Returns: An array of conversion functions.
     private func generate(
         unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool
     ) -> [String] {
@@ -201,6 +225,9 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
         }
     }
 
+    /// Creates a function that generates a conversion function using a unit to unit conversion.
+    /// - Parameter includeImplementation: Whether to include the implementation.
+    /// - Returns: A function containing the code to generate a unit to unit conversion.
     private func createSignFunction(includeImplementation: Bool)
         -> (Creator.Unit, Creator.Unit, Signs, Signs)
         -> String? {
@@ -224,6 +251,11 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
         }
     }
 
+    /// Creates function that generates a conversion function for unit to numeric conversions.
+    /// - Parameter includeImplementation: Whether the function definition should include the
+    ///                                    function body.
+    /// - Returns: A function the can be called to generate C-code that performs a unit to numeric
+    ///            conversion.
     private func createToNumericFunction(includeImplementation: Bool)
         -> (Creator.Unit, Signs, NumericTypes)
         -> String {
@@ -242,6 +274,11 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
         }
     }
 
+    /// Creates a function that generates a C function that will perform a numeric to unit
+    /// conversion.
+    /// - Parameter includeImplementation: Whether the generated function will include the function
+    ///                                    body.
+    /// - Returns: A function which can be used to generate a numeric to unit conversion.
     private func createFromNumericFunction(includeImplementation: Bool)
         -> (NumericTypes, Creator.Unit, Signs)
         -> String {
@@ -262,10 +299,14 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
 
 }
 
+/// DistanceUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>,
     CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
 
+    /// Initialise using DistanceUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -276,10 +317,14 @@ extension UnitsGenerator where
 
 }
 
+/// DistanceUnits initialiser for CPP conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>,
     CPPFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
 
+    /// Initialise using DistanceUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -290,10 +335,14 @@ extension UnitsGenerator where
 
 }
 
+/// ImageUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>,
     CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
 
+    /// Initialise using ImageUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -304,10 +353,14 @@ extension UnitsGenerator where
 
 }
 
+/// ImageUnits initialiser for CPP conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>,
     CPPFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
 
+    /// Initialise using ImageUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -318,10 +371,14 @@ extension UnitsGenerator where
 
 }
 
+/// PercentUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>,
     CFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter> {
 
+    /// Initialise using PercentUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -332,10 +389,14 @@ extension UnitsGenerator where
 
 }
 
+/// PercentUnits initialiser for CPP conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>,
     CPPFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter> {
 
+    /// Initialise using PercentUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -346,10 +407,14 @@ extension UnitsGenerator where
 
 }
 
+/// TimeUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>,
     CFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter> {
 
+    /// Initialise using TimeUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -360,10 +425,14 @@ extension UnitsGenerator where
 
 }
 
+/// TimeUnits initialiser for CPP conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>,
     CPPFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter> {
 
+    /// Initialise using TimeUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -374,6 +443,7 @@ extension UnitsGenerator where
 
 }
 
+/// AngleUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<
         AngleFunctionCreator,
@@ -381,6 +451,12 @@ extension UnitsGenerator where
         NumericTypeConverter
     > {
 
+    /// Initialise using AngleUnits and C conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
     public init(
         bodyCreator: AngleFunctionCreator = AngleFunctionCreator(),
         definitionCreator: CFunctionDefinitionCreator<AngleUnits> = CFunctionDefinitionCreator(),
@@ -396,6 +472,7 @@ extension UnitsGenerator where
 
 }
 
+/// AngleUnits initialiser for CPP conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<
         AngleFunctionCreator,
@@ -403,6 +480,12 @@ extension UnitsGenerator where
         NumericTypeConverter
     > {
 
+    /// Initialise using AngleUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
     public init(
         bodyCreator: AngleFunctionCreator = AngleFunctionCreator(),
         definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(),
@@ -418,10 +501,17 @@ extension UnitsGenerator where
 
 }
 
+/// DistanceUnits initialiser for cpp conversions using Delegating function creators.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>,
     CPPFunctionDefinitionCreator<DistanceUnits>, DelegatingNumericConverter> {
 
+    /// Initialise using DistanceUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
     public init(
         bodyCreator: DelegatingFunctionCreator<DistanceUnits> = DelegatingFunctionCreator(),
         definitionCreator: CPPFunctionDefinitionCreator<DistanceUnits> = CPPFunctionDefinitionCreator(),
@@ -437,10 +527,17 @@ extension UnitsGenerator where
 
 }
 
+/// TimeUnits initialiser for cpp conversions using Delegating function creators.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>,
     CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter> {
 
+    /// Initialise using TimeUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
     public init(
         bodyCreator: DelegatingFunctionCreator<TimeUnits> = DelegatingFunctionCreator(),
         definitionCreator: CPPFunctionDefinitionCreator<TimeUnits> = CPPFunctionDefinitionCreator(),
@@ -456,10 +553,17 @@ extension UnitsGenerator where
 
 }
 
+/// AngleUnits initialiser for cpp conversions using Delegating function creators.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<DelegatingFunctionCreator<AngleUnits>,
     CPPFunctionDefinitionCreator<AngleUnits>, DelegatingNumericConverter> {
 
+    /// Initialise using AngleUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
     public init(
         bodyCreator: DelegatingFunctionCreator<AngleUnits> = DelegatingFunctionCreator(),
         definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(),
