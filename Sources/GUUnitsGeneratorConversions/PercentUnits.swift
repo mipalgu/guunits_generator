@@ -56,23 +56,28 @@
  *
  */
 
+/// A unit for representing percentages.
 public enum PercentUnits: String {
 
-    case percent = "percent"
+    /// Use percent.
+    case percent
 
 }
 
+/// UnitProtocol conformance.
 extension PercentUnits: UnitProtocol {
-    
+
+    /// The abbreviation of this unit.
     public var abbreviation: String {
         switch self {
         case .percent:
             return "pct"
         }
     }
-    
+
+    /// The description of this unit.
     public var description: String {
-        return self.rawValue
+        self.rawValue
     }
-    
+
 }
