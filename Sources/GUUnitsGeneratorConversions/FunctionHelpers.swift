@@ -78,7 +78,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - otherUnit: The unit to convert to.
     ///   - sign: The sign of the first unit.
     ///   - otherSign: The sign of the second unit.
-    ///   - unique: Whether the name of this unit is unique.
+    ///   - unique: Whether the function name has to be unique.
     /// - Returns: The generated function name.
     func functionName(
         forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs, unique: Bool = true
@@ -93,7 +93,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - otherUnit: The unit to convert to.
     ///   - sign: The sign of the first unit.
     ///   - otherSign: The sign of the second unit.
-    ///   - unique: Whether the target unit has a unique name.
+    ///   - unique: Whether the function name has to be unique.
     ///   - namespace: A string that is prepended to the function name.
     /// - Returns: The generated function definition.
     func functionDefinition(
@@ -116,7 +116,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - unit: The unit to convert from.
     ///   - sign: The sign of the unit.
     ///   - type: The type to convert to.
-    ///   - unique: Whether the type is unique.
+    ///   - unique: Whether the function name has to be unique.
     /// - Returns: The generated function name.
     func functionName(forUnit unit: Unit, sign: Signs, to type: NumericTypes, unique: Bool = true) -> String {
         "\(unit.abbreviation)\(collapse(unique ? sign : nil))_to_\(type.abbreviation)"
@@ -127,7 +127,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - unit: The unit to convert from.
     ///   - sign: The sign of the unit.
     ///   - type: The c-type to convert to.
-    ///   - unique: Whether the type is unique.
+    ///   - unique: Whether the function name has to be unique.
     ///   - namespace: A string that is prepended to the function name.
     /// - Returns: The generated function definition.
     func functionDefinition(
@@ -146,7 +146,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - type: The type to convert from.
     ///   - unit: The unit to convert into.
     ///   - sign: The sign of the unit.
-    ///   - unique: Whether the units name is unique.
+    ///   - unique: Whether the function name has to be unique.
     /// - Returns: The generated function name.
     func functionName(from type: NumericTypes, to unit: Unit, sign: Signs, unique: Bool = true) -> String {
         let uniquePrefix = unique || type == .int || type == .uint ? "\(type.abbreviation)_to_" : ""
@@ -158,7 +158,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - type: The type to convert from.
     ///   - unit: The unit to convert into.
     ///   - sign: The sign of the unit.
-    ///   - unique: Whether the unit name is unique.
+    ///   - unique: Whether the function name has to be unique.
     ///   - namespace: A string that is prepended to the function name.
     /// - Returns: The generated function definition.
     func functionDefinition(
