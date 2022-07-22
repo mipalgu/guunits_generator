@@ -56,43 +56,127 @@
  *
  */
 
+/// Helper struct for generating C function definitions and names.
 public struct FunctionHelpers<Unit: UnitProtocol> {
 
+    /// Default init.
     public init() {}
-    
-    fileprivate func collapse(_ sign: Signs?, prefix: String = "_", suffix: String = "") -> String {
-        return sign.map { prefix + $0.rawValue + suffix} ?? ""
+
+    /// Represents a sign in the format suitable for a function declaration.
+    /// - Parameters:
+    ///   - sign: The sign to convert.
+    ///   - prefix: A string to place immediately before the sign.
+    ///   - suffix: A string to place immediately after the sign.
+    /// - Returns: The prefix, sign, and suffix concatenated together.
+    private func collapse(_ sign: Signs?, prefix: String = "_", suffix: String = "") -> String {
+        sign.map { prefix + $0.rawValue + suffix } ?? ""
     }
-    
-    func functionName(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs, unique: Bool = true) -> String {
+
+    /// Generate a function name that represents a unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    ///   - unique: Whether the name of this unit is unique.
+    /// - Returns: The generated function name.
+    func functionName(
+        forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs, unique: Bool = true
+    ) -> String {
         let uniqueSign = collapse(unique ? sign : nil)
         return "\(unit.abbreviation)\(uniqueSign)_to_\(otherUnit.abbreviation)\(collapse(otherSign))"
     }
-    
-    func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs, unique: Bool = true, namespace: String? = nil) -> String {
-        let functionName = self.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: unique)
-        return "\(otherUnit)\(collapse(otherSign)) \(namespace ?? "")\(functionName)(\(unit)\(collapse(sign)) \(unit))"
+
+    /// Creates a c-style function definition for a conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    ///   - unique: Whether the target unit has a unique name.
+    ///   - namespace: A string that is prepended to the function name.
+    /// - Returns: The generated function definition.
+    func functionDefinition(
+        forUnit unit: Unit,
+        to otherUnit: Unit,
+        sign: Signs,
+        otherSign: Signs,
+        unique: Bool = true,
+        namespace: String? = nil
+    ) -> String {
+        let functionName = self.functionName(
+            forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: unique
+        )
+        return "\(otherUnit)\(collapse(otherSign)) \(namespace ?? "")" +
+            "\(functionName)(\(unit)\(collapse(sign)) \(unit))"
     }
-    
+
+    /// Generate a c-style function name representing a unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - type: The type to convert to.
+    ///   - unique: Whether the type is unique.
+    /// - Returns: The generated function name.
     func functionName(forUnit unit: Unit, sign: Signs, to type: NumericTypes, unique: Bool = true) -> String {
-        return "\(unit.abbreviation)\(collapse(unique ? sign : nil))_to_\(type.abbreviation)"
+        "\(unit.abbreviation)\(collapse(unique ? sign : nil))_to_\(type.abbreviation)"
     }
-    
-    func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes, unique: Bool = true, namespace: String? = nil) -> String {
+
+    /// Generate a c-style function definition for a unit conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - type: The c-type to convert to.
+    ///   - unique: Whether the type is unique.
+    ///   - namespace: A string that is prepended to the function name.
+    /// - Returns: The generated function definition.
+    func functionDefinition(
+        forUnit unit: Unit,
+        sign: Signs,
+        to type: NumericTypes,
+        unique: Bool = true,
+        namespace: String? = nil
+    ) -> String {
         let functionName = self.functionName(forUnit: unit, sign: sign, to: type, unique: unique)
         return "\(type.rawValue) \(namespace ?? "")\(functionName)(\(unit)\(collapse(sign)) \(unit))"
     }
-    
+
+    /// Generate a function name for a conversion function.
+    /// - Parameters:
+    ///   - type: The type to convert from.
+    ///   - unit: The unit to convert into.
+    ///   - sign: The sign of the unit.
+    ///   - unique: Whether the units name is unique.
+    /// - Returns: The generated function name.
     func functionName(from type: NumericTypes, to unit: Unit, sign: Signs, unique: Bool = true) -> String {
         let uniquePrefix = unique || type == .int || type == .uint ? "\(type.abbreviation)_to_" : ""
         return uniquePrefix + "\(unit.abbreviation)\(collapse(sign))"
     }
-    
-    func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs, unique: Bool = true, namespace: String? = nil) -> String {
+
+    /// Generate a c-style function definition for a conversion function.
+    /// - Parameters:
+    ///   - type: The type to convert from.
+    ///   - unit: The unit to convert into.
+    ///   - sign: The sign of the unit.
+    ///   - unique: Whether the unit name is unique.
+    ///   - namespace: A string that is prepended to the function name.
+    /// - Returns: The generated function definition.
+    func functionDefinition(
+        from type: NumericTypes,
+        to unit: Unit,
+        sign: Signs,
+        unique: Bool = true,
+        namespace: String? = nil
+    ) -> String {
         let functionName = self.functionName(from: type, to: unit, sign: sign, unique: unique)
         return "\(unit)\(collapse(sign)) \(namespace ?? "")\(functionName)(\(type.rawValue) \(unit))"
     }
-    
+
+    /// Helper function that converts integer literals into floating point and double literals.
+    /// - Parameters:
+    ///   - value: The literal to convert.
+    ///   - sign: The sign to convert into.
+    /// - Returns: The generated literal.
     func modify(value: Int, forSign sign: Signs) -> String {
         switch sign.numericType {
         case .float:
@@ -103,5 +187,5 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
             return "\(value)"
         }
     }
-    
+
 }
