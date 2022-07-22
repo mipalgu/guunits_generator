@@ -56,16 +56,24 @@
  *
  */
 
+/// A Unit for representing distances.
 public enum DistanceUnits: String {
 
-    case millimetres = "millimetres"
-    case centimetres = "centimetres"
-    case metres = "metres"
+    /// Millimetres
+    case millimetres
+
+    /// Centimetres
+    case centimetres
+
+    /// Metres
+    case metres
 
 }
 
+/// UnitProtocol conformance.
 extension DistanceUnits: UnitProtocol {
-    
+
+    /// The abbreviation of the unit.
     public var abbreviation: String {
         switch self {
         case .millimetres:
@@ -76,9 +84,10 @@ extension DistanceUnits: UnitProtocol {
             return "m"
         }
     }
-    
+
+    /// The description of the unit.
     public var description: String {
-        return self.rawValue
+        self.rawValue
     }
-    
+
 }
