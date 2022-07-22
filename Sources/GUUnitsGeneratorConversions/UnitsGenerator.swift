@@ -114,8 +114,14 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
             }
         )
         let sorted = functions.sorted { (lhs: String, rhs: String) -> Bool in
-            let first: String = lhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
-            let second: String = rhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
+            let first = lhs
+                .components(separatedBy: .whitespaces)
+                .dropFirst()
+                .reduce(into: "") { $0 = $0 + $1 }
+            let second = rhs
+                .components(separatedBy: .whitespaces)
+                .dropFirst()
+                .reduce(into: "") { $0 = $0 + $1 }
             return first < second
         }
         guard let firstFunction = sorted.first else {
