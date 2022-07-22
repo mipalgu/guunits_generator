@@ -58,36 +58,90 @@
 
 import Foundation
 
-public typealias DistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter>>
-public typealias TimeUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>, CFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter>>
-public typealias AngleUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<AngleFunctionCreator, CFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter>>
-public typealias ImageUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter>>
-public typealias PercentUnitGenerator = UnitsGenerator<CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>, CFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter>>
+public typealias DistanceUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        GradualFunctionCreator<DistanceUnits>,
+        CFunctionDefinitionCreator<DistanceUnits>,
+        NumericTypeConverter
+    >
+>
 
-public typealias CPPDistanceUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>, CPPFunctionDefinitionCreator<DistanceUnits>, DelegatingNumericConverter>>
-public typealias CPPTimeUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>, CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter>>
-public typealias CPPAngleUnitsGenerator = UnitsGenerator<CompositeFunctionCreator<DelegatingFunctionCreator<AngleUnits>, CPPFunctionDefinitionCreator<AngleUnits>, DelegatingNumericConverter>>
+public typealias TimeUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        GradualFunctionCreator<TimeUnits>,
+        CFunctionDefinitionCreator<TimeUnits>,
+        NumericTypeConverter
+    >
+>
+
+public typealias AngleUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        AngleFunctionCreator,
+        CFunctionDefinitionCreator<AngleUnits>,
+        NumericTypeConverter
+    >
+>
+
+public typealias ImageUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        GradualFunctionCreator<ImageUnits>,
+        CFunctionDefinitionCreator<ImageUnits>,
+        NumericTypeConverter
+    >
+>
+
+public typealias PercentUnitGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        GradualFunctionCreator<PercentUnits>,
+        CFunctionDefinitionCreator<PercentUnits>,
+        NumericTypeConverter
+    >
+>
+
+public typealias CPPDistanceUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        DelegatingFunctionCreator<DistanceUnits>,
+        CPPFunctionDefinitionCreator<DistanceUnits>,
+        DelegatingNumericConverter
+    >
+>
+
+public typealias CPPTimeUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        DelegatingFunctionCreator<TimeUnits>,
+        CPPFunctionDefinitionCreator<TimeUnits>,
+        DelegatingNumericConverter
+    >
+>
+
+public typealias CPPAngleUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        DelegatingFunctionCreator<AngleUnits>,
+        CPPFunctionDefinitionCreator<AngleUnits>,
+        DelegatingNumericConverter
+    >
+>
 
 public struct UnitsGenerator<Creator: FunctionCreator> {
-    
+
     let creator: Creator
-    
-    fileprivate let helpers: FunctionHelpers<Creator.Unit>
-    
+
+    private let helpers: FunctionHelpers<Creator.Unit>
+
     public init(creator: Creator, helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
         self.creator = creator
         self.helpers = helpers
     }
-    
+
     func generateDeclarations(forUnits units: [Creator.Unit]) -> String? {
-        return self.generate(forUnits: units, includeImplementation: false)
+        self.generate(forUnits: units, includeImplementation: false)
     }
-    
+
     func generateImplementations(forUnits units: [Creator.Unit]) -> String? {
-        return self.generate(forUnits: units, includeImplementation: true)
+        self.generate(forUnits: units, includeImplementation: true)
     }
-    
-    fileprivate func generate(forUnits units: [Creator.Unit], includeImplementation: Bool) -> String? {
+
+    private func generate(forUnits units: [Creator.Unit], includeImplementation: Bool) -> String? {
         var hashSet = Set<Creator.Unit>()
         var unique: [Creator.Unit] = []
         unique.reserveCapacity(units.count)
@@ -98,7 +152,11 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
             hashSet.insert($0)
             unique.append($0)
         }
-        let functions = Set<String>(unique.flatMap { self.generate(unit: $0, against: unique, includeImplementation: includeImplementation) })
+        let functions = Set<String>(
+            unique.flatMap {
+                self.generate(unit: $0, against: unique, includeImplementation: includeImplementation)
+            }
+        )
         let sorted = functions.sorted(by: { (lhs: String, rhs: String) -> Bool in
             let first: String = lhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
             let second: String = rhs.components(separatedBy: .whitespaces).dropFirst().reduce("", +)
@@ -110,14 +168,16 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
         return sorted.dropFirst().reduce(firstFunction) { $0 + "\n\n" + $1 }
     }
 
-    fileprivate func generate(unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool) -> [String] {
+    private func generate(
+        unit: Creator.Unit, against allUnits: [Creator.Unit], includeImplementation: Bool
+    ) -> [String] {
         let signFunc = self.createSignFunction(includeImplementation: includeImplementation)
         let toNumFunc = self.createToNumericFunction(includeImplementation: includeImplementation)
         let fromNumFunc = self.createFromNumericFunction(includeImplementation: includeImplementation)
         return NumericTypes.allCases.flatMap { type in
             Signs.allCases.flatMap { sign in
                 Signs.allCases.flatMap { otherSign in
-                    allUnits.flatMap { (unit) -> [String] in
+                    allUnits.flatMap { unit -> [String] in
                         let increasing = allUnits.compactMap { signFunc(unit, $0, sign, otherSign) }
                         let decreasing = allUnits.compactMap { signFunc($0, unit, sign, otherSign) }
                         var arr: [String] = []
@@ -129,9 +189,11 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
             }
         }
     }
-    
-    fileprivate func createSignFunction(includeImplementation: Bool) -> (Creator.Unit, Creator.Unit, Signs, Signs) -> String? {
-        return { (unit, otherUnit, sign, otherSign) in
+
+    private func createSignFunction(includeImplementation: Bool)
+        -> (Creator.Unit, Creator.Unit, Signs, Signs)
+        -> String? {
+        { unit, otherUnit, sign, otherSign in
             if unit == otherUnit && sign == otherSign {
                 return nil
             }
@@ -140,17 +202,21 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
                  * Convert \(unit)_\(sign.rawValue) to \(otherUnit)_\(otherSign.rawValue).
                  */
                 """
-            let definition = self.creator.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+            let definition = self.creator
+                .functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
             if false == includeImplementation {
                 return comment + "\n" + definition + ";"
             }
-            let body = self.creator.createFunction(unit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+            let body = self.creator
+                .createFunction(unit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
             return comment + "\n" + definition + "\n{\n" + body + "\n" + "}"
         }
     }
-    
-    fileprivate func createToNumericFunction(includeImplementation: Bool) -> (Creator.Unit, Signs, NumericTypes) -> String {
-        return { (unit, sign, type) in
+
+    private func createToNumericFunction(includeImplementation: Bool)
+        -> (Creator.Unit, Signs, NumericTypes)
+        -> String {
+        { unit, sign, type in
             let comment = """
                 /**
                  * Convert \(unit)_\(sign.rawValue) to \(type.rawValue).
@@ -164,9 +230,11 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
             return comment + "\n" + definition + "\n{\n" + "    return " + body + ";\n}"
         }
     }
-    
-    fileprivate func createFromNumericFunction(includeImplementation: Bool) -> (NumericTypes, Creator.Unit, Signs) -> String {
-        return { (type, unit, sign) in
+
+    private func createFromNumericFunction(includeImplementation: Bool)
+        -> (NumericTypes, Creator.Unit, Signs)
+        -> String {
+        { type, unit, sign in
             let comment = """
             /**
              * Convert \(type.rawValue) to \(unit)_\(sign.rawValue).
@@ -183,8 +251,10 @@ public struct UnitsGenerator<Creator: FunctionCreator> {
 
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>,
+    CFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -192,11 +262,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>, CPPFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<DistanceUnits>,
+    CPPFunctionDefinitionCreator<DistanceUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -204,11 +276,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>,
+    CFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -216,11 +290,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>, CPPFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>,
+    CPPFunctionDefinitionCreator<ImageUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -228,11 +304,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>, CFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>,
+    CFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -240,11 +318,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>, CPPFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<PercentUnits>,
+    CPPFunctionDefinitionCreator<PercentUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -252,11 +332,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>, CFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>,
+    CFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -264,11 +346,13 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>, CPPFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter> {
-    
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<TimeUnits>,
+    CPPFunctionDefinitionCreator<TimeUnits>, NumericTypeConverter> {
+
     public init(unitDifference: [Creator.Unit: Int]) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
@@ -276,65 +360,106 @@ extension UnitsGenerator where Creator == CompositeFunctionCreator<GradualFuncti
             numericConverter: NumericTypeConverter()
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<AngleFunctionCreator, CFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter> {
-    
-    public init(bodyCreator: AngleFunctionCreator = AngleFunctionCreator(), definitionCreator: CFunctionDefinitionCreator<AngleUnits> = CFunctionDefinitionCreator(), numericConverter: NumericTypeConverter = NumericTypeConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<
+        AngleFunctionCreator,
+        CFunctionDefinitionCreator<AngleUnits>,
+        NumericTypeConverter
+    > {
+
+    public init(
+        bodyCreator: AngleFunctionCreator = AngleFunctionCreator(),
+        definitionCreator: CFunctionDefinitionCreator<AngleUnits> = CFunctionDefinitionCreator(),
+        numericConverter: NumericTypeConverter = NumericTypeConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
             numericConverter: numericConverter
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<AngleFunctionCreator, CPPFunctionDefinitionCreator<AngleUnits>, NumericTypeConverter> {
-    
-    public init(bodyCreator: AngleFunctionCreator = AngleFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(), numericConverter: NumericTypeConverter = NumericTypeConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<
+        AngleFunctionCreator,
+        CPPFunctionDefinitionCreator<AngleUnits>,
+        NumericTypeConverter
+    > {
+
+    public init(
+        bodyCreator: AngleFunctionCreator = AngleFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: NumericTypeConverter = NumericTypeConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
             numericConverter: numericConverter
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>, CPPFunctionDefinitionCreator<DistanceUnits>, DelegatingNumericConverter> {
-    
-    public init(bodyCreator: DelegatingFunctionCreator<DistanceUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<DistanceUnits> = CPPFunctionDefinitionCreator(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>,
+    CPPFunctionDefinitionCreator<DistanceUnits>, DelegatingNumericConverter> {
+
+    public init(
+        bodyCreator: DelegatingFunctionCreator<DistanceUnits> = DelegatingFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<DistanceUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
             numericConverter: numericConverter
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>, CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter> {
-    
-    public init(bodyCreator: DelegatingFunctionCreator<TimeUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<TimeUnits> = CPPFunctionDefinitionCreator(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<DelegatingFunctionCreator<TimeUnits>,
+    CPPFunctionDefinitionCreator<TimeUnits>, DelegatingNumericConverter> {
+
+    public init(
+        bodyCreator: DelegatingFunctionCreator<TimeUnits> = DelegatingFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<TimeUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
             numericConverter: numericConverter
         ))
     }
-    
+
 }
 
-extension UnitsGenerator where Creator == CompositeFunctionCreator<DelegatingFunctionCreator<AngleUnits>, CPPFunctionDefinitionCreator<AngleUnits>, DelegatingNumericConverter> {
-    
-    public init(bodyCreator: DelegatingFunctionCreator<AngleUnits> = DelegatingFunctionCreator(), definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(), numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(), helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()) {
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<DelegatingFunctionCreator<AngleUnits>,
+    CPPFunctionDefinitionCreator<AngleUnits>, DelegatingNumericConverter> {
+
+    public init(
+        bodyCreator: DelegatingFunctionCreator<AngleUnits> = DelegatingFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<AngleUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
         self.init(creator: CompositeFunctionCreator(
             bodyCreator: bodyCreator,
             definitionCreator: definitionCreator,
             numericConverter: numericConverter
         ))
     }
-    
+
 }
