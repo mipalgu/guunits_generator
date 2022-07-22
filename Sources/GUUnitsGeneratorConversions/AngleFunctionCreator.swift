@@ -56,13 +56,25 @@
  *
  */
 
+/// Struct that defines conversion functions between angle units.
 public struct AngleFunctionCreator: FunctionBodyCreator {
-    
-    fileprivate let signConverter: SignConverter = SignConverter()
 
+    /// Helper object used to create sign conversion functions.
+    private let signConverter = SignConverter()
+
+    /// Default init.
     public init() {}
-    
-    public func createFunction(unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs) -> String {
+
+    /// Generates C-code that will perform a cast between different angle units.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: Generated C-code that performs the conversion.
+    public func createFunction(
+        unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs
+    ) -> String {
         let convert: String
         switch (unit, otherUnit) {
         case (.degrees, .radians):
@@ -75,13 +87,24 @@ public struct AngleFunctionCreator: FunctionBodyCreator {
         let implementation = self.shouldRound(from: sign, to: otherSign) ? "round(\(convert))" : convert
         return "    return ((\(otherUnit)_\(otherSign.rawValue)) (\(implementation)));"
     }
-    
+
+    /// Generates a standard sign conversion for identical unit types.
+    /// - Parameters:
+    ///   - unit: The unit to change sign.
+    ///   - sign: The sign of the unit.
+    ///   - otherSign: The sign to change into.
+    /// - Returns: The generated C-code that performs the sign conversion.
     func castFunc(forUnit unit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return "    return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
+        "    return \(self.signConverter.convert("\(unit)", otherUnit: unit, from: sign, to: otherSign));"
     }
-    
-    fileprivate func shouldRound(from sign: Signs, to otherSign: Signs) -> Bool {
-        return (sign == .d || sign == .f) && (otherSign != .d && otherSign != .f)
+
+    /// Function that indicates whether a round operation needs to happen during a conversion.
+    /// - Parameters:
+    ///   - sign: The sign of the first parameter.
+    ///   - otherSign: The sign of the second parameter.
+    /// - Returns: Whether a round operation needs to occur.
+    private func shouldRound(from sign: Signs, to otherSign: Signs) -> Bool {
+        (sign == .d || sign == .f) && (otherSign != .d && otherSign != .f)
     }
-    
+
 }
