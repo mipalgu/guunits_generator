@@ -56,14 +56,38 @@
  *
  */
 
+/// Protocol that specifies generation function for creating function definitions
+/// for conversion functions between unit and numeric types.
 public protocol FunctionDefinitionCreator {
-    
+
+    /// The unit category to perform conversions within. E.g. DistanceUnits, AngleUnits, TimeUnits.
     associatedtype Unit: UnitProtocol
-    
+
+    /// Convert a unit to another unit of the same category.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - to: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The generated function definition.
     func functionDefinition(forUnit: Unit, to: Unit, sign: Signs, otherSign: Signs) -> String
-    
+
+    /// Generate the function definition for a function that converts between a given unit type
+    /// and a given numeric type.
+    /// - Parameters:
+    ///   - forUnit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - to: The numeric type to convert to.
+    /// - Returns: The generated function definition.
     func functionDefinition(forUnit: Unit, sign: Signs, to: NumericTypes) -> String
-    
+
+    /// Generate the function definition for a function that converts between a given numeric type
+    /// and a given unit type.
+    /// - Parameters:
+    ///   - from: The numeric type to convert from.
+    ///   - to: The unit type to convert to.
+    ///   - sign: The sign of the unit type.
+    /// - Returns: The generated function definition that performs the conversion.
     func functionDefinition(from: NumericTypes, to: Unit, sign: Signs) -> String
-    
+
 }

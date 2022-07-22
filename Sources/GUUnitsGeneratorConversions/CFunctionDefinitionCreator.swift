@@ -56,22 +56,49 @@
  *
  */
 
+/// Function that generates the C function definitions for converting between units and numeric types within
+/// the same unit category.
 public struct CFunctionDefinitionCreator<Unit: UnitProtocol>: FunctionDefinitionCreator {
 
-    fileprivate let helpers: FunctionHelpers<Unit> = FunctionHelpers()
+    /// Helper that will generate the functions.
+    private let helpers: FunctionHelpers<Unit> = FunctionHelpers()
 
+    /// Default init.
     public init() {}
 
-    public func functionDefinition(forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+    /// Convert a unit to another unit of the same category.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The generated C function definition.
+    public func functionDefinition(
+        forUnit unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs
+    ) -> String {
+        helpers.functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
     }
-    
+
+    /// Generate the function definition for a function that converts between a given unit type
+    /// and a given numeric type.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - type: The numeric type to convert to.
+    /// - Returns: The generated C function definition.
     public func functionDefinition(forUnit unit: Unit, sign: Signs, to type: NumericTypes) -> String {
-        return self.helpers.functionDefinition(forUnit: unit, sign: sign, to: type)
+        helpers.functionDefinition(forUnit: unit, sign: sign, to: type)
     }
-    
+
+    /// Generate the function definition for a function that converts between a given numeric type
+    /// and a given unit type.
+    /// - Parameters:
+    ///   - type: The numeric type to convert from.
+    ///   - unit: The unit type to convert to.
+    ///   - sign: The sign of the unit type.
+    /// - Returns: The generated C function definition that performs the conversion.
     public func functionDefinition(from type: NumericTypes, to unit: Unit, sign: Signs) -> String {
-        return self.helpers.functionDefinition(from: type, to: unit, sign: sign)
+        helpers.functionDefinition(from: type, to: unit, sign: sign)
     }
-    
+
 }
