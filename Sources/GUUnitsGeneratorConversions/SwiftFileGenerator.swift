@@ -321,6 +321,11 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Create inits that convert between unit cases.
+    ///
+    /// - Parameter type: The type of the unit.
+    ///
+    /// - Returns: The definitions of all inits separated by two newlines.
     private func createCategoryConversionInits<T: UnitProtocol>(for type: T.Type) -> String {
         self.createMultiple(for: T.allCases) { source in
             self.createMultiple(for: Signs.allCases) {
@@ -329,6 +334,15 @@ public struct SwiftFileCreator {
         }
     }
 
+    /// Create an initialiser that creates a category struct from a unit case.
+    ///
+    /// - Parameter type: The type of the unit.
+    ///
+    /// - Parameter source: The specific case that the init converts from.
+    ///
+    /// - Parameter sign: The sign of the unit case that the init converts from.
+    ///
+    /// - Returns: The init definition and implementation.
     private func createCategoryConversionInit<T: UnitProtocol>(
         for type: T.Type, from source: T, _ sign: Signs
     ) -> String {
@@ -351,6 +365,13 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Create initialisers that can create a category struct from support
+    /// swift numeric type found in `SwiftNumericTypes.uniqueTypes`.
+    ///
+    /// - Parameter type: The type of the unit that the initialiser creates.
+    ///
+    /// - Returns: The definitions and implementations of all inits separated by
+    /// two new line characters.
     private func createCategoryNumericInits<T: UnitProtocol>(for type: T.Type) -> String {
         self.createMultiple(for: SwiftNumericTypes.uniqueTypes) { numeric in
             self.createMultiple(for: type.allCases) {
@@ -359,6 +380,16 @@ public struct SwiftFileCreator {
         }
     }
 
+    /// Create a single initialiser that create a category struct from a swift
+    /// numeric type.
+    ///
+    /// - Parameter type: The type of the unit being created.
+    ///
+    /// - Parameter numeric: The swift numeric type that is being converted.
+    ///
+    /// - Parameter value: A specific unit case the dictates what unit the
+    /// numeric value is in. The external parameter name of the value that this
+    /// init takes will be the description of this case.
     private func createCategoryNumericInit<T: UnitProtocol>(
         for type: T.Type, from numeric: SwiftNumericTypes, as value: T
     ) -> String {
@@ -383,6 +414,15 @@ public struct SwiftFileCreator {
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
+    /// Create extensions on `extensionType` that provide initialisers
+    /// that convert from a category type to a `type` type.
+    ///
+    /// - Parameter extensionType: The name of the type being extended.
+    ///
+    /// - Parameter type: The unit type that the initialiser creates.
+    ///
+    /// - Returns: The definition and implementation of the extension including
+    /// the initialiser.
     private func generateCategoryExtension<T: UnitProtocol>(
         for extensionType: String, from type: T.Type
     ) -> String {
@@ -399,6 +439,7 @@ public struct SwiftFileCreator {
             + "\n\n" + endef
     }
 
+    /// Creates a struct for a particular case of a unit.
     private func generateUnitStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
         let signComment: String
         switch sign {
