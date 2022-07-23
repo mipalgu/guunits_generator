@@ -170,11 +170,8 @@ public struct HeaderCreator {
 
     /// Generate a string containing all of the type and function definitions.
     /// - Parameters:
-    ///   - distanceGenerator: The generator that creates distance unit definitions.
-    ///   - timeGenerator: The generator that creates time unit definitions.
-    ///   - angleGenerator: The generator that creates angle unit definitions.
-    ///   - imageGenerator: The generator that creates image unit definitions.
-    ///   - percentGenerator: The generator that creates percent unit definitions.
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
     /// - Returns: All of the type and function definitions for a C header file.
     public func generate(generators: [AnyGenerator]) -> String {
         let content = self.createContent(generators: generators)
@@ -183,11 +180,8 @@ public struct HeaderCreator {
 
     /// Creates the function definitions for every unit type.
     /// - Parameters:
-    ///   - distanceGenerator: The generator that creates distance unit definitions.
-    ///   - timeGenerator: The generator that creates time unit definitions.
-    ///   - angleGenerator: The generator that creates angle unit definitions.
-    ///   - imageGenerator: The generator that creates image unit definitions.
-    ///   - percentGenerator: The generator that creates percent unit definitions.
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
     /// - Returns: A string of all the function definitions.
     private func createContent(generators: [AnyGenerator]) -> String {
         let functions: [String] = generators.map {

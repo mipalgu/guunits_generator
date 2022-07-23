@@ -148,11 +148,8 @@ public struct CFileCreator {
 
     /// Generate all of the guunits source code.
     /// - Parameters:
-    ///   - distanceGenerator: The generator which creates distance functions.
-    ///   - timeGenerator: The generator which creates time functions.
-    ///   - angleGenerator: The generator which creates angle functions.
-    ///   - imageGenerator: The generator which creates image functions.
-    ///   - percentGenerator: The generator which creates percent functions.
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
     /// - Returns: A string of all C functions for the supported guunits types.
     public func generate(generators: [AnyGenerator]) -> String {
         let content = self.createContent(generators: generators)
@@ -161,11 +158,8 @@ public struct CFileCreator {
 
     /// Create the conversion functions for each unit type.
     /// - Parameters:
-    ///   - distanceGenerator: The generator which creates distance functions.
-    ///   - timeGenerator: The generator which creates time functions.
-    ///   - angleGenerator: The generator which creates angle functions.
-    ///   - imageGenerator: The generator which creates image functions.
-    ///   - percentGenerator: The generator which creates percent functions.
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
     /// - Returns: A string containing all of the conversion functions.
     private func createContent(generators: [AnyGenerator]) -> String {
         let implementations: [String] = generators.map {
