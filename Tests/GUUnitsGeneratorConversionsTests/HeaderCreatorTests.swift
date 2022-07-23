@@ -99,6 +99,11 @@ final class HeaderCreatorTests: XCTestCase {
         generating: PercentUnits.self, using: PercentUnitGenerator(unitDifference: [:])
     )
 
+    /// The temperate generator.
+    let temperatureGenerator = AnyGenerator(
+        generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
+    )
+
     /// The header of the file.
     var prefix: String {
         """
@@ -213,7 +218,8 @@ final class HeaderCreatorTests: XCTestCase {
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
-                percentGenerator
+                percentGenerator,
+                temperatureGenerator
             ]
         )
         guard
@@ -221,7 +227,8 @@ final class HeaderCreatorTests: XCTestCase {
             let times = timeGenerator.declarations,
             let angles = angleGenerator.declarations,
             let images = imageGenerator.declarations,
-            let percentages = percentGenerator.declarations
+            let percentages = percentGenerator.declarations,
+            let temperatures = temperatureGenerator.declarations
         else {
             XCTFail("Unable to create header.")
             return
@@ -232,6 +239,7 @@ final class HeaderCreatorTests: XCTestCase {
             + "\n\n" + angles
             + "\n\n" + images
             + "\n\n" + percentages
+            + "\n\n" + temperatures
             + "\n\n" + suffix
         XCTAssertEqual(result, expected)
     }

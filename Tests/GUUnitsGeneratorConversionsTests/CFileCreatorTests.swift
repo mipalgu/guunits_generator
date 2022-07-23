@@ -119,6 +119,11 @@ final class CFileCreatorTests: XCTestCase {
         generating: PercentUnits.self, using: PercentUnitGenerator(unitDifference: [:])
     )
 
+    /// The temperate generator.
+    let temperatureGenerator = AnyGenerator(
+        generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
+    )
+
     /// Test computed properties have right values.
     func testComputedProperties() {
         XCTAssertEqual(creator.suffix, "")
@@ -132,7 +137,8 @@ final class CFileCreatorTests: XCTestCase {
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
-                percentGenerator
+                percentGenerator,
+                temperatureGenerator
             ]
         )
         guard
@@ -140,7 +146,8 @@ final class CFileCreatorTests: XCTestCase {
             let times = timeGenerator.implementations,
             let angles = angleGenerator.implementations,
             let images = imageGenerator.implementations,
-            let percentages = percentGenerator.implementations
+            let percentages = percentGenerator.implementations,
+            let temperatures = temperatureGenerator.implementations
         else {
             XCTFail("Unable to create C file.")
             return
@@ -150,6 +157,7 @@ final class CFileCreatorTests: XCTestCase {
             + "\n\n" + angles
             + "\n\n" + images
             + "\n\n" + percentages
+            + "\n\n" + temperatures
             + "\n\n"
         XCTAssertEqual(result, expected)
     }
