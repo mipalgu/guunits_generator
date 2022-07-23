@@ -70,7 +70,6 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     public func createFunction(
         unit: TemperatureUnits, to otherUnit: TemperatureUnits, sign: Signs, otherSign: Signs
     ) -> String {
-        let convert: String
         switch (unit, otherUnit) {
         case (.celsius, .kelvin):
             return celsiusToKelvin(
@@ -89,11 +88,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         case (.fahrenheit, .kelvin):
             return fahrenheitToKelvin(valueSign: sign, otherSign: otherSign)
         default:
-            fatalError("Not yet supported!")
+            let conversion = signConverter.convert(
+                unit.rawValue, otherUnit: otherUnit, from: sign, to: otherSign
+            )
+            return "    return \(conversion);"
         }
-        let roundedString = round(value: convert, from: sign, to: otherSign)
-        let implementation = "(\(otherUnit.rawValue)_\(otherSign.rawValue)) (\(roundedString))"
-        return "    return (\(implementation));"
     }
 
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {

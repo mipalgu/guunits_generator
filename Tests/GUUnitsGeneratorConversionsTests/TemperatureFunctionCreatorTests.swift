@@ -266,4 +266,10 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    func testCelsiusToCelsiusIntegerToUnsigned() {
+        let result = creator.createFunction(unit: .celsius, to: .celsius, sign: .t, otherSign: .u)
+        let expected = "    return ((celsius_u) ((celsius) < 0 ? 0 : celsius));"
+        XCTAssertEqual(result, expected)
+    }
+
 }
