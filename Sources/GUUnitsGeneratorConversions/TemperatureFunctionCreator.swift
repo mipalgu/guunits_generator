@@ -82,6 +82,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             )
         case (.celsius, .fahrenheit):
             return celsiusToFahrenheit(valueSign: sign, otherSign: otherSign)
+        case (.fahrenheit, .celsius):
+            return fahrenheitToCelsius(valueSign: sign, otherSign: otherSign)
         default:
             fatalError("Not yet supported!")
         }
@@ -136,6 +138,19 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
         }
         return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(roundedString)));"
+    }
+
+    private func fahrenheitToCelsius(valueSign: Signs, otherSign: Signs) -> String {
+        if otherSign == .d && valueSign == .d {
+            let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0)"
+            return "    return ((celsius_d) (\(conversion)));"
+        }
+        let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0)"
+        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
+        let typeLimits = otherSign.numericType.limits
+        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
+        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
+        return "    return ((celsius_\(otherSign)) (\(maxString)));"
     }
 
     private func kelvinCelsiusConvertionLiteral(sign: Signs) -> String {
