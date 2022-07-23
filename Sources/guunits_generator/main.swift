@@ -2,25 +2,38 @@ import Foundation
 import GUUnitsGeneratorConversions
 
 /// The distance generator.
-let distanceGenerator = DistanceUnitsGenerator(unitDifference: [
-    .millimetres: 10,
-    .centimetres: 100
-])
+let distanceGenerator = AnyGenerator(
+    generating: DistanceUnits.self,
+    using: DistanceUnitsGenerator(unitDifference: [
+        .millimetres: 10,
+        .centimetres: 100
+    ])
+)
 
 /// The time generator.
-let timeGenerator = TimeUnitsGenerator(unitDifference: [
-    .microseconds: 1000,
-    .milliseconds: 1000
-])
+let timeGenerator = AnyGenerator(
+    generating: TimeUnits.self,
+    using: TimeUnitsGenerator(unitDifference: [
+        .microseconds: 1000,
+        .milliseconds: 1000
+    ])
+)
 
 /// The angle generator.
-let angleGenerator = AngleUnitsGenerator()
+let angleGenerator = AnyGenerator(generating: AngleUnits.self, using: AngleUnitsGenerator())
 
 /// The image generator.
-let imageGenerator = ImageUnitsGenerator(unitDifference: [:])
+let imageGenerator = AnyGenerator(
+    generating: ImageUnits.self, using: ImageUnitsGenerator(unitDifference: [:])
+)
 
 /// The percent Generator.
-let percentGenerator = PercentUnitGenerator(unitDifference: [:])
+let percentGenerator = AnyGenerator(
+    generating: PercentUnits.self, using: PercentUnitGenerator(unitDifference: [:])
+)
+
+/// The temperate generator.
+let temperatureGenerator = AnyGenerator(generating: TemperatureUnits.self, using: TemperatureUnitsGenerator())
 
 // C++ Variants
 /// The CPP header distance generator.
@@ -61,29 +74,37 @@ do {
         .write(toFile: ImageUnits.category + ".swift", atomically: true, encoding: .utf8)
     try swiftFileCreator.generate(for: PercentUnits.self)
         .write(toFile: PercentUnits.category + ".swift", atomically: true, encoding: .utf8)
+    try swiftFileCreator.generate(for: TemperatureUnits.self)
+        .write(toFile: TemperatureUnits.category + ".swift", atomically: true, encoding: .utf8)
 } catch let e {
     fatalError("Unable to write swift file: \(e)")
 }
 
 do {
-    try HeaderCreator().generate(
-            distanceGenerator: distanceGenerator,
-            timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator,
-            percentGenerator: percentGenerator
+    let fileContents: String = HeaderCreator().generate(
+            generators: [
+                distanceGenerator,
+                timeGenerator,
+                angleGenerator,
+                imageGenerator,
+                percentGenerator,
+                temperatureGenerator
+            ]
         )
-        .write(
+    try fileContents.write(
             to: URL(fileURLWithPath: "guunits.h", isDirectory: false),
             atomically: false,
             encoding: .utf8
         )
     try CFileCreator().generate(
-            distanceGenerator: distanceGenerator,
-            timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator,
-            percentGenerator: percentGenerator
+            generators: [
+                distanceGenerator,
+                timeGenerator,
+                angleGenerator,
+                imageGenerator,
+                percentGenerator,
+                temperatureGenerator
+            ]
         )
         .write(
             to: URL(fileURLWithPath: "guunits.c", isDirectory: false),
