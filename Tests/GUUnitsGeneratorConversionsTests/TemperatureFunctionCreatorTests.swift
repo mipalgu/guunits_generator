@@ -137,4 +137,75 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    func testKelvinToCelsiusInteger() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .t)
+        let expected = "    return ((celsius_t) (kelvin - 273));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusIntegerToUnsigned() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .u)
+        let expected = "    return ((celsius_u) ((kelvin - 273) < 0 ? 0 : kelvin - 273));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusIntegerToFloat() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .f)
+        let expected = "    return ((celsius_f) (((double) (kelvin)) - 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusIntegerToDouble() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .d)
+        let expected = "    return ((celsius_d) (((double) (kelvin)) - 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusFloat() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .f)
+        let expected = "    return ((celsius_f) (kelvin - 273.15f));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusFloatToInteger() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .t)
+        let minString = "MIN(((double) (INT_MAX)), (round(((double) (kelvin)) - 273.15)))"
+        let expected = "    return ((celsius_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusFloatToUnsigned() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .u)
+        let minString = "MIN(((double) (UINT_MAX)), (round(((double) (kelvin)) - 273.15)))"
+        let expected = "    return ((celsius_u) (MAX(((double) (0)), \(minString))));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusFloatToDouble() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .d)
+        let expected = "    return ((celsius_d) (((double) (kelvin)) - 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusDouble() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .d, otherSign: .d)
+        let expected = "    return ((celsius_d) (kelvin - 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusUnsigned() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .u, otherSign: .u)
+        let expected = "    return ((celsius_u) (kelvin - 273));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testKelvinToCelsiusUnsignedToInteger() {
+        let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .u, otherSign: .t)
+        let comparison = "((unsigned int) (INT_MAX))"
+        let addition = "kelvin - 273"
+        let ternary = "((\(addition)) > \(comparison) ? \(comparison) : \(addition))"
+        let expected = "    return ((celsius_t) \(ternary));"
+        XCTAssertEqual(result, expected)
+    }
+
 }
