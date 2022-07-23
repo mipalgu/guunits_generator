@@ -63,8 +63,6 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
 
     private let signConverter = SignConverter()
 
-    private let numericConverter = NumericTypeConverter()
-
     public init () {}
 
     public func createFunction(
