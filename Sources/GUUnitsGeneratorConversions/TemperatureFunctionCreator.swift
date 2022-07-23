@@ -57,14 +57,27 @@
 //  */
 // 
 
+/// A function creator that generates code for temperature conversions. This function
+/// creator can handle conversions between common temperature units such as
+/// Kelvin, degrees Celsius, and degrees Fahrenheit.
 public struct TemperatureFunctionCreator: FunctionBodyCreator {
 
+    /// The category of this function creator is a TemperatureUnits.
     public typealias Unit = TemperatureUnits
 
+    /// Sign converter for converting between the same unit.
     private let signConverter = SignConverter()
 
+    /// Default initialiser.
     public init () {}
 
+    /// Generate a function body between all the different unit and sign types.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The function body that performs the conversion.
     public func createFunction(
         unit: TemperatureUnits, to otherUnit: TemperatureUnits, sign: Signs, otherSign: Signs
     ) -> String {
@@ -93,6 +106,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
     }
 
+    /// Convert celsius to fahrenheit.
+    /// - Parameters:
+    ///   - valueSign: The sign of the celsius parameter.
+    ///   - otherSign: The sign of the fahrenheit parameter.
+    /// - Returns: The function body that implements the conversion.
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
         if otherSign == .d && valueSign == .d {
             let conversion = "celsius * 1.8 + 32.0"
@@ -109,6 +127,14 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
     }
 
+    /// Convert celsius to Kelvin or Kelvin to celsius.
+    /// - Parameters:
+    ///   - value: The unit to convert from.
+    ///   - other: The unit to convert to.
+    ///   - valueSign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    ///   - operation: + for celsius -> kelvin, minus for kelvin -> celsius. 
+    /// - Returns: The conversion function body.
     private func celsiusToKelvin(
         value: TemperatureUnits,
         other: TemperatureUnits,
@@ -141,6 +167,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(roundedString)));"
     }
 
+    /// Convert fahrenheit to celsius.
+    /// - Parameters:
+    ///   - valueSign: The sign of the fahrenheit parameter.
+    ///   - otherSign: The sign of the celsius parameter.
+    /// - Returns: The function body that implements the conversion.
     private func fahrenheitToCelsius(valueSign: Signs, otherSign: Signs) -> String {
         performDownConversion(
             value: .fahrenheit,
@@ -151,6 +182,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         )
     }
 
+    /// Convert fahrenheit to kelvin.
+    /// - Parameters:
+    ///   - valueSign: The sign of the fahrenheit parameter.
+    ///   - otherSign: The sign of the kelvin parameter.
+    /// - Returns: The function body that implements the conversion.
     private func fahrenheitToKelvin(valueSign: Signs, otherSign: Signs) -> String {
         if valueSign == .d && otherSign == .d {
             let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0) + 273.15"
@@ -164,6 +200,9 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         return "    return ((kelvin_\(otherSign)) (\(maxString)));"
     }
 
+    /// A literal representation of the difference between kelvin and celsius (273.15 degrees).
+    /// - Parameter sign: The sign of the literal.
+    /// - Returns: The C-literal formatted to match the sign.
     private func kelvinCelsiusConvertionLiteral(sign: Signs) -> String {
         switch sign {
         case .f:
@@ -175,6 +214,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
     }
 
+    /// Convert kelvin to fahrenheit.
+    /// - Parameters:
+    ///   - valueSign: The sign of the kelvin parameter.
+    ///   - otherSign: The sign of the fahrenheit parameter.
+    /// - Returns: The function body that implements the conversion.
     private func kelvinToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
         if valueSign == .d && otherSign == .d {
             let conversion = "(kelvin - 273.15) * 1.8 + 32.0"
@@ -188,6 +232,15 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
     }
 
+    /// Implement conversion function for a type that loses precision.
+    /// - Parameters:
+    ///   - value: The unit to convert from.
+    ///   - other: The unit to convert to.
+    ///   - valueSign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    ///   - literal: The literal to perform a magnitude change between the 2 types.
+    ///              273.15 for kelvin -> celsius, 32 for celsius -> kelvin.
+    /// - Returns: The conversion function body.
     private func performDownConversion(
         value: TemperatureUnits,
         other: TemperatureUnits,
@@ -207,6 +260,12 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         return "    return ((\(other.rawValue)_\(otherSign)) (\(maxString)));"
     }
 
+    /// Checks if a conversion needs to a round operation and includes it if necessary.
+    /// - Parameters:
+    ///   - value: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: The code with a round of operation if needed, otherwise the original value.
     private func round(value: String, from sign: Signs, to otherSign: Signs) -> String {
         guard shouldRound(from: sign, to: otherSign) else {
             return value
