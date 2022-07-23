@@ -57,16 +57,25 @@
 //  */
 // 
 
+/// A type-erased UnitGenerator.
 public struct AnyGenerator {
 
+    /// The declarations function.
     private let _declarations: () -> String?
 
+    /// The implementations function.
     private let _implementations: () -> String?
 
+    /// The property for the declarations.
     var declarations: String? { _declarations() }
 
+    /// The property for the implementations.
     var implementations: String? { _implementations() }
 
+    /// Construct a type-erased unit generator from a generic UnitGenerator.
+    /// - Parameters:
+    ///   - type: The type of the category the generator creates.
+    ///   - generator: The generator.
     public init<T: UnitProtocol>(generating type: T.Type, using generator: UnitsGeneratable) {
         self._declarations = { generator.generateDeclarations(forUnits: Array(type.allCases)) }
         self._implementations = { generator.generateImplementations(forUnits: Array(type.allCases)) }
