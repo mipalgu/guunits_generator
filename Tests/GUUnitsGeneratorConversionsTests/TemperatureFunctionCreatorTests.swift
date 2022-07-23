@@ -208,4 +208,17 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    func testCelsiusToFahrenheitInteger() {
+        let result = creator.createFunction(unit: .celsius, to: .fahrenheit, sign: .t, otherSign: .t)
+        let minString = "MIN(((double) (INT_MAX)), (round(((((double) (celsius)) * 1.8) + 32.0))))"
+        let expected = "    return ((fahrenheit_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToFahrenheitDouble() {
+        let result = creator.createFunction(unit: .celsius, to: .fahrenheit, sign: .d, otherSign: .d)
+        let expected = "    return ((fahrenheit_d) (celsius * 1.8 + 32.0));"
+        XCTAssertEqual(result, expected)
+    }
+
 }

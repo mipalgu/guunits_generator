@@ -80,12 +80,30 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             return celsiusToKelvin(
                 value: unit, other: otherUnit, valueSign: sign, otherSign: otherSign, operation: "-"
             )
+        case (.celsius, .fahrenheit):
+            return celsiusToFahrenheit(valueSign: sign, otherSign: otherSign)
         default:
             fatalError("Not yet supported!")
         }
         let roundedString = round(value: convert, from: sign, to: otherSign)
         let implementation = "(\(otherUnit.rawValue)_\(otherSign.rawValue)) (\(roundedString))"
         return "    return (\(implementation));"
+    }
+
+    private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
+        if otherSign == .d && valueSign == .d {
+            let conversion = "celsius * 1.8 + 32.0"
+            return "    return ((fahrenheit_d) (\(conversion)));"
+        }
+        let conversion = "((((double) (celsius)) * 1.8) + 32.0)"
+        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
+        guard otherSign != .d else {
+            return "    return ((fahrenheit_\(otherSign)) (\(roundedConversion)));"
+        }
+        let typeLimits = otherSign.numericType.limits
+        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
+        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
+        return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
     }
 
     private func celsiusToKelvin(
