@@ -125,6 +125,7 @@ public struct HeaderCreator {
         \("")
         #include <stdint.h>
         #include <limits.h>
+        #include <float.h>
         \("")
         #ifdef __cplusplus
         extern "C" {
@@ -151,7 +152,8 @@ public struct HeaderCreator {
             ("// Time Units.", Array(TimeUnits.allCases)),
             ("// Angle Units.", Array(AngleUnits.allCases)),
             ("// Image Units.", Array(ImageUnits.allCases)),
-            ("// Percent Units.", Array(PercentUnits.allCases))
+            ("// Percent Units.", Array(PercentUnits.allCases)),
+            ("// Temperature Units.", Array(TemperatureUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in
