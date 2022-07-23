@@ -86,6 +86,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             return fahrenheitToCelsius(valueSign: sign, otherSign: otherSign)
         case (.kelvin, .fahrenheit):
             return kelvinToFahrenheit(valueSign: sign, otherSign: otherSign)
+        case (.fahrenheit, .kelvin):
+            return fahrenheitToKelvin(valueSign: sign, otherSign: otherSign)
         default:
             fatalError("Not yet supported!")
         }
@@ -152,6 +154,19 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         )
     }
 
+    private func fahrenheitToKelvin(valueSign: Signs, otherSign: Signs) -> String {
+        if valueSign == .d && otherSign == .d {
+            let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0) + 273.15"
+            return "    return ((kelvin_d) (\(conversion)));"
+        }
+        let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0) + 273.15"
+        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
+        let typeLimits = otherSign.numericType.limits
+        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
+        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
+        return "    return ((kelvin_\(otherSign)) (\(maxString)));"
+    }
+
     private func kelvinCelsiusConvertionLiteral(sign: Signs) -> String {
         switch sign {
         case .f:
@@ -164,13 +179,16 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     }
 
     private func kelvinToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
-        performDownConversion(
-            value: .kelvin,
-            other: .fahrenheit,
-            valueSign: valueSign,
-            otherSign: otherSign,
-            literal: "305.15"
-        )
+        if valueSign == .d && otherSign == .d {
+            let conversion = "(kelvin - 273.15) * 1.8 + 32.0"
+            return "    return ((fahrenheit_d) (\(conversion)));"
+        }
+        let conversion = "(((double) (kelvin)) - 273.15) * 1.8 + 32.0"
+        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
+        let typeLimits = otherSign.numericType.limits
+        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
+        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
+        return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
     }
 
     private func performDownConversion(

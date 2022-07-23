@@ -236,16 +236,31 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    func testFahrenheitToKelvinDouble() {
+        let result = creator.createFunction(unit: .fahrenheit, to: .kelvin, sign: .d, otherSign: .d)
+        let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0) + 273.15"
+        let expected = "    return ((kelvin_d) (\(conversion)));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testFahrenheitToKelvinInteger() {
+        let result = creator.createFunction(unit: .fahrenheit, to: .kelvin, sign: .t, otherSign: .t)
+        let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0) + 273.15"
+        let minString = "MIN(((double) (INT_MAX)), (round(\(conversion))))"
+        let expected = "    return ((kelvin_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        XCTAssertEqual(result, expected)
+    }
+
     func testKelvinToFahrenheitDouble() {
         let result = creator.createFunction(unit: .kelvin, to: .fahrenheit, sign: .d, otherSign: .d)
-        let conversion = "(kelvin - 305.15) * (5.0 / 9.0)"
+        let conversion = "(kelvin - 273.15) * 1.8 + 32.0"
         let expected = "    return ((fahrenheit_d) (\(conversion)));"
         XCTAssertEqual(result, expected)
     }
 
     func testKelvinToFahrenheitInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .fahrenheit, sign: .t, otherSign: .t)
-        let conversion = "(((double) (kelvin)) - 305.15) * (5.0 / 9.0)"
+        let conversion = "(((double) (kelvin)) - 273.15) * 1.8 + 32.0"
         let minString = "MIN(((double) (INT_MAX)), (round(\(conversion))))"
         let expected = "    return ((fahrenheit_t) (MAX(((double) (INT_MIN)), \(minString))));"
         XCTAssertEqual(result, expected)
