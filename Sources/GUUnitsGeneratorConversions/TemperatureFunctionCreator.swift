@@ -147,6 +147,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             let conversion = "\(value.rawValue) \(operation) \(literal)"
             return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
         }
+        if valueSign == .u && otherSign == .t && operation == "-" {
+            let signConversion = signConverter.convert(value.rawValue, otherUnit: value, from: .u, to: .t)
+            let conversion = "((\(signConversion)) \(operation) 273)"
+            return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
+        }
         guard valueSign.isFloatingPoint || otherSign.isFloatingPoint else {
             let conversion = "\(value.rawValue) \(operation) 273"
             let signConversion = signConverter.convert(
