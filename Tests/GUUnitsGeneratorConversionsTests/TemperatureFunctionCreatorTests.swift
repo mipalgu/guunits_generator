@@ -66,6 +66,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     /// The creator being tested.
     let creator = TemperatureFunctionCreator()
 
+    // swiftlint:disable missing_docs
+
     func testCelsiusToKelvinInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .t)
         let expected = "    return ((kelvin_t) (celsius + 273));"
@@ -271,5 +273,7 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         let expected = "    return ((celsius_u) ((celsius) < 0 ? 0 : celsius));"
         XCTAssertEqual(result, expected)
     }
+
+    // swiftlint:enable missing_docs
 
 }
