@@ -77,7 +77,7 @@ public struct SwiftFileCreator {
         let unitStruct = self.createMultiple(for: type.allCases) {
             self.generateUnit(for: $0)
         }
-        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct
+        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct + "\n"
     }
 
     /// Creates the swift file contents for a given case of a unit type.

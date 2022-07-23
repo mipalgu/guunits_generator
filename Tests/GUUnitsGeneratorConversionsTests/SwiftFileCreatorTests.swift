@@ -74,7 +74,7 @@ final class SwiftFileCreatorTests: XCTestCase {
     /// Test that the unit code is generated correctly.
     func testGenerate() {
         let result = creator.generate(for: FakeUnit.self)
-        XCTAssertEqual(result, expected)
+        XCTAssertEqual(result, expected + "\n")
     }
 
     /// The expected output from the generate function.
