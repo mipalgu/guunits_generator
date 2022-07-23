@@ -57,6 +57,8 @@
 //  */
 // 
 
+/// Protocol for a UnitsGenerator. This protocol defines methods for creating
+/// function definitions and implementations.
 public protocol UnitsGeneratable {
 
     /// Generates the function declarations for an array of units.
