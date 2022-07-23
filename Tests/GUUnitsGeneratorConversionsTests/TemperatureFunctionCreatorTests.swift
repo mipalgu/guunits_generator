@@ -110,4 +110,31 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    func testCelsiusToKelvinFloatToDouble() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .d)
+        let expected = "    return ((kelvin_d) (((double) (celsius)) + 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToKelvinDouble() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .d, otherSign: .d)
+        let expected = "    return ((kelvin_d) (celsius + 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToKelvinUnsigned() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .u, otherSign: .u)
+        let expected = "    return ((kelvin_u) (celsius + 273));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToKelvinUnsignedToInteger() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .u, otherSign: .t)
+        let comparison = "((unsigned int) (INT_MAX))"
+        let addition = "celsius + 273"
+        let ternary = "((\(addition)) > \(comparison) ? \(comparison) : \(addition))"
+        let expected = "    return ((kelvin_t) \(ternary));"
+        XCTAssertEqual(result, expected)
+    }
+
 }
