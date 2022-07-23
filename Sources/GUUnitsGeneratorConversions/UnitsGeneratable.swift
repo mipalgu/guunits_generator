@@ -63,13 +63,13 @@ public protocol UnitsGeneratable {
 
     /// Generates the function declarations for an array of units.
     /// - Parameter units: The units to generate conversion functions for.
-    /// - Returns: A String representing valid C-code for conversion functions which can be
+    /// - Returns: A String representing valid code for conversion functions which can be
     ///            applied to the units.
     func generateDeclarations<Unit: UnitProtocol>(forUnits units: [Unit]) -> String?
 
     /// Generates the function implementations for an array of units.
     /// - Parameter units: The units to generate conversion functions for.
-    /// - Returns: A string representing valid C-code for conversion functions with
+    /// - Returns: A string representing valid code for conversion functions with
     ///            function bodies.
     func generateImplementations<Unit: UnitProtocol>(forUnits units: [Unit]) -> String?
 
