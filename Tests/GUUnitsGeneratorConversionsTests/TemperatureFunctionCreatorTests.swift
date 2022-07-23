@@ -80,13 +80,33 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToKelvinIntegerToFloat() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .f)
-        let expected = "    return ((kelvin_f) (((double) (celsius)) + 273.15f));"
+        let expected = "    return ((kelvin_f) (((double) (celsius)) + 273.15));"
         XCTAssertEqual(result, expected)
     }
 
     func testCelsiusToKelvinIntegerToDouble() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .d)
         let expected = "    return ((kelvin_d) (((double) (celsius)) + 273.15));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToKelvinFloat() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .f)
+        let expected = "    return ((kelvin_f) (celsius + 273.15f));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToKelvinFloatToInteger() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .t)
+        let minString = "MIN(((double) (INT_MAX)), (round(((double) (celsius)) + 273.15)))"
+        let expected = "    return ((kelvin_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        XCTAssertEqual(result, expected)
+    }
+
+    func testCelsiusToKelvinFloatToUnsigned() {
+        let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .u)
+        let minString = "MIN(((double) (UINT_MAX)), (round(((double) (celsius)) + 273.15)))"
+        let expected = "    return ((kelvin_u) (MAX(((double) (0)), \(minString))));"
         XCTAssertEqual(result, expected)
     }
 

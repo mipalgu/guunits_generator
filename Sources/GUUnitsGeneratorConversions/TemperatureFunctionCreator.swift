@@ -83,8 +83,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     }
 
     private func celsiusToKelvin(value: TemperatureUnits, valueSign: Signs, otherSign: Signs) -> String {
-        let literal = kelvinCelsiusConvertionLiteral(sign: otherSign)
         guard valueSign != otherSign else {
+            let literal = kelvinCelsiusConvertionLiteral(sign: valueSign)
             let conversion = "\(value.rawValue) + \(literal)"
             return "    return ((\(TemperatureUnits.kelvin.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
         }
@@ -95,9 +95,16 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             )
             return "    return \(signConversion);"
         }
+        let conversionString = "((double) (\(value.rawValue))) + 273.15"
         let roundedString = round(
-            value: "((double) (\(value.rawValue))) + \(literal)", from: valueSign, to: otherSign
+            value: conversionString, from: valueSign, to: otherSign
         )
+        guard otherSign.isFloatingPoint else {
+            let typeLimits = otherSign.numericType.limits
+            let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedString)))"
+            let conversion = "MAX(((double) (\(typeLimits.0))), \(minString))"
+            return "    return ((kelvin_\(otherSign.rawValue)) (\(conversion)));"
+        }
         return "    return ((kelvin_\(otherSign.rawValue)) (\(roundedString)));"
     }
 
