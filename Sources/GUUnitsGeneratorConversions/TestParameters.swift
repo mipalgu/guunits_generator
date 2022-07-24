@@ -66,4 +66,67 @@ struct TestParameters {
     /// The expected output of the test.
     let output: String
 
+    static func parameters<Unit: UnitProtocol>(
+        for unit: Unit, with sign: Signs, to otherSign: Signs
+    ) -> [TestParameters] where Unit: RawRepresentable, Unit.RawValue == String {
+        guard sign != otherSign else {
+            return []
+        }
+        let unitType = "\(unit.rawValue)_\(sign.rawValue)"
+        let limits = sign.numericType.limits
+        let lowerLimit = limits.0
+        let upperLimit = limits.1
+        let castedLowerLimit = "((\(unitType)) (\(lowerLimit)))"
+        let castedUpperLimit = "((\(unitType)) (\(upperLimit)))"
+        let otherUnitType = "\(unit.rawValue)_\(otherSign.rawValue)"
+        let lowerLimitAsOther = "((\(otherUnitType)) (\(lowerLimit)))"
+        let upperLimitAsOther = "((\(otherUnitType)) (\(upperLimit)))"
+        let otherLimits = otherSign.numericType.limits
+        let otherLowerLimit = otherLimits.0
+        let otherUpperLimit = otherLimits.1
+        let otherCastedLowerLimit = "((\(otherUnitType)) (\(otherLowerLimit)))"
+        let otherCastedUpperLimit = "((\(otherUnitType)) (\(otherUpperLimit)))"
+        let otherLowerLimitAsSelf = "((\(unitType)) (\(otherLowerLimit)))"
+        let otherUpperLimitAsSelf = "((\(unitType)) (\(otherUpperLimit)))"
+        switch sign {
+        case .u:
+            switch otherSign {
+            case .t:
+                let t1 = TestParameters(input: castedLowerLimit, output: lowerLimitAsOther)
+                let t2 = TestParameters(input: castedUpperLimit, output: otherCastedUpperLimit)
+                return [t1, t2]
+            default:
+                let t1 = TestParameters(input: castedLowerLimit, output: lowerLimitAsOther)
+                let t2 = TestParameters(input: castedUpperLimit, output: upperLimitAsOther)
+                return [t1, t2]
+            }
+        case .t:
+            switch otherSign {
+            case .u:
+                let t1 = TestParameters(input: castedLowerLimit, output: otherCastedLowerLimit)
+                let t2 = TestParameters(input: castedUpperLimit, output: upperLimitAsOther)
+                return [t1, t2]
+            default:
+                let t1 = TestParameters(input: castedLowerLimit, output: lowerLimitAsOther)
+                let t2 = TestParameters(input: castedUpperLimit, output: upperLimitAsOther)
+                return [t1, t2]
+            }
+        case .f:
+            switch otherSign {
+            case .u, .t:
+                let t1 = TestParameters(input: castedLowerLimit, output: otherCastedLowerLimit)
+                let t2 = TestParameters(input: castedUpperLimit, output: otherCastedUpperLimit)
+                return [t1, t2]
+            default:
+                let t1 = TestParameters(input: castedLowerLimit, output: lowerLimitAsOther)
+                let t2 = TestParameters(input: castedUpperLimit, output: upperLimitAsOther)
+                return [t1, t2]
+            }
+        case .d:
+            let t1 = TestParameters(input: castedLowerLimit, output: otherCastedLowerLimit)
+            let t2 = TestParameters(input: castedUpperLimit, output: otherCastedUpperLimit)
+            return [t1, t2]
+        }
+    }
+
 }
