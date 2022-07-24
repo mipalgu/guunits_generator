@@ -114,7 +114,7 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         return assert(body: fn, parameters: parameters)
     }
 
-    /// Use XCT to test.
+    /// Use XCTest to test.
     /// - Parameters:
     ///   - body: The conversion function.
     ///   - parameters: The parameters to test.
