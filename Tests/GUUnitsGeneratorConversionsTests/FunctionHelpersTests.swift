@@ -51,4 +51,52 @@ final class FunctionHelpersTests: XCTestCase {
         XCTAssertEqual(result4, "5")
     }
 
+    /// Test create test function name for unit conversion.
+    func testTestFunctionNameUsingUnits() {
+        let result = helper.testFunctionName(
+            from: TemperatureUnits.celsius,
+            with: .t,
+            to: TemperatureUnits.kelvin,
+            with: .u,
+            using: TestParameters(input: "300", output: "27")
+        )
+        let expected = "testcelsius_tTokelvin_uUsing300Expecting27"
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test create test function name for unit to numeric conversion.
+    func testTestFunctionNameUsingUnitToNumericConversion() {
+        let result = helper.testFunctionName(
+            from: TemperatureUnits.kelvin,
+            with: .d,
+            to: .float,
+            using: TestParameters(input: "23.0", output: "23.0f")
+        )
+        let expected = "testkelvin_dTofloatUsing23Expecting23"
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test create test function name for numeric to unit conversion.
+    func testTestFunctionNameUsingNumericToUnitConversion() {
+        let result = helper.testFunctionName(
+            from: .int,
+            to: TemperatureUnits.fahrenheit,
+            with: .u,
+            using: TestParameters(input: "2", output: "2")
+        )
+        let expected = "testintTofahrenheit_uUsing2Expecting2"
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test create test function name for numeric to numeric conversion.
+    func testTestFunctionNameUsingNumerics() {
+        let result = helper.testFunctionName(
+            from: .float,
+            to: .double,
+            using: TestParameters(input: "33.0f", output: "33.0")
+        )
+        let expected = "testfloatTodoubleUsing33Expecting33"
+        XCTAssertEqual(result, expected)
+    }
+
 }

@@ -56,6 +56,8 @@
  *
  */
 
+import Foundation
+
 /// Helper struct for generating C function definitions and names.
 public struct FunctionHelpers<Unit: UnitProtocol> {
 
@@ -186,6 +188,126 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
         default:
             return "\(value)"
         }
+    }
+
+    /// Create the name of a function that test a conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: The test parameters.
+    /// - Returns: The name of a suitable test function.
+    func testFunctionName<Unit: UnitProtocol>(
+        from unit: Unit,
+        with sign: Signs,
+        to otherUnit: Unit,
+        with otherSign: Signs,
+        using parameters: TestParameters
+    ) -> String where
+        Unit: RawRepresentable,
+        Unit.RawValue == String {
+        doTestFunctionName(
+            from: "\(unit.rawValue)_\(sign.rawValue)",
+            to: "\(otherUnit.rawValue)_\(otherSign.rawValue)",
+            with: "\(parameters.input)",
+            expecting: "\(parameters.output)"
+        )
+    }
+
+    /// Create the name of a function that test a conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - other: The numeric type to convert to.
+    ///   - parameters: The parameters to test in the function.
+    /// - Returns: A test function name of this conversion function.
+    func testFunctionName<Unit>(
+        from unit: Unit,
+        with sign: Signs,
+        to other: NumericTypes,
+        using parameters: TestParameters
+    ) -> String where
+        Unit: RawRepresentable,
+        Unit.RawValue == String {
+        doTestFunctionName(
+            from: "\(unit.rawValue)_\(sign.rawValue)",
+            to: other.rawValue,
+            with: parameters.input,
+            expecting: parameters.output
+        )
+    }
+
+    /// Create a test function name for a conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    ///   - parameters: The parameters to use in the test.
+    /// - Returns: An appropriate test function name.
+    func testFunctionName<Unit>(
+        from numeric: NumericTypes,
+        to unit: Unit,
+        with sign: Signs,
+        using parameters: TestParameters
+    ) -> String where
+        Unit: RawRepresentable,
+        Unit.RawValue == String {
+        doTestFunctionName(
+            from: numeric.rawValue,
+            to: "\(unit.rawValue)_\(sign.rawValue)",
+            with: parameters.input,
+            expecting: parameters.output
+        )
+    }
+
+    /// Create a test function name for a conversion between 2 numeric types.
+    /// - Parameters:
+    ///   - from: The numeric type to convert from.
+    ///   - to: The numeric type to convert to.
+    ///   - parameters: The parameters used in the test function.
+    /// - Returns: An appropriate name for the test function.
+    func testFunctionName(from: NumericTypes, to: NumericTypes, using parameters: TestParameters) -> String {
+        doTestFunctionName(
+            from: from.rawValue,
+            to: to.rawValue,
+            with: parameters.input,
+            expecting: parameters.output
+        )
+    }
+
+    /// Create a test function name.
+    /// - Parameters:
+    ///   - from: The name of the type to convert from.
+    ///   - to: The name of the type to convert to.
+    ///   - with: The input parameter.
+    ///   - expecting: The expected output parameter.
+    /// - Returns: An appropriate test function name.
+    private func doTestFunctionName(from: String, to: String, with: String, expecting: String) -> String {
+        let firstUnit = sanitise(string: from)
+        let secondUnit = sanitise(string: to)
+        let input = sanitise(string: with)
+        let output = sanitise(string: expecting)
+        return "test\(firstUnit)To\(secondUnit)Using\(input)Expecting\(output)"
+    }
+
+    /// Remove all characters after an invalid character is found.
+    /// - Parameter string: The string to santise.
+    /// - Returns: The sanitised string.
+    private func sanitise(string: String) -> String {
+        guard
+            !string.isEmpty,
+            let badIndex = string.firstIndex(where: {
+                guard let scalar = Unicode.Scalar("\($0)") else {
+                    return true
+                }
+                return !CharacterSet.alphanumerics.contains(scalar) && $0 != "_"
+            })
+        else {
+            return string
+        }
+        let firstIndex = String.Index(utf16Offset: 0, in: string)
+        return String(string[firstIndex..<badIndex])
     }
 
 }
