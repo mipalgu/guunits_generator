@@ -200,6 +200,64 @@ extension UnitsGenerator where
 
 }
 
+/// TemperatureUnits initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<
+        TemperatureFunctionCreator,
+        CFunctionDefinitionCreator<TemperatureUnits>,
+        NumericTypeConverter
+    > {
+
+    /// Initialise using TemperatureUnits and C conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
+    public init(
+        bodyCreator: TemperatureFunctionCreator = TemperatureFunctionCreator(),
+        definitionCreator: CFunctionDefinitionCreator<TemperatureUnits> = CFunctionDefinitionCreator(),
+        numericConverter: NumericTypeConverter = NumericTypeConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: bodyCreator,
+            definitionCreator: definitionCreator,
+            numericConverter: numericConverter
+        ))
+    }
+
+}
+
+/// TemperatureUnits initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<
+        TemperatureFunctionCreator,
+        CPPFunctionDefinitionCreator<TemperatureUnits>,
+        NumericTypeConverter
+    > {
+
+    /// Initialise using TemperatureUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
+    public init(
+        bodyCreator: TemperatureFunctionCreator = TemperatureFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<TemperatureUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: NumericTypeConverter = NumericTypeConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: bodyCreator,
+            definitionCreator: definitionCreator,
+            numericConverter: numericConverter
+        ))
+    }
+
+}
+
 /// DistanceUnits initialiser for cpp conversions using Delegating function creators.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>,

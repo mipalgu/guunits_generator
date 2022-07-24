@@ -67,27 +67,42 @@ final class HeaderCreatorTests: XCTestCase {
     let creator = HeaderCreator()
 
     /// The distance generator.
-    let distanceGenerator = DistanceUnitsGenerator(
-        unitDifference: [
-            .millimetres: 10,
-            .centimetres: 100
-        ]
+    let distanceGenerator = AnyGenerator(
+        generating: DistanceUnits.self,
+        using: DistanceUnitsGenerator(
+            unitDifference: [
+                .millimetres: 10,
+                .centimetres: 100
+            ]
+        )
     )
 
     /// The time generator.
-    let timeGenerator = TimeUnitsGenerator(unitDifference: [
-        .microseconds: 1000,
-        .milliseconds: 1000
-    ])
+    let timeGenerator = AnyGenerator(
+        generating: TimeUnits.self,
+        using: TimeUnitsGenerator(unitDifference: [
+            .microseconds: 1000,
+            .milliseconds: 1000
+        ])
+    )
 
     /// The angle generator.
-    let angleGenerator = AngleUnitsGenerator()
+    let angleGenerator = AnyGenerator(generating: AngleUnits.self, using: AngleUnitsGenerator())
 
     /// The image generator.
-    let imageGenerator = ImageUnitsGenerator(unitDifference: [:])
+    let imageGenerator = AnyGenerator(
+        generating: ImageUnits.self, using: ImageUnitsGenerator(unitDifference: [:])
+    )
 
     /// The percent generator.
-    let percentGenerator = PercentUnitGenerator(unitDifference: [:])
+    let percentGenerator = AnyGenerator(
+        generating: PercentUnits.self, using: PercentUnitGenerator(unitDifference: [:])
+    )
+
+    /// The temperate generator.
+    let temperatureGenerator = AnyGenerator(
+        generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
+    )
 
     /// The header of the file.
     var prefix: String {
@@ -155,6 +170,7 @@ final class HeaderCreatorTests: XCTestCase {
         \("")
         #include <stdint.h>
         #include <limits.h>
+        #include <float.h>
         \("")
         #ifdef __cplusplus
         extern "C" {
@@ -181,7 +197,8 @@ final class HeaderCreatorTests: XCTestCase {
             ("// Time Units.", Array(TimeUnits.allCases)),
             ("// Angle Units.", Array(AngleUnits.allCases)),
             ("// Image Units.", Array(ImageUnits.allCases)),
-            ("// Percent Units.", Array(PercentUnits.allCases))
+            ("// Percent Units.", Array(PercentUnits.allCases)),
+            ("// Temperature Units.", Array(TemperatureUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in
@@ -198,28 +215,33 @@ final class HeaderCreatorTests: XCTestCase {
     /// Test header file is created correctly.
     func testGenerate() {
         let result = creator.generate(
-            distanceGenerator: distanceGenerator,
-            timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator,
-            percentGenerator: percentGenerator
+            generators: [
+                distanceGenerator,
+                timeGenerator,
+                angleGenerator,
+                imageGenerator,
+                percentGenerator,
+                temperatureGenerator
+            ]
         )
         guard
-            let distances = distanceGenerator.generateDeclarations(forUnits: DistanceUnits.allCases),
-            let times = timeGenerator.generateDeclarations(forUnits: TimeUnits.allCases),
-            let angles = angleGenerator.generateDeclarations(forUnits: AngleUnits.allCases),
-            let images = imageGenerator.generateDeclarations(forUnits: ImageUnits.allCases),
-            let percentages = percentGenerator.generateDeclarations(forUnits: PercentUnits.allCases)
+            let distances = distanceGenerator.declarations,
+            let times = timeGenerator.declarations,
+            let angles = angleGenerator.declarations,
+            let images = imageGenerator.declarations,
+            let percentages = percentGenerator.declarations,
+            let temperatures = temperatureGenerator.declarations
         else {
             XCTFail("Unable to create header.")
             return
         }
         let expected = prefix + "\n" + typeDefs
-            + "\n\n// Distance Conversion Functions\n\n" + distances
-            + "\n\n// Time Conversion Functions\n\n" + times
-            + "\n\n// Angle Conversion Functions\n\n" + angles
-            + "\n\n// Image Conversion Functions\n\n" + images
-            + "\n\n// Percent Conversion Functions\n\n" + percentages
+            + "\n\n" + distances
+            + "\n\n" + times
+            + "\n\n" + angles
+            + "\n\n" + images
+            + "\n\n" + percentages
+            + "\n\n" + temperatures
             + "\n\n" + suffix
         XCTAssertEqual(result, expected)
     }

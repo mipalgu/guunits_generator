@@ -95,6 +95,11 @@ extension Signs {
         }
     }
 
+    /// True of the sign is a floating point type.
+    var isFloatingPoint: Bool {
+        self == .f || self == .d
+    }
+
 }
 
 extension Signs: CaseIterable {}

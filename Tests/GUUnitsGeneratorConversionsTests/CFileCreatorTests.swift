@@ -87,27 +87,42 @@ final class CFileCreatorTests: XCTestCase {
     }
 
     /// The distance generator.
-    let distanceGenerator = DistanceUnitsGenerator(
-        unitDifference: [
-            .millimetres: 10,
-            .centimetres: 100
-        ]
+    let distanceGenerator = AnyGenerator(
+        generating: DistanceUnits.self,
+        using: DistanceUnitsGenerator(
+            unitDifference: [
+                .millimetres: 10,
+                .centimetres: 100
+            ]
+        )
     )
 
     /// The time generator.
-    let timeGenerator = TimeUnitsGenerator(unitDifference: [
-        .microseconds: 1000,
-        .milliseconds: 1000
-    ])
+    let timeGenerator = AnyGenerator(
+        generating: TimeUnits.self,
+        using: TimeUnitsGenerator(unitDifference: [
+            .microseconds: 1000,
+            .milliseconds: 1000
+        ])
+    )
 
     /// The angle generator.
-    let angleGenerator = AngleUnitsGenerator()
+    let angleGenerator = AnyGenerator(generating: AngleUnits.self, using: AngleUnitsGenerator())
 
     /// The image generator.
-    let imageGenerator = ImageUnitsGenerator(unitDifference: [:])
+    let imageGenerator = AnyGenerator(
+        generating: ImageUnits.self, using: ImageUnitsGenerator(unitDifference: [:])
+    )
 
     /// The percent generator.
-    let percentGenerator = PercentUnitGenerator(unitDifference: [:])
+    let percentGenerator = AnyGenerator(
+        generating: PercentUnits.self, using: PercentUnitGenerator(unitDifference: [:])
+    )
+
+    /// The temperate generator.
+    let temperatureGenerator = AnyGenerator(
+        generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
+    )
 
     /// Test computed properties have right values.
     func testComputedProperties() {
@@ -117,27 +132,32 @@ final class CFileCreatorTests: XCTestCase {
     /// Test generate function creates all c functions.
     func testGenerate() {
         let result = creator.generate(
-            distanceGenerator: distanceGenerator,
-            timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator,
-            percentGenerator: percentGenerator
+            generators: [
+                distanceGenerator,
+                timeGenerator,
+                angleGenerator,
+                imageGenerator,
+                percentGenerator,
+                temperatureGenerator
+            ]
         )
         guard
-            let distances = distanceGenerator.generateImplementations(forUnits: DistanceUnits.allCases),
-            let times = timeGenerator.generateImplementations(forUnits: TimeUnits.allCases),
-            let angles = angleGenerator.generateImplementations(forUnits: AngleUnits.allCases),
-            let images = imageGenerator.generateImplementations(forUnits: ImageUnits.allCases),
-            let percentages = percentGenerator.generateImplementations(forUnits: PercentUnits.allCases)
+            let distances = distanceGenerator.implementations,
+            let times = timeGenerator.implementations,
+            let angles = angleGenerator.implementations,
+            let images = imageGenerator.implementations,
+            let percentages = percentGenerator.implementations,
+            let temperatures = temperatureGenerator.implementations
         else {
             XCTFail("Unable to create C file.")
             return
         }
-        let expected = prefix + "\n\n" + "// Distance Conversion Functions\n\n" + distances
-            + "\n\n// Time Conversion Functions\n\n" + times
-            + "\n\n// Angle Conversion Functions\n\n" + angles
-            + "\n\n// Image Conversion Functions\n\n" + images
-            + "\n\n// Percent Conversion Functions\n\n" + percentages
+        let expected = prefix + "\n\n" + distances
+            + "\n\n" + times
+            + "\n\n" + angles
+            + "\n\n" + images
+            + "\n\n" + percentages
+            + "\n\n" + temperatures
             + "\n\n"
         XCTAssertEqual(result, expected)
     }

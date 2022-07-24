@@ -125,6 +125,7 @@ public struct HeaderCreator {
         \("")
         #include <stdint.h>
         #include <limits.h>
+        #include <float.h>
         \("")
         #ifdef __cplusplus
         extern "C" {
@@ -151,7 +152,8 @@ public struct HeaderCreator {
             ("// Time Units.", Array(TimeUnits.allCases)),
             ("// Angle Units.", Array(AngleUnits.allCases)),
             ("// Image Units.", Array(ImageUnits.allCases)),
-            ("// Percent Units.", Array(PercentUnits.allCases))
+            ("// Percent Units.", Array(PercentUnits.allCases)),
+            ("// Temperature Units.", Array(TemperatureUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in
@@ -170,58 +172,27 @@ public struct HeaderCreator {
 
     /// Generate a string containing all of the type and function definitions.
     /// - Parameters:
-    ///   - distanceGenerator: The generator that creates distance unit definitions.
-    ///   - timeGenerator: The generator that creates time unit definitions.
-    ///   - angleGenerator: The generator that creates angle unit definitions.
-    ///   - imageGenerator: The generator that creates image unit definitions.
-    ///   - percentGenerator: The generator that creates percent unit definitions.
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
     /// - Returns: All of the type and function definitions for a C header file.
-    public func generate(
-        distanceGenerator: DistanceUnitsGenerator,
-        timeGenerator: TimeUnitsGenerator,
-        angleGenerator: AngleUnitsGenerator,
-        imageGenerator: ImageUnitsGenerator,
-        percentGenerator: PercentUnitGenerator
-    ) -> String {
-        let content = self.createContent(
-            distanceGenerator: distanceGenerator,
-            timeGenerator: timeGenerator,
-            angleGenerator: angleGenerator,
-            imageGenerator: imageGenerator,
-            percentGenerator: percentGenerator
-        )
+    public func generate(generators: [AnyGenerator]) -> String {
+        let content = self.createContent(generators: generators)
         return self.prefix + "\n" + self.typeDefs + "\n\n" + content + "\n\n" + self.suffix
     }
 
     /// Creates the function definitions for every unit type.
     /// - Parameters:
-    ///   - distanceGenerator: The generator that creates distance unit definitions.
-    ///   - timeGenerator: The generator that creates time unit definitions.
-    ///   - angleGenerator: The generator that creates angle unit definitions.
-    ///   - imageGenerator: The generator that creates image unit definitions.
-    ///   - percentGenerator: The generator that creates percent unit definitions.
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
     /// - Returns: A string of all the function definitions.
-    private func createContent(
-        distanceGenerator: DistanceUnitsGenerator,
-        timeGenerator: TimeUnitsGenerator,
-        angleGenerator: AngleUnitsGenerator,
-        imageGenerator: ImageUnitsGenerator,
-        percentGenerator: PercentUnitGenerator
-    ) -> String {
-        guard
-            let distances = distanceGenerator.generateDeclarations(forUnits: DistanceUnits.allCases),
-            let times = timeGenerator.generateDeclarations(forUnits: TimeUnits.allCases),
-            let angles = angleGenerator.generateDeclarations(forUnits: AngleUnits.allCases),
-            let images = imageGenerator.generateDeclarations(forUnits: ImageUnits.allCases),
-            let percentages = percentGenerator.generateDeclarations(forUnits: PercentUnits.allCases)
-        else {
-            fatalError("Unable to create header.")
+    private func createContent(generators: [AnyGenerator]) -> String {
+        let functions: [String] = generators.map {
+            guard let definitions = $0.declarations else {
+                fatalError("Failed to convert functions")
+            }
+            return definitions
         }
-        return "// Distance Conversion Functions\n\n" + distances
-            + "\n\n// Time Conversion Functions\n\n" + times
-            + "\n\n// Angle Conversion Functions\n\n" + angles
-            + "\n\n// Image Conversion Functions\n\n" + images
-            + "\n\n// Percent Conversion Functions\n\n" + percentages
+        return functions.joined(separator: "\n\n")
     }
 
 }

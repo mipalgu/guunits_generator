@@ -43,6 +43,15 @@ public typealias PercentUnitGenerator = UnitsGenerator<
     >
 >
 
+/// Temperature Units Generator
+public typealias TemperatureUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        TemperatureFunctionCreator,
+        CFunctionDefinitionCreator<TemperatureUnits>,
+        NumericTypeConverter
+    >
+>
+
 /// CPP Distance Units Generator
 public typealias CPPDistanceUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
