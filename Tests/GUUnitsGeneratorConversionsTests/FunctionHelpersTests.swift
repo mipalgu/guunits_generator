@@ -72,7 +72,7 @@ final class FunctionHelpersTests: XCTestCase {
             to: .float,
             using: TestParameters(input: "23.0", output: "23.0f")
         )
-        let expected = "testkelvin_dTofloatUsing23Expecting23"
+        let expected = "testkelvin_dTofloatUsing23_0Expecting23_0f"
         XCTAssertEqual(result, expected)
     }
 

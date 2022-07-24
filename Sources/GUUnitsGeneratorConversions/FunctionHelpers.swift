@@ -280,19 +280,15 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     /// - Parameter string: The string to santise.
     /// - Returns: The sanitised string.
     private func sanitise(string: String) -> String {
-        guard
-            !string.isEmpty,
-            let badIndex = string.firstIndex(where: {
-                guard let scalar = Unicode.Scalar("\($0)") else {
-                    return true
-                }
-                return !CharacterSet.alphanumerics.contains(scalar) && $0 != "_"
-            })
-        else {
+        guard !string.isEmpty else {
             return string
         }
-        let firstIndex = String.Index(utf16Offset: 0, in: string)
-        return String(string[firstIndex..<badIndex])
+        return string.replacingOccurrences(of: ".", with: "_").filter {
+            guard let scalar = Unicode.Scalar("\($0)") else {
+                return false
+            }
+            return CharacterSet.alphanumerics.contains(scalar) || $0 == "_"
+        }
     }
 
 }
