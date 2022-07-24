@@ -149,7 +149,7 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
         if valueSign == .u && otherSign == .t && operation == "-" {
             let signConversion = signConverter.convert(value.rawValue, otherUnit: value, from: .u, to: .t)
-            let conversion = "((\(signConversion)) \(operation) 273)"
+            let conversion = "\(signConversion) \(operation) 273"
             return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
         }
         guard valueSign.isFloatingPoint || otherSign.isFloatingPoint else {

@@ -204,9 +204,9 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testKelvinToCelsiusUnsignedToInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .u, otherSign: .t)
         let comparison = "((unsigned int) (INT_MAX))"
-        let addition = "kelvin - 273"
-        let ternary = "((\(addition)) > \(comparison) ? \(comparison) : \(addition))"
-        let expected = "    return ((celsius_t) \(ternary));"
+        let ternary = "((kelvin) > \(comparison) ? \(comparison) : kelvin)"
+        let conversion = "((kelvin_t) \(ternary)) - 273"
+        let expected = "    return ((celsius_t) (\(conversion)));"
         XCTAssertEqual(result, expected)
     }
 
