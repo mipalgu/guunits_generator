@@ -57,10 +57,13 @@
 //  */
 // 
 
+/// Class for storing expected test result from an input.
 struct TestParameters {
 
+    /// The input into the test.
     let input: String
 
+    /// The expected output of the test.
     let output: String
 
 }
