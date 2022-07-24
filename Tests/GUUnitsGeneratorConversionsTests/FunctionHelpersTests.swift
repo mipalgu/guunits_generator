@@ -88,15 +88,4 @@ final class FunctionHelpersTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
-    /// Test create test function name for numeric to numeric conversion.
-    func testTestFunctionNameUsingNumerics() {
-        let result = helper.testFunctionName(
-            from: .float,
-            to: .double,
-            using: TestParameters(input: "33.0f", output: "33.0")
-        )
-        let expected = "testfloatTodoubleUsing33Expecting33"
-        XCTAssertEqual(result, expected)
-    }
-
 }

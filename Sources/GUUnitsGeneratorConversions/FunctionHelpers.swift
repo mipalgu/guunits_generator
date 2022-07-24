@@ -261,21 +261,6 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
         )
     }
 
-    /// Create a test function name for a conversion between 2 numeric types.
-    /// - Parameters:
-    ///   - from: The numeric type to convert from.
-    ///   - to: The numeric type to convert to.
-    ///   - parameters: The parameters used in the test function.
-    /// - Returns: An appropriate name for the test function.
-    func testFunctionName(from: NumericTypes, to: NumericTypes, using parameters: TestParameters) -> String {
-        doTestFunctionName(
-            from: from.rawValue,
-            to: to.rawValue,
-            with: parameters.input,
-            expecting: parameters.output
-        )
-    }
-
     /// Create a test function name.
     /// - Parameters:
     ///   - from: The name of the type to convert from.
