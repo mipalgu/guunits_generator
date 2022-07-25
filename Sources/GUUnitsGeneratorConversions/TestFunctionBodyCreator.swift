@@ -57,6 +57,8 @@
 //  */
 // 
 
+import Foundation
+
 /// A struct that generates function bodies for test functions that test the
 /// guunits conversion functions.
 struct TestFunctionBodyCreator<Unit: UnitProtocol> {
@@ -112,6 +114,64 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
     ) -> String {
         let fn = helper.functionName(from: numeric, to: unit, sign: sign)
         return assert(body: fn, parameters: parameters)
+    }
+
+    /// Converts a literal into a suitable C-literal for type conversion. The typical use-case of
+    /// this function is to turn a double literal into a float literal when doing float conversions.
+    /// For example turning 0.0 into 0.0f.
+    /// - Parameters:
+    ///   - literal: The string to sanitise.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: The sanitised literal.
+    func sanitiseLiteral(literal: String, sign: Signs) -> String {
+        sanitiseLiteral(literal: literal, to: sign.numericType)
+    }
+
+    /// Converts a literal into a suitable C-literal for type conversion. The typical use-case of
+    /// this function is to turn a double literal into a float literal when doing float conversions.
+    /// For example turning 0.0 into 0.0f.
+    /// - Parameters:
+    ///   - literal: The string to sanitise.
+    ///   - type: The numeric type to convert to.
+    /// - Returns: The sanitised literal.
+    func sanitiseLiteral(literal: String, to type: NumericTypes) -> String {
+        guard !literal.isEmpty, isNumeric(literal: literal) else {
+            return literal
+        }
+        let components = literal.components(separatedBy: ".")
+        guard components.count == 2 else {
+            switch type {
+            case .double:
+                return "\(literal).0"
+            case .float:
+                return "\(literal).0f"
+            default:
+                return literal
+            }
+        }
+        switch type {
+        case .double:
+            return literal
+        case .float:
+            return "\(literal)f"
+        default:
+            return "\(components[0])"
+        }
+    }
+
+    /// Checks that a given string only conaints the decimal digits (0-9) and at most
+    /// 1 decimal point (.).
+    /// - Parameter literal: The string to check.
+    /// - Returns: Whether it is a numeric literal.
+    private func isNumeric(literal: String) -> Bool {
+        literal.allSatisfy {
+            guard let scalar = Unicode.Scalar(String($0)) else {
+                return false
+            }
+            return CharacterSet.decimalDigits.contains(scalar) || $0 == "."
+        }
+         && literal.components(separatedBy: ".").count < 3
     }
 
     /// Use XCTest to test.

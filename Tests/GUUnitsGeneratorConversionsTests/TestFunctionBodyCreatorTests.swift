@@ -97,4 +97,46 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test Integer Literal -> Double
+    func testSanitiseLiteralForIntegerLiteralToDouble() {
+        let result = creator.sanitiseLiteral(literal: "5", sign: .d)
+        XCTAssertEqual(result, "5.0")
+    }
+
+    /// Test Integer Literal -> Unsigned
+    func testSanitiseLiteralForIntegerLiteralToUnsigned() {
+        let result = creator.sanitiseLiteral(literal: "5", sign: .u)
+        XCTAssertEqual(result, "5")
+    }
+
+    /// Test Integer Literal -> Float
+    func testSanitiseLiteralForIntegerLiteralToFloat() {
+        let result = creator.sanitiseLiteral(literal: "5", sign: .f)
+        XCTAssertEqual(result, "5.0f")
+    }
+
+    /// Test String Literal -> Unsigned
+    func testSanitiseLiteralForStringLiteralToUnsigned() {
+        let result = creator.sanitiseLiteral(literal: "UINT_MAX", sign: .f)
+        XCTAssertEqual(result, "UINT_MAX")
+    }
+
+    /// Test Double Literal -> Integer
+    func testSanitiseLiteralForDoubleLiteralToInteger() {
+        let result = creator.sanitiseLiteral(literal: "5.0", sign: .t)
+        XCTAssertEqual(result, "5")
+    }
+
+    /// Test Double Literal -> Float
+    func testSanitiseLiteralForDoubleLiteralToFloat() {
+        let result = creator.sanitiseLiteral(literal: "5.0", sign: .f)
+        XCTAssertEqual(result, "5.0f")
+    }
+
+    /// Test empty literal.
+    func testSanitiseLiteralForEmptyString() {
+        let result = creator.sanitiseLiteral(literal: "", sign: .d)
+        XCTAssertEqual(result, "")
+    }
+
 }
