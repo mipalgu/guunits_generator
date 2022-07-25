@@ -72,6 +72,7 @@ final class TestParametersTests: XCTestCase {
         XCTAssertEqual(parameters.output, output)
     }
 
+    /// Test parameters for Unsigned -> Signed conversion.
     func testParametersFromUToT() {
         let result = TestParameters.limitParameters(for: DistanceUnits.centimetres, with: .u, to: .t)
         let expected = [
@@ -81,6 +82,7 @@ final class TestParametersTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test parameters for Unsigned -> Double conversion.
     func testParametersFromUToD() {
         let result = TestParameters.limitParameters(for: DistanceUnits.centimetres, with: .u, to: .d)
         let expected = [
