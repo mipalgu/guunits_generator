@@ -58,7 +58,7 @@
 // 
 
 /// Class for storing expected test result from an input.
-struct TestParameters {
+struct TestParameters: Hashable, Codable, Sendable {
 
     /// The input into the test.
     let input: String
@@ -66,12 +66,23 @@ struct TestParameters {
     /// The expected output of the test.
     let output: String
 
-    static func parameters<Unit: UnitProtocol>(
+    // swiftlint:disable function_body_length
+    // Disable function body length since I don't want to create multiple static functions.
+
+    /// Find the default test parameters need to test the conversion methods at the edge cases of the
+    /// converting type. This function only tests a conversion between the same unit type.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit to convert from.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: An array of suitable test parameters.
+    static func limitParameters<Unit: UnitProtocol>(
         for unit: Unit, with sign: Signs, to otherSign: Signs
     ) -> [TestParameters] where Unit: RawRepresentable, Unit.RawValue == String {
         guard sign != otherSign else {
             return []
         }
+        let creator = TestFunctionBodyCreator<Unit>()
         let unitType = "\(unit.rawValue)_\(sign.rawValue)"
         let limits = sign.numericType.limits
         let lowerLimit = limits.0
@@ -79,15 +90,15 @@ struct TestParameters {
         let castedLowerLimit = "((\(unitType)) (\(lowerLimit)))"
         let castedUpperLimit = "((\(unitType)) (\(upperLimit)))"
         let otherUnitType = "\(unit.rawValue)_\(otherSign.rawValue)"
-        let lowerLimitAsOther = "((\(otherUnitType)) (\(lowerLimit)))"
-        let upperLimitAsOther = "((\(otherUnitType)) (\(upperLimit)))"
+        let sanitisedLowerLimit = creator.sanitiseLiteral(literal: lowerLimit, sign: otherSign)
+        let sanitisedUpperLimit = creator.sanitiseLiteral(literal: upperLimit, sign: otherSign)
+        let lowerLimitAsOther = "((\(otherUnitType)) (\(sanitisedLowerLimit)))"
+        let upperLimitAsOther = "((\(otherUnitType)) (\(sanitisedUpperLimit)))"
         let otherLimits = otherSign.numericType.limits
         let otherLowerLimit = otherLimits.0
         let otherUpperLimit = otherLimits.1
         let otherCastedLowerLimit = "((\(otherUnitType)) (\(otherLowerLimit)))"
         let otherCastedUpperLimit = "((\(otherUnitType)) (\(otherUpperLimit)))"
-        let otherLowerLimitAsSelf = "((\(unitType)) (\(otherLowerLimit)))"
-        let otherUpperLimitAsSelf = "((\(unitType)) (\(otherUpperLimit)))"
         switch sign {
         case .u:
             switch otherSign {
@@ -128,5 +139,7 @@ struct TestParameters {
             return [t1, t2]
         }
     }
+
+    // swiftlint:enable function_body_length
 
 }

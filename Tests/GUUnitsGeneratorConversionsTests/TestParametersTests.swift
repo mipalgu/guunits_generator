@@ -72,4 +72,22 @@ final class TestParametersTests: XCTestCase {
         XCTAssertEqual(parameters.output, output)
     }
 
+    func testParametersFromUToT() {
+        let result = TestParameters.limitParameters(for: DistanceUnits.centimetres, with: .u, to: .t)
+        let expected = [
+            TestParameters(input: "((centimetres_u) (0))", output: "((centimetres_t) (0))"),
+            TestParameters(input: "((centimetres_u) (UINT_MAX))", output: "((centimetres_t) (INT_MAX))")
+        ]
+        XCTAssertEqual(result, expected)
+    }
+
+    func testParametersFromUToD() {
+        let result = TestParameters.limitParameters(for: DistanceUnits.centimetres, with: .u, to: .d)
+        let expected = [
+            TestParameters(input: "((centimetres_u) (0))", output: "((centimetres_d) (0.0))"),
+            TestParameters(input: "((centimetres_u) (UINT_MAX))", output: "((centimetres_d) (UINT_MAX))")
+        ]
+        XCTAssertEqual(result, expected)
+    }
+
 }
