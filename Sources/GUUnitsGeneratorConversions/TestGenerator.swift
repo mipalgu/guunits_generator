@@ -84,7 +84,7 @@ extension TestGenerator {
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {
         let limits = LimitStruct(unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign)
-        var parameters = [TestParameters(input: limits.sanitisedZero, output: limits.otherSanitisedZero)]
+        var parameters: [TestParameters] = []
         guard sign != otherSign else {
             return parameters
         }
@@ -134,7 +134,13 @@ extension TestGenerator {
         from unit: UnitType, with sign: Signs, to numeric: NumericTypes
     ) -> [TestParameters] {
         let limits = NumericLimitStruct(unit: unit, sign: sign, numeric: numeric)
-        let parameters = [TestParameters(input: limits.sanitisedZero, output: limits.numericSanitisedZero)]
+        let parameters = [
+            TestParameters(input: limits.sanitisedZero, output: limits.numericSanitisedZero),
+            TestParameters(
+                input: limits.creator.sanitiseLiteral(literal: "5", sign: sign),
+                output: limits.creator.sanitiseLiteral(literal: "5", to: numeric)
+            )
+        ]
         guard sign.numericType != numeric else {
             return parameters
         }
@@ -184,7 +190,13 @@ extension TestGenerator {
         from numeric: NumericTypes, to unit: UnitType, with sign: Signs
     ) -> [TestParameters] {
         let limits = NumericLimitStruct(unit: unit, sign: sign, numeric: numeric)
-        let parameters = [TestParameters(input: limits.numericSanitisedZero, output: limits.sanitisedZero)]
+        let parameters = [
+            TestParameters(input: limits.numericSanitisedZero, output: limits.sanitisedZero),
+            TestParameters(
+                input: limits.creator.sanitiseLiteral(literal: "5", to: numeric),
+                output: limits.creator.sanitiseLiteral(literal: "5", sign: sign)
+            )
+        ]
         guard sign.numericType != numeric else {
             return parameters
         }
@@ -249,7 +261,7 @@ private struct LimitStruct<UnitType> where
     UnitType: RawRepresentable,
     UnitType.RawValue == String {
 
-    private let creator = TestFunctionBodyCreator<UnitType>()
+    let creator = TestFunctionBodyCreator<UnitType>()
 
     let unit: UnitType
 
@@ -337,7 +349,7 @@ private struct NumericLimitStruct<UnitType> where
     UnitType: RawRepresentable,
     UnitType.RawValue == String {
 
-    private let creator = TestFunctionBodyCreator<UnitType>()
+    let creator = TestFunctionBodyCreator<UnitType>()
 
     let unit: UnitType
 
