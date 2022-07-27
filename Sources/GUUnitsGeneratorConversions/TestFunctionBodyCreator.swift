@@ -136,6 +136,12 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
     ///   - type: The numeric type to convert to.
     /// - Returns: The sanitised literal.
     func sanitiseLiteral(literal: String, to type: NumericTypes) -> String {
+        let trimmedLiteral = literal.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let first = literal.first else {
+            return literal
+        }
+        let isNegative = first == "-"
+        let literal = isNegative ? String(trimmedLiteral.dropFirst()) : trimmedLiteral
         guard !literal.isEmpty, isNumeric(literal: literal) else {
             return literal
         }
@@ -152,11 +158,11 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         }
         switch type {
         case .double:
-            return literal
+            return isNegative ? "-" + literal : literal
         case .float:
-            return "\(literal)f"
+            return isNegative ? "-" + "\(literal)f" : "\(literal)f"
         default:
-            return "\(components[0])"
+            return isNegative ? "-" + "\(components[0])" : "\(components[0])"
         }
     }
 
