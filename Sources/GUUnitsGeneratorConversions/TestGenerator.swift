@@ -236,8 +236,8 @@ extension TestGenerator {
                 )
             }
         case .d:
-            t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.castedLowerLimit)
-            t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.castedUpperLimit)
+            t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.numericLowerLimitAsUnit)
+            t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.numericUpperLimitAsUnit)
         }
         return parameters + [t1, t2]
     }
