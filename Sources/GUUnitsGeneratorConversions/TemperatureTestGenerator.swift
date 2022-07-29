@@ -100,6 +100,12 @@ struct TemperatureTestGenerator: TestGenerator {
                         output: creator.sanitiseLiteral(literal: "278", sign: otherSign)
                     )
                 )
+                newTests.append(
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "273.15", sign: otherSign)
+                    )
+                )
                 if (sign == .t || sign == .f || sign == .d) && otherSign == .u {
                     newTests.append(
                         TestParameters(input: "-300", output: "0")
@@ -110,6 +116,20 @@ struct TemperatureTestGenerator: TestGenerator {
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: "2147483375", sign: sign),
                             output: "((kelvin_\(otherSign.rawValue)) (INT_MAX))"
+                        )
+                    )
+                }
+                if sign == .t || sign == .f || sign == .d {
+                    newTests.append(
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-273.15", sign: sign),
+                            output: creator.sanitiseLiteral(liteal: "0", sign: otherSign)
+                        )
+                    )
+                    newTest.append(
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-274", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
                         )
                     )
                 }
@@ -133,8 +153,17 @@ struct TemperatureTestGenerator: TestGenerator {
                         )
                     )
                 }
+                if sign == .u {
+                    let output = creator.sanitiseLiteral(literal: "-5", sign: otherSign)
+                    newTests.append(
+                        TestParameters(
+                            input: "23",
+                            output: "((celsius_\(otherSign.rawValue)) (\(output)))"
+                        )
+                    )
+                }
             case .kelvin:
-
+                break
             default:
                 break
             }
