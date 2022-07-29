@@ -149,11 +149,13 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         guard components.count == 2 else {
             switch type {
             case .double:
-                return "\(literal).0"
+                return addNegative(literal: "\(literal).0", isNegative: isNegative)
             case .float:
-                return "\(literal).0f"
+                return addNegative(literal: "\(literal).0f", isNegative: isNegative)
+            case .uint, .uint8, .uint16, .uint32, .uint64:
+                return isNegative ? "0" : literal 
             default:
-                return literal
+                return addNegative(literal: literal, isNegative: isNegative)
             }
         }
         switch type {
@@ -161,13 +163,19 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
             return isNegative ? "-" + literal : literal
         case .float:
             return isNegative ? "-" + "\(literal)f" : "\(literal)f"
+        case .uint8, .uint16, .uint32, .uint64, .uint:
+            return isNegative ? "0" : "\(components[0])"
         default:
             return isNegative ? "-" + "\(components[0])" : "\(components[0])"
         }
     }
 
-    /// Checks that a given string only conaints the decimal digits (0-9) and at most
-    /// 1 decimal point (.).
+    private func addNegative(literal: String, isNegative: Bool = false) -> String {
+        isNegative ? "-" + literal : literal
+    }
+
+    /// Checks that a given string only contains the decimal digits (0-9) and at most
+    /// 1 decimal point (.). This check will only work for positive literals.
     /// - Parameter literal: The string to check.
     /// - Returns: Whether it is a numeric literal.
     private func isNumeric(literal: String) -> Bool {
