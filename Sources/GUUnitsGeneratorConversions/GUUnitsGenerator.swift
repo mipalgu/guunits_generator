@@ -70,11 +70,9 @@ public struct GUUnitsGenerator {
         }
         var hFile = path
         var cFile = path
-        print("Creating urls to source files.")
+        hFile.appendPathComponent("include", isDirectory: true)
         hFile.appendPathComponent("guunits.h", isDirectory: false)
         cFile.appendPathComponent("guunits.c", isDirectory: false)
-        print("Done")
-        print("Resource is reachable.")
         let distanceGenerator = AnyGenerator(
             generating: DistanceUnits.self,
             using: DistanceUnitsGenerator(unitDifference: [
