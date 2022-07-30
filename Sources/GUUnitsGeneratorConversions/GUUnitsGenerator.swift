@@ -60,9 +60,11 @@ import Foundation
 
 public struct GUUnitsGenerator {
 
+    let fileManager = FileManager()
+
     public init() {}
 
-    public func generateCFiles(in path: URL) throws {
+    public func generateCFiles(in path: URL) {
         guard !path.isFileURL else {
             fatalError("Path is not a valid directory.")
         }
@@ -108,7 +110,6 @@ public struct GUUnitsGenerator {
             ]
         )
         .data(using: .utf8)
-        let fileManager = FileManager()
         print("Writing H-file to path \(hFile.absoluteString)...")
         fileManager.createFile(atPath: hFile.absoluteString, contents: fileContents)
         print("Done!\nWriting C-File to path \(cFile.absoluteString)...")
@@ -130,23 +131,38 @@ public struct GUUnitsGenerator {
         print("Done!")
     }
 
-    public func generateSwiftFiles(in path: URL) throws {
+    public func generateSwiftFiles(in path: URL) {
         guard !path.isFileURL else {
             fatalError("Path is not a valid directory.")
         }
         let swiftFileCreator = SwiftFileCreator()
-        try swiftFileCreator.generate(for: DistanceUnits.self)
-            .write(toFile: DistanceUnits.category + ".swift", atomically: true, encoding: .utf8)
-        try swiftFileCreator.generate(for: TimeUnits.self)
-            .write(toFile: TimeUnits.category + ".swift", atomically: true, encoding: .utf8)
-        try swiftFileCreator.generate(for: AngleUnits.self)
-            .write(toFile: AngleUnits.category + ".swift", atomically: true, encoding: .utf8)
-        try swiftFileCreator.generate(for: ImageUnits.self)
-            .write(toFile: ImageUnits.category + ".swift", atomically: true, encoding: .utf8)
-        try swiftFileCreator.generate(for: PercentUnits.self)
-            .write(toFile: PercentUnits.category + ".swift", atomically: true, encoding: .utf8)
-        try swiftFileCreator.generate(for: TemperatureUnits.self)
-            .write(toFile: TemperatureUnits.category + ".swift", atomically: true, encoding: .utf8)
+        writeFile(
+            at: path, with: DistanceUnits.category, and: swiftFileCreator.generate(for: DistanceUnits.self)
+        )
+        writeFile(
+            at: path, with: TimeUnits.category, and: swiftFileCreator.generate(for: TimeUnits.self)
+        )
+        writeFile(
+            at: path, with: AngleUnits.category, and: swiftFileCreator.generate(for: AngleUnits.self)
+        )
+        writeFile(
+            at: path, with: ImageUnits.category, and: swiftFileCreator.generate(for: ImageUnits.self)
+        )
+        writeFile(
+            at: path, with: PercentUnits.category, and: swiftFileCreator.generate(for: PercentUnits.self)
+        )
+        writeFile(
+            at: path,
+            with: TemperatureUnits.category,
+            and: swiftFileCreator.generate(for: TemperatureUnits.self)
+        )
+    }
+
+    private func writeFile(at path: URL, with name: String, and contents: String) {
+        fileManager.createFile(
+            atPath: path.appendingPathComponent("\(name).swift", isDirectory: false).absoluteString,
+            contents: contents.data(using: .utf8)
+        )
     }
 
 }
