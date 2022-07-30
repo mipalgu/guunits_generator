@@ -56,6 +56,7 @@
 // 
 // 
 
+import Foundation
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
@@ -80,19 +81,45 @@ final class GUUnitsGeneratorTests: XCTestCase {
         return currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
     }
 
-    func testguunits() {
-        generatePackage()
+    var guunitsDirectory: URL? {
+        packageURL?.appendingPathComponent("Sources").appendingPathComponent("CGUUnits")
     }
 
-    private func generatePackage() {
+    var swiftGUUnitsDirectory: URL? {
+        packageURL?.appendingPathComponent("Sources").appendingPathComponent("swift_GUUnits")
+    }
+
+    var guunitsTests: URL? {
+        packageURL?.appendingPathComponent("Tests").appendingPathComponent("CGUUnitsTests")
+    }
+
+    var swiftGUUnitsTests: URL? {
+        packageURL?.appendingPathComponent("Tests").appendingPathComponent("swift_GUUnitsTests")
+    }
+
+    func testguunits() {
+        generatePackage()
         guard let packageURL = packageURL else {
             XCTFail("Failed to ascertain package path.")
             return
         }
-        let guunitsDirectory = packageURL.appendingPathComponent("Sources").appendingPathComponent("CGUUnits")
-        let swiftGUUnitsDirectory = packageURL
-            .appendingPathComponent("Sources")
-            .appendingPathComponent("swift_GUUnits")
+        guard let command = "cd \(packageURL.absoluteString) && swift test".cString(using: .utf8) else {
+            XCTFail("Failed to create command")
+            return
+        }
+        XCTAssertEqual(system(command), EXIT_SUCCESS)
+    }
+
+    private func generatePackage() {
+        guard
+            let guunitsDirectory = guunitsDirectory,
+            let swiftGUUnitsDirectory = swiftGUUnitsDirectory,
+            let guunitsTests = guunitsTests,
+            let swiftGUUnitsTests = swiftGUUnitsTests
+        else {
+            XCTFail("Failed to ascertain package path.")
+            return
+        }
         // let guunitsTests = packageURL.appendingPathComponent("Tests/guunitsTests")
         // let swiftTests = packageURL.appendingPathComponent("Tests/swift_GUUnitsTests")
         generator.generateCFiles(in: guunitsDirectory)
