@@ -97,8 +97,8 @@ final class GUUnitsGeneratorTests: XCTestCase {
         packageURL?.appendingPathComponent("Tests").appendingPathComponent("swift_GUUnitsTests")
     }
 
-    func testguunits() {
-        generatePackage()
+    func testguunits() throws {
+        try generatePackage()
         guard let packageURL = packageURL else {
             XCTFail("Failed to ascertain package path.")
             return
@@ -110,7 +110,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         XCTAssertEqual(system(command), EXIT_SUCCESS)
     }
 
-    private func generatePackage() {
+    private func generatePackage() throws {
         guard
             let guunitsDirectory = guunitsDirectory,
             let swiftGUUnitsDirectory = swiftGUUnitsDirectory,
@@ -122,7 +122,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         }
         // let guunitsTests = packageURL.appendingPathComponent("Tests/guunitsTests")
         // let swiftTests = packageURL.appendingPathComponent("Tests/swift_GUUnitsTests")
-        generator.generateCFiles(in: guunitsDirectory)
+        try generator.generateCFiles(in: guunitsDirectory)
         generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
     }
 

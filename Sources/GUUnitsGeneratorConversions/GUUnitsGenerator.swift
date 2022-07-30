@@ -64,13 +64,16 @@ public struct GUUnitsGenerator {
 
     public init() {}
 
-    public func generateCFiles(in path: URL) {
+    public func generateCFiles(in path: URL) throws {
         guard !path.isFileURL else {
             fatalError("Path is not a valid directory.")
         }
         var hFile = path
         var cFile = path
         hFile.appendPathComponent("include", isDirectory: true)
+        if !fileManager.fileExists(atPath: hFile.absoluteString) {
+            try fileManager.createDirectory(atPath: hFile.absoluteString, withIntermediateDirectories: false)
+        }
         hFile.appendPathComponent("guunits.h", isDirectory: false)
         cFile.appendPathComponent("guunits.c", isDirectory: false)
         let distanceGenerator = AnyGenerator(
