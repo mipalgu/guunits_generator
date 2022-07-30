@@ -148,21 +148,17 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         let components = literal.components(separatedBy: ".")
         guard components.count == 2 else {
             switch type {
-            case .double:
+            case .double, .float:
                 return addNegative(literal: "\(literal).0", isNegative: isNegative)
-            case .float:
-                return addNegative(literal: "\(literal).0f", isNegative: isNegative)
             case .uint, .uint8, .uint16, .uint32, .uint64:
-                return isNegative ? "0" : literal 
+                return isNegative ? "0" : literal
             default:
                 return addNegative(literal: literal, isNegative: isNegative)
             }
         }
         switch type {
-        case .double:
+        case .double, .float:
             return isNegative ? "-" + literal : literal
-        case .float:
-            return isNegative ? "-" + "\(literal)f" : "\(literal)f"
         case .uint8, .uint16, .uint32, .uint64, .uint:
             return isNegative ? "0" : "\(components[0])"
         default:

@@ -132,6 +132,19 @@ public struct GUUnitsGenerator {
         print("Done!")
     }
 
+    func generateCTests(in path: URL) {
+        guard !path.isFileURL else {
+            fatalError("Path is not a valid directory.")
+        }
+        let fileCreator = TestFileCreator<TemperatureTestGenerator>()
+        let testGenerator = TemperatureTestGenerator()
+        writeFile(
+            at: path,
+            with: "TemperatureTests.swift",
+            and: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
+        )
+    }
+
     public func generateSwiftFiles(in path: URL) {
         guard !path.isFileURL else {
             fatalError("Path is not a valid directory.")

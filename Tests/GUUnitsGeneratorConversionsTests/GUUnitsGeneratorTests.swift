@@ -127,6 +127,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         // let swiftTests = packageURL.appendingPathComponent("Tests/swift_GUUnitsTests")
         try generator.generateCFiles(in: guunitsDirectory)
         generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
+        generator.generateCTests(in: guunitsTests)
     }
 
 }

@@ -57,32 +57,42 @@
 //  */
 // 
 
-struct TestFileCreator<Unit: UnitProtocol> where Unit: RawRepresentable, Unit.RawValue == String {
+struct TestFileCreator<TestGeneratorType: TestGenerator> {
+
+    typealias Unit = TestGeneratorType.UnitType
 
     private let helper = FunctionHelpers<Unit>()
 
     private let bodyCreator = TestFunctionBodyCreator<Unit>()
 
-    // private var tests: String {
-    //     Unit.allCases.flatMap { unit in
-    //         Unit.allCases.flatMap { otherUnit in
-    //             Signs.allCases.flatMap { sign in
-    //                 Signs.allCases.flatMap { otherSign in
-    //                     TestParameters.parameters(from: sign, to: otherSign).map { parameters in
-    //                         self.createTestFunction(
-    //                             from: unit,
-    //                             with: sign,
-    //                             to: otherUnit,
-    //                             with: otherSign,
-    //                             with: parameters
-    //                         )
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     .joined(separator: "\n\n")
-    // }
+    func tests(generator: TestGeneratorType, imports: String) -> String {
+        let unitTests: [String] = Unit.allCases.flatMap { unit in
+            Unit.allCases.flatMap { otherUnit in
+                Signs.allCases.flatMap { sign in
+                    Signs.allCases.flatMap { otherSign in
+                        self.createTests(
+                            from: unit, with: sign, to: otherUnit, with: otherSign, using: generator
+                        )
+                    }
+                }
+            }
+        }
+        let allTests = unitTests.joined(separator: "\n\n")
+        return "\(imports)\nimport Foundation\nimport XCTest\n\nfinal class \(Unit.category)" +
+            "Tests: XCTestCase {\n\n\(allTests)\n\n}\n"
+    }
+
+    private func createTests(
+        from unit: Unit,
+        with sign: Signs,
+        to otherUnit: Unit,
+        with otherSign: Signs,
+        using generator: TestGeneratorType
+    ) -> [String] {
+        generator.testParameters(from: unit, with: sign, to: otherUnit, with: otherSign).map {
+            self.createTestFunction(from: unit, with: sign, to: otherUnit, with: otherSign, with: $0)
+        }
+    }
 
     private func createTestFunction(
         from unit: Unit,
@@ -97,7 +107,29 @@ struct TestFileCreator<Unit: UnitProtocol> where Unit: RawRepresentable, Unit.Ra
         let body = bodyCreator.generateFunction(
             from: unit, with: sign, to: otherUnit, with: otherSign, using: parameters
         )
-        return "func \(name) {\n    \(body)\n}"
+        return "    func \(name)() {\n        \(body)\n    }"
+    }
+
+    private func createTestFunction(
+        from unit: Unit,
+        with sign: Signs,
+        to numeric: NumericTypes,
+        with parameters: TestParameters
+    ) -> String {
+        let name = helper.testFunctionName(from: unit, with: sign, to: numeric, using: parameters)
+        let body = bodyCreator.generateFunction(from: unit, with: sign, to: numeric, using: parameters)
+        return "    func \(name)() {\n        \(body)\n    }"
+    }
+
+    private func createTestFunction(
+        from numeric: NumericTypes,
+        to unit: Unit,
+        with sign: Signs,
+        with parameters: TestParameters
+    ) -> String {
+        let name = helper.testFunctionName(from: numeric, to: unit, with: sign, using: parameters)
+        let body = bodyCreator.generateFunction(from: numeric, to: unit, with: sign, using: parameters)
+        return "    func \(name)() {\n        \(body)\n    }"
     }
 
 }
