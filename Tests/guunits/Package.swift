@@ -11,7 +11,7 @@ let package = Package(
         // to other packages.
         .library(
             name: "guunits",
-            targets: ["guunits"]
+            targets: ["CGUUnits", "swift_GUUnits"]
         )
     ],
     dependencies: [
