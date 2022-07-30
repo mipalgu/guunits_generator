@@ -136,6 +136,7 @@ public struct GUUnitsGenerator {
         guard !path.isFileURL else {
             fatalError("Path is not a valid directory.")
         }
+        print("Writing Swift files to \(path.absoluteString)...")
         let swiftFileCreator = SwiftFileCreator()
         writeFile(
             at: path, with: DistanceUnits.category, and: swiftFileCreator.generate(for: DistanceUnits.self)
@@ -157,6 +158,7 @@ public struct GUUnitsGenerator {
             with: TemperatureUnits.category,
             and: swiftFileCreator.generate(for: TemperatureUnits.self)
         )
+        print("Done!")
     }
 
     private func writeFile(at path: URL, with name: String, and contents: String) {
