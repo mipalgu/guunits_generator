@@ -390,7 +390,7 @@ private struct NumericLimitStruct<UnitType> where
     }
 
     private var numericUnitType: String {
-        numeric.rawValue
+        numeric.swiftType.rawValue
     }
 
     private var sanitisedLowerLimit: String {
