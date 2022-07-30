@@ -83,6 +83,7 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
                 }
             }
         }
+        print("Created \(unitTests.count) Tests for \(Unit.category)!")
         let allTests = unitTests.joined(separator: "\n\n")
         return "\(imports)\nimport Foundation\nimport XCTest\n\nfinal class \(Unit.category)" +
             "Tests: XCTestCase {\n\n\(allTests)\n\n}\n"
