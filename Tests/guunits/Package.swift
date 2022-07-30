@@ -32,7 +32,7 @@ let package = Package(
         ),
         .testTarget(
             name: "CGUUnitsTests",
-            dependencies: ["guunits"]
+            dependencies: ["CGUUnits"]
         ),
         .testTarget(
             name: "swift_GUUnitsTests",
