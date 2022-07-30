@@ -58,7 +58,7 @@ private func generatePackage() {
         )
     }
     packageURL = currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
-    let guunitsDirectory = packageURL.appendingPathComponent("Sources").appendingPathComponent("guunits")
+    let guunitsDirectory = packageURL.appendingPathComponent("Sources").appendingPathComponent("CGUUnits")
     let swiftGUUnitsDirectory = packageURL
         .appendingPathComponent("Sources")
         .appendingPathComponent("swift_GUUnits")

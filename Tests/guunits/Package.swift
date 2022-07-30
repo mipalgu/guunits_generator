@@ -23,15 +23,15 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages
         // this package depends on.
         .target(
-            name: "guunits",
+            name: "CGUUnits",
             dependencies: []
         ),
         .target(
             name: "swift_GUUnits",
-            dependencies: ["guunits"]
+            dependencies: ["CGUUnits"]
         ),
         .testTarget(
-            name: "guunitsTests",
+            name: "CGUUnitsTests",
             dependencies: ["guunits"]
         ),
         .testTarget(
