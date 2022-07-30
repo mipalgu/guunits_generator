@@ -75,6 +75,12 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
                         )
                     }
                 }
+            } +
+            Signs.allCases.flatMap { sign in
+                NumericTypes.allCases.flatMap { numeric in
+                    self.createTests(from: unit, with: sign, to: numeric, using: generator) +
+                        self.createTests(from: numeric, to: unit, with: sign, using: generator)
+                }
             }
         }
         let allTests = unitTests.joined(separator: "\n\n")
@@ -91,6 +97,28 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
     ) -> [String] {
         generator.testParameters(from: unit, with: sign, to: otherUnit, with: otherSign).map {
             self.createTestFunction(from: unit, with: sign, to: otherUnit, with: otherSign, with: $0)
+        }
+    }
+
+    private func createTests(
+        from unit: Unit,
+        with sign: Signs,
+        to numeric: NumericTypes,
+        using generator: TestGeneratorType
+    ) -> [String] {
+        generator.testParameters(from: unit, with: sign, to: numeric).map {
+            self.createTestFunction(from: unit, with: sign, to: numeric, with: $0)
+        }
+    }
+
+    private func createTests(
+        from numeric: NumericTypes,
+        to unit: Unit,
+        with sign: Signs,
+        using generator: TestGeneratorType
+    ) -> [String] {
+        generator.testParameters(from: numeric, to: unit, with: sign).map {
+            self.createTestFunction(from: numeric, to: unit, with: sign, with: $0)
         }
     }
 
