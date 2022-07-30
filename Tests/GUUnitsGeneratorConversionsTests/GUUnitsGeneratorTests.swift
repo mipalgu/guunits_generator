@@ -98,16 +98,19 @@ final class GUUnitsGeneratorTests: XCTestCase {
     }
 
     func testguunits() throws {
-        try generatePackage()
         guard let packageURL = packageURL else {
             XCTFail("Failed to ascertain package path.")
             return
         }
+        try generatePackage()
         guard let command = "cd \(packageURL.absoluteString) && swift test".cString(using: .utf8) else {
             XCTFail("Failed to create command")
             return
         }
-        XCTAssertEqual(system(command), EXIT_SUCCESS)
+        guard EXIT_SUCCESS == system(command) else {
+            XCTFail("Tests failed with error number: \(errno)")
+            return
+        }
     }
 
     private func generatePackage() throws {
