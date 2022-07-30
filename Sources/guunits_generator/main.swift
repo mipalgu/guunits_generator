@@ -57,17 +57,22 @@ private func generate(directory: URL? = URL(string: FileManager().currentDirecto
 private func main() throws {
     var path: String?
     let argc = CommandLine.argc
+    let arguments = CommandLine.arguments
+    if argc == 2 && arguments.count > 1 && arguments[1] == "-h" || arguments[1] == "--help" {
+        print("guunits_generator\n\nUsage: guunits_generator [-h] [-d <directory>]")
+        return
+    }
     guard argc > 1 else {
         try generate()
         return
     }
-    CommandLine.arguments.indices.forEach {
-        let argument = CommandLine.arguments[$0]
+    arguments.indices.forEach {
+        let argument = arguments[$0]
         guard $0 < argc - 1 else {
             return
         }
-        if argument == "-p" || argument == "--path" {
-            path = CommandLine.arguments[$0 + 1]
+        if argument == "-d" || argument == "--directory" {
+            path = arguments[$0 + 1]
         }
     }
     guard let unwrappedPath = path, let url = URL(string: unwrappedPath) else {
