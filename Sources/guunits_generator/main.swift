@@ -45,13 +45,36 @@ try CPPFileCreator().generate(
     encoding: .utf8
 )*/
 
-private func generate() throws {
-    guard let currentDirectory = URL(string: FileManager().currentDirectoryPath) else {
+private func generate(directory: URL? = URL(string: FileManager().currentDirectoryPath)) throws {
+    guard let directory = directory else {
         fatalError("Failed to find current directory.")
     }
     let generator = GUUnitsGenerator()
-    try generator.generateCFiles(in: currentDirectory)
-    generator.generateSwiftFiles(in: currentDirectory)
+    try generator.generateCFiles(in: directory)
+    generator.generateSwiftFiles(in: directory)
 }
 
-try generate()
+private func main() throws {
+    var path: String?
+    let argc = CommandLine.argc
+    guard argc > 1 else {
+        try generate()
+        return
+    }
+    CommandLine.arguments.indices.forEach {
+        let argument = CommandLine.arguments[$0]
+        guard $0 < argc - 1 else {
+            return
+        }
+        if argument == "-p" || argument == "--path" {
+            path = CommandLine.arguments[$0 + 1]
+        }
+    }
+    guard let unwrappedPath = path, let url = URL(string: unwrappedPath) else {
+        try generate()
+        return
+    }
+    try generate(directory: url)
+}
+
+try main()
