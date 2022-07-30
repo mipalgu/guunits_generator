@@ -45,28 +45,4 @@ try CPPFileCreator().generate(
     encoding: .utf8
 )*/
 
-private func generatePackage() {
-    guard var currentDirectory = URL(string: FileManager().currentDirectoryPath) else {
-        exit(1)
-    }
-    let packageURL: URL
-    if currentDirectory.lastPathComponent != "guunits_generator" {
-        repeat {
-            currentDirectory.deleteLastPathComponent()
-        } while (currentDirectory.lastPathComponent != "guunits_generator"
-            && !currentDirectory.lastPathComponent.isEmpty
-        )
-    }
-    packageURL = currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
-    let guunitsDirectory = packageURL.appendingPathComponent("Sources").appendingPathComponent("CGUUnits")
-    let swiftGUUnitsDirectory = packageURL
-        .appendingPathComponent("Sources")
-        .appendingPathComponent("swift_GUUnits")
-    // let guunitsTests = packageURL.appendingPathComponent("Tests/guunitsTests")
-    // let swiftTests = packageURL.appendingPathComponent("Tests/swift_GUUnitsTests")
-    let generator = GUUnitsGenerator()
-    generator.generateCFiles(in: guunitsDirectory)
-    generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
-}
-
-generatePackage()
+// generatePackage()
