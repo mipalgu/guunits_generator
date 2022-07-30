@@ -63,16 +63,10 @@ final class GUUnitsGeneratorTests: XCTestCase {
 
     let generator = GUUnitsGenerator()
 
-    func testguunits() {
-        
-    }
-
-    private func generatePackage() {
+    var packageURL: URL? {
         guard var currentDirectory = URL(string: FileManager().currentDirectoryPath) else {
-            XCTFail("Can't find current directory.")
-            return
+            return nil
         }
-        let packageURL: URL
         if currentDirectory.lastPathComponent != "guunits_generator" {
             repeat {
                 currentDirectory.deleteLastPathComponent()
@@ -81,10 +75,20 @@ final class GUUnitsGeneratorTests: XCTestCase {
             )
         }
         guard !currentDirectory.lastPathComponent.isEmpty else {
+            return nil
+        }
+        return currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
+    }
+
+    func testguunits() {
+        generatePackage()
+    }
+
+    private func generatePackage() {
+        guard let packageURL = packageURL else {
             XCTFail("Failed to ascertain package path.")
             return
         }
-        packageURL = currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
         let guunitsDirectory = packageURL.appendingPathComponent("Sources").appendingPathComponent("CGUUnits")
         let swiftGUUnitsDirectory = packageURL
             .appendingPathComponent("Sources")
