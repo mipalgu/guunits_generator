@@ -177,14 +177,11 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         to otherType: NumericTypes
     ) -> String {
         if type.isFloat && !otherType.isFloat {
-            let roundString = self.cast(
-                "round(\(type != .double ? self.cast(str, to: "double") : str))",
-                to: currentType
-            )
+            let roundString = "round(\(type != .double ? self.cast(str, to: "double") : str))"
             let (min, max) = otherType.limits
-            return "MIN(MAX((\(roundString)), ((\(type.rawValue)) " +
-                "(\(self.sanitise(literal: min, to: type))))), " +
-                "((\(type.rawValue)) (\(self.sanitise(literal: max, to: type)))))"
+            return "MIN(MAX((\(roundString)), ((double) " +
+                "(\(self.sanitise(literal: min, to: .double))))), " +
+                "((double) (\(self.sanitise(literal: max, to: type)))))"
         }
         return str
     }
