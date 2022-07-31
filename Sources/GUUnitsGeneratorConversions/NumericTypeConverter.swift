@@ -56,6 +56,8 @@
  *
  */
 
+import Foundation
+
 /// A struct for converting between numeric types and unit types.
 public struct NumericTypeConverter: NumericConverterProtocol {
 
@@ -130,6 +132,9 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         if type.isFloat != otherType.isFloat {
             let converted = self.convertFloat(str, from: type, currentType: currentType, to: otherType)
             // if type.isFloat {
+            //     converted = self.convertSign(converted, from: type, currentType: currentType, to: otherType)
+            // }
+            // if type.isFloat {
             //     converted = otherType.isSigned
             //         ? converted
             //         : self.convertSign(converted, from: .int, currentType: currentType, to: otherType)
@@ -172,10 +177,12 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         to otherType: NumericTypes
     ) -> String {
         if type.isFloat && !otherType.isFloat {
-            return self.cast(
+            let roundString = self.cast(
                 "round(\(type != .double ? self.cast(str, to: "double") : str))",
                 to: currentType
             )
+            let (min, max) = otherType.limits
+            return "MIN(MAX((\(roundString)), ((\(type.rawValue)) (\(self.sanitise(literal: min, to: type))))), ((\(type.rawValue)) (\(self.sanitise(literal: max, to: type)))))"
         }
         return str
     }
@@ -196,7 +203,7 @@ public struct NumericTypeConverter: NumericConverterProtocol {
     ) -> String {
         let (_, max) = otherType.limits
         if type.isSigned {
-            return "MAX(\(self.cast("0", to: currentType)), \(str))"
+            return "MAX(\(self.cast(self.sanitise(literal: "0", to: type), to: currentType)), \(str))"
         }
         if otherType.opposite.largerThan(type) {
             return str
@@ -223,6 +230,41 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         }
         let (min, max) = otherType.limits
         return "MIN(\(self.cast(max, to: currentType)), MAX(\(self.cast(min, to: currentType)), \(str)))"
+    }
+
+    private func sanitise(literal: String, to type: NumericTypes) -> String {
+        guard
+            nil == literal.first(where: {
+                guard let scalar = Unicode.Scalar(String($0)) else {
+                    return true
+                }
+                return !(CharacterSet.decimalDigits.contains(scalar) || $0 == "." || $0 == "-")
+            }),
+            literal.filter({ $0 == "." }).count <= 1,
+            literal.filter({ $0 == "-" }).count <= 1,
+            let firstChar = literal.first,
+            literal.contains("-") ? firstChar == "-" : true
+        else {
+            return literal
+        }
+        let hasDecimal = literal.contains(".")
+        switch type {
+        case .float:
+            guard hasDecimal else {
+                return "\(literal).0f"
+            }
+            return "\(literal)f"
+        case .double:
+            guard hasDecimal else {
+                return "\(literal).0"
+            }
+            return literal
+        default:
+            guard hasDecimal else {
+                return literal
+            }
+            return "round((double) (\(literal)))"
+        }
     }
 
 }
