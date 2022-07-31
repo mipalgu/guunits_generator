@@ -128,16 +128,16 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             return self.cast(str, to: resultType)
         }
         if type.isFloat != otherType.isFloat {
-            var converted = self.convertFloat(str, from: type, currentType: currentType, to: otherType)
-            if type.isFloat {
-                converted = otherType.isSigned
-                    ? converted
-                    : self.convertSign(converted, from: .int, currentType: currentType, to: otherType)
-            } else {
-                converted = type.isSigned
-                    ? converted
-                    : self.convertSign(converted, from: type, currentType: currentType, to: .int)
-            }
+            let converted = self.convertFloat(str, from: type, currentType: currentType, to: otherType)
+            // if type.isFloat {
+            //     converted = otherType.isSigned
+            //         ? converted
+            //         : self.convertSign(converted, from: .int, currentType: currentType, to: otherType)
+            // } else {
+            //     converted = type.isSigned
+            //         ? converted
+            //         : self.convertSign(converted, from: type, currentType: currentType, to: .int)
+            // }
             return self.cast(converted, to: resultType)
         }
         if type.isSigned == otherType.isSigned {
