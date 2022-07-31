@@ -65,7 +65,7 @@ struct TemperatureTestGenerator: TestGenerator {
     func testParameters(
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {
-        let defaultTests = self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
+        // let defaultTests = self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
         var newTests: [TestParameters] = []
         switch unit {
         case .celsius:
@@ -187,7 +187,7 @@ struct TemperatureTestGenerator: TestGenerator {
                 break
             }
         }
-        return defaultTests + newTests
+        return newTests
     }
 
     func testParameters(from unit: UnitType, with sign: Signs, to numeric: NumericTypes) -> [TestParameters] {
