@@ -109,14 +109,13 @@ final class GUUnitsGeneratorTests: XCTestCase {
         print("Using package url: \(packageURL.path)")
         try generatePackage()
         fflush(stdout)
-        guard let command = "cd \(packageURL.path) && swift test".cString(using: .utf8) else {
-            XCTFail("Failed to create command")
-            return
-        }
-        guard EXIT_SUCCESS == system(command) else {
-            XCTFail("Tests failed with error number: \(errno)")
-            return
-        }
+        let process = Process()
+        process.currentDirectoryURL = packageURL
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/env", isDirectory: false)
+        process.arguments = ["swift", "test"]
+        try process.run()
+        process.waitUntilExit()
+        XCTAssertEqual(EXIT_SUCCESS, process.terminationStatus)
     }
 
     private func generatePackage() throws {
