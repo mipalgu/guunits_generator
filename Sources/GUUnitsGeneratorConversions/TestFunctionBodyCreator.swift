@@ -61,7 +61,7 @@ import Foundation
 
 /// A struct that generates function bodies for test functions that test the
 /// guunits conversion functions.
-struct TestFunctionBodyCreator<Unit: UnitProtocol> {
+struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable, Unit.RawValue == String {
 
     /// The helper which provides function names.
     private let helper = FunctionHelpers<Unit>()
@@ -82,6 +82,10 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         using parameters: TestParameters
     ) -> String {
         let fn = helper.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
+        guard !otherSign.numericType.isFloat else {
+            let conversion = "\(otherUnit.rawValue)_\(otherSign.rawValue)"
+            return floatAssert(body: fn, parameters: parameters, conversion: conversion)
+        }
         return assert(body: fn, parameters: parameters)
     }
 
@@ -99,6 +103,9 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         using parameters: TestParameters
     ) -> String {
         let fn = helper.functionName(forUnit: unit, sign: sign, to: numeric)
+        guard !numeric.isFloat else {
+            return floatAssert(body: fn, parameters: parameters, conversion: numeric.swiftType.rawValue)
+        }
         return assert(body: fn, parameters: parameters)
     }
 
@@ -113,6 +120,10 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
         from numeric: NumericTypes, to unit: Unit, with sign: Signs, using parameters: TestParameters
     ) -> String {
         let fn = helper.functionName(from: numeric, to: unit, sign: sign)
+        guard !sign.numericType.isFloat else {
+            let conversion = "\(unit.rawValue)_\(sign.rawValue)"
+            return floatAssert(body: fn, parameters: parameters, conversion: conversion)
+        }
         return assert(body: fn, parameters: parameters)
     }
 
@@ -191,6 +202,19 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> {
     /// - Returns: The implementation of the conversion test.
     private func assert(body: String, parameters: TestParameters) -> String {
         "XCTAssertEqual(\(body)(\(parameters.input)), \(parameters.output))"
+    }
+
+    private func floatAssert(body: String, parameters: TestParameters, conversion: String) -> String {
+        """
+        let result = \(body)(\(parameters.input))
+                let expected: \(conversion) = \(parameters.output)
+                let tolerance: \(conversion) = 0.5
+                if result > expected {
+                    XCTAssertLessThanOrEqual(result - expected, tolerance)
+                } else {
+                    XCTAssertLessThanOrEqual(expected - result, tolerance)
+                }
+        """
     }
 
 }

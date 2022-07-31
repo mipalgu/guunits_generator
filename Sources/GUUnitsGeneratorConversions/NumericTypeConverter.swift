@@ -182,7 +182,9 @@ public struct NumericTypeConverter: NumericConverterProtocol {
                 to: currentType
             )
             let (min, max) = otherType.limits
-            return "MIN(MAX((\(roundString)), ((\(type.rawValue)) (\(self.sanitise(literal: min, to: type))))), ((\(type.rawValue)) (\(self.sanitise(literal: max, to: type)))))"
+            return "MIN(MAX((\(roundString)), ((\(type.rawValue)) " +
+                "(\(self.sanitise(literal: min, to: type))))), " +
+                "((\(type.rawValue)) (\(self.sanitise(literal: max, to: type)))))"
         }
         return str
     }
