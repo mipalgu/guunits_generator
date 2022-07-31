@@ -176,12 +176,20 @@ extension TestGenerator {
                 t1 = TestParameters(input: limits.castedLowerLimit, output: limits.lowerLimitAsNumeric)
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.upperLimitAsNumeric)
             default:
-                t1 = TestParameters(input: limits.castedLowerLimit, output: limits.numericCastedLowerLimit)
-                t2 = TestParameters(input: limits.castedUpperLimit, output: limits.numericCastedUpperLimit)
+                t1 = TestParameters(
+                    input: "\(limits.castedLowerLimit) + 1.0", output: limits.numericCastedLowerLimit
+                )
+                t2 = TestParameters(
+                    input: "\(limits.castedUpperLimit) - 1.0", output: limits.numericCastedUpperLimit
+                )
             }
         case .d:
-            t1 = TestParameters(input: limits.castedLowerLimit, output: limits.numericCastedLowerLimit)
-            t2 = TestParameters(input: limits.castedUpperLimit, output: limits.numericCastedUpperLimit)
+            t1 = TestParameters(
+                input: "\(limits.castedLowerLimit) + 1.0", output: limits.numericCastedLowerLimit
+            )
+            t2 = TestParameters(
+                input: "\(limits.castedUpperLimit) - 1.0", output: limits.numericCastedUpperLimit
+            )
         }
         return parameters + [t1, t2]
     }
@@ -205,7 +213,11 @@ extension TestGenerator {
         switch sign {
         case .t:
             switch numeric {
-            case .float, .double, .int32, .int, .int64:
+            case .float, .double:
+                t1 = TestParameters(
+                    input: "\(limits.numericCastedLowerLimit) + 1.0", output: limits.castedLowerLimit
+                )
+            case .int32, .int, .int64:
                 t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.castedLowerLimit)
             case .uint8, .uint16, .uint32, .uint, .uint64, .int8, .int16:
                 t1 = TestParameters(
@@ -213,7 +225,11 @@ extension TestGenerator {
                 )
             }
             switch numeric {
-            case .float, .double, .uint64, .int64, .int32, .uint32, .int, .uint:
+            case .float, .double:
+                t2 = TestParameters(
+                    input: "\(limits.numericCastedUpperLimit) - 1.0", output: limits.castedUpperLimit
+                )
+            case .uint64, .int64, .int32, .uint32, .int, .uint:
                 t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.castedUpperLimit)
             case .uint8, .uint16, .int8, .int16:
                 t2 = TestParameters(
@@ -223,7 +239,11 @@ extension TestGenerator {
         case .u:
             t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.castedLowerLimit)
             switch numeric {
-            case .uint64, .uint, .uint32, .float, .double, .int64:
+            case .float, .double:
+                t2 = TestParameters(
+                    input: "\(limits.numericCastedUpperLimit) - 1.0", output: limits.castedUpperLimit
+                )
+            case .uint64, .uint, .uint32, .int64:
                 t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.castedUpperLimit)
             case .int32, .int, .int16, .int8, .uint16, .uint8:
                 t2 = TestParameters(
