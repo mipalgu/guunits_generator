@@ -284,7 +284,7 @@ private struct LimitStruct<UnitType> where
     }
 
     private var limits: (String, String) {
-        sign.numericType.limits
+        sign.numericType.swiftType.limits
     }
 
     private var lowerLimit: String {
@@ -323,7 +323,7 @@ private struct LimitStruct<UnitType> where
     }
 
     private var otherLimits: (String, String) {
-        otherSign.numericType.limits
+        otherSign.numericType.swiftType.limits
     }
 
     private var otherLowerLimit: String {
@@ -370,7 +370,7 @@ private struct NumericLimitStruct<UnitType> where
     }
 
     private var limits: (String, String) {
-        sign.numericType.limits
+        sign.numericType.swiftType.limits
     }
 
     private var lowerLimit: String {
@@ -409,7 +409,7 @@ private struct NumericLimitStruct<UnitType> where
     }
 
     private var numericLimits: (String, String) {
-        numeric.limits
+        numeric.swiftType.limits
     }
 
     private var numericLowerLimit: String {
