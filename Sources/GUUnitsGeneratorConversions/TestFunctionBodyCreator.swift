@@ -207,13 +207,13 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
     private func floatAssert(body: String, parameters: TestParameters, conversion: String) -> String {
         """
         let result = \(body)(\(parameters.input))
-                let expected: \(conversion) = \(parameters.output)
-                let tolerance: \(conversion) = 0.5
-                if result > expected {
-                    XCTAssertLessThanOrEqual(result - expected, tolerance)
-                } else {
-                    XCTAssertLessThanOrEqual(expected - result, tolerance)
-                }
+        let expected: \(conversion) = \(parameters.output)
+        let tolerance: \(conversion) = 0.5
+        if result > expected {
+            XCTAssertLessThanOrEqual(result - expected, tolerance)
+        } else {
+            XCTAssertLessThanOrEqual(expected - result, tolerance)
+        }
         """
     }
 

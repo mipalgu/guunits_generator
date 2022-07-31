@@ -145,7 +145,10 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         let body = bodyCreator.generateFunction(
             from: unit, with: sign, to: otherUnit, with: otherSign, using: parameters
         )
-        return "    func \(name)() {\n        \(body)\n    }"
+        let formattedBody = body.components(separatedBy: .newlines)
+            .map { "        " + $0 }
+            .joined(separator: "\n")
+        return "    func \(name)() {\n\(formattedBody)\n    }"
     }
 
     private func createTestFunction(
@@ -156,7 +159,10 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
     ) -> String {
         let name = helper.testFunctionName(from: unit, with: sign, to: numeric, using: parameters)
         let body = bodyCreator.generateFunction(from: unit, with: sign, to: numeric, using: parameters)
-        return "    func \(name)() {\n        \(body)\n    }"
+        let formattedBody = body.components(separatedBy: .newlines)
+            .map { "        " + $0 }
+            .joined(separator: "\n")
+        return "    func \(name)() {\n\(formattedBody)\n    }"
     }
 
     private func createTestFunction(
@@ -167,7 +173,10 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
     ) -> String {
         let name = helper.testFunctionName(from: numeric, to: unit, with: sign, using: parameters)
         let body = bodyCreator.generateFunction(from: numeric, to: unit, with: sign, using: parameters)
-        return "    func \(name)() {\n        \(body)\n    }"
+        let formattedBody = body.components(separatedBy: .newlines)
+            .map { "        " + $0 }
+            .joined(separator: "\n")
+        return "    func \(name)() {\n\(formattedBody)\n    }"
     }
 
 }
