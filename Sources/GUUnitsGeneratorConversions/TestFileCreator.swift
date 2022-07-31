@@ -66,28 +66,36 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
     private let bodyCreator = TestFunctionBodyCreator<Unit>()
 
     func tests(generator: TestGeneratorType, imports: String) -> String {
-        let unitTests: [String] = Unit.allCases.flatMap { unit in
-            Unit.allCases.flatMap { otherUnit in
-                Signs.allCases.flatMap { sign in
-                    Signs.allCases.flatMap { otherSign in
-                        self.createTests(
-                            from: unit, with: sign, to: otherUnit, with: otherSign, using: generator
-                        )
+        let head = "\(imports)\nimport Foundation\nimport XCTest"
+        let unitTests: [(String, String)] = Unit.allCases.map { unit in
+            (
+                unit.rawValue,
+                (Unit.allCases.flatMap { otherUnit in
+                    Signs.allCases.flatMap { sign in
+                        Signs.allCases.flatMap { otherSign in
+                            self.createTests(
+                                from: unit, with: sign, to: otherUnit, with: otherSign, using: generator
+                            )
+                        }
                     }
-                }
-            } +
-            Signs.allCases.flatMap { sign in
-                NumericTypes.allCases.flatMap { numeric in
-                    self.createTests(from: unit, with: sign, to: numeric, using: generator) +
-                        self.createTests(from: numeric, to: unit, with: sign, using: generator)
-                }
-            }
+                } +
+                Signs.allCases.flatMap { sign in
+                    NumericTypes.allCases.flatMap { numeric in
+                        self.createTests(from: unit, with: sign, to: numeric, using: generator) +
+                            self.createTests(from: numeric, to: unit, with: sign, using: generator)
+                    }
+                })
+                .sorted()
+                .joined(separator: "\n\n")
+            )
         }
-        .sorted()
-        print("Created \(unitTests.count) Tests for \(Unit.category)!")
-        let allTests = unitTests.joined(separator: "\n\n")
-        return "\(imports)\nimport Foundation\nimport XCTest\n\nfinal class \(Unit.category)" +
-            "Tests: XCTestCase {\n\n\(allTests)\n\n}\n"
+        let sorted = unitTests.sorted { $0.1 <= $1.1 }
+        let body = sorted.map {
+            return "final class \(Unit.category)_\($0.capitalized)" +
+                "Tests: XCTestCase {\n\n\($1)\n\n}\n"
+        }
+        .joined(separator: "\n\n")
+        return head + "\n\n" + body + "\n"
     }
 
     private func createTests(
