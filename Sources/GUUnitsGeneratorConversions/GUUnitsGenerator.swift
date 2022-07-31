@@ -140,7 +140,7 @@ public struct GUUnitsGenerator {
         let testGenerator = TemperatureTestGenerator()
         writeFile(
             at: path,
-            with: "TemperatureTests.swift",
+            with: "TemperatureTests",
             and: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
         )
     }
