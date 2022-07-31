@@ -65,20 +65,24 @@ final class GUUnitsGeneratorTests: XCTestCase {
     let generator = GUUnitsGenerator()
 
     var packageURL: URL? {
-        guard var currentDirectory = URL(string: FileManager().currentDirectoryPath) else {
-            return nil
-        }
-        if currentDirectory.lastPathComponent != "guunits_generator" {
-            repeat {
-                currentDirectory.deleteLastPathComponent()
-            } while (currentDirectory.lastPathComponent != "guunits_generator"
-                && !currentDirectory.lastPathComponent.isEmpty
-            )
-        }
-        guard !currentDirectory.lastPathComponent.isEmpty else {
-            return nil
-        }
-        return currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
+        URL(fileURLWithPath: #filePath, isDirectory: false)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("guunits", isDirectory: true)
+        // guard var currentDirectory = URL(string: FileManager().currentDirectoryPath) else {
+        //     return nil
+        // }
+        // if currentDirectory.lastPathComponent != "guunits_generator" {
+        //     repeat {
+        //         currentDirectory.deleteLastPathComponent()
+        //     } while (currentDirectory.lastPathComponent != "guunits_generator"
+        //         && !currentDirectory.lastPathComponent.isEmpty
+        //     )
+        // }
+        // guard !currentDirectory.lastPathComponent.isEmpty else {
+        //     return nil
+        // }
+        // return currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
     }
 
     var guunitsDirectory: URL? {
@@ -102,8 +106,10 @@ final class GUUnitsGeneratorTests: XCTestCase {
             XCTFail("Failed to ascertain package path.")
             return
         }
+        print("Using package url: \(packageURL.path)")
         try generatePackage()
-        guard let command = "cd \(packageURL.absoluteString) && swift test".cString(using: .utf8) else {
+        fflush(stdout)
+        guard let command = "cd \(packageURL.path) && swift test".cString(using: .utf8) else {
             XCTFail("Failed to create command")
             return
         }

@@ -65,14 +65,14 @@ public struct GUUnitsGenerator {
     public init() {}
 
     public func generateCFiles(in path: URL) throws {
-        guard !path.isFileURL else {
-            fatalError("Path is not a valid directory.")
-        }
+        // guard !path.isFileURL else {
+        //     fatalError("Path is not a valid directory.")
+        // }
         var hFile = path
         var cFile = path
         hFile.appendPathComponent("include", isDirectory: true)
-        if !fileManager.fileExists(atPath: hFile.absoluteString) {
-            try fileManager.createDirectory(atPath: hFile.absoluteString, withIntermediateDirectories: false)
+        if !fileManager.fileExists(atPath: hFile.path) {
+            try fileManager.createDirectory(atPath: hFile.path, withIntermediateDirectories: true)
         }
         hFile.appendPathComponent("guunits.h", isDirectory: false)
         cFile.appendPathComponent("guunits.c", isDirectory: false)
@@ -112,7 +112,7 @@ public struct GUUnitsGenerator {
         )
         .data(using: .utf8)
         print("Writing H-file to path \(hFile.absoluteString)...")
-        fileManager.createFile(atPath: hFile.absoluteString, contents: fileContents)
+        fileManager.createFile(atPath: hFile.path, contents: fileContents)
         print("Done!\nWriting C-File to path \(cFile.absoluteString)...")
         let cContents = CFileCreator().generate(
             generators: [
@@ -128,14 +128,14 @@ public struct GUUnitsGenerator {
         // if fileManager.fileExists(atPath: cFile.absoluteString) {
         //     try fileManager.removeItem(atPath: cFile.absoluteString)
         // }
-        fileManager.createFile(atPath: cFile.absoluteString, contents: cContents)
+        fileManager.createFile(atPath: cFile.path, contents: cContents)
         print("Done!")
     }
 
     func generateCTests(in path: URL) {
-        guard !path.isFileURL else {
-            fatalError("Path is not a valid directory.")
-        }
+        // guard !path.isFileURL else {
+        //     fatalError("Path is not a valid directory.")
+        // }
         let fileCreator = TestFileCreator<TemperatureTestGenerator>()
         let testGenerator = TemperatureTestGenerator()
         writeFile(
@@ -146,9 +146,9 @@ public struct GUUnitsGenerator {
     }
 
     public func generateSwiftFiles(in path: URL) {
-        guard !path.isFileURL else {
-            fatalError("Path is not a valid directory.")
-        }
+        // guard !path.isFileURL else {
+        //     fatalError("Path is not a valid directory.")
+        // }
         print("Writing Swift files to \(path.absoluteString)...")
         let swiftFileCreator = SwiftFileCreator()
         writeFile(
@@ -176,7 +176,7 @@ public struct GUUnitsGenerator {
 
     private func writeFile(at path: URL, with name: String, and contents: String) {
         fileManager.createFile(
-            atPath: path.appendingPathComponent("\(name).swift", isDirectory: false).absoluteString,
+            atPath: path.appendingPathComponent("\(name).swift", isDirectory: false).path,
             contents: contents.data(using: .utf8)
         )
     }
