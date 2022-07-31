@@ -114,6 +114,15 @@ public enum SwiftNumericTypes: String, Hashable, CaseIterable {
         )
     }
 
+    var limits: (String, String) {
+        switch self {
+        case .Double, .Float:
+            return ("-\(self.rawValue).greatestFiniteMagnitude", "\(self.rawValue).greatestFiniteMagnitude")
+        default:
+            return ("\(self.rawValue).min", "\(self.rawValue).max")
+        }
+    }
+
     /// The *NumericTypes* equivalent of this swift type.
     var numericType: NumericTypes {
         switch self {

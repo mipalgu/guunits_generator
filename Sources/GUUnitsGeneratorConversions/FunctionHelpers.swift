@@ -283,12 +283,14 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
         guard !string.isEmpty else {
             return string
         }
-        return string.replacingOccurrences(of: ".", with: "_").filter {
-            guard let scalar = Unicode.Scalar("\($0)") else {
-                return false
+        return string.replacingOccurrences(of: ".", with: "_")
+            .replacingOccurrences(of: "-", with: "Neg")
+            .filter {
+                guard let scalar = Unicode.Scalar("\($0)") else {
+                    return false
+                }
+                return CharacterSet.alphanumerics.contains(scalar) || $0 == "_"
             }
-            return CharacterSet.alphanumerics.contains(scalar) || $0 == "_"
-        }
     }
 
 }

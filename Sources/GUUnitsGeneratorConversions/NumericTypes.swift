@@ -202,9 +202,9 @@ extension NumericTypes {
         case .uint64:
             return ("0", "ULONG_MAX")
         case .float:
-            return ("FLT_MIN", "FLT_MAX")
+            return ("-FLT_MAX", "FLT_MAX")
         case .double:
-            return ("DBL_MIN", "DBL_MAX")
+            return ("-DBL_MAX", "DBL_MAX")
         }
     }
 
