@@ -45,7 +45,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: true,
             isFloat: false,
             opposite: .uint16,
-            limits: ("SHRT_MIN", "SHRT_MAX"),
+            limits: ("-32768", "32767"),
             swiftType: .Int16,
             smallerThan: [.int32, .int64, .double, .float],
             largerThan: [.int8]
@@ -61,7 +61,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: true,
             isFloat: false,
             opposite: .uint32,
-            limits: ("INT_MIN", "INT_MAX"),
+            limits: ("-2147483648", "2147483647"),
             swiftType: .Int32,
             smallerThan: [.int64, .double, .float],
             largerThan: [.int8, .int16]
@@ -77,7 +77,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: true,
             isFloat: false,
             opposite: .uint64,
-            limits: ("LONG_MIN", "LONG_MAX"),
+            limits: ("-9223372036854775807 - 1", "9223372036854775807"),
             swiftType: .Int64,
             smallerThan: [],
             largerThan: [.int8, .int16, .int32, .int, .float]
@@ -125,7 +125,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: false,
             isFloat: false,
             opposite: .int16,
-            limits: ("0", "USHRT_MAX"),
+            limits: ("0", "65535"),
             swiftType: .UInt16,
             smallerThan: [.uint32, .uint64],
             largerThan: [.uint8]
@@ -141,7 +141,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: false,
             isFloat: false,
             opposite: .int32,
-            limits: ("0", "UINT_MAX"),
+            limits: ("0", "4294967295U"),
             swiftType: .UInt32,
             smallerThan: [.uint64],
             largerThan: [.uint8, .uint16]
@@ -157,7 +157,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: false,
             isFloat: false,
             opposite: .int64,
-            limits: ("0", "ULONG_MAX"),
+            limits: ("0", "18446744073709551615U"),
             swiftType: .UInt64,
             smallerThan: [],
             largerThan: [.uint8, .uint16, .uint32]
@@ -173,7 +173,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: true,
             isFloat: true,
             opposite: .float,
-            limits: ("FLT_MIN", "FLT_MAX"),
+            limits: ("-FLT_MAX", "FLT_MAX"),
             swiftType: .Float,
             smallerThan: [],
             largerThan: []
@@ -189,7 +189,7 @@ final class NumericTypesTests: XCTestCase {
             isSigned: true,
             isFloat: true,
             opposite: .double,
-            limits: ("DBL_MIN", "DBL_MAX"),
+            limits: ("-DBL_MAX", "DBL_MAX"),
             swiftType: .Double,
             smallerThan: [],
             largerThan: []
