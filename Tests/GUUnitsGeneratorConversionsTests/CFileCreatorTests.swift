@@ -4,21 +4,36 @@ import XCTest
 /// Test class for CFileCreator.
 final class CFileCreatorTests: XCTestCase {
 
+    /// Mock class for keeping track of how functions are called.
     class MockUnitGenerator: UnitsGeneratable {
 
+        // swiftlint:disable nesting
+
+        /// Using distance units for mock.
         typealias Unit = DistanceUnits
 
+        // swiftlint:enable nesting
+
+        /// Gen function implementation and declaration.
         fileprivate let magicString = "MAGIC!"
 
+        /// The last parameters passed to the generateDeclarations function.
         fileprivate var lastDeclarationCall: [DistanceUnits] = []
 
+        /// The last parameters passed to the generateImplementations function.
         fileprivate var lastImplementationCall: [DistanceUnits] = []
 
+        /// Generate fake function declarations.
+        /// - Parameter units: The units to generate.
+        /// - Returns: A mock string.
         func generateDeclarations(forUnits units: [DistanceUnits]) -> String? {
             lastDeclarationCall = units
             return magicString
         }
 
+        /// Generate fake function implementations.
+        /// - Parameter units: The units to generate functions for.
+        /// - Returns: A mock string.
         func generateImplementations(forUnits units: [DistanceUnits]) -> String? {
             lastImplementationCall = units
             return magicString
