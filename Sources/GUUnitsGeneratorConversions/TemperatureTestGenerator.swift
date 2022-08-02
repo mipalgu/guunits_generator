@@ -88,7 +88,7 @@ struct TemperatureTestGenerator: TestGenerator {
                 if (sign == .d || sign == .f || sign == .u) && otherSign == .t {
                     newTests.append(
                         TestParameters(
-                            input: creator.sanitiseLiteral(literal: "1193046455", sign: sign),
+                            input: creator.sanitiseLiteral(literal: "1193047000", sign: sign),
                             output: "((fahrenheit_\(otherSign.rawValue)) (INT_MAX))"
                         )
                     )
@@ -126,12 +126,12 @@ struct TemperatureTestGenerator: TestGenerator {
                             output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
                         )
                     )
-                    newTests.append(
-                        TestParameters(
-                            input: creator.sanitiseLiteral(literal: "-274", sign: sign),
-                            output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
-                        )
-                    )
+                    // newTests.append(
+                    //     TestParameters(
+                    //         input: creator.sanitiseLiteral(literal: "-274", sign: sign),
+                    //         output: creator.sanitiseLiteral(literal: "-1", sign: otherSign)
+                    //     )
+                    // )
                 }
             default:
                 break
