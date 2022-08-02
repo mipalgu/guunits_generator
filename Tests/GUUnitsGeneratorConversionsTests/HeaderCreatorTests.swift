@@ -192,15 +192,18 @@ final class HeaderCreatorTests: XCTestCase {
         """
     }
 
+    /// Add default numeric conversion functions.
     private var numericConversions: String {
         [NumericTypes.double, NumericTypes.float].flatMap { type in
             NumericTypes.allCases.compactMap { otherType in
                 guard type.isFloat && !otherType.isFloat || (type == .double && otherType == .float) else {
                     return nil
                 }
-                return "\(otherType.rawValue) \(type.abbreviation)_to_\(otherType.abbreviation)(\(type.rawValue));"
+                return "\(otherType.rawValue) \(type.abbreviation)_to_" +
+                    "\(otherType.abbreviation)(\(type.rawValue));"
             }
-        }.joined(separator: "\n\n")
+        }
+        .joined(separator: "\n\n")
     }
 
     /// TypeDefs in header.

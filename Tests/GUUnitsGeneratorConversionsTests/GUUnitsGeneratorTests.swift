@@ -60,47 +60,41 @@ import Foundation
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for GUUnitsGenerator.
 final class GUUnitsGeneratorTests: XCTestCase {
 
+    /// The generator being tested.
     let generator = GUUnitsGenerator()
 
+    /// The URL of the guunits test package.
     var packageURL: URL? {
         URL(fileURLWithPath: #filePath, isDirectory: false)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("guunits", isDirectory: true)
-        // guard var currentDirectory = URL(string: FileManager().currentDirectoryPath) else {
-        //     return nil
-        // }
-        // if currentDirectory.lastPathComponent != "guunits_generator" {
-        //     repeat {
-        //         currentDirectory.deleteLastPathComponent()
-        //     } while (currentDirectory.lastPathComponent != "guunits_generator"
-        //         && !currentDirectory.lastPathComponent.isEmpty
-        //     )
-        // }
-        // guard !currentDirectory.lastPathComponent.isEmpty else {
-        //     return nil
-        // }
-        // return currentDirectory.appendingPathComponent("Tests").appendingPathComponent("guunits")
     }
 
+    /// The CGUUnits target in the Source directory.
     var guunitsDirectory: URL? {
         packageURL?.appendingPathComponent("Sources").appendingPathComponent("CGUUnits")
     }
 
+    /// The swift_GUUnits target in the Source directory.
     var swiftGUUnitsDirectory: URL? {
         packageURL?.appendingPathComponent("Sources").appendingPathComponent("swift_GUUnits")
     }
 
+    /// The CGUUnitsTests target in the Tests directory.
     var guunitsTests: URL? {
         packageURL?.appendingPathComponent("Tests").appendingPathComponent("CGUUnitsTests")
     }
 
+    /// The swift_GUUnitsTests target in the Tests directory.
     var swiftGUUnitsTests: URL? {
         packageURL?.appendingPathComponent("Tests").appendingPathComponent("swift_GUUnitsTests")
     }
 
+    /// Generate the guunits package and make sure all generated tests pass.
     func testguunits() throws {
         guard let packageURL = packageURL else {
             XCTFail("Failed to ascertain package path.")
@@ -118,6 +112,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         XCTAssertEqual(EXIT_SUCCESS, process.terminationStatus)
     }
 
+    /// Helper method that generates the guunits source files and package.
     private func generatePackage() throws {
         guard
             let guunitsDirectory = guunitsDirectory,
