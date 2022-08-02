@@ -73,18 +73,27 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
             with: .f,
             to: .centimetres,
             with: .u,
-            using: TestParameters(input: "53.0f", output: "53")
+            using: TestParameters(input: "53.0", output: "53")
         )
-        let expected = "XCTAssertEqual(cm_f_to_cm_u(53.0f), 53)"
+        let expected = "XCTAssertEqual(cm_f_to_cm_u(53.0), 53)"
         XCTAssertEqual(result, expected)
     }
 
     /// Test generate function for unit to numeric conversion.
     func testGenerateFunctionUnitsToNumeric() {
         let result = creator.generateFunction(
-            from: .centimetres, with: .t, to: .float, using: TestParameters(input: "10", output: "10.0f")
+            from: .centimetres, with: .t, to: .float, using: TestParameters(input: "10", output: "10.0")
         )
-        let expected = "XCTAssertEqual(cm_t_to_f(10), 10.0f)"
+        let expected = """
+        let result = cm_t_to_f(10)
+        let expected: Float = 10.0
+        let tolerance: Float = 0.5
+        if result > expected {
+            XCTAssertLessThanOrEqual(result - expected, tolerance)
+        } else {
+            XCTAssertLessThanOrEqual(expected - result, tolerance)
+        }
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -112,7 +121,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
     /// Test Integer Literal -> Float
     func testSanitiseLiteralForIntegerLiteralToFloat() {
         let result = creator.sanitiseLiteral(literal: "5", sign: .f)
-        XCTAssertEqual(result, "5.0f")
+        XCTAssertEqual(result, "5.0")
     }
 
     /// Test String Literal -> Unsigned
@@ -130,7 +139,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
     /// Test Double Literal -> Float
     func testSanitiseLiteralForDoubleLiteralToFloat() {
         let result = creator.sanitiseLiteral(literal: "5.0", sign: .f)
-        XCTAssertEqual(result, "5.0f")
+        XCTAssertEqual(result, "5.0")
     }
 
     /// Test empty literal.
