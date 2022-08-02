@@ -185,22 +185,26 @@ extension NumericTypes {
     /// in a tuple as (MIN, MAX).
     var limits: (String, String) {
         switch self {
-        case .int, .int32:
+        case .int32:
+            return ("-2147483648", "2147483647")
+        case .int:
             return ("INT_MIN", "INT_MAX")
         case .int8:
             return ("-128", "127")
         case .int16:
-            return ("SHRT_MIN", "SHRT_MAX")
+            return ("-32768", "32767")
         case .int64:
-            return ("LONG_MIN", "LONG_MAX")
-        case .uint, .uint32:
+            return ("-9223372036854775808", "9223372036854775807")
+        case .uint32:
+            return ("0", "4294967295")
+        case .uint:
             return ("0", "UINT_MAX")
         case .uint8:
             return ("0", "255")
         case .uint16:
-            return ("0", "USHRT_MAX")
+            return ("0", "65535")
         case .uint64:
-            return ("0", "ULONG_MAX")
+            return ("0", "18446744073709551615")
         case .float:
             return ("-FLT_MAX", "FLT_MAX")
         case .double:
