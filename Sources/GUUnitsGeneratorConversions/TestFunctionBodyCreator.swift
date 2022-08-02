@@ -148,13 +148,13 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
     /// - Returns: The sanitised literal.
     func sanitiseLiteral(literal: String, to type: NumericTypes) -> String {
         let trimmedLiteral = literal.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let first = literal.first else {
-            return literal
+        guard let first = trimmedLiteral.first else {
+            return trimmedLiteral
         }
         let isNegative = first == "-"
         let literal = isNegative ? String(trimmedLiteral.dropFirst()) : trimmedLiteral
         guard !literal.isEmpty, isNumeric(literal: literal) else {
-            return literal
+            return isNegative ? "-" + literal : literal
         }
         let components = literal.components(separatedBy: ".")
         guard components.count == 2 else {
@@ -190,9 +190,11 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
             guard let scalar = Unicode.Scalar(String($0)) else {
                 return false
             }
-            return CharacterSet.decimalDigits.contains(scalar) || $0 == "."
+            return CharacterSet.decimalDigits.contains(scalar) || $0 == "." || $0 == "U" || $0 == "L"
         }
          && literal.components(separatedBy: ".").count < 3
+         && literal.components(separatedBy: "U").count < 2
+         && literal.components(separatedBy: "L").filter { !$0.isEmpty }.count == 1
     }
 
     /// Use XCTest to test.
