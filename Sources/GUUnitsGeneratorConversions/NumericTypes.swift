@@ -194,9 +194,9 @@ extension NumericTypes {
         case .int16:
             return ("-32768", "32767")
         case .int64:
-            return ("-9223372036854775808", "9223372036854775807")
+            return ("-9223372036854775807L - 1L", "9223372036854775807L")
         case .uint32:
-            return ("0", "4294967295")
+            return ("0", "4294967295U")
         case .uint:
             return ("0", "UINT_MAX")
         case .uint8:
@@ -204,7 +204,7 @@ extension NumericTypes {
         case .uint16:
             return ("0", "65535")
         case .uint64:
-            return ("0", "18446744073709551615")
+            return ("0", "18446744073709551615UL")
         case .float:
             return ("-FLT_MAX", "FLT_MAX")
         case .double:
