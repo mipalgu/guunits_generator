@@ -139,6 +139,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
         XCTAssertEqual(result, "")
     }
 
+    /// Test negative non-numeric input.
     func testSanitiseLiteralForNegativeFloatToDouble() {
         let result = creator.sanitiseLiteral(literal: "-Float.greatestFiniteMagnitude", to: .double)
         let expected = "-Float.greatestFiniteMagnitude"

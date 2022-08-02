@@ -117,8 +117,8 @@ final class GUUnitsGeneratorTests: XCTestCase {
         guard
             let guunitsDirectory = guunitsDirectory,
             let swiftGUUnitsDirectory = swiftGUUnitsDirectory,
-            let guunitsTests = guunitsTests,
-            let swiftGUUnitsTests = swiftGUUnitsTests
+            let guunitsTests = guunitsTests
+            // let swiftGUUnitsTests = swiftGUUnitsTests
         else {
             XCTFail("Failed to ascertain package path.")
             return

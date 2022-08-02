@@ -59,8 +59,10 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for TestGenerator Default implementations.
 final class TestGeneratorTests: XCTestCase {
 
+    /// The generator to test.
     let generator = TemperatureTestGenerator()
 
     // /// Test parameters for Unsigned -> Signed conversion.

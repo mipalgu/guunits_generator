@@ -45,6 +45,8 @@ try CPPFileCreator().generate(
     encoding: .utf8
 )*/
 
+/// Generate the source code for the guunits package.
+/// - Parameter directory: The folder to create the package in.
 private func generate(directory: URL? = URL(string: FileManager().currentDirectoryPath)) throws {
     guard let directory = directory else {
         fatalError("Failed to find current directory.")
@@ -54,6 +56,7 @@ private func generate(directory: URL? = URL(string: FileManager().currentDirecto
     generator.generateSwiftFiles(in: directory)
 }
 
+/// Main method for generating the guunits sources.
 private func main() throws {
     var path: String?
     let argc = CommandLine.argc
@@ -82,4 +85,5 @@ private func main() throws {
     try generate(directory: url)
 }
 
+/// Run main.
 try main()
