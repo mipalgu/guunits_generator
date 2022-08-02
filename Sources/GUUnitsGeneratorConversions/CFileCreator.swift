@@ -62,8 +62,7 @@ import Foundation
 public struct CFileCreator {
 
     /// The prefix which appears at the top of the file.
-    private var prefix: String {
-        """
+    private var prefix = """
         /*
         * guunits.c
         * guunits
@@ -138,7 +137,6 @@ public struct CFileCreator {
         #define M_PI 3.14159265358979323846
         #endif
         """
-    }
 
     /// The suffix which appears at the end of the file.
     var suffix: String {
@@ -152,6 +150,12 @@ public struct CFileCreator {
 
     /// Default init.
     public init() {}
+
+    /// Standard data initialiser.
+    /// - Parameter prefix: The prefix which appears before the function generation.
+    init(prefix: String) {
+        self.prefix = prefix
+    }
 
     /// Generate all of the guunits source code.
     /// - Parameters:
