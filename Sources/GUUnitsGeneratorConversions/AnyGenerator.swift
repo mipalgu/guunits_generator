@@ -76,7 +76,9 @@ public struct AnyGenerator {
     /// - Parameters:
     ///   - type: The type of the category the generator creates.
     ///   - generator: The generator.
-    public init<T: UnitProtocol>(generating type: T.Type, using generator: UnitsGeneratable) {
+    public init<T, U: UnitsGeneratable>(
+        generating type: T.Type, using generator: U
+    ) where U.Unit == T, T: CaseIterable {
         self._declarations = { generator.generateDeclarations(forUnits: Array(type.allCases)) }
         self._implementations = { generator.generateImplementations(forUnits: Array(type.allCases)) }
     }

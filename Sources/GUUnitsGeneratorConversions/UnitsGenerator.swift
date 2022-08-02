@@ -61,6 +61,9 @@ import Foundation
 /// Struct that generates the code for all the possible conversion functions.
 public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
 
+    /// A Unit is the same as the Creator Unit.
+    public typealias Unit = Creator.Unit
+
     /// The creator which generators language-specific code for a conversion function.
     let creator: Creator
 
@@ -76,25 +79,21 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         self.helpers = helpers
     }
 
-    // swiftlint:disable force_cast
-
     /// Generates the function declarations for an array of units.
     /// - Parameter units: The units to generate conversion functions for.
     /// - Returns: A String representing valid C-code for conversion functions which can be
     ///            applied to the units.
-    public func generateDeclarations<Unit>(forUnits units: [Unit]) -> String? where Unit == Creator.Unit {
-        self.generate(forUnits: units as! [Creator.Unit], includeImplementation: false)
+    public func generateDeclarations(forUnits units: [Unit]) -> String? {
+        self.generate(forUnits: units, includeImplementation: false)
     }
 
     /// Generates the function implementations for an array of units.
     /// - Parameter units: The units to generate conversion functions for.
     /// - Returns: A string representing valid C-code for conversion functions with
     ///            function bodies.
-    public func generateImplementations<Unit>(forUnits units: [Unit]) -> String? where Unit == Creator.Unit {
-        self.generate(forUnits: units as! [Creator.Unit], includeImplementation: true)
+    public func generateImplementations(forUnits units: [Unit]) -> String? {
+        self.generate(forUnits: units, includeImplementation: true)
     }
-
-    // swiftlint:enable force_cast
 
     /// Generates the conversion function definitions for the given units.
     /// - Parameters:

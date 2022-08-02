@@ -61,16 +61,19 @@
 /// function definitions and implementations.
 public protocol UnitsGeneratable {
 
+    /// Use a generic Unit Category.
+    associatedtype Unit where Unit: UnitProtocol
+
     /// Generates the function declarations for an array of units.
     /// - Parameter units: The units to generate conversion functions for.
     /// - Returns: A String representing valid code for conversion functions which can be
     ///            applied to the units.
-    func generateDeclarations<Unit: UnitProtocol>(forUnits units: [Unit]) -> String?
+    func generateDeclarations(forUnits units: [Unit]) -> String?
 
     /// Generates the function implementations for an array of units.
     /// - Parameter units: The units to generate conversion functions for.
     /// - Returns: A string representing valid code for conversion functions with
     ///            function bodies.
-    func generateImplementations<Unit: UnitProtocol>(forUnits units: [Unit]) -> String?
+    func generateImplementations(forUnits units: [Unit]) -> String?
 
 }
