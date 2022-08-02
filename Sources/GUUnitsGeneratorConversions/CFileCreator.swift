@@ -56,6 +56,8 @@
  *
  */
 
+import Foundation
+
 /// Generates all of the C types and conversion functions.
 public struct CFileCreator {
 
@@ -140,7 +142,81 @@ public struct CFileCreator {
 
     /// The suffix which appears at the end of the file.
     var suffix: String {
-        ""
+        [NumericTypes.double, NumericTypes.float].flatMap { type in
+            NumericTypes.allCases.compactMap { otherType in
+                defineFloatToIntegralConversion(type.rawValue, from: type, to: otherType)
+            }
+        }
+        .joined(separator: "\n\n")
+    }
+
+    private func defineFloatToIntegralConversion(
+        _ str: String,
+        from type: NumericTypes,
+        to otherType: NumericTypes
+    ) -> String? {
+        guard type.isFloat && !otherType.isFloat else {
+            return nil
+        }
+        let roundLiteral = "\(str)Val"
+        let roundedString: String
+        if type == .float {
+            roundedString = "const \(type.rawValue) roundedValue = roundf(\(roundLiteral));"
+        } else {
+            roundedString = "const \(type.rawValue) roundedValue = round(\(roundLiteral));"
+        }
+        let nextToward = type == .float ? "nexttowardf" : "nexttoward"
+        let upperLimit = self.sanitise(literal: otherType.limits.1, to: type)
+        let lowerLimit = self.sanitise(literal: otherType.limits.0, to: type)
+        return """
+        \(otherType.rawValue) \(type.abbreviation)_to_\(otherType.abbreviation)(\(type.rawValue) \(str)Val) {
+            \(roundedString)
+            const \(type.rawValue) maxValue = \(nextToward)(((\(type.rawValue)) (\(upperLimit))), 0.0);
+            const \(type.rawValue) minValue = \(nextToward)(((\(type.rawValue)) (\(lowerLimit))), 0.0);
+            if (roundedValue > maxValue) {
+                return \(otherType.limits.1);
+            } else if (roundedValue < minValue) {
+                return \(otherType.limits.0);
+            } else {
+                return ((\(otherType.rawValue)) (roundedValue));
+            }
+        }
+        """
+    }
+
+    private func sanitise(literal: String, to type: NumericTypes) -> String {
+        guard
+            nil == literal.first(where: {
+                guard let scalar = Unicode.Scalar(String($0)) else {
+                    return true
+                }
+                return !(CharacterSet.decimalDigits.contains(scalar) || $0 == "." || $0 == "-")
+            }),
+            literal.filter({ $0 == "." }).count <= 1,
+            literal.filter({ $0 == "-" }).count <= 1,
+            let firstChar = literal.first,
+            literal.contains("-") ? firstChar == "-" : true
+        else {
+            return literal
+        }
+        let hasDecimal = literal.contains(".")
+        switch type {
+        case .float:
+            guard hasDecimal else {
+                return "\(literal).0f"
+            }
+            return "\(literal)f"
+        case .double:
+            guard hasDecimal else {
+                return "\(literal).0"
+            }
+            return literal
+        default:
+            guard hasDecimal else {
+                return literal
+            }
+            return "round((double) (\(literal)))"
+        }
     }
 
     /// Default init.
@@ -153,7 +229,7 @@ public struct CFileCreator {
     /// - Returns: A string of all C functions for the supported guunits types.
     public func generate(generators: [AnyGenerator]) -> String {
         let content = self.createContent(generators: generators)
-        return self.prefix + "\n\n" + content + "\n\n" + self.suffix
+        return self.prefix + "\n\n" + content + "\n\n" + self.suffix + "\n"
     }
 
     /// Create the conversion functions for each unit type.

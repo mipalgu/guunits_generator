@@ -181,6 +181,8 @@ final class HeaderCreatorTests: XCTestCase {
     /// The footer of the file.
     var suffix: String {
         """
+        \(numericConversions)
+
         #ifdef __cplusplus
         }
         #endif
@@ -188,6 +190,17 @@ final class HeaderCreatorTests: XCTestCase {
         #endif  /* GUUNITS_H */
         \("")
         """
+    }
+
+    private var numericConversions: String {
+        [NumericTypes.double, NumericTypes.float].flatMap { type in
+            NumericTypes.allCases.compactMap { otherType in
+                guard type.isFloat && !otherType.isFloat else {
+                    return nil
+                }
+                return "\(otherType.rawValue) \(type.abbreviation)_to_\(otherType.abbreviation)(\(type.rawValue));"
+            }
+        }.joined(separator: "\n\n")
     }
 
     /// TypeDefs in header.

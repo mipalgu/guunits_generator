@@ -136,6 +136,8 @@ public struct HeaderCreator {
     /// The suffix which appears at the bottom of the header file.
     private var suffix: String {
         """
+        \(numericConversions)
+
         #ifdef __cplusplus
         }
         #endif
@@ -143,6 +145,17 @@ public struct HeaderCreator {
         #endif  /* GUUNITS_H */
         \("")
         """
+    }
+
+    private var numericConversions: String {
+        [NumericTypes.double, NumericTypes.float].flatMap { type in
+            NumericTypes.allCases.compactMap { otherType in
+                guard type.isFloat && !otherType.isFloat else {
+                    return nil
+                }
+                return "\(otherType.rawValue) \(type.abbreviation)_to_\(otherType.abbreviation)(\(type.rawValue));"
+            }
+        }.joined(separator: "\n\n")
     }
 
     /// Type definitions for all the unit types.

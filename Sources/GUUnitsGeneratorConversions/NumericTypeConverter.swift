@@ -130,7 +130,7 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             return self.cast(str, to: resultType)
         }
         if type.isFloat != otherType.isFloat {
-            let converted = self.convertFloat(str, from: type, currentType: currentType, to: otherType)
+            return self.convertFloat(str, from: type, currentType: currentType, to: otherType)
             // if type.isFloat {
             //     converted = self.convertSign(converted, from: type, currentType: currentType, to: otherType)
             // }
@@ -143,7 +143,6 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             //         ? converted
             //         : self.convertSign(converted, from: type, currentType: currentType, to: .int)
             // }
-            return self.cast(converted, to: resultType)
         }
         if type.isSigned == otherType.isSigned {
             return self.cast(
@@ -176,14 +175,13 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         currentType: String,
         to otherType: NumericTypes
     ) -> String {
-        if type.isFloat && !otherType.isFloat {
-            let roundString = "round(\(type != .double ? self.cast(str, to: "double") : str))"
-            let (min, max) = otherType.limits
-            return "MIN(MAX((\(roundString)), ((double) " +
-                "(\(self.sanitise(literal: min, to: .double))))), " +
-                "((double) (\(self.sanitise(literal: max, to: type)))))"
+        guard type.isFloat && !otherType.isFloat else {
+            return str
         }
-        return str
+        guard currentType != type.rawValue else {
+            return "\(type.abbreviation)_to_\(otherType.abbreviation)(\(str))"
+        }
+        return "\(type.abbreviation)_to_\(otherType.abbreviation)(((\(type.rawValue)) (\(str))))"
     }
 
     /// Method for casting signed integer values. This function clamps values within the size of the
