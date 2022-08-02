@@ -296,11 +296,11 @@ private struct LimitStruct<UnitType> where
     }
 
     var castedLowerLimit: String {
-        "((\(unitType)) (\(lowerLimit)))"
+        "\(unitType)(\(lowerLimit))"
     }
 
     var castedUpperLimit: String {
-        "((\(unitType)) (\(upperLimit)))"
+        "\(unitType)(\(upperLimit))"
     }
 
     private var otherUnitType: String {
@@ -316,10 +316,10 @@ private struct LimitStruct<UnitType> where
     }
 
     var lowerLimitAsOther: String {
-        "((\(otherUnitType)) (\(sanitisedLowerLimit)))"
+        "\(otherUnitType)(\(sanitisedLowerLimit))"
     }
     var upperLimitAsOther: String {
-        "((\(otherUnitType)) (\(sanitisedUpperLimit)))"
+        "\(otherUnitType)(\(sanitisedUpperLimit))"
     }
 
     private var otherLimits: (String, String) {
@@ -335,11 +335,11 @@ private struct LimitStruct<UnitType> where
     }
 
     var otherCastedLowerLimit: String {
-        "((\(otherUnitType)) (\(otherLowerLimit)))"
+        "\(otherUnitType)(\(otherLowerLimit))"
     }
 
     var otherCastedUpperLimit: String {
-        "((\(otherUnitType)) (\(otherUpperLimit)))"
+        "\(otherUnitType)(\(otherUpperLimit))"
     }
 
 }
@@ -382,11 +382,11 @@ private struct NumericLimitStruct<UnitType> where
     }
 
     var castedLowerLimit: String {
-        "((\(unitType)) (\(lowerLimit)))"
+        "\(unitType)(\(lowerLimit))"
     }
 
     var castedUpperLimit: String {
-        "((\(unitType)) (\(upperLimit)))"
+        "\(unitType)(\(upperLimit))"
     }
 
     private var numericUnitType: String {
@@ -402,10 +402,10 @@ private struct NumericLimitStruct<UnitType> where
     }
 
     var lowerLimitAsNumeric: String {
-        "((\(numericUnitType)) (\(sanitisedLowerLimit)))"
+        "\(numericUnitType)(\(sanitisedLowerLimit))"
     }
     var upperLimitAsNumeric: String {
-        "((\(numericUnitType)) (\(sanitisedUpperLimit)))"
+        "\(numericUnitType)(\(sanitisedUpperLimit))"
     }
 
     private var numericLimits: (String, String) {
@@ -421,19 +421,19 @@ private struct NumericLimitStruct<UnitType> where
     }
 
     var numericCastedLowerLimit: String {
-        "((\(numericUnitType)) (\(numericLowerLimit)))"
+        "\(numericUnitType)(\(numericLowerLimit))"
     }
 
     var numericCastedUpperLimit: String {
-        "((\(numericUnitType)) (\(numericUpperLimit)))"
+        "\(numericUnitType)(\(numericUpperLimit))"
     }
 
     var numericLowerLimitAsUnit: String {
-        "((\(unitType)) (\(numericLowerLimit)))"
+        "\(unitType)(\(numericLowerLimit))"
     }
 
     var numericUpperLimitAsUnit: String {
-        "((\(unitType)) (\(numericUpperLimit)))"
+        "\(unitType)(\(numericUpperLimit))"
     }
 
 }

@@ -89,7 +89,7 @@ struct TemperatureTestGenerator: TestGenerator {
                     newTests.append(
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: "1193047000", sign: sign),
-                            output: "((fahrenheit_\(otherSign.rawValue)) (INT_MAX))"
+                            output: "fahrenheit_\(otherSign.rawValue)(INT_MAX)"
                         )
                     )
                 }
@@ -115,7 +115,7 @@ struct TemperatureTestGenerator: TestGenerator {
                     newTests.append(
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: "2147483375", sign: sign),
-                            output: "((kelvin_\(otherSign.rawValue)) (INT_MAX))"
+                            output: "kelvin_\(otherSign.rawValue)(INT_MAX)"
                         )
                     )
                 }
@@ -149,7 +149,7 @@ struct TemperatureTestGenerator: TestGenerator {
                     newTests.append(
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: "3865470600", sign: sign),
-                            output: "((celsius_\(otherSign.rawValue)) (INT_MAX))"
+                            output: "celsius_\(otherSign.rawValue)(INT_MAX)"
                         )
                     )
                 }
@@ -158,7 +158,7 @@ struct TemperatureTestGenerator: TestGenerator {
                     newTests.append(
                         TestParameters(
                             input: "23",
-                            output: "((celsius_\(otherSign.rawValue)) (\(output)))"
+                            output: "celsius_\(otherSign.rawValue)(\(output))"
                         )
                     )
                 }
