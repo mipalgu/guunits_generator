@@ -66,4 +66,12 @@ final class NumericTypeConverterTests: XCTestCase {
         XCTAssertEqual(result2, "((unsigned int) (MAX(((centimetres_t) (0)), x)))")
     }
 
+    /// Test case for double to cm_f conversion.
+    func testDoubleToCMF() {
+        let result = converter.convert("x", from: .double, to: DistanceUnits.centimetres, sign: .f)
+        XCTAssertEqual(result, "((centimetres_f) (d_to_f(x)))")
+        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .f, to: .double)
+        XCTAssertEqual(result2, "((double) (x))")
+    }
+
 }

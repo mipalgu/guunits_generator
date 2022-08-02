@@ -134,6 +134,7 @@ public struct NumericTypeConverter: NumericConverterProtocol {
                 if otherType.rawValue == resultType {
                     return "d_to_f(((double) (\(str))))"
                 }
+                // Should never happen...
                 return "((\(resultType)) (d_to_f(((double) (\(str))))))"
             }
             if resultType == otherType.rawValue {
