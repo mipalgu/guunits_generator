@@ -130,10 +130,21 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             guard type == .double && otherType == .float else {
                 return self.cast(str, to: resultType)
             }
-            return "d_to_f(\(str))"
+            guard currentType == type.rawValue else {
+                if otherType.rawValue == resultType {
+                    return "d_to_f(((double) (\(str))))"
+                }
+                return "((\(resultType)) (d_to_f(((double) (\(str))))))"
+            }
+            if resultType == otherType.rawValue {
+                return "d_to_f(\(str))"
+            }
+            return "((\(resultType)) (d_to_f(\(str))))"
         }
         if type.isFloat != otherType.isFloat {
-            return self.convertFloat(str, from: type, currentType: currentType, to: otherType)
+            return self.convertFloat(
+                str, from: type, currentType: currentType, to: otherType, resultType: resultType
+            )
         }
         if type.isSigned == otherType.isSigned {
             return self.cast(
@@ -164,10 +175,11 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         _ str: String,
         from type: NumericTypes,
         currentType: String,
-        to otherType: NumericTypes
+        to otherType: NumericTypes,
+        resultType: String
     ) -> String {
         guard type.isFloat && !otherType.isFloat else {
-            return str
+            return "((\(resultType)) (\(str)))"
         }
         guard currentType != type.rawValue else {
             return "\(type.abbreviation)_to_\(otherType.abbreviation)(\(str))"

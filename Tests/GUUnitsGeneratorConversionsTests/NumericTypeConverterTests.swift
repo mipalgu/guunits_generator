@@ -20,13 +20,13 @@ final class NumericTypeConverterTests: XCTestCase {
         let result = converter.convert("x", from: .float, to: DistanceUnits.centimetres, sign: .d)
         XCTAssertEqual(result, "((centimetres_d) (x))")
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .d, to: .float)
-        XCTAssertEqual(result2, "((float) (x))")
+        XCTAssertEqual(result2, "d_to_f(((double) (x)))")
     }
 
     /// Tests that a double can be converted to a float unit.
     func testDoubleToFloat() {
         let result = converter.convert("x", from: .double, to: DistanceUnits.centimetres, sign: .f)
-        XCTAssertEqual(result, "((centimetres_f) (x))")
+        XCTAssertEqual(result, "((centimetres_f) (d_to_f(x)))")
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .f, to: .double)
         XCTAssertEqual(result2, "((double) (x))")
     }
@@ -55,7 +55,7 @@ final class NumericTypeConverterTests: XCTestCase {
         let result = converter.convert("x", from: .int, to: DistanceUnits.centimetres, sign: .d)
         XCTAssertEqual(result, "((centimetres_d) (x))")
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .d, to: .int)
-        XCTAssertEqual(result2, "((int) (((centimetres_d) (round(x)))))")
+        XCTAssertEqual(result2, "d_to_i(((double) (x)))")
     }
 
     /// Test case for unsigned to signed conversion.
