@@ -65,6 +65,8 @@ struct TemperatureTestGenerator: TestGenerator {
     /// The creator which will sanitise literals.
     let creator = TestFunctionBodyCreator<TemperatureUnits>()
 
+    // swiftlint:disable function_body_length
+
     /// Generate the test parameters for a unit to unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -200,10 +202,24 @@ struct TemperatureTestGenerator: TestGenerator {
         return newTests
     }
 
+    // swiftlint:enable function_body_length
+
+    /// Generate test parameters for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: The test parameters for test functions using this conversion.
     func testParameters(from unit: UnitType, with sign: Signs, to numeric: NumericTypes) -> [TestParameters] {
         self.defaultParameters(from: unit, with: sign, to: numeric)
     }
 
+    /// Generate test parameters for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: Test parameters which are used to create new test functions.
     func testParameters(from numeric: NumericTypes, to unit: UnitType, with sign: Signs) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }

@@ -57,6 +57,8 @@
 //  */
 // 
 
+// swiftlint:disable file_length
+
 /// Conforming types will generate test parameters for a specific unit.
 protocol TestGenerator {
 
@@ -74,12 +76,25 @@ protocol TestGenerator {
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters]
 
+    /// Generate test parameters for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: The test parameters for test functions using this conversion.
     func testParameters(from unit: UnitType, with sign: Signs, to numeric: NumericTypes) -> [TestParameters]
 
+    /// Generate test parameters for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: Test parameters which are used to create new test functions.
     func testParameters(from numeric: NumericTypes, to unit: UnitType, with sign: Signs) -> [TestParameters]
 
 }
 
+/// TestGenerator Default Implementations.
 extension TestGenerator {
 
     /// Find the default test parameters need to test the conversion methods at the edge cases of the
@@ -139,6 +154,14 @@ extension TestGenerator {
         return parameters
     }
 
+    // swiftlint:disable function_body_length
+
+    /// Find the default test parameters for a unit to numeric conversion test.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: An array of test parameters used to test the conversion function.
     func defaultParameters(
         from unit: UnitType, with sign: Signs, to numeric: NumericTypes
     ) -> [TestParameters] {
@@ -195,6 +218,12 @@ extension TestGenerator {
         return parameters + [t1, t2]
     }
 
+    /// Find the default parameters for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: An array of test parameters which are used to test the conversion function.
     func defaultParameters(
         from numeric: NumericTypes, to unit: UnitType, with sign: Signs
     ) -> [TestParameters] {
@@ -263,186 +292,243 @@ extension TestGenerator {
         return parameters + [t1, t2]
     }
 
+    // swiftlint:enable function_body_length
+
 }
 
+/// Provides helper properties for common unit conversion used in a test function.
 private struct LimitStruct<UnitType> where
     UnitType: UnitProtocol,
     UnitType: RawRepresentable,
     UnitType.RawValue == String {
 
+    /// Helper object to sanitise literals.
     let creator = TestFunctionBodyCreator<UnitType>()
 
+    /// The unit to convert from.
     let unit: UnitType
 
+    /// The sign of the unit.
     let sign: Signs
 
+    /// The unit to convert to.
     let otherUnit: UnitType
 
+    /// The sign of the unit to convert to.
     let otherSign: Signs
 
+    /// A zero literal expressed as a unit.
     var sanitisedZero: String {
         creator.sanitiseLiteral(literal: "0", sign: sign)
     }
 
+    /// A zero literal expressed as the other unit type.
     var otherSanitisedZero: String {
         creator.sanitiseLiteral(literal: "0", sign: otherSign)
     }
 
+    /// The C unit type.
     private var unitType: String {
         "\(unit.rawValue)_\(sign.rawValue)"
     }
 
+    /// The limits of the unit expressed using swift types. The tuple represents
+    /// (min, max) values.
     private var limits: (String, String) {
         sign.numericType.swiftType.limits
     }
 
+    /// The lower limit of the unit.
     private var lowerLimit: String {
         limits.0
     }
 
+    /// The upper limit of the unit.
     private var upperLimit: String {
         limits.1
     }
 
+    /// The lower limit expressed as the unit type.
     var castedLowerLimit: String {
         "\(unitType)(\(lowerLimit))"
     }
 
+    /// The upper limit expressed as the unit type.
     var castedUpperLimit: String {
         "\(unitType)(\(upperLimit))"
     }
 
+    /// The other unit C type.
     private var otherUnitType: String {
         "\(unit.rawValue)_\(otherSign.rawValue)"
     }
 
+    /// The lower limit expressed using the other sign.
     private var sanitisedLowerLimit: String {
         creator.sanitiseLiteral(literal: lowerLimit, sign: otherSign)
     }
 
+    /// The upper limit expressed using the other sign.
     private var sanitisedUpperLimit: String {
         creator.sanitiseLiteral(literal: upperLimit, sign: otherSign)
     }
 
+    /// The lower limit expressed as the other unit type.
     var lowerLimitAsOther: String {
         "\(otherUnitType)(\(sanitisedLowerLimit))"
     }
+
+    /// The upper limit expressed as the other unit type.
     var upperLimitAsOther: String {
         "\(otherUnitType)(\(sanitisedUpperLimit))"
     }
 
+    /// The other units limits.
     private var otherLimits: (String, String) {
         otherSign.numericType.swiftType.limits
     }
 
+    /// The other units lower limit.
     private var otherLowerLimit: String {
         otherLimits.0
     }
 
+    /// The other units upper limit.
     private var otherUpperLimit: String {
         otherLimits.1
     }
 
+    /// The other units lower limit casted to the other unit type.
     var otherCastedLowerLimit: String {
         "\(otherUnitType)(\(otherLowerLimit))"
     }
 
+    /// The other units upper limit casted to the other unit type.
     var otherCastedUpperLimit: String {
         "\(otherUnitType)(\(otherUpperLimit))"
     }
 
 }
 
+/// A helper struct creating common representations of variables used in a
+/// unit to numeric (or vice versa) conversion.
 private struct NumericLimitStruct<UnitType> where
     UnitType: UnitProtocol,
     UnitType: RawRepresentable,
     UnitType.RawValue == String {
 
+    /// A helper object used to sanitise literal strings.
     let creator = TestFunctionBodyCreator<UnitType>()
 
+    /// The unit used in the conversion.
     let unit: UnitType
 
+    /// The sign of the unit.
     let sign: Signs
 
+    /// The numeric type used in the conversion.
     let numeric: NumericTypes
 
+    /// The 0 literal expressed as the units sign.
     var sanitisedZero: String {
         creator.sanitiseLiteral(literal: "0", sign: sign)
     }
 
+    /// The 0 literal expressed as the numeric type.
     var numericSanitisedZero: String {
         creator.sanitiseLiteral(literal: "0", to: numeric)
     }
 
+    /// The unit C type.
     private var unitType: String {
         "\(unit.rawValue)_\(sign.rawValue)"
     }
 
+    /// The limits of the units underlying C-type.
     private var limits: (String, String) {
         sign.numericType.swiftType.limits
     }
 
+    /// The lower limit of the unit.
     private var lowerLimit: String {
         limits.0
     }
 
+    /// The upper limit of the unit.
     private var upperLimit: String {
         limits.1
     }
 
+    /// The lower limit casted to the unit type.
     var castedLowerLimit: String {
         "\(unitType)(\(lowerLimit))"
     }
 
+    /// The upper limit casted to the unit type.
     var castedUpperLimit: String {
         "\(unitType)(\(upperLimit))"
     }
 
+    /// The numeric C-equivalent swift type.
     private var numericUnitType: String {
         numeric.swiftType.rawValue
     }
 
+    /// The sanitised lower limit.
     private var sanitisedLowerLimit: String {
         creator.sanitiseLiteral(literal: lowerLimit, to: numeric)
     }
 
+    /// The sanitised upper limit.
     private var sanitisedUpperLimit: String {
         creator.sanitiseLiteral(literal: upperLimit, to: numeric)
     }
 
+    /// The lower limit casted to the numeric type.
     var lowerLimitAsNumeric: String {
         "\(numericUnitType)(\(sanitisedLowerLimit))"
     }
+
+    /// The upper limit casted to the numeric type.
     var upperLimitAsNumeric: String {
         "\(numericUnitType)(\(sanitisedUpperLimit))"
     }
 
+    /// The numeric types limits.
     private var numericLimits: (String, String) {
         numeric.swiftType.limits
     }
 
+    /// The numeric lower limit.
     private var numericLowerLimit: String {
         numericLimits.0
     }
 
+    /// The numeric upper limit.
     private var numericUpperLimit: String {
         numericLimits.1
     }
 
+    /// The numeric lower limit expressed as a numeric unit type.
     var numericCastedLowerLimit: String {
         "\(numericUnitType)(\(numericLowerLimit))"
     }
 
+    /// The numeric upper limit expressed as the swift numeric type.
     var numericCastedUpperLimit: String {
         "\(numericUnitType)(\(numericUpperLimit))"
     }
 
+    /// The numeric lower limit casted to the unit type.
     var numericLowerLimitAsUnit: String {
         "\(unitType)(\(numericLowerLimit))"
     }
 
+    /// The numeric upper limit casted to the unit type.
     var numericUpperLimitAsUnit: String {
         "\(unitType)(\(numericUpperLimit))"
     }
 
 }
+
+// swiftlint:enable file_length

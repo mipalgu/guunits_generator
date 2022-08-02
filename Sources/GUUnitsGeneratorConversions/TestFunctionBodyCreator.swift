@@ -177,6 +177,11 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         }
     }
 
+    /// Adds a negative symbol to the front of a string if that string requires it.
+    /// - Parameters:
+    ///   - literal: The string to modify.
+    ///   - isNegative: Whether to add the negative sign.
+    /// - Returns: A new string with a negative symbol out the front if required.
     private func addNegative(literal: String, isNegative: Bool = false) -> String {
         isNegative ? "-" + literal : literal
     }
@@ -206,6 +211,13 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         "XCTAssertEqual(\(body)(\(parameters.input)), \(parameters.output))"
     }
 
+    /// Template code for performing an assertion using floating point numbers. This code performs a floating
+    /// point operating and assumes the result is within some margin of error.
+    /// - Parameters:
+    ///   - body: The conversion function to test.
+    ///   - parameters: The parameters to use in the test.
+    ///   - conversion: The type of the converted output.
+    /// - Returns: The test code for asserting that the operation was successful.
     private func floatAssert(body: String, parameters: TestParameters, conversion: String) -> String {
         """
         let result = \(body)(\(parameters.input))

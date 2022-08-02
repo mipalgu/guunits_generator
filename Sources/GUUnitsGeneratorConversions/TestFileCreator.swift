@@ -57,14 +57,25 @@
 //  */
 // 
 
+/// Creates the contents for a test file. This struct generates all of the test code required
+/// to fully test a Unit category.
 struct TestFileCreator<TestGeneratorType: TestGenerator> {
 
+    /// The unit category to test.
     typealias Unit = TestGeneratorType.UnitType
 
+    /// A function helper for providing apt function names.
     private let helper = FunctionHelpers<Unit>()
 
+    /// The body creator for generating test function code.
     private let bodyCreator = TestFunctionBodyCreator<Unit>()
 
+    /// Create all of the tests for a Unit category.
+    /// - Parameters:
+    ///   - generator: A test generator for creating the test parameters for different test functions.
+    ///   - imports: Any additional imports required in the test file. XCTest, Foundation and CGUUnits
+    ///              are included by default.
+    /// - Returns: All of the test code as a string.
     func tests(generator: TestGeneratorType, imports: String) -> String {
         let head = "\(imports)\nimport Foundation\nimport XCTest"
         let unitTests: [(String, String)] = Unit.allCases.flatMap { unit in
@@ -98,6 +109,14 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         return head + "\n\n" + body + "\n"
     }
 
+    /// Create tests for a unit to unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - generator: The generator which creates the test parameters for this conversion function.
+    /// - Returns: 
     private func createTests(
         from unit: Unit,
         with sign: Signs,
@@ -110,6 +129,13 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         }
     }
 
+    /// Generates an array of test functions that test a conversion from a unit to a numeric type.
+    /// - Parameters:
+    ///   - unit: The unit to convert.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The type to convert to.
+    ///   - generator: The generator which creates the test cases.
+    /// - Returns: An array of test functions that test the conversion function.
     private func createTests(
         from unit: Unit,
         with sign: Signs,
@@ -121,6 +147,13 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         }
     }
 
+    /// Generates an array of test functions that test a conversion from a numeric to a unit type.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    ///   - generator: The generator which creates the test function body.
+    /// - Returns: The tests that test the conversion function.
     private func createTests(
         from numeric: NumericTypes,
         to unit: Unit,
@@ -132,6 +165,14 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         }
     }
 
+    /// Creates a test function for a unit to unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: The test parameters to use in the test.
+    /// - Returns: A test which uses the test parameters for the conversion function.
     private func createTestFunction(
         from unit: Unit,
         with sign: Signs,
@@ -151,6 +192,13 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         return "    func \(name)() {\n\(formattedBody)\n    }"
     }
 
+    /// Create a test function for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    ///   - parameters: The test parameters to use in the test.
+    /// - Returns: A function which tests the conversion function using the test parameters.
     private func createTestFunction(
         from unit: Unit,
         with sign: Signs,
@@ -165,6 +213,13 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
         return "    func \(name)() {\n\(formattedBody)\n    }"
     }
 
+    /// Create a test function for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    ///   - parameters: The parameters to use in the test function.
+    /// - Returns: A test which tests the conversion function by using the given parameters.
     private func createTestFunction(
         from numeric: NumericTypes,
         to unit: Unit,
