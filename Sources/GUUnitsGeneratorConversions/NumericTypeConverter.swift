@@ -127,7 +127,10 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             return self.cast(str, to: resultType)
         }
         if type.isFloat && otherType.isFloat {
-            return self.cast(str, to: resultType)
+            guard type == .double && otherType == .float else {
+                return self.cast(str, to: resultType)
+            }
+            return "d_to_f(\(str))"
         }
         if type.isFloat != otherType.isFloat {
             return self.convertFloat(str, from: type, currentType: currentType, to: otherType)

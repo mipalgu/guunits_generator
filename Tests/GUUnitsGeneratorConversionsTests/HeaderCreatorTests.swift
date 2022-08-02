@@ -195,7 +195,7 @@ final class HeaderCreatorTests: XCTestCase {
     private var numericConversions: String {
         [NumericTypes.double, NumericTypes.float].flatMap { type in
             NumericTypes.allCases.compactMap { otherType in
-                guard type.isFloat && !otherType.isFloat else {
+                guard type.isFloat && !otherType.isFloat || (type == .double && otherType == .float) else {
                     return nil
                 }
                 return "\(otherType.rawValue) \(type.abbreviation)_to_\(otherType.abbreviation)(\(type.rawValue));"

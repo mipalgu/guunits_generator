@@ -155,33 +155,41 @@ public struct CFileCreator {
         from type: NumericTypes,
         to otherType: NumericTypes
     ) -> String? {
-        guard type.isFloat && !otherType.isFloat else {
+        guard (type.isFloat && !otherType.isFloat) || (type == .double && otherType == .float) else {
             return nil
         }
         let roundLiteral = "\(str)Val"
-        let roundedString: String
-        if type == .float {
-            roundedString = "const \(type.rawValue) roundedValue = roundf(\(roundLiteral));"
-        } else {
-            roundedString = "const \(type.rawValue) roundedValue = round(\(roundLiteral));"
+        var roundedString = ""
+        if !otherType.isFloat {
+            if type == .float {
+                roundedString = "const \(type.rawValue) roundedValue = roundf(\(roundLiteral));"
+            } else {
+                roundedString = "const \(type.rawValue) roundedValue = round(\(roundLiteral));"
+            }
         }
         let nextToward = type == .float ? "nexttowardf" : "nexttoward"
         let upperLimit = self.sanitise(literal: otherType.limits.1, to: type)
         let lowerLimit = self.sanitise(literal: otherType.limits.0, to: type)
-        return """
-        \(otherType.rawValue) \(type.abbreviation)_to_\(otherType.abbreviation)(\(type.rawValue) \(str)Val) {
-            \(roundedString)
-            const \(type.rawValue) maxValue = \(nextToward)(((\(type.rawValue)) (\(upperLimit))), 0.0);
+        let firstLine = "\(otherType.rawValue) \(type.abbreviation)_to_" +
+            "\(otherType.abbreviation)(\(type.rawValue) \(str)Val) {"
+        let line2 = "const \(type.rawValue) maxValue = " +
+            "\(nextToward)(((\(type.rawValue)) (\(upperLimit))), 0.0);"
+        let nextLines = !roundedString.isEmpty ? roundedString + "\n" + line2 : line2
+        let trailer = """
             const \(type.rawValue) minValue = \(nextToward)(((\(type.rawValue)) (\(lowerLimit))), 0.0);
-            if (roundedValue > maxValue) {
+            if (\(roundedString.isEmpty ? roundLiteral : "roundedValue") > maxValue) {
                 return \(otherType.limits.1);
-            } else if (roundedValue < minValue) {
+            } else if (\(roundedString.isEmpty ? roundLiteral : "roundedValue") < minValue) {
                 return \(otherType.limits.0);
             } else {
-                return ((\(otherType.rawValue)) (roundedValue));
+                return ((\(otherType.rawValue)) (\(roundedString.isEmpty ? roundLiteral : "roundedValue")));
             }
         }
         """
+        return firstLine +
+            nextLines.components(separatedBy: .newlines).reduce(into: "") { $0 = $0 + "\n    " + $1 } +
+            "\n" +
+            trailer
     }
 
     private func sanitise(literal: String, to type: NumericTypes) -> String {
