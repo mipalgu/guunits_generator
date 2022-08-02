@@ -144,13 +144,48 @@ public struct CFileCreator {
     var suffix: String {
         [NumericTypes.double, NumericTypes.float].flatMap { type in
             NumericTypes.allCases.compactMap { otherType in
-                defineFloatToIntegralConversion(type.rawValue, from: type, to: otherType)
+                defineFloatConversion(type.rawValue, from: type, to: otherType)
             }
         }
         .joined(separator: "\n\n")
     }
 
-    private func defineFloatToIntegralConversion(
+    /// Default init.
+    public init() {}
+
+    /// Generate all of the guunits source code.
+    /// - Parameters:
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
+    /// - Returns: A string of all C functions for the supported guunits types.
+    public func generate(generators: [AnyGenerator]) -> String {
+        let content = self.createContent(generators: generators)
+        return self.prefix + "\n\n" + content + "\n\n" + self.suffix + "\n"
+    }
+
+    /// Create the conversion functions for each unit type.
+    /// - Parameters:
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
+    /// - Returns: A string containing all of the conversion functions.
+    private func createContent(generators: [AnyGenerator]) -> String {
+        let implementations: [String] = generators.map {
+            guard let imp = $0.implementations else {
+                fatalError("Failed to get implementations")
+            }
+            return imp
+        }
+        return implementations.joined(separator: "\n\n")
+    }
+
+    /// Create the numeric conversion functions from a floating point type to another numeric type.
+    /// - Parameters:
+    ///   - str: The value to convert.
+    ///   - type: The type of the `str` value. This type must be a double or float.
+    ///   - otherType: The type to convert to. This type is usually an integral type, however this type
+    ///                may also be a float when `type` is a double.
+    /// - Returns: The function definition and implementation that performs the conversion.
+    private func defineFloatConversion(
         _ str: String,
         from type: NumericTypes,
         to otherType: NumericTypes
@@ -192,6 +227,12 @@ public struct CFileCreator {
             trailer
     }
 
+    /// Convert literals into a value suitable for a specific numeric type. For example converting 0 to 0.0
+    /// for a double literal.
+    /// - Parameters:
+    ///   - literal: The literal to sanitise.
+    ///   - type: The type to transform it into.
+    /// - Returns: The sanitised literal.
     private func sanitise(literal: String, to type: NumericTypes) -> String {
         guard
             nil == literal.first(where: {
@@ -225,34 +266,6 @@ public struct CFileCreator {
             }
             return "round((double) (\(literal)))"
         }
-    }
-
-    /// Default init.
-    public init() {}
-
-    /// Generate all of the guunits source code.
-    /// - Parameters:
-    ///   - generators: The generators that creates the function definitions for their
-    ///                 respective units.
-    /// - Returns: A string of all C functions for the supported guunits types.
-    public func generate(generators: [AnyGenerator]) -> String {
-        let content = self.createContent(generators: generators)
-        return self.prefix + "\n\n" + content + "\n\n" + self.suffix + "\n"
-    }
-
-    /// Create the conversion functions for each unit type.
-    /// - Parameters:
-    ///   - generators: The generators that creates the function definitions for their
-    ///                 respective units.
-    /// - Returns: A string containing all of the conversion functions.
-    private func createContent(generators: [AnyGenerator]) -> String {
-        let implementations: [String] = generators.map {
-            guard let imp = $0.implementations else {
-                fatalError("Failed to get implementations")
-            }
-            return imp
-        }
-        return implementations.joined(separator: "\n\n")
     }
 
 }

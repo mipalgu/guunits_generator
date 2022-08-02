@@ -56,12 +56,22 @@
 *
 */
 
+/// Create test cases for the C temperature unit.
 struct TemperatureTestGenerator: TestGenerator {
 
+    /// The unit type it temperature.
     typealias UnitType = TemperatureUnits
 
+    /// The creator which will sanitise literals.
     let creator = TestFunctionBodyCreator<TemperatureUnits>()
 
+    /// Generate the test parameters for a unit to unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: the sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: An array of test parameters suitable for testing this conversion function.
     func testParameters(
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {

@@ -114,6 +114,7 @@ public enum SwiftNumericTypes: String, Hashable, CaseIterable {
         )
     }
 
+    /// The limits of each swift type as (min, max).
     var limits: (String, String) {
         switch self {
         case .Double, .Float:

@@ -134,18 +134,6 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         }
         if type.isFloat != otherType.isFloat {
             return self.convertFloat(str, from: type, currentType: currentType, to: otherType)
-            // if type.isFloat {
-            //     converted = self.convertSign(converted, from: type, currentType: currentType, to: otherType)
-            // }
-            // if type.isFloat {
-            //     converted = otherType.isSigned
-            //         ? converted
-            //         : self.convertSign(converted, from: .int, currentType: currentType, to: otherType)
-            // } else {
-            //     converted = type.isSigned
-            //         ? converted
-            //         : self.convertSign(converted, from: type, currentType: currentType, to: .int)
-            // }
         }
         if type.isSigned == otherType.isSigned {
             return self.cast(
@@ -232,6 +220,12 @@ public struct NumericTypeConverter: NumericConverterProtocol {
         return "MIN(\(self.cast(max, to: currentType)), MAX(\(self.cast(min, to: currentType)), \(str)))"
     }
 
+    /// Convert a literal into a form that is suitable for a numeric type. For example converting 0
+    /// into 0.0 for a double type.
+    /// - Parameters:
+    ///   - literal: The literal to convert.
+    ///   - type: The type to convert it into.
+    /// - Returns: The sanitised literal.
     private func sanitise(literal: String, to type: NumericTypes) -> String {
         guard
             nil == literal.first(where: {

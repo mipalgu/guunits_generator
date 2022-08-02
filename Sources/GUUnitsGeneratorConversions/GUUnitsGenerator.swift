@@ -58,12 +58,19 @@
 
 import Foundation
 
+/// Create the source files the C and swift targets of guunits.
 public struct GUUnitsGenerator {
 
+    /// The manager that performs the writing.
     let fileManager = FileManager()
 
+    /// Default init.
     public init() {}
 
+    // swiftlint:disable function_body_length
+
+    /// Create all of the C source files at a specific path.
+    /// - Parameter path: The path to create files in.
     public func generateCFiles(in path: URL) throws {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
@@ -125,13 +132,14 @@ public struct GUUnitsGenerator {
             ]
         )
         .data(using: .utf8)
-        // if fileManager.fileExists(atPath: cFile.absoluteString) {
-        //     try fileManager.removeItem(atPath: cFile.absoluteString)
-        // }
         fileManager.createFile(atPath: cFile.path, contents: cContents)
         print("Done!")
     }
 
+    // swiftlint:enable function_body_length
+
+    /// Create the C Test files at a specific location.
+    /// - Parameter path: The path to the folder that will contain the test files.
     func generateCTests(in path: URL) {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
@@ -145,6 +153,8 @@ public struct GUUnitsGenerator {
         )
     }
 
+    /// Generate the swift source files for guunits.
+    /// - Parameter path: The path to the directory containing the new files.
     public func generateSwiftFiles(in path: URL) {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
@@ -174,6 +184,11 @@ public struct GUUnitsGenerator {
         print("Done!")
     }
 
+    /// Write a Swift source file to a location.
+    /// - Parameters:
+    ///   - path: The URL of the source file.
+    ///   - name: The name of the file.
+    ///   - contents: The contents of the file.
     private func writeFile(at path: URL, with name: String, and contents: String) {
         fileManager.createFile(
             atPath: path.appendingPathComponent("\(name).swift", isDirectory: false).path,
