@@ -98,6 +98,17 @@ final class TemperatureTestGeneratorTests: XCTestCase {
         }
     }
 
+    func testCelsiusTToCelsiusU() {
+        let result = generator.testParameters(from: .celsius, with: .t, to: .celsius, with: .u)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "0"),
+            TestParameters(input: "celsius_t(CInt.max)", output: "celsius_u(CInt.max)"),
+            TestParameters(input: "celsius_t(CInt.min)", output: "celsius_u(CUnsignedInt.min)"),
+            TestParameters(input: "5", output: "5")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
     private func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool {
         var success = true
         result.forEach {
