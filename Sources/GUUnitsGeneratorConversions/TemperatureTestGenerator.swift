@@ -120,6 +120,40 @@ struct TemperatureTestGenerator: TestGenerator {
                         output: creator.sanitiseLiteral(literal: "273.15", sign: otherSign)
                     )
                 )
+                if sign == .t {
+                    newTests += [
+                        TestParameters(
+                            input: "-272", output: creator.sanitiseLiteral(literal: "1", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: "1", output: creator.sanitiseLiteral(literal: "274", sign: otherSign)
+                        )
+                    ]
+                    if otherSign == .t {
+                        newTests.append(
+                            TestParameters(input: "CInt.max", output: "kelvin_t(CInt.max)")
+                        )
+                    } else {
+                        newTests.append(
+                            TestParameters(
+                                input: "CInt.max",
+                                output: "kelvin_\(otherSign.rawValue)(CInt.max) + 273"
+                            )
+                        )
+                    }
+                    if otherSign == .u {
+                        newTests.append(
+                            TestParameters(input: "CInt.min", output: "kelvin_u(CUnsignedInt.min)")
+                        )
+                    } else {
+                        newTests.append(
+                            TestParameters(
+                                input: "CInt.min",
+                                output: "kelvin_\(otherSign.rawValue)(CInt.min + 273)"
+                            )
+                        )
+                    }
+                }
                 if (sign == .t || sign == .f || sign == .d) && otherSign == .u {
                     newTests.append(
                         TestParameters(input: "-300", output: "0")
