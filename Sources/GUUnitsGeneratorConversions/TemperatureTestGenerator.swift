@@ -77,7 +77,7 @@ struct TemperatureTestGenerator: TestGenerator {
     func testParameters(
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {
-        guard unit != otherUnit && sign != otherSign else {
+        guard (unit != otherUnit) || (sign != otherSign) else {
             return []
         }
         var newTests: [TestParameters] = []
@@ -153,10 +153,6 @@ struct TemperatureTestGenerator: TestGenerator {
                     TestParameters(
                         input: creator.sanitiseLiteral(literal: "5", sign: sign),
                         output: creator.sanitiseLiteral(literal: "5", sign: otherSign)
-                    ),
-                    TestParameters(
-                        input: creator.sanitiseLiteral(literal: "0", sign: sign),
-                        output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
                     )
                 ]
             }

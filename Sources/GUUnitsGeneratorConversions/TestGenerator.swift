@@ -108,7 +108,9 @@ extension TestGenerator {
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {
         let limits = LimitStruct(unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign)
-        var parameters: [TestParameters] = []
+        var parameters: [TestParameters] = [
+            TestParameters(input: limits.sanitisedZero, output: limits.otherSanitisedZero)
+        ]
         guard sign != otherSign else {
             return parameters
         }

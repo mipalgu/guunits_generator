@@ -10,8 +10,8 @@ final class TemperatureTestGeneratorTests: XCTestCase {
         [Signs.f, Signs.d].forEach {
             let result = generator.testParameters(from: .celsius, with: .t, to: .celsius, with: $0)
             let expected: Set<TestParameters> = [
-                TestParameters(input: "celsius_t(CInt.max)", output: "\($0.numericType.swiftType)(CInt.max)"),
-                TestParameters(input: "celsius_t(CInt.min)", output: "\($0.numericType.swiftType)(CInt.min)"),
+                TestParameters(input: "celsius_t(CInt.max)", output: "celsius_\($0.rawValue)(CInt.max)"),
+                TestParameters(input: "celsius_t(CInt.min)", output: "celsius_\($0.rawValue)(CInt.min)"),
                 TestParameters(input: "0", output: "0.0"),
                 TestParameters(input: "5", output: "5.0")
             ]
