@@ -175,15 +175,12 @@ extension TestGenerator {
                 output: limits.creator.sanitiseLiteral(literal: "5", to: numeric)
             )
         ]
-        guard sign.numericType != numeric else {
-            return parameters
-        }
         let t1: TestParameters
         let t2: TestParameters
         switch sign {
         case .t:
             switch numeric {
-            case .int8, .int16, .int32, .int, .uint8, .uint16, .uint32, .uint64, .uint:
+            case .int8, .int16, .uint8, .uint16, .uint32, .uint64, .uint:
                 t1 = TestParameters(
                     input: limits.castedLowerLimit, output: limits.numericCastedLowerLimit
                 )
@@ -191,7 +188,7 @@ extension TestGenerator {
                 t1 = TestParameters(input: limits.castedLowerLimit, output: limits.lowerLimitAsNumeric)
             }
             switch numeric {
-            case .int8, .int16, .int32, .int, .uint8, .uint16:
+            case .int8, .int16, .uint8, .uint16:
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.numericCastedUpperLimit)
             default:
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.upperLimitAsNumeric)
