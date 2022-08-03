@@ -99,6 +99,24 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         case (.fahrenheit, .kelvin):
             return fahrenheitToKelvin(valueSign: sign, otherSign: otherSign)
         default:
+            guard !sign.isFloatingPoint else {
+                guard otherSign.isFloatingPoint else {
+                    return "    return ((\(otherUnit.rawValue)_\(otherSign.rawValue)) " +
+                        "(\(sign.numericType.abbreviation)_to_" +
+                        "\(otherSign.numericType.abbreviation)" +
+                        "((\(sign.numericType.rawValue)) (\(unit.rawValue)))));"
+                }
+                guard otherSign != .d else {
+                    return "    return ((\(otherUnit.rawValue)_\(otherSign.rawValue)) (\(unit.rawValue)));"
+                }
+                guard sign != .f else {
+                    return "    return ((\(otherUnit.rawValue)_\(otherSign.rawValue)) (\(unit.rawValue)));"
+                }
+                return "    return ((\(otherUnit.rawValue)_\(otherSign.rawValue)) " +
+                        "(\(sign.numericType.abbreviation)_to_" +
+                        "\(otherSign.numericType.abbreviation)" +
+                        "((\(sign.numericType.rawValue)) (\(unit.rawValue)))));"
+            }
             let conversion = signConverter.convert(
                 unit.rawValue, otherUnit: otherUnit, from: sign, to: otherSign
             )
