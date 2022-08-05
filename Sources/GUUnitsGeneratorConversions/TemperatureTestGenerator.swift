@@ -219,7 +219,13 @@ struct TemperatureTestGenerator: TestGenerator {
             case .kelvin:
                 break
             default:
-                break
+                newTests += self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
+                newTests += [
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "5", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "5", sign: otherSign)
+                    )
+                ]
             }
         case .kelvin:
             switch otherUnit {
@@ -230,6 +236,14 @@ struct TemperatureTestGenerator: TestGenerator {
                         output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
                     )
                 )
+                if otherSign != .u {
+                    newTests.append(
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-273.15", sign: otherSign)
+                        )
+                    )
+                }
             case .fahrenheit:
                 newTests.append(
                     TestParameters(
@@ -238,7 +252,13 @@ struct TemperatureTestGenerator: TestGenerator {
                     )
                 )
             default:
-                break
+                newTests += self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
+                newTests += [
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "5", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "5", sign: otherSign)
+                    )
+                ]
             }
         }
         return newTests

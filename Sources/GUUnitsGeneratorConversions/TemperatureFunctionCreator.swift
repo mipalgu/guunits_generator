@@ -181,9 +181,16 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             """
         }
         if valueSign == .u && otherSign == .t && operation == "-" {
-            let signConversion = signConverter.convert(value.rawValue, otherUnit: value, from: .u, to: .t)
-            let conversion = "\(signConversion) \(operation) 273"
-            return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
+            let signConversion = signConverter.convert(
+                "\(value.rawValue) - 273", otherUnit: value, from: .u, to: .t
+            )
+            let lowerLimit = valueSign.numericType.limits.0
+            return """
+                if (\(value) < (\(lowerLimit) + 273)) {
+                    return (((\(other.rawValue)_\(otherSign.rawValue)) (\(value))) - 273);
+                }
+                return ((\(other.rawValue)_\(otherSign.rawValue)) (\(signConversion)));
+            """
         }
         if valueSign == .t && otherSign == .u && operation == "+" {
             let lowerLimit = Signs.u.numericType.limits.0
