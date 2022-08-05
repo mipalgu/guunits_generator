@@ -163,12 +163,40 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         guard valueSign != otherSign else {
             let literal = kelvinCelsiusConvertionLiteral(sign: valueSign)
             let conversion = "\(value.rawValue) \(operation) \(literal)"
-            return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
+            guard operation == "-" else {
+                let maxLimit = valueSign.numericType.limits.1
+                return """
+                    if (\(value) > (\(maxLimit) - \(literal))) {
+                        return ((\(other.rawValue)_\(otherSign.rawValue)) (\(maxLimit)));
+                    }
+                    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));
+                """
+            }
+            let minLimit = valueSign.numericType.limits.0
+            return """
+                if (\(value) < (\(minLimit) + \(literal))) {
+                    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(minLimit)));
+                }
+                return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));
+            """
         }
         if valueSign == .u && otherSign == .t && operation == "-" {
             let signConversion = signConverter.convert(value.rawValue, otherUnit: value, from: .u, to: .t)
             let conversion = "\(signConversion) \(operation) 273"
             return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
+        }
+        if valueSign == .t && otherSign == .u && operation == "+" {
+            let signConversion = signConverter.convert(value.rawValue, otherUnit: value, from: .t, to: .u)
+            let conversion = "\(signConversion) \(operation) 273"
+            let signConversion2 = signConverter.convert(
+                "\(value.rawValue) + 273", otherUnit: value, from: .t, to: .u
+            )
+            return """
+                if (\(value) > 0) {
+                    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));
+                }
+                return ((\(other.rawValue)_\(otherSign.rawValue)) (\(signConversion2)));
+            """
         }
         guard valueSign.isFloatingPoint || otherSign.isFloatingPoint else {
             let conversion = "\(value.rawValue) \(operation) 273"
