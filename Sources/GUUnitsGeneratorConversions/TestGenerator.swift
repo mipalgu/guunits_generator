@@ -97,6 +97,8 @@ protocol TestGenerator {
 /// TestGenerator Default Implementations.
 extension TestGenerator {
 
+    // swiftlint:disable function_body_length
+
     /// Find the default test parameters need to test the conversion methods at the edge cases of the
     /// converting type. This function only tests a conversion between the same unit type.
     /// - Parameters:
@@ -155,8 +157,6 @@ extension TestGenerator {
         }
         return parameters
     }
-
-    // swiftlint:disable function_body_length
 
     /// Find the default test parameters for a unit to numeric conversion test.
     /// - Parameters:
