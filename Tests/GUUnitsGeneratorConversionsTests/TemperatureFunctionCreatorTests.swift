@@ -70,13 +70,23 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToKelvinInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .t)
-        let expected = "    return ((kelvin_t) (celsius + 273));"
+        let expected = """
+            if (celsius > (INT_MAX - 273)) {
+                return ((kelvin_t) (INT_MAX));
+            }
+            return ((kelvin_t) (celsius + 273));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testCelsiusToKelvinIntegerToUnsigned() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .u)
-        let expected = "    return ((kelvin_u) ((celsius + 273) < 0 ? 0 : celsius + 273));"
+        let expected = """
+            if (celsius > 0) {
+                return (((kelvin_u) (celsius)) + 273);
+            }
+            return ((kelvin_u) ((celsius + 273) < 0 ? 0 : (celsius + 273)));
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -94,7 +104,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToKelvinFloat() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .f)
-        let expected = "    return ((kelvin_f) (celsius + 273.15f));"
+        let expected = """
+            if (celsius > (FLT_MAX - 273.15f)) {
+                return ((kelvin_f) (FLT_MAX));
+            }
+            return ((kelvin_f) (celsius + 273.15f));
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -120,13 +135,23 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToKelvinDouble() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .d, otherSign: .d)
-        let expected = "    return ((kelvin_d) (celsius + 273.15));"
+        let expected = """
+            if (celsius > (DBL_MAX - 273.15)) {
+                return ((kelvin_d) (DBL_MAX));
+            }
+            return ((kelvin_d) (celsius + 273.15));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testCelsiusToKelvinUnsigned() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .u, otherSign: .u)
-        let expected = "    return ((kelvin_u) (celsius + 273));"
+        let expected = """
+            if (celsius > (UINT_MAX - 273)) {
+                return ((kelvin_u) (UINT_MAX));
+            }
+            return ((kelvin_u) (celsius + 273));
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -141,7 +166,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToCelsiusInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .t)
-        let expected = "    return ((celsius_t) (kelvin - 273));"
+        let expected = """
+            if (kelvin < (INT_MIN + 273)) {
+                return ((celsius_t) (INT_MIN));
+            }
+            return ((celsius_t) (kelvin - 273));
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -165,7 +195,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToCelsiusFloat() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .f)
-        let expected = "    return ((celsius_f) (kelvin - 273.15f));"
+        let expected = """
+            if (kelvin < (-FLT_MAX + 273.15f)) {
+                return ((celsius_f) (-FLT_MAX));
+            }
+            return ((celsius_f) (kelvin - 273.15f));
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -191,13 +226,23 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToCelsiusDouble() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .d, otherSign: .d)
-        let expected = "    return ((celsius_d) (kelvin - 273.15));"
+        let expected = """
+            if (kelvin < (-DBL_MAX + 273.15)) {
+                return ((celsius_d) (-DBL_MAX));
+            }
+            return ((celsius_d) (kelvin - 273.15));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testKelvinToCelsiusUnsigned() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .u, otherSign: .u)
-        let expected = "    return ((celsius_u) (kelvin - 273));"
+        let expected = """
+            if (kelvin < (0 + 273)) {
+                return ((celsius_u) (0));
+            }
+            return ((celsius_u) (kelvin - 273));
+        """
         XCTAssertEqual(result, expected)
     }
 
