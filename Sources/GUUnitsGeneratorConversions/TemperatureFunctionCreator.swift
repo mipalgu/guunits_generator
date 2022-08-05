@@ -186,16 +186,13 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));"
         }
         if valueSign == .t && otherSign == .u && operation == "+" {
-            let signConversion = signConverter.convert(value.rawValue, otherUnit: value, from: .t, to: .u)
-            let conversion = "\(signConversion) \(operation) 273"
-            let signConversion2 = signConverter.convert(
-                "\(value.rawValue) + 273", otherUnit: value, from: .t, to: .u
-            )
+            let lowerLimit = Signs.u.numericType.limits.0
+            let conversion = "(\(value) + 273) < \(lowerLimit) ? \(lowerLimit) : (\(value) + 273)"
             return """
                 if (\(value) > 0) {
-                    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));
+                    return (((\(other.rawValue)_\(otherSign.rawValue)) (\(value))) + 273);
                 }
-                return ((\(other.rawValue)_\(otherSign.rawValue)) (\(signConversion2)));
+                return ((\(other.rawValue)_\(otherSign.rawValue)) (\(conversion)));
             """
         }
         guard valueSign.isFloatingPoint || otherSign.isFloatingPoint else {
