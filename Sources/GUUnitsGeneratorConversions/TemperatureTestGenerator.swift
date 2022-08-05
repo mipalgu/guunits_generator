@@ -155,7 +155,7 @@ struct TemperatureTestGenerator: TestGenerator {
                         )
                     }
                 }
-                if (sign == .u && otherSign == .u) {
+                if sign == .u && otherSign == .u {
                     newTests += [
                         TestParameters(input: "1", output: "274"),
                         TestParameters(input: "CUnsignedInt.max", output: "kelvin_u(CUnsignedInt.max)"),
