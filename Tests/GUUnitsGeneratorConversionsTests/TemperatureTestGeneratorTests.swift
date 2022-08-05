@@ -1,10 +1,14 @@
-@testable import GUUnitsGeneratorConversions
 import Foundation
+@testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for TemperatureTestGenerator.
 final class TemperatureTestGeneratorTests: XCTestCase {
 
+    /// The generator to test.
     let generator = TemperatureTestGenerator()
+
+    // swiftlint:disable missing_docs
 
     func testCelsiusTToCelsiusFloatUnitTypes() {
         [Signs.f, Signs.d].forEach {
@@ -124,6 +128,13 @@ final class TemperatureTestGeneratorTests: XCTestCase {
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
 
+    // swiftlint:enable missing_docs
+
+    /// Tests that an array of TestParameters contains the same elements as a set of TestParameters.
+    /// - Parameters:
+    ///   - result: The array to test.
+    ///   - expected: The set to compare result against.
+    /// - Returns: Whether result contains the same members as expected.
     private func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool {
         var success = true
         result.forEach {
