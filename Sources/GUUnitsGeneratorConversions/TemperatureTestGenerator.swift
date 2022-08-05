@@ -66,6 +66,7 @@ struct TemperatureTestGenerator: TestGenerator {
     let creator = TestFunctionBodyCreator<TemperatureUnits>()
 
     // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
 
     /// Generate the test parameters for a unit to unit conversion.
     /// - Parameters:
@@ -265,6 +266,7 @@ struct TemperatureTestGenerator: TestGenerator {
     }
 
     // swiftlint:enable function_body_length
+    // swiftlint:enable cyclomatic_complexity
 
     /// Generate test parameters for a unit to numeric conversion.
     /// - Parameters:
