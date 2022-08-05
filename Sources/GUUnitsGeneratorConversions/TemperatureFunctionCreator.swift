@@ -145,6 +145,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
     }
 
+    // swiftlint:disable function_body_length
+
     /// Convert celsius to Kelvin or Kelvin to celsius.
     /// - Parameters:
     ///   - value: The unit to convert from.
@@ -221,6 +223,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
         return "    return ((\(other.rawValue)_\(otherSign.rawValue)) (\(roundedString)));"
     }
+
+    // swiftlint:enable function_body_length
 
     /// Convert fahrenheit to celsius.
     /// - Parameters:
