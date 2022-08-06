@@ -171,9 +171,17 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         case .double, .float:
             return isNegative ? "-" + literal : literal
         case .uint8, .uint16, .uint32, .uint64, .uint:
-            return isNegative ? "0" : "\(components[0])"
+            guard let doubleLiteral = Double(literal)?.rounded() else {
+                return isNegative ? "0" : "\(components[0])"
+            }
+            let intLiteral = UInt(doubleLiteral)
+            return isNegative ? "0" : "\(intLiteral)"
         default:
-            return isNegative ? "-" + "\(components[0])" : "\(components[0])"
+            guard let doubleLiteral = Double(literal)?.rounded() else {
+                return isNegative ? "-" + "\(components[0])" : "\(components[0])"
+            }
+            let intLiteral = UInt(doubleLiteral)
+            return isNegative ? "-" + "\(intLiteral)" : "\(intLiteral)"
         }
     }
 

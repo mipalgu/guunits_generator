@@ -155,4 +155,20 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test sanitise literal performs round correctly.
+    func testSanitiseLiteralRounding() {
+        let result = creator.sanitiseLiteral(literal: "-23.75", sign: .t)
+        XCTAssertEqual(result, "-24")
+        let result2 = creator.sanitiseLiteral(literal: "23.75", sign: .t)
+        XCTAssertEqual(result2, "24")
+        let result3 = creator.sanitiseLiteral(literal: "23.25", sign: .u)
+        XCTAssertEqual(result3, "23")
+        let result4 = creator.sanitiseLiteral(literal: "23.25", sign: .t)
+        XCTAssertEqual(result4, "23")
+        let result5 = creator.sanitiseLiteral(literal: "23.75", sign: .u)
+        XCTAssertEqual(result5, "24")
+        let result6 = creator.sanitiseLiteral(literal: "-23.25", sign: .t)
+        XCTAssertEqual(result6, "-23")
+    }
+
 }
