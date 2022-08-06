@@ -82,10 +82,13 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testCelsiusToKelvinIntegerToUnsigned() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .u)
         let expected = """
-            if (celsius > 0) {
-                return (((kelvin_u) (celsius)) + 273);
+            if (celsius < -273) {
+                return ((kelvin_u) (0));
             }
-            return ((kelvin_u) ((celsius + 273) < 0 ? 0 : (celsius + 273)));
+            if (celsius < 0) {
+                return ((kelvin_u) (celsius + 273));
+            }
+            return (((kelvin_u) (celsius)) + 273);
         """
         XCTAssertEqual(result, expected)
     }
@@ -195,7 +198,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToCelsiusIntegerToUnsigned() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .u)
-        let expected = "    return ((celsius_u) ((kelvin - 273) < 0 ? 0 : kelvin - 273));"
+        let expected = """
+            if (kelvin < 273) {
+                return ((celsius_u) (0));
+            }
+            return ((celsius_u) (kelvin - 273));
+        """
         XCTAssertEqual(result, expected)
     }
 
