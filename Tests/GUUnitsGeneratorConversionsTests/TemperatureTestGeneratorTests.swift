@@ -111,21 +111,6 @@ final class TemperatureTestGeneratorTests: XCTestCase {
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
 
-    func testCelsiusTToKelvinU() {
-        let result = generator.testParameters(from: .celsius, with: .t, to: .kelvin, with: .u)
-        let expected: Set<TestParameters> = [
-            TestParameters(input: "0", output: "273"),
-            TestParameters(input: "1", output: "274"),
-            TestParameters(input: "-273", output: "0"),
-            TestParameters(input: "-272", output: "1"),
-            TestParameters(input: "CInt.min", output: "kelvin_u(CUnsignedInt.min)"),
-            TestParameters(input: "CInt.max", output: "kelvin_u(CInt.max) + 273"),
-            TestParameters(input: "5", output: "278"),
-            TestParameters(input: "-300", output: "0")
-        ]
-        XCTAssertTrue(testSet(result: result, expected: expected))
-    }
-
     func testCelsiusUToCelsiusFloatUnitTypes() {
         [Signs.f, Signs.d].forEach {
             let result = generator.testParameters(from: .celsius, with: .u, to: .celsius, with: $0)
@@ -261,6 +246,102 @@ final class TemperatureTestGeneratorTests: XCTestCase {
             TestParameters(input: "CUnsignedInt.min", output: "kelvin_u(CUnsignedInt.min + 273)"),
             TestParameters(input: "CUnsignedInt.max", output: "kelvin_u(CUnsignedInt.max)"),
             TestParameters(input: "5", output: "278")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusTToKelvinU() {
+        let result = generator.testParameters(from: .celsius, with: .t, to: .kelvin, with: .u)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273"),
+            TestParameters(input: "1", output: "274"),
+            TestParameters(input: "-273", output: "0"),
+            TestParameters(input: "-272", output: "1"),
+            TestParameters(input: "CInt.min", output: "kelvin_u(CUnsignedInt.min)"),
+            TestParameters(input: "CInt.max", output: "kelvin_u(CInt.max) + 273"),
+            TestParameters(input: "5", output: "278"),
+            TestParameters(input: "-300", output: "0")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusUToKelvinT() {
+        let result = generator.testParameters(from: .celsius, with: .u, to: .kelvin, with: .t)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273"),
+            TestParameters(input: "1", output: "274"),
+            TestParameters(input: "CUnsignedInt.min", output: "kelvin_t(CUnsignedInt.min) + 273"),
+            TestParameters(input: "CUnsignedInt.max", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "5", output: "278")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusTToKelvinT() {
+        let result = generator.testParameters(from: .celsius, with: .t, to: .kelvin, with: .t)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273"),
+            TestParameters(input: "1", output: "274"),
+            TestParameters(input: "-273", output: "0"),
+            TestParameters(input: "-272", output: "1"),
+            TestParameters(input: "CInt.min", output: "kelvin_t(CInt.min) + 273"),
+            TestParameters(input: "CInt.max", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "5", output: "278"),
+            TestParameters(input: "-300", output: "-27")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusUToKelvinF() {
+        let result = generator.testParameters(from: .celsius, with: .u, to: .kelvin, with: .f)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273.15"),
+            TestParameters(input: "1", output: "274.15"),
+            TestParameters(input: "CUnsignedInt.min", output: "kelvin_f(CUnsignedInt.min) + 273.15"),
+            TestParameters(input: "CUnsignedInt.max", output: "kelvin_f(CUnsignedInt.max) + 273.15"),
+            TestParameters(input: "5", output: "278.15")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusTToKelvinF() {
+        let result = generator.testParameters(from: .celsius, with: .t, to: .kelvin, with: .f)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273.15"),
+            TestParameters(input: "1", output: "274.15"),
+            TestParameters(input: "-273", output: "0.15"),
+            TestParameters(input: "-272", output: "1.15"),
+            TestParameters(input: "CInt.min", output: "kelvin_f(CInt.min) + 273.15"),
+            TestParameters(input: "CInt.max", output: "kelvin_f(CInt.max) + 273.15"),
+            TestParameters(input: "5", output: "278.15"),
+            TestParameters(input: "-300", output: "-26.85")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusUToKelvinD() {
+        let result = generator.testParameters(from: .celsius, with: .u, to: .kelvin, with: .d)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273.15"),
+            TestParameters(input: "1", output: "274.15"),
+            TestParameters(input: "CUnsignedInt.min", output: "kelvin_d(CUnsignedInt.min) + 273.15"),
+            TestParameters(input: "CUnsignedInt.max", output: "kelvin_d(CUnsignedInt.max) + 273.15"),
+            TestParameters(input: "5", output: "278.15")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusTToKelvinD() {
+        let result = generator.testParameters(from: .celsius, with: .t, to: .kelvin, with: .d)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0", output: "273.15"),
+            TestParameters(input: "1", output: "274.15"),
+            TestParameters(input: "-273", output: "0.15"),
+            TestParameters(input: "-272", output: "1.15"),
+            TestParameters(input: "CInt.min", output: "kelvin_d(CInt.min) + 273.15"),
+            TestParameters(input: "CInt.max", output: "kelvin_d(CInt.max) + 273.15"),
+            TestParameters(input: "5", output: "278.15"),
+            TestParameters(input: "-300", output: "-26.85")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
