@@ -57,10 +57,13 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for Kelvin to celsius conversions.
 final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestable, TestConversionTestable {
 
+    /// The generator under test.
     let generator = TemperatureTestGenerator()
 
+    /// The conversions to test.
     var conversions: [ConversionTest<TemperatureUnits>] {
         [
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .t, parameters: [
@@ -160,12 +163,19 @@ final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestabl
         ]
     }
 
+    /// Perform the tests.
     func testConversions() {
         conversions.forEach {
             self.doTest(conversion: $0)
         }
     }
 
+    /// Create default test parameters for a conversion from Kelvin to Celsius.
+    /// - Parameters:
+    ///   - sign: The sign of the kelvin parameter.
+    ///   - otherSign: The sign of the celsius parameter.
+    ///   - additional: Additional tests.
+    /// - Returns: A set of all test cases to be tested against the conversion function.
     func expected(
         from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
     ) -> Set<TestParameters> {

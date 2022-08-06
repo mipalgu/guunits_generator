@@ -57,22 +57,36 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Common interface for implementing helper functions for conversion method testing.
 protocol TestConversionTestable {
 
+    /// Require a generator.
     associatedtype Generator: TestGenerator
 
+    /// The generator stored property.
     var generator: Generator { get }
 
+    /// Perform all the tests.
+    /// - Parameter conversion: The conversion functions to test and their parameters. 
     func doTest(conversion: ConversionTest<Generator.UnitType>)
 
+    /// Create default test parameters for a conversion from Kelvin to Celsius.
+    /// - Parameters:
+    ///   - sign: The sign of the kelvin parameter.
+    ///   - otherSign: The sign of the celsius parameter.
+    ///   - additional: Additional tests.
+    /// - Returns: A set of all test cases to be tested against the conversion function.
     func expected(
         from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
     ) -> Set<TestParameters>
 
 }
 
+/// Default implementation for TestConversionTestable.
 extension TestConversionTestable where Self: TestParameterTestable {
 
+    /// Test a conversion function by delegating to underlying implementation.
+    /// - Parameter conversion: The conversion functions to test.
     func doTest(conversion: ConversionTest<Generator.UnitType>) {
         self.doTest(
             from: conversion.unit,
@@ -83,6 +97,13 @@ extension TestConversionTestable where Self: TestParameterTestable {
         )
     }
 
+    /// Test a conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: Any additional test cases for the conversion function.
     private func doTest(
         from unit: Generator.UnitType,
         with sign: Signs,

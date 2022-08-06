@@ -56,16 +56,22 @@
 
 @testable import GUUnitsGeneratorConversions
 
+/// Helper struct for storing the metadata for a conversion.
 struct ConversionTest<Unit: UnitProtocol> {
 
+    /// The unit to convert from.
     var unit: Unit
 
+    /// The sign of the unit.
     var sign: Signs
 
+    /// The unit to convert to.
     var otherUnit: Unit
 
+    /// The sign of the unit to convert to.
     var otherSign: Signs
 
+    /// Additional test parameters for this conversion.
     var parameters: Set<TestParameters>
 
 }

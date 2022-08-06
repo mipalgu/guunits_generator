@@ -57,24 +57,46 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Helper protocol for providing default method for testing unit to numeric conversions.
 protocol TestGeneratorNumericTestable {
 
+    /// Require a generator.
     associatedtype Generator: TestGenerator
 
+    /// The generator being tested.
     var generator: Generator { get }
 
+    /// Create test parameters for a sign conversion between a unit.
+    /// - Parameters:
+    ///   - unit: The unit being tested.
+    ///   - sign: The original sign.
+    ///   - otherSign: The new sign.
+    /// - Returns: The parameters testing this conversion.
     func unitTests(
         from unit: Generator.UnitType, with sign: Signs, to otherSign: Signs
     ) -> Set<TestParameters>
 
+    /// Create test parameters for a unit to numeric type conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: The test parameters testing the conversion.
     func numericTests(
         from unit: Generator.UnitType, with sign: Signs, to numeric: NumericTypes
     ) -> Set<TestParameters>
 
 }
 
+/// Default implementations for TestGeneratorNumericTestable.
 extension TestGeneratorNumericTestable where Self: TestParameterTestable {
 
+    /// Create test parameters for a sign conversion between a unit.
+    /// - Parameters:
+    ///   - unit: The unit being tested.
+    ///   - sign: The original sign.
+    ///   - otherSign: The new sign.
+    /// - Returns: The parameters testing this conversion.
     func unitTests(
         from unit: Generator.UnitType, with sign: Signs, to otherSign: Signs
     ) -> Set<TestParameters> {
@@ -99,6 +121,12 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         ]
     }
 
+    /// Create test parameters for a unit to numeric type conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: The test parameters testing the conversion.
     func numericTests(
         from unit: Generator.UnitType, with sign: Signs, to numeric: NumericTypes
     ) -> Set<TestParameters> {
@@ -123,6 +151,10 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         ]
     }
 
+    /// Perform a unit test for all sign conversions from a unit type.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
     func unitTest(unit: Generator.UnitType, sign: Signs) {
         [Signs.f, Signs.d, Signs.t, Signs.u].forEach {
             guard sign != $0 else {
@@ -137,6 +169,10 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         }
     }
 
+    /// Perform a unit test between a unit type and all numeric types.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
     func numericTest(unit: Generator.UnitType, sign: Signs) {
         NumericTypes.allCases.forEach {
             let expected = self.numericTests(from: unit, with: sign, to: $0)
@@ -148,6 +184,11 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         }
     }
 
+    /// Finds the lowest magnitude lower bound between a sign and numeric type.
+    /// - Parameters:
+    ///   - sign: The sign to compare.
+    ///   - numeric: The numeric type to compare.
+    /// - Returns: The lowest-magnitude lower bound.
     private func expectedOtherMin(from sign: Signs, to numeric: NumericTypes) -> String {
         switch sign {
         case .t:
@@ -171,6 +212,11 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         }
     }
 
+    /// Finds the lowest magnitude lower bound between a 2 sign types.
+    /// - Parameters:
+    ///   - sign: The first sign.
+    ///   - otherSign: The other sign.
+    /// - Returns: The lowest-magnitude lower bound.
     private func expectedOtherMin(from sign: Signs, to otherSign: Signs) -> String {
         switch sign {
         case .t:
@@ -190,6 +236,11 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         }
     }
 
+    /// Finds the lowest magnitude upper bound between a sign and numeric type.
+    /// - Parameters:
+    ///   - sign: The sign to compare.
+    ///   - numeric: The numeric type to compare.
+    /// - Returns: The lowest-magnitude upper bound.
     private func expectedOtherMax(from sign: Signs, to numeric: NumericTypes) -> String {
         switch sign {
         case .t:
@@ -218,6 +269,11 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         }
     }
 
+    /// Finds the lowest magnitude upper bound between a 2 sign types.
+    /// - Parameters:
+    ///   - sign: The first sign.
+    ///   - otherSign: The other sign.
+    /// - Returns: The lowest-magnitude upper bound.
     private func expectedOtherMax(from sign: Signs, to otherSign: Signs) -> String {
         switch sign {
         case .t:
