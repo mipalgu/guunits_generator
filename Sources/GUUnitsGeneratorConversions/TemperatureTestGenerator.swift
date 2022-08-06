@@ -162,7 +162,7 @@ struct TemperatureTestGenerator: TestGenerator {
                         )
                     }
                     if (sign == .f && otherSign != .d) || sign == .d {
-                        if sign == .d || (sign == .f && otherSign != .f) {
+                        if (sign == .d && otherSign != .d) || (sign == .f && otherSign != .f) {
                             newTests.append(
                                 TestParameters(
                                     input: sign.numericType.swiftType.limits.0,
@@ -171,7 +171,7 @@ struct TemperatureTestGenerator: TestGenerator {
                                 )
                             )
                         }
-                        if sign == .f && otherSign == .f {
+                        if (sign == .f && otherSign == .f) || (sign == .d && otherSign == .d) {
                             newTests.append(
                                 TestParameters(
                                     input: sign.numericType.swiftType.limits.0,
