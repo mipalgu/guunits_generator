@@ -134,6 +134,21 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
 
+    func testCelsiusFToKelvinT() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .kelvin, with: .t)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "273"),
+            TestParameters(input: "1.0", output: "274"),
+            TestParameters(input: "-273.0", output: "0"),
+            TestParameters(input: "-272.0", output: "1"),
+            TestParameters(input: "-Float.greatestFiniteMagnitude", output: "kelvin_t(CInt.min)"),
+            TestParameters(input: "Float.greatestFiniteMagnitude", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "5.0", output: "278"),
+            TestParameters(input: "-300.0", output: "-27")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
     func testCelsiusUToKelvinF() {
         let result = generator.testParameters(from: .celsius, with: .u, to: .kelvin, with: .f)
         let expected: Set<TestParameters> = [

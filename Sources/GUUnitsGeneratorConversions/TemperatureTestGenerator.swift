@@ -145,14 +145,7 @@ struct TemperatureTestGenerator: TestGenerator {
                             )
                         )
                     }
-                    if otherSign == .u {
-                        newTests.append(
-                            TestParameters(
-                                input: sign.numericType.swiftType.limits.0,
-                                output: "kelvin_u(CUnsignedInt.min)"
-                            )
-                        )
-                    } else if sign == .t {
+                    if sign == .t && otherSign != .u {
                         newTests.append(
                             TestParameters(
                                 input: "CInt.min",
@@ -160,15 +153,27 @@ struct TemperatureTestGenerator: TestGenerator {
                                     "\(creator.sanitiseLiteral(literal: "273.15", sign: otherSign))"
                             )
                         )
-                    }
-                    if sign == .f && otherSign != .d {
+                    } else if sign == .t && otherSign == .u {
                         newTests.append(
+                            TestParameters(
+                                input: "CInt.min",
+                                output: "kelvin_u(CUnsignedInt.min)"
+                            )
+                        )
+                    }
+                    if (sign == .f && otherSign != .d) || sign == .d {
+                        newTests += [
+                            TestParameters(
+                                input: sign.numericType.swiftType.limits.0,
+                                output: "kelvin_\(otherSign.rawValue)" +
+                                    "(\(otherSign.numericType.swiftType.limits.0))"
+                            ),
                             TestParameters(
                                 input: sign.numericType.swiftType.limits.1,
                                 output: "kelvin_\(otherSign.rawValue)" +
                                     "(\(otherSign.numericType.swiftType.limits.1))"
                             )
-                        )
+                        ]
                     }
                 }
                 if sign == .u && otherSign == .u {
