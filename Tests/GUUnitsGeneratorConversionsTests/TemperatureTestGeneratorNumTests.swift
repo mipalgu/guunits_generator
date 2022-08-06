@@ -15,73 +15,15 @@ final class TemperatureTestGeneratorNumTests: XCTestCase,
     func testUnitFloatTypes() {
         TemperatureUnits.allCases.forEach { unit in
             [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
-                floatUnitTest(unit: unit, sign: sign)
+                unitTest(unit: unit, sign: sign)
             }
         }
     }
 
-    func testUnitToFloatNumericTypes() {
+    func testUnitToNumericTypes() {
         TemperatureUnits.allCases.forEach { unit in
             [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
-                self.floatNumericTest(unit: unit, sign: sign)
-            }
-        }
-    }
-
-    func testCelsiusTToCelsiusSignedTypes() {
-        [NumericTypes.int, NumericTypes.int32, NumericTypes.int64].forEach {
-            let result = generator.testParameters(from: .celsius, with: .t, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(input: "celsius_t(CInt.max)", output: "\($0.swiftType.rawValue)(CInt.max)"),
-                TestParameters(input: "celsius_t(CInt.min)", output: "\($0.swiftType.rawValue)(CInt.min)"),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_t to \($0.rawValue)")
-                return
-            }
-        }
-        [NumericTypes.int16, NumericTypes.int8].forEach {
-            let result = generator.testParameters(from: .celsius, with: .t, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(input: "celsius_t(CInt.max)", output: "\($0.swiftType)(\($0.swiftType).max)"),
-                TestParameters(input: "celsius_t(CInt.min)", output: "\($0.swiftType)(\($0.swiftType).min)"),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_t to \($0.rawValue)")
-                return
-            }
-        }
-    }
-
-    func testCelsiusTToUnsignedTypes() {
-        [NumericTypes.uint, NumericTypes.uint32, NumericTypes.uint64].forEach {
-            let result = generator.testParameters(from: .celsius, with: .t, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(input: "celsius_t(CInt.max)", output: "\($0.swiftType.rawValue)(CInt.max)"),
-                TestParameters(input: "celsius_t(CInt.min)", output: "\($0.swiftType)(\($0.swiftType).min)"),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_t to \($0.rawValue)")
-                return
-            }
-        }
-        [NumericTypes.uint16, NumericTypes.uint8].forEach {
-            let result = generator.testParameters(from: .celsius, with: .t, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(input: "celsius_t(CInt.max)", output: "\($0.swiftType)(\($0.swiftType).max)"),
-                TestParameters(input: "celsius_t(CInt.min)", output: "\($0.swiftType)(\($0.swiftType).min)"),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_t to \($0.rawValue)")
-                return
+                self.numericTest(unit: unit, sign: sign)
             }
         }
     }
@@ -95,82 +37,6 @@ final class TemperatureTestGeneratorNumTests: XCTestCase,
             TestParameters(input: "5", output: "5")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
-    }
-
-    func testCelsiusUToCelsiusSignedTypes() {
-        [NumericTypes.int, NumericTypes.int32, NumericTypes.int16, NumericTypes.int8].forEach {
-            let result = generator.testParameters(from: .celsius, with: .u, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.max)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
-                ),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.min)", output: "\($0.swiftType.rawValue)(CUnsignedInt.min)"
-                ),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_u to \($0.rawValue)")
-                return
-            }
-        }
-        [NumericTypes.int64].forEach {
-            let result = generator.testParameters(from: .celsius, with: .u, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.max)", output: "\($0.swiftType)(CUnsignedInt.max)"
-                ),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.min)", output: "\($0.swiftType)(CUnsignedInt.min)"
-                ),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_u to \($0.rawValue)")
-                return
-            }
-        }
-    }
-
-    func testCelsiusUToUnsignedTypes() {
-        [NumericTypes.uint, NumericTypes.uint32, NumericTypes.uint16, NumericTypes.uint8].forEach {
-            let result = generator.testParameters(from: .celsius, with: .u, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.max)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType).max)"
-                ),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.min)", output: "\($0.swiftType)(CUnsignedInt.min)"
-                ),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_t to \($0.rawValue)")
-                return
-            }
-        }
-        [NumericTypes.uint64].forEach {
-            let result = generator.testParameters(from: .celsius, with: .u, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0", output: "0"),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.max)", output: "\($0.swiftType)(CUnsignedInt.max)"
-                ),
-                TestParameters(
-                    input: "celsius_u(CUnsignedInt.min)", output: "\($0.swiftType)(CUnsignedInt.min)"
-                ),
-                TestParameters(input: "5", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_t to \($0.rawValue)")
-                return
-            }
-        }
     }
 
     func testCelsiusUToCelsiusT() {
@@ -229,52 +95,6 @@ final class TemperatureTestGeneratorNumTests: XCTestCase,
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
 
-    func testCelsiusFToCelsiusSignedTypes() {
-        [NumericTypes.int, NumericTypes.int32, NumericTypes.int16, NumericTypes.int8, NumericTypes.int64]
-        .forEach {
-            let result = generator.testParameters(from: .celsius, with: .f, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0.0", output: "0"),
-                TestParameters(
-                    input: "celsius_f(Float.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
-                ),
-                TestParameters(
-                    input: "celsius_f(-Float.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).min)"
-                ),
-                TestParameters(input: "5.0", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_f to \($0.rawValue)")
-                return
-            }
-        }
-    }
-
-    func testCelsiusFToCelsiusUnSignedTypes() {
-        [NumericTypes.uint, NumericTypes.uint32, NumericTypes.uint16, NumericTypes.uint8, NumericTypes.uint64]
-        .forEach {
-            let result = generator.testParameters(from: .celsius, with: .f, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0.0", output: "0"),
-                TestParameters(
-                    input: "celsius_f(Float.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
-                ),
-                TestParameters(
-                    input: "celsius_f(-Float.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).min)"
-                ),
-                TestParameters(input: "5.0", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_f to \($0.rawValue)")
-                return
-            }
-        }
-    }
-
     func testCelsiusDToCelsiusT() {
         let result = generator.testParameters(from: .celsius, with: .d, to: .celsius, with: .t)
         let expected: Set<TestParameters> = [
@@ -318,52 +138,6 @@ final class TemperatureTestGeneratorNumTests: XCTestCase,
             TestParameters(input: "5.0", output: "5.0")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
-    }
-
-    func testCelsiusDToCelsiusSignedTypes() {
-        [NumericTypes.int, NumericTypes.int32, NumericTypes.int16, NumericTypes.int8, NumericTypes.int64]
-        .forEach {
-            let result = generator.testParameters(from: .celsius, with: .d, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0.0", output: "0"),
-                TestParameters(
-                    input: "celsius_d(Double.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
-                ),
-                TestParameters(
-                    input: "celsius_d(-Double.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).min)"
-                ),
-                TestParameters(input: "5.0", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_d to \($0.rawValue)")
-                return
-            }
-        }
-    }
-
-    func testCelsiusDToCelsiusUnSignedTypes() {
-        [NumericTypes.uint, NumericTypes.uint32, NumericTypes.uint16, NumericTypes.uint8, NumericTypes.uint64]
-        .forEach {
-            let result = generator.testParameters(from: .celsius, with: .d, to: $0)
-            let expected: Set<TestParameters> = [
-                TestParameters(input: "0.0", output: "0"),
-                TestParameters(
-                    input: "celsius_d(Double.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
-                ),
-                TestParameters(
-                    input: "celsius_d(-Double.greatestFiniteMagnitude)",
-                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).min)"
-                ),
-                TestParameters(input: "5.0", output: "5")
-            ]
-            guard testSet(result: result, expected: expected) else {
-                XCTFail("Failed to test conversion from celsius_d to \($0.rawValue)")
-                return
-            }
-        }
     }
 
     // swiftlint:enable missing_docs

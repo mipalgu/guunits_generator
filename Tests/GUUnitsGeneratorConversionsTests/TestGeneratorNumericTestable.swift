@@ -63,11 +63,11 @@ protocol TestGeneratorNumericTestable {
 
     var generator: Generator { get }
 
-    func floatUnitTests(
+    func unitTests(
         from unit: Generator.UnitType, with sign: Signs, to otherSign: Signs
     ) -> Set<TestParameters>
 
-    func floatNumericTests(
+    func numericTests(
         from unit: Generator.UnitType, with sign: Signs, to numeric: NumericTypes
     ) -> Set<TestParameters>
 
@@ -75,7 +75,7 @@ protocol TestGeneratorNumericTestable {
 
 extension TestGeneratorNumericTestable where Self: TestParameterTestable {
 
-    func floatUnitTests(
+    func unitTests(
         from unit: Generator.UnitType, with sign: Signs, to otherSign: Signs
     ) -> Set<TestParameters> {
         let creator = TestFunctionBodyCreator<Generator.UnitType>()
@@ -99,7 +99,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         ]
     }
 
-    func floatNumericTests(
+    func numericTests(
         from unit: Generator.UnitType, with sign: Signs, to numeric: NumericTypes
     ) -> Set<TestParameters> {
         let creator = TestFunctionBodyCreator<Generator.UnitType>()
@@ -123,13 +123,13 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         ]
     }
 
-    func floatUnitTest(unit: Generator.UnitType, sign: Signs) {
-        [Signs.f, Signs.d].forEach {
+    func unitTest(unit: Generator.UnitType, sign: Signs) {
+        [Signs.f, Signs.d, Signs.t, Signs.u].forEach {
             guard sign != $0 else {
                 return
             }
             let result = generator.testParameters(from: unit, with: sign, to: unit, with: $0)
-            let expected = self.floatUnitTests(from: unit, with: sign, to: $0)
+            let expected = self.unitTests(from: unit, with: sign, to: $0)
             guard testSet(result: result, expected: expected) else {
                 XCTFail("Failing test for unit conversion from \(unit)_\(sign) to \(unit)_\($0.rawValue)")
                 return
@@ -137,9 +137,9 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         }
     }
 
-    func floatNumericTest(unit: Generator.UnitType, sign: Signs) {
-        [NumericTypes.float, NumericTypes.double].forEach {
-            let expected = self.floatNumericTests(from: unit, with: sign, to: $0)
+    func numericTest(unit: Generator.UnitType, sign: Signs) {
+        NumericTypes.allCases.forEach {
+            let expected = self.numericTests(from: unit, with: sign, to: $0)
             let result = generator.testParameters(from: unit, with: sign, to: $0)
             guard testSet(result: result, expected: expected) else {
                 XCTFail("Failing test for celsius_t to \($0.rawValue) conversion")
@@ -201,7 +201,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
             }
         case .u:
             switch numeric {
-            case .uint64, .float, .double:
+            case .uint64, .float, .double, .int64:
                 return sign.numericType.swiftType.limits.1
             default:
                 return numeric.swiftType.limits.1
