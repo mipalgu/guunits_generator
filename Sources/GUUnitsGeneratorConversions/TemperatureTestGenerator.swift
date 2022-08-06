@@ -305,19 +305,118 @@ struct TemperatureTestGenerator: TestGenerator {
         case .kelvin:
             switch otherUnit {
             case .celsius:
-                newTests.append(
+                newTests += [
                     TestParameters(
                         input: creator.sanitiseLiteral(literal: "273.15", sign: sign),
                         output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "274.0", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "0.85", sign: otherSign)
                     )
-                )
-                if otherSign != .u {
-                    newTests.append(
+                ]
+                if otherSign.numericType.isSigned {
+                    newTests += [
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "1.0", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-272.15", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "5.0", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-268.15", sign: otherSign)
+                        ),
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: "0", sign: sign),
                             output: creator.sanitiseLiteral(literal: "-273.15", sign: otherSign)
                         )
+                    ]
+                }
+                if sign.numericType.isSigned && otherSign.numericType.isSigned {
+                    newTests.append(
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-300", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-573.15", sign: otherSign)
+                        )
                     )
+                }
+                guard sign != otherSign else {
+                    newTests += [
+                        TestParameters(
+                            input: sign.numericType.swiftType.limits.0,
+                            output: "\(otherUnit)_\(otherSign)(\(otherSign.numericType.swiftType.limits.0))"
+                        ),
+                        TestParameters(
+                            input: sign.numericType.swiftType.limits.1,
+                            output: "\(otherUnit)_\(otherSign)(\(otherSign.numericType.swiftType.limits.1))" +
+                                " - \(creator.sanitiseLiteral(literal: "273.15", sign: otherSign))"
+                        )
+                    ]
+                    break
+                }
+                let lowerLimit = sign.numericType.swiftType.limits.0
+                let upperLimit = sign.numericType.swiftType.limits.1
+                let otherLowerLimit = otherSign.numericType.swiftType.limits.0
+                let otherUpperLimit = otherSign.numericType.swiftType.limits.1
+                let literal = creator.sanitiseLiteral(literal: "273.15", sign: otherSign)
+                switch sign {
+                case .t:
+                    if otherSign == .u {
+                        newTests.append(
+                            TestParameters(
+                                input: lowerLimit,
+                                output: "celsius_u(\(otherLowerLimit))"
+                            )
+                        )
+                    } else {
+                        newTests.append(
+                            TestParameters(
+                                input: lowerLimit,
+                                output: "celsius_\(otherSign)(\(lowerLimit)) - \(literal)"
+                            )
+                        )
+                    }
+                    newTests.append(
+                        TestParameters(
+                            input: upperLimit,
+                            output: "celsius_\(otherSign)(\(upperLimit)) - \(literal)"
+                        )
+                    )
+                case .u:
+                    newTests.append(
+                        TestParameters(
+                            input: lowerLimit,
+                            output: "celsius_\(otherSign)(\(lowerLimit)) - \(literal)"
+                        )
+                    )
+                    if otherSign == .t {
+                        newTests.append(
+                            TestParameters(
+                                input: upperLimit,
+                                output: "celsius_\(otherSign)(\(otherUpperLimit))"
+                            )
+                        )
+                    } else {
+                        newTests.append(
+                            TestParameters(
+                                input: upperLimit,
+                                output: "celsius_\(otherSign)(\(upperLimit)) - \(literal)"
+                            )
+                        )
+                    }
+                case .f:
+                    let lowerOutput = otherSign == .d ? "celsius_\(otherSign)(\(lowerLimit)) - \(literal)" :
+                        "celsius_\(otherSign)(\(otherLowerLimit))"
+                    let upperOutput = otherSign == .d ? "celsius_\(otherSign)(\(upperLimit)) - \(literal)" :
+                        "celsius_\(otherSign)(\(otherUpperLimit))"
+                    newTests += [
+                        TestParameters(input: lowerLimit, output: lowerOutput),
+                        TestParameters(input: upperLimit, output: upperOutput)
+                    ]
+                case .d:
+                    newTests += [
+                        TestParameters(input: lowerLimit, output: "celsius_\(otherSign)(\(otherLowerLimit))"),
+                        TestParameters(input: upperLimit, output: "celsius_\(otherSign)(\(otherUpperLimit))")
+                    ]
                 }
             case .fahrenheit:
                 newTests.append(
