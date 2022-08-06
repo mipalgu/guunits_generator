@@ -115,15 +115,31 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToKelvinFloatToInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .t)
-        let minString = "MIN(((double) (INT_MAX)), (round(((double) (celsius)) + 273.15)))"
-        let expected = "    return ((kelvin_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        let expected = """
+            const celsius_f upperLimit = ((celsius_f) (INT_MAX));
+            const celsius_f lowerLimit = ((celsius_f) (INT_MIN));
+            if (celsius > (upperLimit - 273.15f)) {
+                return ((kelvin_t) (INT_MAX));
+            } else if (celsius < (lowerLimit - 273.15f)) {
+                return ((kelvin_t) (INT_MIN));
+            }
+            return ((kelvin_t) (roundf(celsius + 273.15f)));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testCelsiusToKelvinFloatToUnsigned() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .u)
-        let minString = "MIN(((double) (UINT_MAX)), (round(((double) (celsius)) + 273.15)))"
-        let expected = "    return ((kelvin_u) (MAX(((double) (0)), \(minString))));"
+        let expected = """
+            const celsius_f upperLimit = ((celsius_f) (UINT_MAX));
+            const celsius_f lowerLimit = ((celsius_f) (0));
+            if (celsius > (upperLimit - 273.15f)) {
+                return ((kelvin_u) (UINT_MAX));
+            } else if (celsius < (lowerLimit - 273.15f)) {
+                return ((kelvin_u) (0));
+            }
+            return ((kelvin_u) (roundf(celsius + 273.15f)));
+        """
         XCTAssertEqual(result, expected)
     }
 
@@ -208,15 +224,31 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToCelsiusFloatToInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .t)
-        let minString = "MIN(((double) (INT_MAX)), (round(((double) (kelvin)) - 273.15)))"
-        let expected = "    return ((celsius_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        let expected = """
+            const kelvin_f upperLimit = ((kelvin_f) (INT_MAX));
+            const kelvin_f lowerLimit = ((kelvin_f) (INT_MIN));
+            if (kelvin < (lowerLimit + 273.15f)) {
+                return ((celsius_t) (INT_MIN));
+            } else if (kelvin > (upperLimit + 273.15f)) {
+                return ((celsius_t) (INT_MAX));
+            }
+            return ((celsius_t) (roundf(kelvin - 273.15f)));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testKelvinToCelsiusFloatToUnsigned() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .u)
-        let minString = "MIN(((double) (UINT_MAX)), (round(((double) (kelvin)) - 273.15)))"
-        let expected = "    return ((celsius_u) (MAX(((double) (0)), \(minString))));"
+        let expected = """
+            const kelvin_f upperLimit = ((kelvin_f) (UINT_MAX));
+            const kelvin_f lowerLimit = ((kelvin_f) (0));
+            if (kelvin < (lowerLimit + 273.15f)) {
+                return ((celsius_u) (0));
+            } else if (kelvin > (upperLimit + 273.15f)) {
+                return ((celsius_u) (UINT_MAX));
+            }
+            return ((celsius_u) (roundf(kelvin - 273.15f)));
+        """
         XCTAssertEqual(result, expected)
     }
 

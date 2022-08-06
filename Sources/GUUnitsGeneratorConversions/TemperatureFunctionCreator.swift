@@ -219,6 +219,35 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             )
             return "    return \(signConversion);"
         }
+        if (valueSign == .f && otherSign != .d) || valueSign == .d {
+            let literal = valueSign == .f ? "273.15f" : "273.15"
+            let lowerLimit = otherSign.numericType.limits.0
+            let upperLimit = otherSign.numericType.limits.1
+            guard operation == "-" else {
+                let conversionString = round(value: "\(value) + \(literal)", from: valueSign, to: otherSign)
+                return """
+                    const \(value)_\(valueSign) upperLimit = ((\(value)_\(valueSign)) (\(upperLimit)));
+                    const \(value)_\(valueSign) lowerLimit = ((\(value)_\(valueSign)) (\(lowerLimit)));
+                    if (\(value) > (upperLimit - \(literal))) {
+                        return ((\(other)_\(otherSign)) (\(upperLimit)));
+                    } else if (\(value) < (lowerLimit - \(literal))) {
+                        return ((\(other)_\(otherSign)) (\(lowerLimit)));
+                    }
+                    return ((\(other)_\(otherSign)) (\(conversionString)));
+                """
+            }
+            let conversionString = round(value: "\(value) - \(literal)", from: valueSign, to: otherSign)
+            return """
+                const \(value)_\(valueSign) upperLimit = ((\(value)_\(valueSign)) (\(upperLimit)));
+                const \(value)_\(valueSign) lowerLimit = ((\(value)_\(valueSign)) (\(lowerLimit)));
+                if (\(value) < (lowerLimit + \(literal))) {
+                    return ((\(other)_\(otherSign)) (\(lowerLimit)));
+                } else if (\(value) > (upperLimit + \(literal))) {
+                    return ((\(other)_\(otherSign)) (\(upperLimit)));
+                }
+                return ((\(other)_\(otherSign)) (\(conversionString)));
+            """
+        }
         let conversionString = "((double) (\(value.rawValue))) \(operation) 273.15"
         let roundedString = round(
             value: conversionString, from: valueSign, to: otherSign
@@ -336,6 +365,9 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     private func round(value: String, from sign: Signs, to otherSign: Signs) -> String {
         guard shouldRound(from: sign, to: otherSign) else {
             return value
+        }
+        guard sign == .d else {
+            return "roundf(\(value))"
         }
         return "round(\(value))"
     }
