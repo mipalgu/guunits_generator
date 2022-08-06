@@ -121,20 +121,22 @@ struct TemperatureTestGenerator: TestGenerator {
                         output: creator.sanitiseLiteral(literal: "273.15", sign: otherSign)
                     )
                 )
-                if sign == .t {
+                if sign != .u {
                     newTests += [
                         TestParameters(
-                            input: "-272", output: creator.sanitiseLiteral(literal: "1.15", sign: otherSign)
+                            input: creator.sanitiseLiteral(literal: "-272", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "1.15", sign: otherSign)
                         ),
                         TestParameters(
-                            input: "1", output: creator.sanitiseLiteral(literal: "274.15", sign: otherSign)
+                            input: creator.sanitiseLiteral(literal: "1", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "274.15", sign: otherSign)
                         )
                     ]
-                    if otherSign == .t {
+                    if otherSign == .t && sign == .t {
                         newTests.append(
                             TestParameters(input: "CInt.max", output: "kelvin_t(CInt.max)")
                         )
-                    } else {
+                    } else if sign == .t {
                         newTests.append(
                             TestParameters(
                                 input: "CInt.max",
@@ -145,14 +147,26 @@ struct TemperatureTestGenerator: TestGenerator {
                     }
                     if otherSign == .u {
                         newTests.append(
-                            TestParameters(input: "CInt.min", output: "kelvin_u(CUnsignedInt.min)")
+                            TestParameters(
+                                input: sign.numericType.swiftType.limits.0,
+                                output: "kelvin_u(CUnsignedInt.min)"
+                            )
                         )
-                    } else {
+                    } else if sign == .t {
                         newTests.append(
                             TestParameters(
                                 input: "CInt.min",
                                 output: "kelvin_\(otherSign.rawValue)(CInt.min) + " +
                                     "\(creator.sanitiseLiteral(literal: "273.15", sign: otherSign))"
+                            )
+                        )
+                    }
+                    if sign == .f && otherSign != .d {
+                        newTests.append(
+                            TestParameters(
+                                input: sign.numericType.swiftType.limits.1,
+                                output: "kelvin_\(otherSign.rawValue)" +
+                                    "(\(otherSign.numericType.swiftType.limits.1))"
                             )
                         )
                     }

@@ -238,6 +238,119 @@ final class TemperatureTestGeneratorTests: XCTestCase {
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
 
+    func testCelsiusFToCelsiusT() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .celsius, with: .t)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "0"),
+            TestParameters(input: "celsius_f(Float.greatestFiniteMagnitude)", output: "celsius_t(CInt.max)"),
+            TestParameters(
+                input: "celsius_f(-Float.greatestFiniteMagnitude)", output: "celsius_t(CInt.min)"
+            ),
+            TestParameters(input: "5.0", output: "5")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusFToCelsiusU() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .celsius, with: .u)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "0"),
+            TestParameters(
+                input: "celsius_f(Float.greatestFiniteMagnitude)", output: "celsius_u(CUnsignedInt.max)"
+            ),
+            TestParameters(
+                input: "celsius_f(-Float.greatestFiniteMagnitude)", output: "celsius_u(CUnsignedInt.min)"
+            ),
+            TestParameters(input: "5.0", output: "5")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusFToCelsiusD() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .celsius, with: .d)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "0.0"),
+            TestParameters(
+                input: "celsius_f(Float.greatestFiniteMagnitude)",
+                output: "celsius_d(Float.greatestFiniteMagnitude)"
+            ),
+            TestParameters(
+                input: "celsius_f(-Float.greatestFiniteMagnitude)",
+                output: "celsius_d(-Float.greatestFiniteMagnitude)"
+            ),
+            TestParameters(input: "5.0", output: "5.0")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusFToFloatNumericTypes() {
+        [NumericTypes.float, NumericTypes.double].forEach {
+            let expected: Set<TestParameters> = [
+                TestParameters(input: "0.0", output: "0.0"),
+                TestParameters(
+                    input: "celsius_f(Float.greatestFiniteMagnitude)",
+                    output: "\($0.swiftType)(Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "celsius_f(-Float.greatestFiniteMagnitude)",
+                    output: "\($0.swiftType)(-Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(input: "5.0", output: "5.0")
+            ]
+            let result = generator.testParameters(from: .celsius, with: .f, to: $0)
+            guard testSet(result: result, expected: expected) else {
+                XCTFail("Failing test for celsius_f to \($0.rawValue) conversion")
+                return
+            }
+        }
+    }
+
+    func testCelsiusFToCelsiusSignedTypes() {
+        [NumericTypes.int, NumericTypes.int32, NumericTypes.int16, NumericTypes.int8, NumericTypes.int64]
+        .forEach {
+            let result = generator.testParameters(from: .celsius, with: .f, to: $0)
+            let expected: Set<TestParameters> = [
+                TestParameters(input: "0.0", output: "0"),
+                TestParameters(
+                    input: "celsius_f(Float.greatestFiniteMagnitude)",
+                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
+                ),
+                TestParameters(
+                    input: "celsius_f(-Float.greatestFiniteMagnitude)",
+                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).min)"
+                ),
+                TestParameters(input: "5.0", output: "5")
+            ]
+            guard testSet(result: result, expected: expected) else {
+                XCTFail("Failed to test conversion from celsius_f to \($0.rawValue)")
+                return
+            }
+        }
+    }
+
+    func testCelsiusFToCelsiusUnSignedTypes() {
+        [NumericTypes.uint, NumericTypes.uint32, NumericTypes.uint16, NumericTypes.uint8, NumericTypes.uint64]
+        .forEach {
+            let result = generator.testParameters(from: .celsius, with: .f, to: $0)
+            let expected: Set<TestParameters> = [
+                TestParameters(input: "0.0", output: "0"),
+                TestParameters(
+                    input: "celsius_f(Float.greatestFiniteMagnitude)",
+                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).max)"
+                ),
+                TestParameters(
+                    input: "celsius_f(-Float.greatestFiniteMagnitude)",
+                    output: "\($0.swiftType.rawValue)(\($0.swiftType.rawValue).min)"
+                ),
+                TestParameters(input: "5.0", output: "5")
+            ]
+            guard testSet(result: result, expected: expected) else {
+                XCTFail("Failed to test conversion from celsius_f to \($0.rawValue)")
+                return
+            }
+        }
+    }
+
     func testCelsiusUToKelvinU() {
         let result = generator.testParameters(from: .celsius, with: .u, to: .kelvin, with: .u)
         let expected: Set<TestParameters> = [
@@ -261,6 +374,21 @@ final class TemperatureTestGeneratorTests: XCTestCase {
             TestParameters(input: "CInt.max", output: "kelvin_u(CInt.max) + 273"),
             TestParameters(input: "5", output: "278"),
             TestParameters(input: "-300", output: "0")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusFToKelvinU() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .kelvin, with: .u)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "273"),
+            TestParameters(input: "1.0", output: "274"),
+            TestParameters(input: "-273.0", output: "0"),
+            TestParameters(input: "-272.0", output: "1"),
+            TestParameters(input: "-Float.greatestFiniteMagnitude", output: "kelvin_u(CUnsignedInt.min)"),
+            TestParameters(input: "Float.greatestFiniteMagnitude", output: "kelvin_u(CUnsignedInt.max)"),
+            TestParameters(input: "5.0", output: "278"),
+            TestParameters(input: "-300.0", output: "0")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
