@@ -218,13 +218,7 @@ struct TemperatureTestGenerator: TestGenerator {
                         ]
                     }
                 }
-                if sign == .u && otherSign == .u {
-                    newTests += [
-                        TestParameters(input: "CUnsignedInt.max", output: "kelvin_u(CUnsignedInt.max)"),
-                        TestParameters(input: "CUnsignedInt.min", output: "kelvin_u(CUnsignedInt.min + 273)")
-                    ]
-                }
-                if (sign == .t || sign == .f || sign == .d) && otherSign == .u {
+                if sign != .u && otherSign == .u {
                     newTests.append(
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: "-300", sign: sign),
