@@ -194,6 +194,14 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
                 return ((\(other.rawValue)_\(otherSign.rawValue)) (\(signConversion)));
             """
         }
+        if valueSign == .u && otherSign == .t && operation == "+" {
+            return """
+                if (celsius > (INT_MAX - 273)) {
+                    return ((kelvin_t) (INT_MAX));
+                }
+                return ((kelvin_t) (\(value.rawValue) + 273));
+            """
+        }
         if valueSign == .t && otherSign == .u && operation == "+" {
             let lowerLimit = Signs.u.numericType.limits.0
             let conversion = "(\(value) + 273) < \(lowerLimit) ? \(lowerLimit) : (\(value) + 273)"

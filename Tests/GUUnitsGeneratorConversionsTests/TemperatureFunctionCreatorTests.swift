@@ -157,10 +157,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToKelvinUnsignedToInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .u, otherSign: .t)
-        let comparison = "((unsigned int) (INT_MAX))"
-        let addition = "celsius + 273"
-        let ternary = "((\(addition)) > \(comparison) ? \(comparison) : \(addition))"
-        let expected = "    return ((kelvin_t) \(ternary));"
+        let expected = """
+            if (celsius > (INT_MAX - 273)) {
+                return ((kelvin_t) (INT_MAX));
+            }
+            return ((kelvin_t) (celsius + 273));
+        """
         XCTAssertEqual(result, expected)
     }
 
