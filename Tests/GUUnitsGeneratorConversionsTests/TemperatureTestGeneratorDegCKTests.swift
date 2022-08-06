@@ -70,7 +70,7 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         let expected: Set<TestParameters> = [
             TestParameters(input: "0", output: "273"),
             TestParameters(input: "1", output: "274"),
-            TestParameters(input: "CUnsignedInt.min", output: "kelvin_u(CUnsignedInt.min + 273)"),
+            TestParameters(input: "CUnsignedInt.min", output: "kelvin_u(CUnsignedInt.min) + 273"),
             TestParameters(input: "CUnsignedInt.max", output: "kelvin_u(CUnsignedInt.max)"),
             TestParameters(input: "5", output: "278")
         ]
