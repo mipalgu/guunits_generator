@@ -3,7 +3,7 @@ import Foundation
 import XCTest
 
 /// Test class for TemperatureTestGenerator Celsius to Numeric conversions.
-final class TemperatureTestGeneratorCelsiusNumTests: XCTestCase {
+final class TemperatureTestGeneratorCelsiusNumTests: XCTestCase, TestParameterTestable {
 
     /// The generator to test.
     let generator = TemperatureTestGenerator()
@@ -352,36 +352,5 @@ final class TemperatureTestGeneratorCelsiusNumTests: XCTestCase {
     }
 
     // swiftlint:enable missing_docs
-
-    /// Tests that an array of TestParameters contains the same elements as a set of TestParameters.
-    /// - Parameters:
-    ///   - result: The array to test.
-    ///   - expected: The set to compare result against.
-    /// - Returns: Whether result contains the same members as expected.
-    private func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool {
-        var success = true
-        result.forEach {
-            guard expected.contains($0) else {
-                XCTFail("Additional test \($0) found!")
-                success = false
-                return
-            }
-        }
-        let resultSet = Set(result)
-        let expectedArray = Array(expected)
-        expectedArray.forEach {
-            guard resultSet.contains($0) else {
-                XCTFail("Missing test \($0)!")
-                success = false
-                return
-            }
-        }
-        XCTAssertEqual(result.count, expected.count)
-        XCTAssertEqual(result.count, resultSet.count)
-        guard result.count == expected.count && result.count == resultSet.count else {
-            return false
-        }
-        return success
-    }
 
 }
