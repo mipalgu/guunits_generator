@@ -57,23 +57,158 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestable {
+final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestable, TestConversionTestable {
 
     let generator = TemperatureTestGenerator()
 
-    func testKelvinTToCelsiusT() {
-        let result = generator.testParameters(from: .kelvin, with: .t, to: .celsius, with: .t)
-        let expected: Set<TestParameters> = [
-            TestParameters(input: "273", output: "0"),
-            TestParameters(input: "274", output: "1"),
-            TestParameters(input: "0", output: "-273"),
-            TestParameters(input: "1", output: "-272"),
-            TestParameters(input: "CInt.min", output: "celsius_t(CInt.min)"),
-            TestParameters(input: "CInt.max", output: "celsius_t(CInt.max) - 273"),
-            TestParameters(input: "5", output: "-268"),
-            TestParameters(input: "-300", output: "-573")
+    var conversions: [ConversionTest<TemperatureUnits>] {
+        [
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(input: "CInt.min", output: "celsius_t(CInt.min)"),
+                TestParameters(input: "CInt.max", output: "celsius_t(CInt.max) - 273")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(input: "CInt.min", output: "celsius_u(CUnsignedInt.min)"),
+                TestParameters(input: "CInt.max", output: "celsius_u(CInt.max) - 273")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(input: "CInt.min", output: "celsius_d(CInt.min) - 273.15"),
+                TestParameters(input: "CInt.max", output: "celsius_d(CInt.max) - 273.15")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(input: "CInt.min", output: "celsius_f(CInt.min) - 273.15"),
+                TestParameters(input: "CInt.max", output: "celsius_f(CInt.max) - 273.15")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "celsius_t(CUnsignedInt.min) - 273"),
+                TestParameters(input: "CUnsignedInt.max", output: "celsius_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "celsius_u(CUnsignedInt.min)"),
+                TestParameters(input: "CUnsignedInt.max", output: "celsius_u(CUnsignedInt.max) - 273")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "celsius_f(CUnsignedInt.min) - 273.15"),
+                TestParameters(input: "CUnsignedInt.max", output: "celsius_f(CUnsignedInt.max) - 273.15")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "celsius_d(CUnsignedInt.min) - 273.15"),
+                TestParameters(input: "CUnsignedInt.max", output: "celsius_d(CUnsignedInt.max) - 273.15")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "celsius_t(CInt.min)"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "celsius_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude", output: "celsius_u(CUnsignedInt.min)"
+                ),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "celsius_u(CUnsignedInt.max)")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "celsius_f(-Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "celsius_f(Float.greatestFiniteMagnitude) - 273.15"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "celsius_d(-Float.greatestFiniteMagnitude) - 273.15"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "celsius_d(Float.greatestFiniteMagnitude) - 273.15"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "celsius_t(CInt.min)"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "celsius_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude", output: "celsius_u(CUnsignedInt.min)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude", output: "celsius_u(CUnsignedInt.max)"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "celsius_f(-Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "celsius_f(Float.greatestFiniteMagnitude)"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "celsius_d(-Double.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "celsius_d(Double.greatestFiniteMagnitude) - 273.15"
+                )
+            ])
         ]
-        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testConversions() {
+        conversions.forEach {
+            self.doTest(conversion: $0)
+        }
+    }
+
+    func expected(
+        from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
+    ) -> Set<TestParameters> {
+        let creator = TestFunctionBodyCreator<TemperatureUnits>()
+        var newTests: Set<TestParameters> = additional.union(
+            Set<TestParameters>(
+                [
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "273.15", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "274", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "0.85", sign: otherSign)
+                    )
+                ]
+            )
+        )
+        if sign.numericType.isSigned && otherSign.numericType.isSigned {
+            newTests.insert(
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-300", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "-573.15", sign: otherSign)
+                )
+            )
+        }
+        if otherSign.numericType.isSigned {
+            newTests = newTests.union(Set<TestParameters>([
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "1.0", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "-272.15", sign: otherSign)
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "5.0", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "-268.15", sign: otherSign)
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "-273.15", sign: otherSign)
+                )
+            ]))
+        }
+        return newTests
     }
 
 }
