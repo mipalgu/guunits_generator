@@ -162,16 +162,43 @@ struct TemperatureTestGenerator: TestGenerator {
                         )
                     }
                     if (sign == .f && otherSign != .d) || sign == .d {
+                        if sign == .d || (sign == .f && otherSign != .f) {
+                            newTests.append(
+                                TestParameters(
+                                    input: sign.numericType.swiftType.limits.0,
+                                    output: "kelvin_\(otherSign.rawValue)" +
+                                        "(\(otherSign.numericType.swiftType.limits.0))"
+                                )
+                            )
+                        }
+                        if sign == .f && otherSign == .f {
+                            newTests.append(
+                                TestParameters(
+                                    input: sign.numericType.swiftType.limits.0,
+                                    output: "kelvin_\(otherSign.rawValue)" +
+                                    "(\(otherSign.numericType.swiftType.limits.0)) + 273.15"
+                                )
+                            )
+                        }
                         newTests += [
-                            TestParameters(
-                                input: sign.numericType.swiftType.limits.0,
-                                output: "kelvin_\(otherSign.rawValue)" +
-                                    "(\(otherSign.numericType.swiftType.limits.0))"
-                            ),
                             TestParameters(
                                 input: sign.numericType.swiftType.limits.1,
                                 output: "kelvin_\(otherSign.rawValue)" +
                                     "(\(otherSign.numericType.swiftType.limits.1))"
+                            )
+                        ]
+                    }
+                    if sign == .f && otherSign == .d {
+                        newTests += [
+                            TestParameters(
+                                input: sign.numericType.swiftType.limits.0,
+                                output: "kelvin_\(otherSign.rawValue)" +
+                                    "(\(sign.numericType.swiftType.limits.0)) + 273.15"
+                            ),
+                            TestParameters(
+                                input: sign.numericType.swiftType.limits.1,
+                                output: "kelvin_\(otherSign.rawValue)" +
+                                    "(\(sign.numericType.swiftType.limits.1)) + 273.15"
                             )
                         ]
                     }

@@ -176,6 +176,26 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
 
+    func testCelsiusFToKelvinF() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .kelvin, with: .f)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "273.15"),
+            TestParameters(input: "1.0", output: "274.15"),
+            TestParameters(input: "-273.0", output: "0.15"),
+            TestParameters(input: "-272.0", output: "1.15"),
+            TestParameters(
+                input: "-Float.greatestFiniteMagnitude",
+                output: "kelvin_f(-Float.greatestFiniteMagnitude) + 273.15"
+            ),
+            TestParameters(
+                input: "Float.greatestFiniteMagnitude", output: "kelvin_f(Float.greatestFiniteMagnitude)"
+            ),
+            TestParameters(input: "5.0", output: "278.15"),
+            TestParameters(input: "-300.0", output: "-26.85")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
     func testCelsiusUToKelvinD() {
         let result = generator.testParameters(from: .celsius, with: .u, to: .kelvin, with: .d)
         let expected: Set<TestParameters> = [
@@ -199,6 +219,27 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "CInt.max", output: "kelvin_d(CInt.max) + 273.15"),
             TestParameters(input: "5", output: "278.15"),
             TestParameters(input: "-300", output: "-26.85")
+        ]
+        XCTAssertTrue(testSet(result: result, expected: expected))
+    }
+
+    func testCelsiusFToKelvinD() {
+        let result = generator.testParameters(from: .celsius, with: .f, to: .kelvin, with: .d)
+        let expected: Set<TestParameters> = [
+            TestParameters(input: "0.0", output: "273.15"),
+            TestParameters(input: "1.0", output: "274.15"),
+            TestParameters(input: "-273.0", output: "0.15"),
+            TestParameters(input: "-272.0", output: "1.15"),
+            TestParameters(
+                input: "-Float.greatestFiniteMagnitude",
+                output: "kelvin_d(-Float.greatestFiniteMagnitude) + 273.15"
+            ),
+            TestParameters(
+                input: "Float.greatestFiniteMagnitude",
+                output: "kelvin_d(Float.greatestFiniteMagnitude) + 273.15"
+            ),
+            TestParameters(input: "5.0", output: "278.15"),
+            TestParameters(input: "-300.0", output: "-26.85")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
     }
