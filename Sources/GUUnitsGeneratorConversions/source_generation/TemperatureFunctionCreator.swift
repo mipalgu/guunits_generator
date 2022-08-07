@@ -131,7 +131,18 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
         if otherSign == .d && valueSign == .d {
             let conversion = "celsius * 1.8 + 32.0"
-            return "    return ((fahrenheit_d) (\(conversion)));"
+            // swiftlint:disable line_length
+            return """
+                const celsius_d upperLimit = nexttoward((\(valueSign.numericType.limits.1) - 32.0) / 1.8 , 0.0);
+                const celsius_d lowerLimit = nexttoward((\(valueSign.numericType.limits.0)) / 1.8 , 0.0);
+                if (celsius > upperLimit) {
+                    return ((fahrenheit_d) (\(otherSign.numericType.limits.1)));
+                } else if (celsius < lowerLimit) {
+                    return ((fahrenheit_d) (\(otherSign.numericType.limits.0)));
+                }
+                return ((fahrenheit_d) (\(conversion)));
+            """
+            // swiftlint:enable line_length
         }
         let conversion = "((((double) (celsius)) * 1.8) + 32.0)"
         let roundedConversion = round(value: conversion, from: .d, to: otherSign)
