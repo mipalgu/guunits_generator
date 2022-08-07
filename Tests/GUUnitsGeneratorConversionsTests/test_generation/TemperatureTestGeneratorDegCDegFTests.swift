@@ -83,6 +83,97 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
             ConversionTest(unit: .celsius, sign: .t, otherUnit: .fahrenheit, otherSign: .d, parameters: [
                 TestParameters(input: "CInt.min", output: "fahrenheit_d(Double(CInt.min) * 1.8 + 32.0)"),
                 TestParameters(input: "CInt.max", output: "fahrenheit_d(Double(CInt.max) * 1.8 + 32.0)")
+            ]),
+            ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .t, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: "fahrenheit_t((Double(CUnsignedInt.min) * 1.8 + 32.0).rounded())"
+                ),
+                TestParameters(input: "CUnsignedInt.max", output: "fahrenheit_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                // 0 -> 32 is already tested in default tests.
+                TestParameters(input: "CUnsignedInt.max", output: "fahrenheit_u(CUnsignedInt.max)")
+            ]),
+            ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min", output: "fahrenheit_f(Double(CUnsignedInt.min) * 1.8 + 32.0)"
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max", output: "fahrenheit_f(Double(CUnsignedInt.max) * 1.8 + 32.0)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min", output: "fahrenheit_d(Double(CUnsignedInt.min) * 1.8 + 32.0)"
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max", output: "fahrenheit_d(Double(CUnsignedInt.max) * 1.8 + 32.0)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .t, parameters: [
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "fahrenheit_t(CInt.min)"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "fahrenheit_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedInt.min)"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedInt.max)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "fahrenheit_f(-Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "fahrenheit_f(Float.greatestFiniteMagnitude)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "fahrenheit_d(Double(-Float.greatestFiniteMagnitude) * 1.8 + 32.0)"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "fahrenheit_d(Double(Float.greatestFiniteMagnitude) * 1.8 + 32.0)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .t, parameters: [
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "fahrenheit_t(CInt.min)"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "fahrenheit_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedInt.min)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedInt.max)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "fahrenheit_f(-Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "fahrenheit_f(Float.greatestFiniteMagnitude)"
+                )
+            ]),
+            ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "fahrenheit_d(-Double.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "fahrenheit_d(Double.greatestFiniteMagnitude)"
+                )
             ])
         ]
     }
