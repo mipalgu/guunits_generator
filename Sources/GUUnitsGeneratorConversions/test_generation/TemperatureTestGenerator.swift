@@ -56,6 +56,8 @@
 *
 */
 
+// swiftlint:disable file_length
+
 /// Create test cases for the C temperature unit.
 struct TemperatureTestGenerator: TestGenerator {
 
@@ -86,27 +88,68 @@ struct TemperatureTestGenerator: TestGenerator {
         case .celsius:
             switch otherUnit {
             case .fahrenheit:
-                newTests.append(
+                newTests += [
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "32", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "0.85", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "33.53", sign: otherSign)
+                    ),
                     TestParameters(
                         input: creator.sanitiseLiteral(literal: "25", sign: sign),
                         output: creator.sanitiseLiteral(literal: "77", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "2", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "35.6", sign: otherSign)
                     )
-                )
-                if (sign == .d || sign == .f || sign == .t) && otherSign == .u {
-                    newTests.append(
-                        TestParameters(
-                            input: creator.sanitiseLiteral(literal: "-20", sign: sign),
-                            output: "0"
-                        )
-                    )
+                ]
+                if sign.numericType.isSigned {
+                    if otherSign.numericType.isSigned {
+                        newTests += [
+                            TestParameters(
+                                input: creator.sanitiseLiteral(literal: "-573.01", sign: sign),
+                                output: creator.sanitiseLiteral(literal: "-999.418", sign: otherSign)
+                            ),
+                            TestParameters(
+                                input: creator.sanitiseLiteral(literal: "-272.15", sign: sign),
+                                output: creator.sanitiseLiteral(literal: "-457.87", sign: otherSign)
+                            ),
+                            TestParameters(
+                                input: creator.sanitiseLiteral(literal: "-268", sign: sign),
+                                output: creator.sanitiseLiteral(literal: "-450.40", sign: otherSign)
+                            ),
+                            TestParameters(
+                                input: creator.sanitiseLiteral(literal: "-273.03", sign: sign),
+                                output: creator.sanitiseLiteral(literal: "-459.454", sign: otherSign)
+                            ),
+                            TestParameters(
+                                input: creator.sanitiseLiteral(literal: "-20", sign: sign),
+                                output: creator.sanitiseLiteral(literal: "-4", sign: otherSign)
+                            )
+                        ]
+                    }
                 }
-                if (sign == .d || sign == .f || sign == .u) && otherSign == .t {
+                let lowerLimit = sign.numericType.swiftType.limits.0
+                let upperLimit = sign.numericType.swiftType.limits.1
+                guard sign != otherSign else {
+                    if sign != .u {
+                        newTests.append(
+                            TestParameters(
+                                input: lowerLimit,
+                                output: "fahrenheit_\(otherSign)(\(lowerLimit))"
+                            )
+                        )
+                    }
                     newTests.append(
                         TestParameters(
-                            input: creator.sanitiseLiteral(literal: "1193047000", sign: sign),
-                            output: "fahrenheit_\(otherSign.rawValue)(INT_MAX)"
+                            input: upperLimit,
+                            output: "fahrenheit_\(otherSign)(\(upperLimit))"
                         )
                     )
+                    break
                 }
             case .kelvin:
                 newTests += [
@@ -462,3 +505,5 @@ struct TemperatureTestGenerator: TestGenerator {
     }
 
 }
+
+// swiftlint:enable file_length
