@@ -73,7 +73,7 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
             ConversionTest(unit: .celsius, sign: .t, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 TestParameters(input: "CInt.min", output: "fahrenheit_u(CUnsignedInt.min)"),
                 TestParameters(
-                    input: "CInt.max", output: "fahrenheit_u((Double(CInt.max) * 1.4 + 32.0).rounded())"
+                    input: "CInt.max", output: "fahrenheit_u((Double(CInt.max) * 1.8 + 32.0).rounded())"
                 )
             ])
         ]

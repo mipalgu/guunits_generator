@@ -151,6 +151,80 @@ struct TemperatureTestGenerator: TestGenerator {
                     )
                     break
                 }
+                let otherLowerLimit = otherSign.numericType.swiftType.limits.0
+                let otherUpperLimit = otherSign.numericType.swiftType.limits.1
+                let calculation: (String) -> String = {
+                    guard sign.isFloatingPoint else {
+                        return "(Double(\($0)) * 1.8 + 32.0).rounded()"
+                    }
+                    return "Double(\($0)) * 1.8 + 32.0"
+                }
+                switch sign {
+                case .t:
+                    if otherSign == .u {
+                        newTests.append(
+                            TestParameters(
+                                input: lowerLimit,
+                                output: "fahrenheit_u(\(otherLowerLimit))"
+                            )
+                        )
+                    } else {
+                        newTests.append(
+                            TestParameters(
+                                input: lowerLimit,
+                                output: "fahrenheit_\(otherSign)(\(calculation(lowerLimit)))"
+                            )
+                        )
+                    }
+                    newTests.append(
+                        TestParameters(
+                            input: upperLimit,
+                            output: "fahrenheit_\(otherSign)(\(calculation(upperLimit)))"
+                        )
+                    )
+                case .u:
+                    newTests.append(
+                        TestParameters(
+                            input: lowerLimit,
+                            output: "fahrenheit_\(otherSign)(\(calculation(lowerLimit)))"
+                        )
+                    )
+                    if otherSign == .t {
+                        newTests.append(
+                            TestParameters(
+                                input: upperLimit,
+                                output: "fahrenheit_\(otherSign)(\(otherUpperLimit))"
+                            )
+                        )
+                    } else {
+                        newTests.append(
+                            TestParameters(
+                                input: upperLimit,
+                                output: "fahrenheit_\(otherSign)(\(calculation(upperLimit)))"
+                            )
+                        )
+                    }
+                case .f:
+                    let lowerOutput = otherSign == .d ?
+                        "fahrenheit_\(otherSign)(\(calculation(lowerLimit)))" :
+                        "fahrenheit_\(otherSign)(\(otherLowerLimit))"
+                    let upperOutput = otherSign == .d ?
+                        "fahrenheit_\(otherSign)(\(calculation(upperLimit)))" :
+                        "fahrenheit_\(otherSign)(\(otherUpperLimit))"
+                    newTests += [
+                        TestParameters(input: lowerLimit, output: lowerOutput),
+                        TestParameters(input: upperLimit, output: upperOutput)
+                    ]
+                case .d:
+                    newTests += [
+                        TestParameters(
+                            input: lowerLimit, output: "fahrenheit_\(otherSign)(\(otherLowerLimit))"
+                        ),
+                        TestParameters(
+                            input: upperLimit, output: "fahrenheit_\(otherSign)(\(otherUpperLimit))"
+                        )
+                    ]
+                }
             case .kelvin:
                 newTests += [
                     TestParameters(
