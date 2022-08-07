@@ -57,6 +57,7 @@
 */
 
 // swiftlint:disable file_length
+// swiftlint:disable type_body_length
 
 /// Create test cases for the C temperature unit.
 struct TemperatureTestGenerator: TestGenerator {
@@ -580,4 +581,5 @@ struct TemperatureTestGenerator: TestGenerator {
 
 }
 
+// swiftlint:enable type_body_length
 // swiftlint:enable file_length
