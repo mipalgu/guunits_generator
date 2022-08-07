@@ -310,7 +310,16 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToFahrenheitDouble() {
         let result = creator.createFunction(unit: .celsius, to: .fahrenheit, sign: .d, otherSign: .d)
-        let expected = "    return ((fahrenheit_d) (celsius * 1.8 + 32.0));"
+        let expected = """
+            const celsius_d upperLimit = nexttoward((DBL_MAX - 32.0) / 1.8, 0.0);
+            const celsius_d lowerLimit = nexttoward((-DBL_MAX) / 1.8, 0.0);
+            if (celsius > upperLimit) {
+                return ((fahrenheit_d) (DBL_MAX));
+            } else if (celsius < lowerLimit) {
+                return ((fahrenheit_d) (-DBL_MAX));
+            }
+            return ((fahrenheit_d) (celsius * 1.8 + 32.0));
+        """
         XCTAssertEqual(result, expected)
     }
 

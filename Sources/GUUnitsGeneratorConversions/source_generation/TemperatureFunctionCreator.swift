@@ -133,8 +133,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             let conversion = "celsius * 1.8 + 32.0"
             // swiftlint:disable line_length
             return """
-                const celsius_d upperLimit = nexttoward((\(valueSign.numericType.limits.1) - 32.0) / 1.8 , 0.0);
-                const celsius_d lowerLimit = nexttoward((\(valueSign.numericType.limits.0)) / 1.8 , 0.0);
+                const celsius_d upperLimit = nexttoward((\(valueSign.numericType.limits.1) - 32.0) / 1.8, 0.0);
+                const celsius_d lowerLimit = nexttoward((\(valueSign.numericType.limits.0)) / 1.8, 0.0);
                 if (celsius > upperLimit) {
                     return ((fahrenheit_d) (\(otherSign.numericType.limits.1)));
                 } else if (celsius < lowerLimit) {
