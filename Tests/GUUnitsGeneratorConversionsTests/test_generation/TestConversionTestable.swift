@@ -70,10 +70,10 @@ protocol TestConversionTestable {
     /// - Parameter conversion: The conversion functions to test and their parameters. 
     func doTest(conversion: ConversionTest<Generator.UnitType>)
 
-    /// Create default test parameters for a conversion from Kelvin to Celsius.
+    /// Create default test parameters for a unit conversion.
     /// - Parameters:
-    ///   - sign: The sign of the kelvin parameter.
-    ///   - otherSign: The sign of the celsius parameter.
+    ///   - sign: The sign of the first parameter.
+    ///   - otherSign: The sign of the second parameter.
     ///   - additional: Additional tests.
     /// - Returns: A set of all test cases to be tested against the conversion function.
     func expected(
