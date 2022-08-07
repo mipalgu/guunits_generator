@@ -155,7 +155,7 @@ struct TemperatureTestGenerator: TestGenerator {
                 let otherLowerLimit = otherSign.numericType.swiftType.limits.0
                 let otherUpperLimit = otherSign.numericType.swiftType.limits.1
                 let calculation: (String) -> String = {
-                    guard sign.isFloatingPoint else {
+                    guard otherSign.isFloatingPoint else {
                         return "(Double(\($0)) * 1.8 + 32.0).rounded()"
                     }
                     return "Double(\($0)) * 1.8 + 32.0"
