@@ -86,7 +86,15 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             ]
         }
         var newTests: [TestParameters] = []
-        let allCases = Unit.allCases
+        let allCases = Array(Unit.allCases)
+        guard
+            let index = allCases.firstIndex(where: { $0 == unit }),
+            let otherIndex = allCases.firstIndex(where: { $0 == otherUnit })
+        else {
+            return []
+        }
+        let scaleFactor = findScaleFactor(allCases: allCases, index: index, otherIndex: otherIndex)
+        let isDividing = index > otherIndex
         return []
     }
 
@@ -108,6 +116,25 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     /// - Returns: An array of test parameters testing the conversion function.
     func testParameters(from numeric: NumericTypes, to unit: Unit, with sign: Signs) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
+    }
+
+    private func findScaleFactor(allCases: [Unit], index: Int, otherIndex: Int) -> Int {
+        guard index > otherIndex else {
+            return self.calculateScaleFactor(allCases: allCases, lowerIndex: index, upperIndex: otherIndex)
+        }
+        return self.calculateScaleFactor(allCases: allCases, lowerIndex: otherIndex, upperIndex: index)
+    }
+
+    private func calculateScaleFactor(allCases: [Unit], lowerIndex: Int, upperIndex: Int) -> Int {
+        guard lowerIndex < upperIndex else {
+            return 1
+        }
+        return allCases[(lowerIndex)...(upperIndex - 1)].reduce(1) {
+            guard let newFactor = unitDifference[$1] else {
+                return $0
+            }
+            return $0 * newFactor
+        }
     }
 
 }
