@@ -72,15 +72,106 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
             ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .t, parameters: [
                 TestParameters(input: "CInt.min", output: "centimetres_t(CInt.min) / 10"),
                 TestParameters(input: "CInt.max", output: "centimetres_t(CInt.max) / 10")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .u, parameters: [
+                TestParameters(input: "CInt.min", output: "0"),
+                TestParameters(input: "CInt.max", output: "centimetres_u(CInt.max) / 10")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .f, parameters: [
+                TestParameters(input: "CInt.min", output: "centimetres_f(CInt.min) / 10.0"),
+                TestParameters(input: "CInt.max", output: "centimetres_f(CInt.max) / 10.0")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .d, parameters: [
+                TestParameters(input: "CInt.min", output: "centimetres_d(CInt.min) / 10.0"),
+                TestParameters(input: "CInt.max", output: "centimetres_d(CInt.max) / 10.0")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .t, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "centimetres_t(CUnsignedInt.min) / 10"),
+                TestParameters(input: "CUnsignedInt.max", output: "centimetres_t(CUnsignedInt.max / 10)")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .u, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "centimetres_u(CUnsignedInt.min)"),
+                TestParameters(input: "CUnsignedInt.max", output: "centimetres_u(CUnsignedInt.max) / 10")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .f, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "centimetres_f(CUnsignedInt.min) / 10.0"),
+                TestParameters(input: "CUnsignedInt.max", output: "centimetres_f(CUnsignedInt.max) / 10.0")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .d, parameters: [
+                TestParameters(input: "CUnsignedInt.min", output: "centimetres_d(CUnsignedInt.min) / 10.0"),
+                TestParameters(input: "CUnsignedInt.max", output: "centimetres_d(CUnsignedInt.max) / 10.0")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .t, parameters: [
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "centimetres_t(CInt.min)"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "centimetres_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.min)"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.max)"
+                )
+            ]),
+            ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "centimetres_f(-Float.greatestFiniteMagnitude) / 10.0"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "centimetres_f(Float.greatestFiniteMagnitude) / 10.0"
+                )
+            ]),
+            ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "centimetres_d(-Float.greatestFiniteMagnitude) / 10.0"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "centimetres_d(Float.greatestFiniteMagnitude) / 10.0"
+                )
+            ]),
+            ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .t, parameters: [
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "centimetres_t(CInt.min)"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "centimetres_t(CInt.max)")
+            ]),
+            ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.min)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.max)"
+                )
+            ]),
+            ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "centimetres_f(-Float.greatestFiniteMagnitude)"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "centimetres_f(Float.greatestFiniteMagnitude)"
+                )
+            ]),
+            ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "centimetres_d(-Double.greatestFiniteMagnitude) / 10.0"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "centimetres_d(Double.greatestFiniteMagnitude) / 10.0"
+                )
             ])
         ]
     }
 
     func testAll() {
-        // conversions.forEach {
-        //     self.doTest(conversion: $0)
-        // }
-        self.doTest(conversion: conversions[0])
+        conversions.forEach {
+            self.doTest(conversion: $0)
+        }
     }
 
     func expected(

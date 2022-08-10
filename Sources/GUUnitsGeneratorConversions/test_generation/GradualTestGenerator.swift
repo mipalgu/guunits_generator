@@ -130,6 +130,20 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         let upperLimit = sign.numericType.swiftType.limits.1
         guard sign != otherSign else {
             if isDividing {
+                guard sign != .u else {
+                    newTests += [
+                        TestParameters(
+                            input: "\(lowerLimit)",
+                            output: "\(otherUnit)_\(otherSign)(\(lowerLimit))"
+                        ),
+                        TestParameters(
+                            input: "\(upperLimit)",
+                            output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                                " \(operation) \(sanitisedScaleFactor)"
+                        )
+                    ]
+                    return newTests
+                }
                 newTests += [
                     TestParameters(
                         input: "\(lowerLimit)",
@@ -240,11 +254,11 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                 newTests += [
                     TestParameters(
                         input: "\(lowerLimit)",
-                        output: otherSign.numericType.swiftType.limits.1
+                        output: "\(otherUnit)_\(otherSign)(\(otherSign.numericType.swiftType.limits.0))"
                     ),
                     TestParameters(
                         input: upperLimit,
-                        output: otherSign.numericType.swiftType.limits.1
+                        output: "\(otherUnit)_\(otherSign)(\(otherSign.numericType.swiftType.limits.1))"
                     )
                 ]
             }
@@ -252,11 +266,11 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             newTests += [
                 TestParameters(
                     input: "\(lowerLimit)",
-                    output: otherSign.numericType.swiftType.limits.1
+                    output: "\(otherUnit)_\(otherSign)(\(otherSign.numericType.swiftType.limits.0))"
                 ),
                 TestParameters(
                     input: upperLimit,
-                    output: otherSign.numericType.swiftType.limits.1
+                    output: "\(otherUnit)_\(otherSign)(\(otherSign.numericType.swiftType.limits.1))"
                 )
             ]
         }
