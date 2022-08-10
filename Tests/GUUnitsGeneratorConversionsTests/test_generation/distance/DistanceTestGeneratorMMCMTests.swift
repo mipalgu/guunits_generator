@@ -70,22 +70,95 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
     var conversions: [ConversionTest<DistanceUnits>] {
         [
             ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .t, parameters: [
-                TestParameters(input: "CInt.min", output: "centimetres_t(CInt.min / 10)"),
-                TestParameters(input: "CInt.max", output: "centimetres_t(CInt.max / 10)")
+                TestParameters(input: "CInt.min", output: "centimetres_t(CInt.min) / 10"),
+                TestParameters(input: "CInt.max", output: "centimetres_t(CInt.max) / 10")
             ])
         ]
     }
 
     func testAll() {
-        conversions.forEach {
-            self.doTest(conversion: $0)
-        }
+        // conversions.forEach {
+        //     self.doTest(conversion: $0)
+        // }
+        self.doTest(conversion: conversions[0])
     }
 
     func expected(
         from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
     ) -> Set<TestParameters> {
-        <#code#>
+        let creator = TestFunctionBodyCreator<DistanceUnits>()
+        let scaleFactor = creator.sanitiseLiteral(literal: "10", sign: otherSign)
+        var newTests: Set<TestParameters> = additional.union(Set([
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "15", sign: sign),
+                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "15", sign: sign)))" +
+                    " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "25", sign: sign),
+                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "25", sign: sign)))" +
+                    " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "250", sign: sign),
+                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "250", sign: sign)))" +
+                    " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "0", sign: sign)))" +
+                    " / \(scaleFactor)"
+            )
+        ]))
+        if sign.numericType.isSigned && otherSign.numericType.isSigned {
+            newTests = newTests.union(Set([
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-323", sign: sign),
+                    output: "centimetres_" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-323", sign: sign)))" +
+                        " / \(scaleFactor)"
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-10", sign: sign),
+                    output: "centimetres_" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-10", sign: sign)))" +
+                        " / \(scaleFactor)"
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-1000", sign: sign),
+                    output: "centimetres_" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-1000", sign: sign)))" +
+                        " / \(scaleFactor)"
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-5", sign: sign),
+                    output: "centimetres_" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-5", sign: sign)))" +
+                        " / \(scaleFactor)"
+                )
+            ]))
+        }
+        if sign.numericType.isSigned && !otherSign.numericType.isSigned {
+            newTests = newTests.union(Set([
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-323", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-10", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-1000", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                ),
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "-6", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                )
+            ]))
+        }
+        return newTests
     }
 
 }

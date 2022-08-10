@@ -85,7 +85,6 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                 )
             ]
         }
-        var newTests: [TestParameters] = []
         let allCases = Array(Unit.allCases)
         guard
             let index = allCases.firstIndex(where: { $0 == unit }),
@@ -94,8 +93,100 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             return []
         }
         let scaleFactor = findScaleFactor(allCases: allCases, index: index, otherIndex: otherIndex)
-        let isDividing = index > otherIndex
-        return []
+        let isDividing = index < otherIndex
+        let operation = isDividing ? "/" : "*"
+        let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
+        var newTests: [TestParameters] = ["15", "25", "250", "0"].map {
+            createTestCase(
+                from: sign,
+                to: otherUnit,
+                with: otherSign,
+                testInput: $0,
+                scaleFactor: sanitisedScaleFactor,
+                operation: operation
+            )
+        }
+        if sign.numericType.isSigned && otherSign.numericType.isSigned {
+            newTests += ["-323", "-10", "-1000", "-5"].map {
+                createTestCase(
+                    from: sign,
+                    to: otherUnit,
+                    with: otherSign,
+                    testInput: $0,
+                    scaleFactor: sanitisedScaleFactor,
+                    operation: operation
+                )
+            }
+        }
+        if sign.numericType.isSigned && !otherSign.numericType.isSigned {
+            newTests += ["-323", "-10", "-1000", "-6"].map {
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: $0, sign: sign),
+                    output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                )
+            }
+        }
+        let lowerLimit = sign.numericType.swiftType.limits.0
+        let upperLimit = sign.numericType.swiftType.limits.1
+        switch sign {
+        case .t:
+            switch otherSign {
+            case .f, .d:
+                newTests += [
+                    TestParameters(
+                        input: "\(lowerLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(lowerLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    ),
+                    TestParameters(
+                        input: "\(upperLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    )
+                ]
+            case .u:
+                newTests += [
+                    TestParameters(
+                        input: "\(lowerLimit)",
+                        output: "0"
+                    ),
+                    TestParameters(
+                        input: "\(upperLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    )
+                ]
+            case .t:
+                if isDividing {
+                    newTests += [
+                        TestParameters(
+                            input: "\(lowerLimit)",
+                            output: "\(otherUnit)_\(otherSign)(\(lowerLimit))" +
+                                " \(operation) \(sanitisedScaleFactor)"
+                        ),
+                        TestParameters(
+                            input: "\(upperLimit)",
+                            output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                                " \(operation) \(sanitisedScaleFactor)"
+                        )
+                    ]
+                } else {
+                    newTests += [
+                        TestParameters(
+                            input: "\(lowerLimit)",
+                            output: "\(otherUnit)_\(otherSign)(\(lowerLimit))"
+                        ),
+                        TestParameters(
+                            input: "\(upperLimit)",
+                            output: "\(otherUnit)_\(otherSign)(\(upperLimit))"
+                        )
+                    ]
+                }
+            }
+        default:
+            break
+        }
+        return newTests
     }
 
     /// Create test parameters for a unit to numeric conversion.
@@ -135,6 +226,21 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             }
             return $0 * newFactor
         }
+    }
+
+    private func createTestCase(
+        from sign: Signs,
+        to otherUnit: Unit,
+        with otherSign: Signs,
+        testInput: String,
+        scaleFactor: String,
+        operation: String
+    ) -> TestParameters {
+        let sanitisedLiteral = creator.sanitiseLiteral(literal: testInput, sign: sign)
+        return TestParameters(
+            input: sanitisedLiteral,
+            output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteral)) \(operation) \(scaleFactor)"
+        )
     }
 
 }
