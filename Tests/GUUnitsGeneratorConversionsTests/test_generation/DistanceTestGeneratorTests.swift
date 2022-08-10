@@ -57,8 +57,10 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for DistanceTestGenerator unit conversion tests.
 final class DistanceTestGeneratorTests: XCTestCase {
 
+    /// The generator under test.
     let generator = GradualTestGenerator<DistanceUnits>(unitDifference: [
         .millimetres: 10,
         .centimetres: 100

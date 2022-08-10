@@ -54,40 +54,58 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Struct used to generate test parameters for units that are convertable using
+/// constant factors. e.g. 10 millimetres in a centimetre.
 struct GradualTestGenerator<Unit>: TestGenerator where
     Unit: UnitProtocol, Unit: RawRepresentable, Unit.RawValue == String {
 
-    typealias UnitType = Unit
-
     /// The creator which will sanitise literals.
-    let creator = TestFunctionBodyCreator<UnitType>()
+    let creator = TestFunctionBodyCreator<Unit>()
 
     /// The magnitude difference between a unit type and the next unit type. Example, for
     /// a unit type of metres, centimetres should be set to 100 since there
     /// are 100 centimetres in a metre.
     private(set) var unitDifference: [Unit: Int]
 
+    /// Create test parameters for a unit to unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: An array of test parameters for the conversion function.
     func testParameters(
         from unit: Unit, with sign: Signs, to otherUnit: Unit, with otherSign: Signs
     ) -> [TestParameters] {
-        var newTests: [TestParameters] = []
         guard unit != otherUnit else {
-            newTests += self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
-            newTests += [
+            return self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign) + [
                 TestParameters(
                     input: creator.sanitiseLiteral(literal: "5", sign: sign),
                     output: creator.sanitiseLiteral(literal: "5", sign: otherSign)
                 )
             ]
-            return newTests
         }
+        var newTests: [TestParameters] = []
+        let allCases = Unit.allCases
         return []
     }
 
+    /// Create test parameters for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: The test parameters testing the conversion.
     func testParameters(from unit: Unit, with sign: Signs, to numeric: NumericTypes) -> [TestParameters] {
         self.defaultParameters(from: unit, with: sign, to: numeric)
     }
 
+    /// Create test parameters for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit type to convert to.
+    ///   - sign: The sign of the unit type to convert to.
+    /// - Returns: An array of test parameters testing the conversion function.
     func testParameters(from numeric: NumericTypes, to unit: Unit, with sign: Signs) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }

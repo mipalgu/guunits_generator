@@ -57,13 +57,16 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for DistanceTestGenerator numeric conversion and same-unit conversion tests.
 final class DistanceTestGeneratorNumTests: XCTestCase, TestParameterTestable, TestGeneratorNumericTestable {
 
+    /// The generator under test.
     let generator = GradualTestGenerator<DistanceUnits>(unitDifference: [
         .millimetres: 10,
         .centimetres: 100
     ])
 
+    /// Test the same unit conversion returns the correct test cases.
     func testUnitTypes() {
         DistanceUnits.allCases.forEach { unit in
             [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
@@ -72,6 +75,7 @@ final class DistanceTestGeneratorNumTests: XCTestCase, TestParameterTestable, Te
         }
     }
 
+    /// Test unit to numeric and numeric to unit conversion tests.
     func testUnitToNumericTypes() {
         DistanceUnits.allCases.forEach { unit in
             [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
