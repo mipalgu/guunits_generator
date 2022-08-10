@@ -59,6 +59,9 @@ struct GradualTestGenerator<Unit>: TestGenerator where
 
     typealias UnitType = Unit
 
+    /// The creator which will sanitise literals.
+    let creator = TestFunctionBodyCreator<UnitType>()
+
     /// The magnitude difference between a unit type and the next unit type. Example, for
     /// a unit type of metres, centimetres should be set to 100 since there
     /// are 100 centimetres in a metre.
@@ -67,7 +70,18 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     func testParameters(
         from unit: Unit, with sign: Signs, to otherUnit: Unit, with otherSign: Signs
     ) -> [TestParameters] {
-        []
+        var newTests: [TestParameters] = []
+        guard unit != otherUnit else {
+            newTests += self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
+            newTests += [
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "5", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "5", sign: otherSign)
+                )
+            ]
+            return newTests
+        }
+        return []
     }
 
     func testParameters(from unit: Unit, with sign: Signs, to numeric: NumericTypes) -> [TestParameters] {
