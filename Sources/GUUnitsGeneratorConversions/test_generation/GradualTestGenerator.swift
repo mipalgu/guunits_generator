@@ -96,7 +96,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         let isDividing = index < otherIndex
         let operation = isDividing ? "/" : "*"
         let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
-        var newTests: [TestParameters] = ["15", "25", "250", "0"].map {
+        var newTests: [TestParameters] = ["15", "25", "250", "0", "2500", "25000", "250000", "2500000"].map {
             createTestCase(
                 from: sign,
                 to: otherUnit,

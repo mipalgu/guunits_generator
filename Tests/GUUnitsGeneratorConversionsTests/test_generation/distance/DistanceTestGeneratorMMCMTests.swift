@@ -108,6 +108,28 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
                 input: creator.sanitiseLiteral(literal: "0", sign: sign),
                 output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "0", sign: sign)))" +
                     " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "2500", sign: sign),
+                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "2500", sign: sign)))" +
+                    " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "25000", sign: sign),
+                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "25000", sign: sign)))" +
+                    " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "250000", sign: sign),
+                output: "centimetres_\(otherSign)" +
+                    "(\(creator.sanitiseLiteral(literal: "250000", sign: sign)))" +
+                    " / \(scaleFactor)"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "2500000", sign: sign),
+                output: "centimetres_\(otherSign)" +
+                    "(\(creator.sanitiseLiteral(literal: "2500000", sign: sign)))" +
+                    " / \(scaleFactor)"
             )
         ]))
         if sign.numericType.isSigned && otherSign.numericType.isSigned {
