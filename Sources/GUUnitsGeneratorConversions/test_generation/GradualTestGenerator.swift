@@ -128,10 +128,8 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         }
         let lowerLimit = sign.numericType.swiftType.limits.0
         let upperLimit = sign.numericType.swiftType.limits.1
-        switch sign {
-        case .t:
-            switch otherSign {
-            case .f, .d:
+        guard sign != otherSign else {
+            if isDividing {
                 newTests += [
                     TestParameters(
                         input: "\(lowerLimit)",
@@ -144,6 +142,23 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                             " \(operation) \(sanitisedScaleFactor)"
                     )
                 ]
+            } else {
+                newTests += [
+                    TestParameters(
+                        input: "\(lowerLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(lowerLimit))"
+                    ),
+                    TestParameters(
+                        input: "\(upperLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(upperLimit))"
+                    )
+                ]
+            }
+            return newTests
+        }
+        switch sign {
+        case .t:
+            switch otherSign {
             case .u:
                 newTests += [
                     TestParameters(
@@ -156,35 +171,94 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                             " \(operation) \(sanitisedScaleFactor)"
                     )
                 ]
+            default:
+                newTests += [
+                    TestParameters(
+                        input: "\(lowerLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(lowerLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    ),
+                    TestParameters(
+                        input: "\(upperLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    )
+                ]
+            }
+        case .u:
+            newTests += [
+                TestParameters(
+                    input: lowerLimit,
+                    output: "\(otherUnit)_\(otherSign)(\(lowerLimit))" +
+                        " \(operation) \(sanitisedScaleFactor)"
+                )
+            ]
+            switch otherSign {
             case .t:
-                if isDividing {
+                let uintIntFactor = Int(UInt.max / UInt(Int.max))
+                if scaleFactor > uintIntFactor {
                     newTests += [
                         TestParameters(
-                            input: "\(lowerLimit)",
-                            output: "\(otherUnit)_\(otherSign)(\(lowerLimit))" +
-                                " \(operation) \(sanitisedScaleFactor)"
-                        ),
-                        TestParameters(
-                            input: "\(upperLimit)",
-                            output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
-                                " \(operation) \(sanitisedScaleFactor)"
+                            input: upperLimit,
+                            output: "\(otherUnit)_\(otherSign)(\(upperLimit)" +
+                                " \(operation) \(sanitisedScaleFactor))"
                         )
                     ]
                 } else {
                     newTests += [
                         TestParameters(
-                            input: "\(lowerLimit)",
-                            output: "\(otherUnit)_\(otherSign)(\(lowerLimit))"
-                        ),
-                        TestParameters(
-                            input: "\(upperLimit)",
-                            output: "\(otherUnit)_\(otherSign)(\(upperLimit))"
+                            input: upperLimit,
+                            output: otherSign.numericType.swiftType.limits.1
                         )
                     ]
                 }
+            default:
+                newTests += [
+                    TestParameters(
+                        input: "\(upperLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    )
+                ]
             }
-        default:
-            break
+        case .f:
+            switch otherSign {
+            case .d:
+                newTests += [
+                    TestParameters(
+                        input: "\(lowerLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(lowerLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    ),
+                    TestParameters(
+                        input: "\(upperLimit)",
+                        output: "\(otherUnit)_\(otherSign)(\(upperLimit))" +
+                            " \(operation) \(sanitisedScaleFactor)"
+                    )
+                ]
+            default:
+                newTests += [
+                    TestParameters(
+                        input: "\(lowerLimit)",
+                        output: otherSign.numericType.swiftType.limits.1
+                    ),
+                    TestParameters(
+                        input: upperLimit,
+                        output: otherSign.numericType.swiftType.limits.1
+                    )
+                ]
+            }
+        case .d:
+            newTests += [
+                TestParameters(
+                    input: "\(lowerLimit)",
+                    output: otherSign.numericType.swiftType.limits.1
+                ),
+                TestParameters(
+                    input: upperLimit,
+                    output: otherSign.numericType.swiftType.limits.1
+                )
+            ]
         }
         return newTests
     }
