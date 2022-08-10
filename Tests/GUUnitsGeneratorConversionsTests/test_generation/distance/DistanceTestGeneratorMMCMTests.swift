@@ -57,13 +57,35 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for DistanceTestGenerator unit conversion tests.
-final class DistanceTestGeneratorTests: XCTestCase {
+/// Test class for DistanceTestGenerator millimetre to centimetre tests.
+final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, TestConversionTestable {
 
     /// The generator under test.
     let generator = GradualTestGenerator<DistanceUnits>(unitDifference: [
         .millimetres: 10,
         .centimetres: 100
     ])
+
+    /// All the test cases.
+    var conversions: [ConversionTest<DistanceUnits>] {
+        [
+            ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .t, parameters: [
+                TestParameters(input: "CInt.min", output: "centimetres_t(CInt.min / 10)"),
+                TestParameters(input: "CInt.max", output: "centimetres_t(CInt.max / 10)")
+            ])
+        ]
+    }
+
+    func testAll() {
+        conversions.forEach {
+            self.doTest(conversion: $0)
+        }
+    }
+
+    func expected(
+        from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
+    ) -> Set<TestParameters> {
+        <#code#>
+    }
 
 }
