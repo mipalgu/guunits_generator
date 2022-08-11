@@ -102,54 +102,18 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         let isDividing = index < otherIndex
         let operation = isDividing ? "/" : "*"
         let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
-        // swiftlint:disable closure_body_length
         var newTests: [TestParameters] = [
             "15", "25", "250", "0", "2500", "25000", "250000", "2500000"
         ].compactMap {
-            guard !isDividing else {
-                return createTestCase(
-                    from: sign,
-                    to: otherUnit,
-                    with: otherSign,
-                    testInput: $0,
-                    scaleFactor: sanitisedScaleFactor,
-                    operation: operation
-                )
-            }
-            guard otherSign != .t, let val = CInt($0), val != 0, scaleFactor < (CInt.max / val) else {
-                return nil
-            }
-            guard
-                otherSign != .u, let val = CUnsignedInt($0), val != 0, scaleFactor < (CUnsignedInt.max / val)
-            else {
-                return nil
-            }
-            guard
-                otherSign != .f,
-                let val = Float($0),
-                val != 0.0,
-                Float(scaleFactor) < (Float.greatestFiniteMagnitude / val)
-            else {
-                return nil
-            }
-            guard
-                otherSign != .d,
-                let val = Double($0),
-                val != 0.0,
-                Double(scaleFactor) < (Double.greatestFiniteMagnitude / val)
-            else {
-                return nil
-            }
-            return createTestCase(
+            sanitisedTestCase(
+                isDividing: isDividing,
                 from: sign,
                 to: otherUnit,
                 with: otherSign,
-                testInput: $0,
-                scaleFactor: sanitisedScaleFactor,
-                operation: operation
+                input: $0,
+                scaleFactor: scaleFactor
             )
         }
-        // swiftlint:enable closure_body_length
         if sign.numericType.isSigned && otherSign.numericType.isSigned {
             newTests += ["-323", "-10", "-1000", "-5"].map {
                 createTestCase(
@@ -342,6 +306,73 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     /// - Returns: An array of test parameters testing the conversion function.
     func testParameters(from numeric: NumericTypes, to unit: Unit, with sign: Signs) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
+    }
+
+    private func sanitisedTestCase(
+        isDividing: Bool,
+        from sign: Signs,
+        to otherUnit: Unit,
+        with otherSign: Signs,
+        input: String,
+        scaleFactor: Int
+    ) -> TestParameters? {
+        let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
+        let operation = isDividing ? "/" : "*"
+        guard !isDividing else {
+            return createTestCase(
+                from: sign,
+                to: otherUnit,
+                with: otherSign,
+                testInput: input,
+                scaleFactor: sanitisedScaleFactor,
+                operation: operation
+            )
+        }
+        guard
+            otherSign != .t,
+            let val = CInt(input),
+            val != 0,
+            (val > 0 && scaleFactor < (CInt.max / val)) || (val < 0 && scaleFactor < (CInt.min / val))
+        else {
+            return nil
+        }
+        guard
+            otherSign != .u,
+            let val = CUnsignedInt(input),
+            val != 0,
+            (val > 0 && scaleFactor < (CUnsignedInt.max / val)) ||
+                (val < 0 && scaleFactor < (CUnsignedInt.min / val))
+        else {
+            return nil
+        }
+        let floatFactor = Float(scaleFactor)
+        guard
+            otherSign != .f,
+            let val = Float(input),
+            val != 0.0,
+            (val > 0 && floatFactor < (Float.greatestFiniteMagnitude / val)) ||
+                (val < 0 && floatFactor < (-Float.greatestFiniteMagnitude / val))
+        else {
+            return nil
+        }
+        let doubleFactor = Double(scaleFactor)
+        guard
+            otherSign != .d,
+            let val = Double(input),
+            val != 0.0,
+            (val > 0 && doubleFactor < (Double.greatestFiniteMagnitude / val)) ||
+                (val < 0 && doubleFactor < (-Double.greatestFiniteMagnitude / val))
+        else {
+            return nil
+        }
+        return createTestCase(
+            from: sign,
+            to: otherUnit,
+            with: otherSign,
+            testInput: input,
+            scaleFactor: sanitisedScaleFactor,
+            operation: operation
+        )
     }
 
     /// Find the scale factor for a unit to unit conversion. This function delegates to calculateScaleFactor.
