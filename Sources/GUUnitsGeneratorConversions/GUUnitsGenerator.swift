@@ -151,6 +151,16 @@ public struct GUUnitsGenerator {
             with: "TemperatureTests",
             and: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
         )
+        let distanceGenerator = GradualTestGenerator<DistanceUnits>(unitDifference: [
+            .millimetres: 10,
+            .centimetres: 100
+        ])
+        let distanceFileCreator = TestFileCreator<GradualTestGenerator<DistanceUnits>>()
+        writeFile(
+            at: path,
+            with: "DistanceTests",
+            and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
+        )
     }
 
     /// Generate the swift source files for guunits.
