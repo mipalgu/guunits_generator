@@ -54,9 +54,17 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Struct for generating tests for unit categories with only 1 unit case.
 struct SameUnitTestGenerator<Unit>: TestGenerator where
     Unit: UnitProtocol, Unit: RawRepresentable, Unit.RawValue == String {
 
+    /// Create the default test parameters.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to. This unit must be the same as the other unit.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: The test parameters which test the conversion.
     func testParameters(
         from unit: Unit, with sign: Signs, to otherUnit: Unit, with otherSign: Signs
     ) -> [TestParameters] {
@@ -69,10 +77,22 @@ struct SameUnitTestGenerator<Unit>: TestGenerator where
         return self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
     }
 
+    /// Create test parameters for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit converting from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type converting to.
+    /// - Returns: The test parameters testing the conversion.
     func testParameters(from unit: Unit, with sign: Signs, to numeric: NumericTypes) -> [TestParameters] {
         self.defaultParameters(from: unit, with: sign, to: numeric)
     }
 
+    /// Create test parameters for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: The test parameters which test the conversion function.
     func testParameters(from numeric: NumericTypes, to unit: Unit, with sign: Signs) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }
