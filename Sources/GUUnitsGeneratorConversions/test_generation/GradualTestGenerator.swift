@@ -68,6 +68,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     private(set) var unitDifference: [Unit: Int]
 
     // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
 
     /// Create test parameters for a unit to unit conversion.
     /// - Parameters:
@@ -101,6 +102,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         let isDividing = index < otherIndex
         let operation = isDividing ? "/" : "*"
         let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
+        // swiftlint:disable closure_body_length
         var newTests: [TestParameters] = [
             "15", "25", "250", "0", "2500", "25000", "250000", "2500000"
         ].compactMap {
@@ -143,6 +145,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                 operation: operation
             )
         }
+        // swiftlint:enable closure_body_length
         if sign.numericType.isSigned && otherSign.numericType.isSigned {
             newTests += ["-323", "-10", "-1000", "-5"].map {
                 createTestCase(
@@ -314,6 +317,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         return newTests
     }
 
+    // swiftlint:enable cyclomatic_complexity
     // swiftlint:enable function_body_length
 
     /// Create test parameters for a unit to numeric conversion.
