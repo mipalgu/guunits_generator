@@ -168,12 +168,21 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
         ]
     }
 
+    /// Perform all tests.
     func testAll() {
         conversions.forEach {
             self.doTest(conversion: $0)
         }
     }
 
+    // swiftlint:disable function_body_length
+
+    /// The default test parameters for this conversion.
+    /// - Parameters:
+    ///   - sign: The sign to convert from.
+    ///   - otherSign: The sign to convert to.
+    ///   - additional: The default parameters.
+    /// - Returns: All the test parameters expected from the conversion.
     func expected(
         from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
     ) -> Set<TestParameters> {
@@ -273,5 +282,7 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
         }
         return newTests
     }
+
+    // swiftlint:enable function_body_length
 
 }

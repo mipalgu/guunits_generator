@@ -67,6 +67,8 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     /// are 100 centimetres in a metre.
     private(set) var unitDifference: [Unit: Int]
 
+    // swiftlint:disable function_body_length
+
     /// Create test parameters for a unit to unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -277,6 +279,8 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         return newTests
     }
 
+    // swiftlint:enable function_body_length
+
     /// Create test parameters for a unit to numeric conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -297,6 +301,12 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }
 
+    /// Find the scale factor for a unit to unit conversion. This function delegates to calculateScaleFactor.
+    /// - Parameters:
+    ///   - allCases: An array of all units.
+    ///   - index: The index of the unit converting from.
+    ///   - otherIndex: The index of the unit converting to.
+    /// - Returns: The scale factor as an int.
     private func findScaleFactor(allCases: [Unit], index: Int, otherIndex: Int) -> Int {
         guard index > otherIndex else {
             return self.calculateScaleFactor(allCases: allCases, lowerIndex: index, upperIndex: otherIndex)
@@ -304,6 +314,12 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         return self.calculateScaleFactor(allCases: allCases, lowerIndex: otherIndex, upperIndex: index)
     }
 
+    /// Calculate the scale factor for a unit to unit conversion.
+    /// - Parameters:
+    ///   - allCases: An array of all units.
+    ///   - lowerIndex: The index of the unit converting from.
+    ///   - upperIndex: The index of the unit converting to.
+    /// - Returns: The scale factor between the units.
     private func calculateScaleFactor(allCases: [Unit], lowerIndex: Int, upperIndex: Int) -> Int {
         guard lowerIndex < upperIndex else {
             return 1
@@ -316,6 +332,17 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         }
     }
 
+    // swiftlint:disable function_parameter_count
+
+    /// Creates a test case for a unit conversion.
+    /// - Parameters:
+    ///   - sign: The sign of the unit converting from.
+    ///   - otherUnit: The unit converting to.
+    ///   - otherSign: The sign of the unit converting to.
+    ///   - testInput: The input test parameter.
+    ///   - scaleFactor: The scale factor between the units.
+    ///   - operation: Whether we need to divide or multiple to convert the units.
+    /// - Returns: A test case that tests the conversion function for the given testInput.
     private func createTestCase(
         from sign: Signs,
         to otherUnit: Unit,
@@ -330,5 +357,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteral)) \(operation) \(scaleFactor)"
         )
     }
+
+    // swiftlint:enable function_parameter_count
 
 }
