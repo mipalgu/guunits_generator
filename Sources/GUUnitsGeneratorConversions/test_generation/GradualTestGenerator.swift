@@ -79,6 +79,9 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     func testParameters(
         from unit: Unit, with sign: Signs, to otherUnit: Unit, with otherSign: Signs
     ) -> [TestParameters] {
+        if unit == otherUnit && sign == otherSign {
+            return []
+        }
         guard unit != otherUnit else {
             return self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign) + [
                 TestParameters(
@@ -98,8 +101,40 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         let isDividing = index < otherIndex
         let operation = isDividing ? "/" : "*"
         let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
-        var newTests: [TestParameters] = ["15", "25", "250", "0", "2500", "25000", "250000", "2500000"].map {
-            createTestCase(
+        var newTests: [TestParameters] = [
+            "15", "25", "250", "0", "2500", "25000", "250000", "2500000"
+        ].compactMap {
+            guard !isDividing else {
+                return createTestCase(
+                    from: sign,
+                    to: otherUnit,
+                    with: otherSign,
+                    testInput: $0,
+                    scaleFactor: sanitisedScaleFactor,
+                    operation: operation
+                )
+            }
+            guard otherSign != .t, let val = CInt($0), scaleFactor < (CInt.max / val) else {
+                return nil
+            }
+            guard otherSign != .u, let val = CUnsignedInt($0), scaleFactor < (CUnsignedInt.max / val) else {
+                return nil
+            }
+            guard
+                otherSign != .f,
+                let val = Float($0),
+                Float(scaleFactor) < (Float.greatestFiniteMagnitude / val)
+            else {
+                return nil
+            }
+            guard
+                otherSign != .d,
+                let val = Double($0),
+                Double(scaleFactor) < (Double.greatestFiniteMagnitude / val)
+            else {
+                return nil
+            }
+            return createTestCase(
                 from: sign,
                 to: otherUnit,
                 with: otherSign,
@@ -212,7 +247,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             switch otherSign {
             case .t:
                 let uintIntFactor = Int(UInt.max / UInt(Int.max))
-                if scaleFactor > uintIntFactor {
+                if scaleFactor > uintIntFactor && isDividing {
                     newTests += [
                         TestParameters(
                             input: upperLimit,
@@ -352,9 +387,10 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         operation: String
     ) -> TestParameters {
         let sanitisedLiteral = creator.sanitiseLiteral(literal: testInput, sign: sign)
+        let sanitisedLiteraAsOther = creator.sanitiseLiteral(literal: testInput, sign: otherSign)
         return TestParameters(
             input: sanitisedLiteral,
-            output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteral)) \(operation) \(scaleFactor)"
+            output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteraAsOther)) \(operation) \(scaleFactor)"
         )
     }
 

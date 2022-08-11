@@ -191,44 +191,50 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
         var newTests: Set<TestParameters> = additional.union(Set([
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "15", sign: sign),
-                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "15", sign: sign)))" +
+                output: "centimetres_" +
+                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "15.0", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "25", sign: sign),
-                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "25", sign: sign)))" +
+                output: "centimetres_" +
+                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "25", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "250", sign: sign),
-                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "250", sign: sign)))" +
+                output: "centimetres_" +
+                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "250", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "0", sign: sign),
-                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "0", sign: sign)))" +
+                output: "centimetres_" +
+                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "0", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "2500", sign: sign),
-                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "2500", sign: sign)))" +
+                output: "centimetres_" +
+                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "2500", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "25000", sign: sign),
-                output: "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "25000", sign: sign)))" +
+                output: "centimetres_" +
+                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "25000", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "250000", sign: sign),
                 output: "centimetres_\(otherSign)" +
-                    "(\(creator.sanitiseLiteral(literal: "250000", sign: sign)))" +
+                    "(\(creator.sanitiseLiteral(literal: "250000", sign: otherSign)))" +
                     " / \(scaleFactor)"
             ),
             TestParameters(
                 input: creator.sanitiseLiteral(literal: "2500000", sign: sign),
                 output: "centimetres_\(otherSign)" +
-                    "(\(creator.sanitiseLiteral(literal: "2500000", sign: sign)))" +
+                    "(\(creator.sanitiseLiteral(literal: "2500000", sign: otherSign)))" +
                     " / \(scaleFactor)"
             )
         ]))
@@ -237,25 +243,25 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
                 TestParameters(
                     input: creator.sanitiseLiteral(literal: "-323", sign: sign),
                     output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-323", sign: sign)))" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-323", sign: otherSign)))" +
                         " / \(scaleFactor)"
                 ),
                 TestParameters(
                     input: creator.sanitiseLiteral(literal: "-10", sign: sign),
                     output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-10", sign: sign)))" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-10", sign: otherSign)))" +
                         " / \(scaleFactor)"
                 ),
                 TestParameters(
                     input: creator.sanitiseLiteral(literal: "-1000", sign: sign),
                     output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-1000", sign: sign)))" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-1000", sign: otherSign)))" +
                         " / \(scaleFactor)"
                 ),
                 TestParameters(
                     input: creator.sanitiseLiteral(literal: "-5", sign: sign),
                     output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-5", sign: sign)))" +
+                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-5", sign: otherSign)))" +
                         " / \(scaleFactor)"
                 )
             ]))
