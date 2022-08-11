@@ -187,7 +187,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                         output: "0"
                     )
                 ]
-                guard isDividing || scaleFactor <= 2 else {
+                guard isDividing || (!isDividing && scaleFactor <= 2) else {
                     newTests += [
                         TestParameters(
                             input: "\(upperLimit)",
