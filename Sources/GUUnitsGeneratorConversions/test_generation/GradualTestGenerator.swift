@@ -116,15 +116,18 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                     operation: operation
                 )
             }
-            guard otherSign != .t, let val = CInt($0), scaleFactor < (CInt.max / val) else {
+            guard otherSign != .t, let val = CInt($0), val != 0, scaleFactor < (CInt.max / val) else {
                 return nil
             }
-            guard otherSign != .u, let val = CUnsignedInt($0), scaleFactor < (CUnsignedInt.max / val) else {
+            guard
+                otherSign != .u, let val = CUnsignedInt($0), val != 0, scaleFactor < (CUnsignedInt.max / val)
+            else {
                 return nil
             }
             guard
                 otherSign != .f,
                 let val = Float($0),
+                val != 0.0,
                 Float(scaleFactor) < (Float.greatestFiniteMagnitude / val)
             else {
                 return nil
@@ -132,6 +135,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             guard
                 otherSign != .d,
                 let val = Double($0),
+                val != 0.0,
                 Double(scaleFactor) < (Double.greatestFiniteMagnitude / val)
             else {
                 return nil
