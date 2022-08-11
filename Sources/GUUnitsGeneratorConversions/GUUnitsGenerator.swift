@@ -161,6 +161,30 @@ public struct GUUnitsGenerator {
             with: "DistanceTests",
             and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
         )
+        let imageGenerator = SameUnitTestGenerator<ImageUnits>()
+        let imageFileCreator = TestFileCreator<SameUnitTestGenerator<ImageUnits>>()
+        writeFile(
+            at: path,
+            with: "ImageTests",
+            and: imageFileCreator.tests(generator: imageGenerator, imports: "import CGUUnits")
+        )
+        let percentGenerator = SameUnitTestGenerator<PercentUnits>()
+        let percentFileCreator = TestFileCreator<SameUnitTestGenerator<PercentUnits>>()
+        writeFile(
+            at: path,
+            with: "PercentTests",
+            and: percentFileCreator.tests(generator: percentGenerator, imports: "import CGUUnits")
+        )
+        let timeGenerator = GradualTestGenerator<TimeUnits>(unitDifference: [
+            .microseconds: 1000,
+            .milliseconds: 1000
+        ])
+        let timeFileCreator = TestFileCreator<GradualTestGenerator<TimeUnits>>()
+        writeFile(
+            at: path,
+            with: "TimeTests",
+            and: timeFileCreator.tests(generator: timeGenerator, imports: "import CGUUnits")
+        )
     }
 
     /// Generate the swift source files for guunits.
