@@ -171,6 +171,8 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
         }
     }
 
+    // swiftlint:disable function_body_length
+
     /// Creates a conversion function that performs a cast to a unit with a higher resolution.
     /// - Parameters:
     ///   - unit: The unit to cast from.
@@ -250,5 +252,7 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
             return "    return ((\(otherUnit)_\(otherSign)) (\(unit))) * \(otherValue);"
         }
     }
+
+    // swiftlint:enable function_body_length
 
 }
