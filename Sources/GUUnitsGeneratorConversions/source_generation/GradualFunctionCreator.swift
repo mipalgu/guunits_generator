@@ -149,8 +149,8 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
         switch (sign, otherSign) {
         case (.t, .u):
             return """
-                if (\(unit) < 0) {
-                    return 0;
+                if (\(unit) < \(otherSign.numericType.limits.0)) {
+                    return \(otherSign.numericType.limits.0);
                 }
                 return ((\(otherUnit)_\(otherSign)) (\(unit) / \(value)));
             """
