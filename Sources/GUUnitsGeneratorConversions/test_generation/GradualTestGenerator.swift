@@ -377,6 +377,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     }
 
     // swiftlint:disable function_body_length
+    // swiftlint:disable cyclomatic_complexity
 
     /// Clamp the conversion between unit types.
     /// - Parameters:
@@ -480,6 +481,8 @@ struct GradualTestGenerator<Unit>: TestGenerator where
             operation: operation
         )
     }
+
+    // swiftlint:enable cyclomatic_complexity
 
     // swiftlint:enable function_body_length
     // swiftlint:enable function_parameter_count
