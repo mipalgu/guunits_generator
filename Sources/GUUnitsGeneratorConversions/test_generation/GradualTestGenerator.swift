@@ -135,6 +135,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         }
         let lowerLimit = sign.numericType.swiftType.limits.0
         let upperLimit = sign.numericType.swiftType.limits.1
+        let otherUpperLimit = otherSign.numericType.swiftType.limits.1
         guard sign != otherSign else {
             if isDividing {
                 guard sign != .u else {
@@ -191,7 +192,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                     newTests += [
                         TestParameters(
                             input: "\(upperLimit)",
-                            output: "\(otherUnit)_\(otherSign)(\(upperLimit))"
+                            output: "\(otherUnit)_\(otherSign)(\(otherUpperLimit))"
                         )
                     ]
                     return newTests
@@ -240,7 +241,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                     newTests += [
                         TestParameters(
                             input: upperLimit,
-                            output: otherSign.numericType.swiftType.limits.1
+                            output: "\(otherUnit)_\(otherSign)(\(otherUpperLimit))"
                         )
                     ]
                 }
@@ -396,7 +397,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     ) -> TestParameters? {
         let sanitisedScaleFactor = creator.sanitiseLiteral(literal: "\(scaleFactor)", sign: otherSign)
         let operation = isDividing ? "/" : "*"
-        guard !isDividing else {
+        guard input.trimmingCharacters(in: .whitespacesAndNewlines) != "0", !isDividing else {
             return createTestCase(
                 from: sign,
                 to: otherUnit,
@@ -406,42 +407,69 @@ struct GradualTestGenerator<Unit>: TestGenerator where
                 operation: operation
             )
         }
-        guard
-            otherSign != .t,
-            let val = CInt(input),
-            val != 0,
-            (val > 0 && scaleFactor < (CInt.max / val)) || (val < 0 && scaleFactor < (CInt.min / val))
-        else {
-            return nil
-        }
-        guard
-            otherSign != .u,
-            let val = CUnsignedInt(input),
-            val != 0,
-            (val > 0 && scaleFactor < (CUnsignedInt.max / val)) ||
-                (val < 0 && scaleFactor < (CUnsignedInt.min / val))
-        else {
-            return nil
-        }
-        let floatFactor = Float(scaleFactor)
-        guard
-            otherSign != .f,
-            let val = Float(input),
-            val != 0.0,
-            (val > 0 && floatFactor < (Float.greatestFiniteMagnitude / val)) ||
-                (val < 0 && floatFactor < (-Float.greatestFiniteMagnitude / val))
-        else {
-            return nil
-        }
-        let doubleFactor = Double(scaleFactor)
-        guard
-            otherSign != .d,
-            let val = Double(input),
-            val != 0.0,
-            (val > 0 && doubleFactor < (Double.greatestFiniteMagnitude / val)) ||
-                (val < 0 && doubleFactor < (-Double.greatestFiniteMagnitude / val))
-        else {
-            return nil
+        switch otherSign {
+        case .t:
+            guard let val = CInt(input) else {
+                return nil
+            }
+            if val > 0 {
+                guard scaleFactor < (CInt.max / val) else {
+                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CInt.max)")
+                }
+            } else {
+                guard scaleFactor < (CInt.min / val) else {
+                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CInt.min)")
+                }
+            }
+        case .u:
+            guard let val = CUnsignedInt(input) else {
+                return nil
+            }
+            if val > 0 {
+                guard scaleFactor < (CUnsignedInt.max / val) else {
+                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CUnsignedInt.max)")
+                }
+            } else {
+                guard scaleFactor < (CUnsignedInt.min / val) else {
+                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CUnsignedInt.min)")
+                }
+            }
+        case .f:
+            let floatFactor = Float(scaleFactor)
+            guard let val = Float(input) else {
+                return nil
+            }
+            if val > 0 {
+                guard floatFactor < (Float.greatestFiniteMagnitude / val) else {
+                    return TestParameters(
+                        input: input, output: "\(otherUnit)_\(otherSign)(Float.greatestFiniteMagnitude)"
+                    )
+                }
+            } else {
+                guard floatFactor < (-Float.greatestFiniteMagnitude / val) else {
+                    return TestParameters(
+                        input: input, output: "\(otherUnit)_\(otherSign)(-Float.greatestFiniteMagnitude)"
+                    )
+                }
+            }
+        case .d:
+            let doubleFactor = Double(scaleFactor)
+            guard let val = Double(input) else {
+                return nil
+            }
+            if val > 0 {
+                guard doubleFactor < (Double.greatestFiniteMagnitude / val) else {
+                    return TestParameters(
+                        input: input, output: "\(otherUnit)_\(otherSign)(Double.greatestFiniteMagnitude)"
+                    )
+                }
+            } else {
+                guard doubleFactor < (-Double.greatestFiniteMagnitude / val) else {
+                    return TestParameters(
+                        input: input, output: "\(otherUnit)_\(otherSign)(-Double.greatestFiniteMagnitude)"
+                    )
+                }
+            }
         }
         return createTestCase(
             from: sign,
