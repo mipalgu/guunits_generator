@@ -94,12 +94,12 @@ struct SignConverter {
         case (.t, .f), (.u, .f), (.f, .f), (_, .d):
             return self.cast("\(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         case (.d, .f):
-            let floatMax = otherSign.numericType.limits.1
-            let floatMin = otherSign.numericType.limits.0
-            let fMax = "((double) (\(floatMax)))"
-            let fMin = "((double) (\(floatMin)))"
+            let otherMax = otherSign.numericType.limits.1
+            let otherMin = otherSign.numericType.limits.0
+            let max = "((double) (\(otherMax)))"
+            let min = "((double) (\(otherMin)))"
             return self.cast(
-                "\(str) < \(fMax) ? (\(str) > \(fMin) ? \(str) : \(floatMin)) : \(floatMax)",
+                "\(str) < \(max) ? (\(str) > \(min) ? \(str) : \(otherMin)) : \(otherMax)",
                 to: "\(otherUnit)_\(otherSign.rawValue)"
             )
         default:
@@ -115,7 +115,15 @@ struct SignConverter {
                 return self.cast("\(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
             }
             let toDouble = self.cast("\(str)", to: "double")
-            return self.cast("round(\(toDouble))", to: "\(otherUnit)_\(otherSign.rawValue)")
+            let otherMax = otherSign.numericType.limits.1
+            let otherMin = otherSign.numericType.limits.0
+            let max = "((double) (\(otherMax)))"
+            let min = "((double) (\(otherMin)))"
+            let str2 = "round(\(toDouble))"
+            return self.cast(
+                "\(str2) < \(max) ? (\(str2) > \(min) ? \(str2) : \(otherMin)) : \(otherMax)",
+                to: "\(otherUnit)_\(otherSign.rawValue)"
+            )
         }
     }
 
