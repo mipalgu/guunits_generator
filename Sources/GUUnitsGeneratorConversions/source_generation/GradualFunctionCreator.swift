@@ -141,15 +141,34 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
         otherSign: Signs,
         andValue value: Int
     ) -> String {
-        guard let lastSign = Signs.allCases.last else {
-            fatalError("Signs is empty.")
+        let otherValue = self.helpers.modify(value: value, forSign: otherSign)
+        let value = self.helpers.modify(value: value, forSign: sign)
+        let conversion = signConverter.convert(
+            "conversion", otherUnit: otherUnit, from: sign, to: otherSign
+        )
+        switch (sign, otherSign) {
+        case (.t, .u):
+            return """
+                if (\(unit) < 0) {
+                    return 0;
+                }
+                return ((\(otherUnit)_\(otherSign)) (\(unit) / \(value)));
+            """
+        case (.u, .t):
+            return """
+                const \(unit)_\(sign) conversion = \(unit) / \(value);
+                return \(conversion);
+            """
+        case (.t, _), (.u, _), (.f, .f), (.d, .d):
+            return "    return ((\(otherUnit)_\(otherSign)) (\(unit) / \(value)));"
+        case (.f, .d):
+            return "    return (((\(otherUnit)_\(otherSign)) (\(unit))) / \(otherValue));"
+        case (.f, _), (.d, _):
+            return """
+                const \(unit)_\(sign) conversion = \(unit) / \(value);
+                return \(conversion);
+            """
         }
-        let lastValue = self.helpers.modify(value: value, forSign: lastSign)
-        let calculate: String = self.signConverter.convert(
-            "\(unit)", otherUnit: unit, from: sign, to: lastSign
-        ) + " / \(lastValue)"
-        let body = self.signConverter.convert(calculate, otherUnit: otherUnit, from: lastSign, to: otherSign)
-        return "    return \(body);"
     }
 
     /// Creates a conversion function that performs a cast to a unit with a higher resolution.
