@@ -187,10 +187,68 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
         andValue difference: Int
     ) -> String {
         let value = self.helpers.modify(value: difference, forSign: sign)
-        let body = self.signConverter.convert(
-            "\(unit) * \(value)", otherUnit: otherUnit, from: sign, to: otherSign
-        )
-        return "    return \(body);"
+        let otherValue = self.helpers.modify(value: difference, forSign: otherSign)
+        let unitAsOther = "((\(otherUnit)_\(otherSign)) (\(unit)))"
+        let unitAsOtherName = "other\(unit.description.capitalized)"
+        switch (sign, otherSign) {
+        case (.u, .u):
+            let upperLimit = sign.numericType.limits.1
+            return """
+                if (\(unit) > \(upperLimit) / \(value)) {
+                    return \(upperLimit);
+                }
+                return \(unitAsOther) * \(otherValue);
+            """
+        case (.t, .t), (.f, .f), (.d, .d):
+            let upperLimit = sign.numericType.limits.1
+            let lowerLimit = sign.numericType.limits.0
+            return """
+                if (\(unit) < \(lowerLimit) / \(value)) {
+                    return \(lowerLimit);
+                }
+                if (\(unit) > \(upperLimit) / \(value)) {
+                    return \(upperLimit);
+                }
+                return \(unitAsOther) * \(otherValue);
+            """
+        case (.t, .u):
+            let maxLimit = "\(otherSign.numericType.limits.1) / \(otherValue)"
+            return """
+                if (\(unit) < \(otherSign.numericType.limits.0)) {
+                    return \(otherSign.numericType.limits.0);
+                }
+                const \(otherUnit)_\(otherSign) \(unitAsOtherName) = \(unitAsOther);
+                if (\(unitAsOtherName) > \(maxLimit)) {
+                    return \(otherSign.numericType.limits.1);
+                }
+                return \(unitAsOtherName) * \(otherValue);
+            """
+        case (.u, .t):
+            let maxLimit = "\(otherSign.numericType.limits.1) / \(otherValue)"
+            let castedMaxLimit = "((\(unit)_\(sign)) (\(maxLimit)))"
+            return """
+                if (\(unit) > \(castedMaxLimit)) {
+                    return \(otherSign.numericType.limits.1);
+                }
+                return ((\(otherUnit)_\(otherSign)) (\(unit) * \(value)));
+            """
+        case (.f, .d):
+            return "    return ((\(otherUnit)_\(otherSign)) (\(unit))) * \(otherValue);"
+        case (.d, _), (.f, _):
+            let maxLimit = "((\(unit)_\(sign)) (\(otherSign.numericType.limits.1))) / \(value)"
+            let minLimit = "((\(unit)_\(sign)) (\(otherSign.numericType.limits.0))) / \(value)"
+            return """
+                if (\(unit) > \(maxLimit)) {
+                    return \(otherSign.numericType.limits.1);
+                }
+                if (\(unit) < \(minLimit)) {
+                    return \(otherSign.numericType.limits.0);
+                }
+                return ((\(otherUnit)_\(otherSign)) (\(unit) * \(value)));
+            """
+        case (_, .f), (_, .d):
+            return "    return ((\(otherUnit)_\(otherSign)) (\(unit))) * \(otherValue);"
+        }
     }
 
 }
