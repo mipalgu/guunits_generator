@@ -91,8 +91,17 @@ struct SignConverter {
                 "(\(str)) > \(intMax) ? \(intMax) : \(str)",
                 to: "\(otherUnit)_\(otherSign.rawValue)"
             )
-        case (_, .f), (_, .d):
+        case (.t, .f), (.u, .f), (.f, .f), (_, .d):
             return self.cast("\(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
+        case (.d, .f):
+            let floatMax = otherSign.numericType.limits.1
+            let floatMin = otherSign.numericType.limits.0
+            let fMax = "((double) (\(floatMax)))"
+            let fMin = "((double) (\(floatMin)))"
+            return self.cast(
+                "\(str) < \(fMax) ? (\(str) > \(fMin) ? \(str) : \(floatMin)) : \(floatMax)",
+                to: "\(otherUnit)_\(otherSign.rawValue)"
+            )
         default:
             let allCases = Array(Signs.allCases)
             guard
