@@ -227,6 +227,11 @@ public struct GUUnitsGenerator {
             with: TemperatureUnits.category,
             and: swiftFileCreator.generate(for: TemperatureUnits.self)
         )
+        writeFile(
+            at: path,
+            with: AccelerationUnits.category,
+            and: swiftFileCreator.generate(for: AccelerationUnits.self)
+        )
         print("Done!")
     }
 
