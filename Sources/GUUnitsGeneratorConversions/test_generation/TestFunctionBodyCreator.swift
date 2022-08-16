@@ -229,7 +229,7 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         """
         let result = \(body)(\(parameters.input))
         let expected: \(conversion) = \(parameters.output)
-        let tolerance: \(conversion) = 0.75
+        let tolerance: \(conversion) = 0.99
         if result > expected {
             XCTAssertLessThanOrEqual(result - expected, tolerance)
         } else {
