@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Struct that creates test parameters for angle conversions.
 struct AngleTestGenerator: TestGenerator {
 
     /// The unit type is AngleUnits.
@@ -61,6 +62,8 @@ struct AngleTestGenerator: TestGenerator {
 
     /// The creator which will sanitise literals.
     let creator = TestFunctionBodyCreator<AngleUnits>()
+
+    // swiftlint:disable function_body_length
 
     /// Generate the test parameters for a unit to unit conversion.
     /// - Parameters:
@@ -146,6 +149,8 @@ struct AngleTestGenerator: TestGenerator {
         return newTests
     }
 
+    // swiftlint:enable function_body_length
+
     /// Generate test parameters for a unit to numeric conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -170,6 +175,14 @@ struct AngleTestGenerator: TestGenerator {
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }
 
+    /// Creates a Test parameters for a conversion function.
+    /// - Parameters:
+    ///   - value: The value to convert.
+    ///   - unit: The unit of the value.
+    ///   - sign: The sign of the value.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: Produces a test parameter that tests the conversion.
     private func testCase(
         value: String,
         from unit: AngleUnits,
