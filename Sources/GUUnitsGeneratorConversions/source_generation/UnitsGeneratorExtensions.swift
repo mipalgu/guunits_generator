@@ -258,6 +258,64 @@ extension UnitsGenerator where
 
 }
 
+/// AccelerationUnits initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<
+        AccelerationFunctionCreator,
+        CFunctionDefinitionCreator<AccelerationUnits>,
+        NumericTypeConverter
+    > {
+
+    /// Initialise using AngleUnits and C conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
+    public init(
+        bodyCreator: AccelerationFunctionCreator = AccelerationFunctionCreator(),
+        definitionCreator: CFunctionDefinitionCreator<AccelerationUnits> = CFunctionDefinitionCreator(),
+        numericConverter: NumericTypeConverter = NumericTypeConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: bodyCreator,
+            definitionCreator: definitionCreator,
+            numericConverter: numericConverter
+        ))
+    }
+
+}
+
+/// AccelerationUnits initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<
+        AccelerationFunctionCreator,
+        CPPFunctionDefinitionCreator<AccelerationUnits>,
+        NumericTypeConverter
+    > {
+
+    /// Initialise using AngleUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
+    public init(
+        bodyCreator: AccelerationFunctionCreator = AccelerationFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<AccelerationUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: NumericTypeConverter = NumericTypeConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: bodyCreator,
+            definitionCreator: definitionCreator,
+            numericConverter: numericConverter
+        ))
+    }
+
+}
+
 /// DistanceUnits initialiser for cpp conversions using Delegating function creators.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<DelegatingFunctionCreator<DistanceUnits>,

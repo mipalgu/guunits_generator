@@ -107,6 +107,9 @@ public struct GUUnitsGenerator {
         let temperatureGenerator = AnyGenerator(
             generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
         )
+        let accelerationGenerator = AnyGenerator(
+            generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
+        )
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
@@ -114,7 +117,8 @@ public struct GUUnitsGenerator {
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
-                temperatureGenerator
+                temperatureGenerator,
+                accelerationGenerator
             ]
         )
         .data(using: .utf8)
@@ -128,7 +132,8 @@ public struct GUUnitsGenerator {
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
-                temperatureGenerator
+                temperatureGenerator,
+                accelerationGenerator
             ]
         )
         .data(using: .utf8)
