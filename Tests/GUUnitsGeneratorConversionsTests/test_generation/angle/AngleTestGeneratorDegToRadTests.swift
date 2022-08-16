@@ -304,10 +304,11 @@ final class AngleTestGeneratorDegToRadTests: XCTestCase, TestParameterTestable, 
             }
             return "radians_\(otherSign)(\(calculation))"
         }
+        let literal = creator.sanitiseLiteral(literal: value, sign: sign)
         guard otherSign.isFloatingPoint else {
-            return "radians_\(otherSign)((Double(\(value)) / 180.0 * Double.pi).rounded())"
+            return "radians_\(otherSign)((Double(\(literal)) / 180.0 * Double.pi).rounded())"
         }
-        return "radians_\(otherSign)(Double(\(value)) / 180.0 * Double.pi)"
+        return "radians_\(otherSign)(Double(\(literal)) / 180.0 * Double.pi)"
     }
 
 }

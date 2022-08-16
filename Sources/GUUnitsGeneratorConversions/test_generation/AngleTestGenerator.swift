@@ -209,30 +209,31 @@ struct AngleTestGenerator: TestGenerator {
         with otherSign: Signs
     ) -> TestParameters {
         let calculation: String
+        let literal = creator.sanitiseLiteral(literal: value, sign: sign)
         switch (unit, otherUnit) {
         case (.radians, .degrees):
             if sign == .d {
                 calculation = "\(creator.sanitiseLiteral(literal: value, to: .double)) / Double.pi * 180.0"
             } else {
-                calculation = "Double(\(value)) / Double.pi * 180.0"
+                calculation = "Double(\(literal)) / Double.pi * 180.0"
             }
         case (.degrees, .radians):
             if sign == .d {
                 calculation = "\(creator.sanitiseLiteral(literal: value, to: .double)) / 180.0 * Double.pi"
             } else {
-                calculation = "Double(\(value)) / 180.0 * Double.pi"
+                calculation = "Double(\(literal)) / 180.0 * Double.pi"
             }
         default:
             fatalError("Same unit type not supported in this function!")
         }
         guard otherSign.isFloatingPoint else {
             return TestParameters(
-            input: creator.sanitiseLiteral(literal: value, sign: sign),
+            input: literal,
             output: "\(otherUnit)_\(otherSign)((\(calculation)).rounded())"
         )
         }
         return TestParameters(
-            input: creator.sanitiseLiteral(literal: value, sign: sign),
+            input: literal,
             output: "\(otherUnit)_\(otherSign)(\(calculation))"
         )
     }
