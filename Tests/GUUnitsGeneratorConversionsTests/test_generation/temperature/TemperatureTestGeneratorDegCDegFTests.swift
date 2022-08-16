@@ -195,47 +195,55 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
         from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
     ) -> Set<TestParameters> {
         let creator = TestFunctionBodyCreator<TemperatureUnits>()
-        var newTests: Set<TestParameters> = additional.union(Set([
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "0", sign: sign),
-                output: creator.sanitiseLiteral(literal: "32", sign: otherSign)
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "0.85", sign: sign),
-                output: creator.sanitiseLiteral(literal: "33.53", sign: otherSign)
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "25", sign: sign),
-                output: creator.sanitiseLiteral(literal: "77", sign: otherSign)
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "2", sign: sign),
-                output: creator.sanitiseLiteral(literal: "35.6", sign: otherSign)
+        var newTests: Set<TestParameters> = additional.union(
+            Set(
+                [
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "32", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "0.85", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "33.53", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "25", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "77", sign: otherSign)
+                    ),
+                    TestParameters(
+                        input: creator.sanitiseLiteral(literal: "2", sign: sign),
+                        output: creator.sanitiseLiteral(literal: "35.6", sign: otherSign)
+                    )
+                ]
             )
-        ]))
+        )
         if sign.numericType.isSigned && otherSign.numericType.isSigned {
-            newTests = newTests.union(Set([
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-573.01", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-999.418", sign: otherSign)
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-272.15", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-457.87", sign: otherSign)
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-268", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-450.40", sign: otherSign)
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-273.03", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-459.454", sign: otherSign)
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-20", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-4", sign: otherSign)
+            newTests = newTests.union(
+                Set(
+                    [
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-573.01", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-999.418", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-272.15", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-457.87", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-268", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-450.40", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-273.03", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-459.454", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "-20", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-4", sign: otherSign)
+                        )
+                    ]
                 )
-            ]))
+            )
         }
         return newTests
     }

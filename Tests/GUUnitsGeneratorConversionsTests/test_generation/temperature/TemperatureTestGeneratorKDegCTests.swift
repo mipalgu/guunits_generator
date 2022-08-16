@@ -203,20 +203,24 @@ final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestabl
             )
         }
         if otherSign.numericType.isSigned {
-            newTests = newTests.union(Set<TestParameters>([
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "1.0", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-272.15", sign: otherSign)
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "5.0", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-268.15", sign: otherSign)
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "0", sign: sign),
-                    output: creator.sanitiseLiteral(literal: "-273.15", sign: otherSign)
+            newTests = newTests.union(
+                Set<TestParameters>(
+                    [
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "1.0", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-272.15", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "5.0", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-268.15", sign: otherSign)
+                        ),
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: "0", sign: sign),
+                            output: creator.sanitiseLiteral(literal: "-273.15", sign: otherSign)
+                        )
+                    ]
                 )
-            ]))
+            )
         }
         return newTests
     }
