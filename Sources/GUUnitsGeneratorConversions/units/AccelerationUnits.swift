@@ -1,4 +1,4 @@
-// TestParameterTestable.swift 
+// AccelerationUnits.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,62 +54,33 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A unit that represents accelerations.
+public enum AccelerationUnits: String {
 
-/// Protocol providing helper functions for Tests that use test parameters.
-protocol TestParameterTestable {
+    /// Metres per second squared. (m/(s^2))
+    case metresPerSecond2
 
-    /// Tests that an array of TestParameters contains the same elements as a set of TestParameters.
-    /// - Parameters:
-    ///   - result: The array to test.
-    ///   - expected: The set to compare result against.
-    /// - Returns: Whether result contains the same members as expected.
-    func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool
+    /// g's. Acceleration normalised to Earths gravitational acceleration (9.807 m/(s^2))
+    case g
 
 }
 
-/// Default implementations for TestParameterTestable.
-extension TestParameterTestable {
+/// UnitProtocol conformance.
+extension AccelerationUnits: UnitProtocol {
 
-    /// Tests that an array of TestParameters contains the same elements as a set of TestParameters.
-    /// - Parameters:
-    ///   - result: The array to test.
-    ///   - expected: The set to compare result against.
-    /// - Returns: Whether result contains the same members as expected.
-    func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool {
-        var success = true
-        result.forEach {
-            guard expected.contains($0) else {
-                XCTFail("Additional test \($0) found!")
-                success = false
-                return
-            }
+    /// The abbreviation of the unit.
+    public var abbreviation: String {
+        switch self {
+        case .metresPerSecond2:
+            return "mps2"
+        case .g:
+            return "g"
         }
-        let resultSet = Set(result)
-        let expectedArray = Array(expected)
-        expectedArray.forEach {
-            guard resultSet.contains($0) else {
-                XCTFail("Missing test \($0)!")
-                success = false
-                return
-            }
-        }
-        XCTAssertEqual(result.count, expected.count)
-        if result.count != expected.count {
-            let duplicates = Dictionary(grouping: result.enumerated()) {
-                $0.1.input + $0.1.output
-            }.filter {
-                $1.count > 1
-            }
-            .map { $0.1 }
-            print("result not equal to expected with duplicates \(duplicates)")
-        }
-        XCTAssertEqual(result.count, resultSet.count)
-        guard result.count == expected.count && result.count == resultSet.count else {
-            return false
-        }
-        return success
+    }
+
+    /// The description of the unit.
+    public var description: String {
+        rawValue
     }
 
 }

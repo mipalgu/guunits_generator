@@ -1,4 +1,4 @@
-// TestParameterTestable.swift 
+// AccelerationUnitsTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,59 +57,29 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Protocol providing helper functions for Tests that use test parameters.
-protocol TestParameterTestable {
+/// Test class for AccelerationUnits.
+final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
 
-    /// Tests that an array of TestParameters contains the same elements as a set of TestParameters.
-    /// - Parameters:
-    ///   - result: The array to test.
-    ///   - expected: The set to compare result against.
-    /// - Returns: Whether result contains the same members as expected.
-    func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool
+    /// Test mps2.
+    func testMps2() {
+        assert(
+            value: AccelerationUnits.metresPerSecond2,
+            rawValue: "metresPerSecond2",
+            abbreviation: "mps2",
+            description: "metresPerSecond2"
+        )
+    }
 
-}
+    /// Test g's.
+    func testGs() {
+        assert(value: AccelerationUnits.g, rawValue: "g", abbreviation: "g", description: "g")
+    }
 
-/// Default implementations for TestParameterTestable.
-extension TestParameterTestable {
-
-    /// Tests that an array of TestParameters contains the same elements as a set of TestParameters.
-    /// - Parameters:
-    ///   - result: The array to test.
-    ///   - expected: The set to compare result against.
-    /// - Returns: Whether result contains the same members as expected.
-    func testSet(result: [TestParameters], expected: Set<TestParameters>) -> Bool {
-        var success = true
-        result.forEach {
-            guard expected.contains($0) else {
-                XCTFail("Additional test \($0) found!")
-                success = false
-                return
-            }
-        }
-        let resultSet = Set(result)
-        let expectedArray = Array(expected)
-        expectedArray.forEach {
-            guard resultSet.contains($0) else {
-                XCTFail("Missing test \($0)!")
-                success = false
-                return
-            }
-        }
-        XCTAssertEqual(result.count, expected.count)
-        if result.count != expected.count {
-            let duplicates = Dictionary(grouping: result.enumerated()) {
-                $0.1.input + $0.1.output
-            }.filter {
-                $1.count > 1
-            }
-            .map { $0.1 }
-            print("result not equal to expected with duplicates \(duplicates)")
-        }
-        XCTAssertEqual(result.count, resultSet.count)
-        guard result.count == expected.count && result.count == resultSet.count else {
-            return false
-        }
-        return success
+    /// Test static vars.
+    func testStaticVars() {
+        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
+        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
+        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
     }
 
 }

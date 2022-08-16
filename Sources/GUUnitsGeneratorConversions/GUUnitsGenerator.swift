@@ -107,6 +107,9 @@ public struct GUUnitsGenerator {
         let temperatureGenerator = AnyGenerator(
             generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
         )
+        let accelerationGenerator = AnyGenerator(
+            generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
+        )
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
@@ -114,7 +117,8 @@ public struct GUUnitsGenerator {
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
-                temperatureGenerator
+                temperatureGenerator,
+                accelerationGenerator
             ]
         )
         .data(using: .utf8)
@@ -128,15 +132,14 @@ public struct GUUnitsGenerator {
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
-                temperatureGenerator
+                temperatureGenerator,
+                accelerationGenerator
             ]
         )
         .data(using: .utf8)
         fileManager.createFile(atPath: cFile.path, contents: cContents)
         print("Done!")
     }
-
-    // swiftlint:enable function_body_length
 
     /// Create the C Test files at a specific location.
     /// - Parameter path: The path to the folder that will contain the test files.
@@ -192,7 +195,16 @@ public struct GUUnitsGenerator {
             with: "AngleTests",
             and: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
         )
+        let accelerationGenerator = AccelerationTestGenerator()
+        let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
+        writeFile(
+            at: path,
+            with: "AccelerationTests",
+            and: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
+        )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Generate the swift source files for guunits.
     /// - Parameter path: The path to the directory containing the new files.
@@ -221,6 +233,11 @@ public struct GUUnitsGenerator {
             at: path,
             with: TemperatureUnits.category,
             and: swiftFileCreator.generate(for: TemperatureUnits.self)
+        )
+        writeFile(
+            at: path,
+            with: AccelerationUnits.category,
+            and: swiftFileCreator.generate(for: AccelerationUnits.self)
         )
         print("Done!")
     }

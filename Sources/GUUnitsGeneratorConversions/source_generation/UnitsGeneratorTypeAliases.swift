@@ -52,6 +52,15 @@ public typealias TemperatureUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Acceleration Units Generator.
+public typealias AccelerationUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        AccelerationFunctionCreator,
+        CFunctionDefinitionCreator<AccelerationUnits>,
+        NumericTypeConverter
+    >
+>
+
 /// CPP Distance Units Generator
 public typealias CPPDistanceUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<

@@ -103,6 +103,11 @@ final class HeaderCreatorTests: XCTestCase {
         generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
     )
 
+    /// The acceleration generator.
+    let accelerationGenerator = AnyGenerator(
+        generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
+    )
+
     /// The header of the file.
     var prefix: String {
         """
@@ -213,7 +218,8 @@ final class HeaderCreatorTests: XCTestCase {
             ("// Angle Units.", Array(AngleUnits.allCases)),
             ("// Image Units.", Array(ImageUnits.allCases)),
             ("// Percent Units.", Array(PercentUnits.allCases)),
-            ("// Temperature Units.", Array(TemperatureUnits.allCases))
+            ("// Temperature Units.", Array(TemperatureUnits.allCases)),
+            ("// Acceleration Units.", Array(AccelerationUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in
@@ -236,7 +242,8 @@ final class HeaderCreatorTests: XCTestCase {
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
-                temperatureGenerator
+                temperatureGenerator,
+                accelerationGenerator
             ]
         )
         guard
@@ -245,7 +252,8 @@ final class HeaderCreatorTests: XCTestCase {
             let angles = angleGenerator.declarations,
             let images = imageGenerator.declarations,
             let percentages = percentGenerator.declarations,
-            let temperatures = temperatureGenerator.declarations
+            let temperatures = temperatureGenerator.declarations,
+            let accelerations = accelerationGenerator.declarations
         else {
             XCTFail("Unable to create header.")
             return
@@ -257,6 +265,7 @@ final class HeaderCreatorTests: XCTestCase {
             + "\n\n" + images
             + "\n\n" + percentages
             + "\n\n" + temperatures
+            + "\n\n" + accelerations
             + "\n\n" + suffix
         XCTAssertEqual(result, expected)
     }
