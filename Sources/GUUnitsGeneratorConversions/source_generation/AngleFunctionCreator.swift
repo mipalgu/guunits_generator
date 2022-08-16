@@ -65,6 +65,8 @@ public struct AngleFunctionCreator: FunctionBodyCreator {
     /// Default init.
     public init() {}
 
+    // swiftlint:disable function_body_length
+
     /// Generates C-code that will perform a cast between different angle units.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -125,6 +127,8 @@ public struct AngleFunctionCreator: FunctionBodyCreator {
             return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign)
         }
     }
+
+    // swiftlint:enable function_body_length
 
     /// Generates a standard sign conversion for identical unit types.
     /// - Parameters:
