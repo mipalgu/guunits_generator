@@ -62,7 +62,7 @@
 /// Create test cases for the C temperature unit.
 struct TemperatureTestGenerator: TestGenerator {
 
-    /// The unit type it temperature.
+    /// The unit type is temperature.
     typealias UnitType = TemperatureUnits
 
     /// The creator which will sanitise literals.

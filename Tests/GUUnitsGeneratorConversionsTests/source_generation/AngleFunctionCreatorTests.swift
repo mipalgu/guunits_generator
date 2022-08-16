@@ -18,13 +18,25 @@ final class AngleFunctionCreatorTests: XCTestCase {
     /// Test degree to radian cast.
     func testCreateFunctionDegToRad() {
         let result = creator.createFunction(unit: .degrees, to: .radians, sign: .t, otherSign: .d)
-        XCTAssertEqual(result, "    return ((radians_d) (((double) degrees) * M_PI / 180.0));")
+        XCTAssertEqual(result, "    return ((radians_d) (((double) (degrees)) / 180.0 * M_PI));")
     }
 
     /// Test radian to degree cast.
     func testCreateFunctionRadToDeg() {
         let result = creator.createFunction(unit: .radians, to: .degrees, sign: .d, otherSign: .t)
-        XCTAssertEqual(result, "    return ((degrees_t) (round(180.0 / M_PI * ((double) radians))));")
+        let expected = """
+            const double maxValue = ((double) (INT_MAX)) / 180.0 * M_PI;
+            const double minValue = ((double) (INT_MIN)) / 180.0 * M_PI;
+            const double castedValue = ((double) (radians));
+            if (castedValue > maxValue) {
+                return INT_MAX;
+            }
+            if (castedValue < minValue) {
+                return INT_MIN;
+            }
+            return ((degrees_t) (round(castedValue / M_PI * 180.0)));
+        """
+        XCTAssertEqual(result, expected)
     }
 
     /// Test standard cast.

@@ -65,6 +65,8 @@ public struct AngleFunctionCreator: FunctionBodyCreator {
     /// Default init.
     public init() {}
 
+    // swiftlint:disable function_body_length
+
     /// Generates C-code that will perform a cast between different angle units.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -75,18 +77,58 @@ public struct AngleFunctionCreator: FunctionBodyCreator {
     public func createFunction(
         unit: AngleUnits, to otherUnit: AngleUnits, sign: Signs, otherSign: Signs
     ) -> String {
-        let convert: String
         switch (unit, otherUnit) {
         case (.degrees, .radians):
-            convert = "((double) \(unit)) * M_PI / 180.0"
+            guard otherSign != .d else {
+                return "    return ((radians_d) (((double) (\(unit))) / 180.0 * M_PI));"
+            }
+            let max = "((double) (\(otherSign.numericType.limits.1)))"
+            let min = "((double) (\(otherSign.numericType.limits.0)))"
+            let roundString: String
+            if otherSign.isFloatingPoint {
+                roundString = "((radians_\(otherSign)) (castedValue / 180.0 * M_PI))"
+            } else {
+                roundString = "((radians_\(otherSign)) (round(castedValue / 180.0 * M_PI)))"
+            }
+            return """
+                const double maxValue = \(max) / M_PI * 180.0;
+                const double minValue = \(min) / M_PI * 180.0;
+                const double castedValue = ((double) (\(unit)));
+                if (castedValue > maxValue) {
+                    return \(otherSign.numericType.limits.1);
+                }
+                if (castedValue < minValue) {
+                    return \(otherSign.numericType.limits.0);
+                }
+                return \(roundString);
+            """
         case (.radians, .degrees):
-            convert = "180.0 / M_PI * ((double) \(unit))"
+            let max = "((double) (\(otherSign.numericType.limits.1))) / 180.0 * M_PI"
+            let min = "((double) (\(otherSign.numericType.limits.0))) / 180.0 * M_PI"
+            let roundString: String
+            if otherSign.isFloatingPoint {
+                roundString = "((degrees_\(otherSign)) (castedValue / M_PI * 180.0))"
+            } else {
+                roundString = "((degrees_\(otherSign)) (round(castedValue / M_PI * 180.0)))"
+            }
+            return """
+                const double maxValue = \(max);
+                const double minValue = \(min);
+                const double castedValue = ((double) (\(unit)));
+                if (castedValue > maxValue) {
+                    return \(otherSign.numericType.limits.1);
+                }
+                if (castedValue < minValue) {
+                    return \(otherSign.numericType.limits.0);
+                }
+                return \(roundString);
+            """
         default:
             return self.castFunc(forUnit: unit, sign: sign, otherSign: otherSign)
         }
-        let implementation = self.shouldRound(from: sign, to: otherSign) ? "round(\(convert))" : convert
-        return "    return ((\(otherUnit)_\(otherSign.rawValue)) (\(implementation)));"
     }
+
+    // swiftlint:enable function_body_length
 
     /// Generates a standard sign conversion for identical unit types.
     /// - Parameters:

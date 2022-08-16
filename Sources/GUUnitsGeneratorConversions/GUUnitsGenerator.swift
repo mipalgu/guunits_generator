@@ -185,6 +185,13 @@ public struct GUUnitsGenerator {
             with: "TimeTests",
             and: timeFileCreator.tests(generator: timeGenerator, imports: "import CGUUnits")
         )
+        let angleGenerator = AngleTestGenerator()
+        let angleFileCreator = TestFileCreator<AngleTestGenerator>()
+        writeFile(
+            at: path,
+            with: "AngleTests",
+            and: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
+        )
     }
 
     /// Generate the swift source files for guunits.
