@@ -96,6 +96,15 @@ extension TestParameterTestable {
             }
         }
         XCTAssertEqual(result.count, expected.count)
+        if result.count != expected.count {
+            let duplicates = Dictionary(grouping: result.enumerated()) {
+                $0.1.input + $0.1.output
+            }.filter {
+                $1.count > 1
+            }
+            .map { $0.1 }
+            print("result not equal to expected with duplicates \(duplicates)")
+        }
         XCTAssertEqual(result.count, resultSet.count)
         guard result.count == expected.count && result.count == resultSet.count else {
             return false
