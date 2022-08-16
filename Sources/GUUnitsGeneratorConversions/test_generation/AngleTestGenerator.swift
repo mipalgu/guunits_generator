@@ -121,10 +121,28 @@ struct AngleTestGenerator: TestGenerator {
             return newTests
         }
         guard unit == .radians else {
-            newTests += [
-                testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
-                testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
-            ]
+            switch (sign, otherSign) {
+            case (.t, .u):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: otherLowerLimit),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            case (.u, .t):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: lowerLimitAsOther),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            case (.f, .t), (.f, .u), (.d, _):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: otherLowerLimit),
+                    TestParameters(input: upperLimit, output: otherUpperLimit)
+                ]
+            default:
+                newTests += [
+                    testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            }
             return newTests
         }
         switch (sign, otherSign) {
