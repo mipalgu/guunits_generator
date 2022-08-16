@@ -63,6 +63,8 @@ struct AccelerationTestGenerator: TestGenerator {
     /// The creator which will sanitise literals.
     let creator = TestFunctionBodyCreator<AccelerationUnits>()
 
+    // swiftlint:disable function_body_length
+
     /// Generate the test parameters for a unit to unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -154,12 +156,37 @@ struct AccelerationTestGenerator: TestGenerator {
                 break
             }
         case (.g, .metresPerSecond2):
-            break
+            switch (sign, otherSign) {
+            case (.u, .t):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: lowerLimitAsOther),
+                    TestParameters(input: upperLimit, output: otherUpperLimit)
+                ]
+            case (.u, _):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: lowerLimitAsOther),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            case (.t, .u), (.d, .f), (.f, .t), (.f, .u), (.d, .t), (.d, .u):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: otherLowerLimit),
+                    TestParameters(input: upperLimit, output: otherUpperLimit)
+                ]
+            case (_, .f), (_, .d):
+                newTests += [
+                    testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            default:
+                break
+            }
         default:
             break
         }
         return newTests
     }
+
+    // swiftlint:enable function_body_length
 
     /// Generate test parameters for a unit to numeric conversion.
     /// - Parameters:
