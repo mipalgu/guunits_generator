@@ -54,6 +54,8 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+// swiftlint:disable file_length
+
 /// Struct used to generate test parameters for units that are convertable using
 /// constant factors. e.g. 10 millimetres in a centimetre.
 struct GradualTestGenerator<Unit>: TestGenerator where
@@ -505,3 +507,5 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     // swiftlint:enable function_parameter_count
 
 }
+
+// swiftlint:enable file_length
