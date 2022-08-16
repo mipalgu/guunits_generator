@@ -60,6 +60,9 @@ struct AccelerationTestGenerator: TestGenerator {
     /// The unit type is AccelerationUnits.
     typealias UnitType = AccelerationUnits
 
+    /// The creator which will sanitise literals.
+    let creator = TestFunctionBodyCreator<AccelerationUnits>()
+
     /// Generate the test parameters for a unit to unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -76,7 +79,86 @@ struct AccelerationTestGenerator: TestGenerator {
         guard unit != otherUnit else {
             return self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
         }
-        return []
+        var newTests: [TestParameters] = (
+            ["250", "0", "2500", "25000", "250000", "2500000", "9.807"] +
+                ["360", "19.614", "98.07", "980.7", "9807"]
+        )
+        .map { testCase(value: $0, from: unit, with: sign, to: otherUnit, with: otherSign) }
+        if sign.numericType.isSigned && otherSign.numericType.isSigned {
+            newTests += (
+                ["-9.807", "-98.07", "-980.7", "-9807"] +
+                    ["-250", "-2500", "-25000", "-250000", "-2500000"]
+            ).map { testCase(value: $0, from: unit, with: sign, to: otherUnit, with: otherSign) }
+        }
+        if sign.numericType.isSigned && !otherSign.numericType.isSigned {
+            newTests += (
+                ["-9.807", "-98.07", "-980.7", "-9807"] +
+                    ["-250", "-2500", "-25000", "-250000", "-2500000"]
+            ).map {
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: $0, sign: sign),
+                    output: creator.sanitiseLiteral(literal: "0", sign: otherSign)
+                )
+            }
+        }
+        let lowerLimit = sign.numericType.swiftType.limits.0
+        let upperLimit = sign.numericType.swiftType.limits.1
+        let otherLowerLimit = otherSign.numericType.swiftType.limits.0
+        let otherUpperLimit = otherSign.numericType.swiftType.limits.1
+        let lowerLimitAsOther = "\(otherUnit)_\(otherSign)(\(lowerLimit))"
+        guard sign != otherSign else {
+            if unit == .g {
+                newTests += [
+                    TestParameters(input: lowerLimit, output: otherLowerLimit),
+                    TestParameters(input: upperLimit, output: otherUpperLimit)
+                ]
+            } else {
+                if sign == .u {
+                    newTests += [
+                        TestParameters(input: lowerLimit, output: otherLowerLimit),
+                        testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                    ]
+                } else {
+                    newTests += [
+                        testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                        testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                    ]
+                }
+            }
+            return newTests
+        }
+        switch (unit, otherUnit) {
+        case (.metresPerSecond2, .g):
+            switch (sign, otherSign) {
+            case (.t, .u):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: otherLowerLimit),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            case (.u, _):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: lowerLimitAsOther),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            case (.f, .t), (.f, .u), (.d, _):
+                newTests += [
+                    TestParameters(input: lowerLimit, output: otherLowerLimit),
+                    TestParameters(input: upperLimit, output: otherUpperLimit)
+                ]
+            case (_, .f), (_, .d):
+                newTests += [
+                    testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                    testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                ]
+            default:
+                break
+            }
+        case (.g, .metresPerSecond2):
+            break
+        default:
+            break
+        }
+        return newTests
     }
 
     /// Generate test parameters for a unit to numeric conversion.
@@ -101,6 +183,51 @@ struct AccelerationTestGenerator: TestGenerator {
         from numeric: NumericTypes, to unit: AccelerationUnits, with sign: Signs
     ) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
+    }
+
+    /// Creates a Test parameters for a conversion function.
+    /// - Parameters:
+    ///   - value: The value to convert.
+    ///   - unit: The unit of the value.
+    ///   - sign: The sign of the value.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: Produces a test parameter that tests the conversion.
+    private func testCase(
+        value: String,
+        from unit: AccelerationUnits,
+        with sign: Signs,
+        to otherUnit: AccelerationUnits,
+        with otherSign: Signs
+    ) -> TestParameters {
+        let calculation: String
+        let literal = creator.sanitiseLiteral(literal: value, sign: sign)
+        switch (unit, otherUnit) {
+        case (.metresPerSecond2, .g):
+            if sign == .d {
+                calculation = "\(creator.sanitiseLiteral(literal: value, to: .double)) / 9.807"
+            } else {
+                calculation = "Double(\(literal)) / 9.807"
+            }
+        case (.g, .metresPerSecond2):
+            if sign == .d {
+                calculation = "\(creator.sanitiseLiteral(literal: value, to: .double)) * 9.807"
+            } else {
+                calculation = "Double(\(literal)) * 9.807"
+            }
+        default:
+            fatalError("Same unit type not supported in this function!")
+        }
+        guard otherSign.isFloatingPoint else {
+            return TestParameters(
+            input: literal,
+            output: "\(otherUnit)_\(otherSign)((\(calculation)).rounded())"
+        )
+        }
+        return TestParameters(
+            input: literal,
+            output: "\(otherUnit)_\(otherSign)(\(calculation))"
+        )
     }
 
 }
