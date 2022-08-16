@@ -86,7 +86,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
         let expected = """
         let result = cm_t_to_f(10)
         let expected: Float = 10.0
-        let tolerance: Float = 0.5
+        let tolerance: Float = 0.99
         if result > expected {
             XCTAssertLessThanOrEqual(result - expected, tolerance)
         } else {

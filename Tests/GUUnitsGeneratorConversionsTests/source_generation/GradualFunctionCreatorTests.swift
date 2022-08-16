@@ -46,16 +46,28 @@ final class GradualFunctionCreatorTests: XCTestCase {
     /// Test that the conversion to a lower unit type is correct.
     func testDownCast() {
         let result = creator.createFunction(unit: .metres, to: .millimetres, sign: .t, otherSign: .u)
-        let conv = "((millimetres_u) ((metres * 1000) < 0 ? 0 : metres * 1000))"
-        let expected = "    return \(conv);"
+        let expected = """
+            if (metres < 0) {
+                return 0;
+            }
+            const millimetres_u otherMetres = ((millimetres_u) (metres));
+            if (otherMetres > UINT_MAX / 1000) {
+                return UINT_MAX;
+            }
+            return otherMetres * 1000;
+        """
         XCTAssertEqual(result, expected)
     }
 
     /// Test that the conversion to a greater unit type is correct.
     func testUpCast() {
         let result = creator.createFunction(unit: .millimetres, to: .metres, sign: .u, otherSign: .t)
-        let conv = "((metres_t) (round(((double) (((millimetres_d) (millimetres)) / 1000.0)))))"
-        let expected = "    return \(conv);"
+        // swiftlint:disable line_length
+        let expected = """
+            const millimetres_u conversion = millimetres / 1000;
+            return ((metres_t) ((conversion) > ((unsigned int) (INT_MAX)) ? ((unsigned int) (INT_MAX)) : conversion));
+        """
+        // swiftlint:enable line_length
         XCTAssertEqual(result, expected)
     }
 

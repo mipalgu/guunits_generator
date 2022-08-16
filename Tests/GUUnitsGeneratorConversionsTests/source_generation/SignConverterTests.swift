@@ -37,7 +37,11 @@ final class SignConverterTests: XCTestCase {
     /// Test convert a double to a signed integer.
     func testConvertDToT() {
         let result = converter.convert("x", otherUnit: DistanceUnits.centimetres, from: .d, to: .t)
-        XCTAssertEqual(result, "((centimetres_t) (round(((double) (x)))))")
+        let round = "round(((double) (x)))"
+        let max = "((double) (INT_MAX))"
+        let min = "((double) (INT_MIN))"
+        let expected = "\(round) < \(max) ? (\(round) > \(min) ? \(round) : INT_MIN) : INT_MAX"
+        XCTAssertEqual(result, "((centimetres_t) (\(expected)))")
     }
 
 }
