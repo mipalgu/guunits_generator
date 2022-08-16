@@ -298,7 +298,14 @@ final class AngleTestGeneratorDegToRadTests: XCTestCase, TestParameterTestable, 
     private func conversion(value: String, sign: Signs, otherSign: Signs) -> String {
         guard sign != .d else {
             let literal = self.creator.sanitiseLiteral(literal: value, to: .double)
-            return "radians_\(otherSign)(\(literal) / 180.0 * Double.pi)"
+            let calculation = "\(literal) / 180.0 * Double.pi"
+            guard otherSign.isFloatingPoint else {
+                return "radians_\(otherSign)((\(calculation)).rounded())"
+            }
+            return "radians_\(otherSign)(\(calculation))"
+        }
+        guard otherSign.isFloatingPoint else {
+            return "radians_\(otherSign)((Double(\(value)) / 180.0 * Double.pi).rounded())"
         }
         return "radians_\(otherSign)(Double(\(value)) / 180.0 * Double.pi)"
     }

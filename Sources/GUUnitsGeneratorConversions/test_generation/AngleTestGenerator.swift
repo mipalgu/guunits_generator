@@ -225,6 +225,12 @@ struct AngleTestGenerator: TestGenerator {
         default:
             fatalError("Same unit type not supported in this function!")
         }
+        guard otherSign.isFloatingPoint else {
+            return TestParameters(
+            input: creator.sanitiseLiteral(literal: value, sign: sign),
+            output: "\(otherUnit)_\(otherSign)((\(calculation)).rounded())"
+        )
+        }
         return TestParameters(
             input: creator.sanitiseLiteral(literal: value, sign: sign),
             output: "\(otherUnit)_\(otherSign)(\(calculation))"
