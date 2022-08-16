@@ -141,8 +141,6 @@ public struct GUUnitsGenerator {
         print("Done!")
     }
 
-    // swiftlint:enable function_body_length
-
     /// Create the C Test files at a specific location.
     /// - Parameter path: The path to the folder that will contain the test files.
     func generateCTests(in path: URL) {
@@ -197,7 +195,16 @@ public struct GUUnitsGenerator {
             with: "AngleTests",
             and: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
         )
+        let accelerationGenerator = AccelerationTestGenerator()
+        let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
+        writeFile(
+            at: path,
+            with: "AccelerationTests",
+            and: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
+        )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Generate the swift source files for guunits.
     /// - Parameter path: The path to the directory containing the new files.
