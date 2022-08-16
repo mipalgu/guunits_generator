@@ -369,10 +369,27 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         operation: String
     ) -> TestParameters {
         let sanitisedLiteral = creator.sanitiseLiteral(literal: testInput, sign: sign)
-        let sanitisedLiteraAsOther = creator.sanitiseLiteral(literal: testInput, sign: otherSign)
+        let sanitisedLiteralAsOther = creator.sanitiseLiteral(literal: testInput, sign: otherSign)
+        let sanitisedScaleFactor = creator.sanitiseLiteral(literal: scaleFactor, sign: sign)
+        let sanitisedScaleFactorAsOther = creator.sanitiseLiteral(literal: scaleFactor, sign: otherSign)
+        guard sign.isFloatingPoint && !otherSign.isFloatingPoint else {
+            guard !sign.isFloatingPoint && otherSign.isFloatingPoint else {
+                return TestParameters(
+                    input: sanitisedLiteral,
+                    output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteralAsOther)) " +
+                        "\(operation) \(sanitisedScaleFactorAsOther)"
+                )
+            }
+            return TestParameters(
+            input: sanitisedLiteral,
+            output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteralAsOther)) " +
+                "\(operation) \(sanitisedScaleFactorAsOther)"
+        )
+        }
         return TestParameters(
             input: sanitisedLiteral,
-            output: "\(otherUnit)_\(otherSign)(\(sanitisedLiteraAsOther)) \(operation) \(scaleFactor)"
+            output: "\(otherUnit)_\(otherSign)((\(sanitisedLiteral) " +
+                "\(operation) \(sanitisedScaleFactor)).rounded())"
         )
     }
 

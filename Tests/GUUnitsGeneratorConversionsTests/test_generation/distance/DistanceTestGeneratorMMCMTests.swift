@@ -60,6 +60,8 @@ import XCTest
 /// Test class for DistanceTestGenerator millimetre to centimetre tests.
 final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, TestConversionTestable {
 
+    let creator = TestFunctionBodyCreator<DistanceUnits>()
+
     /// The generator under test.
     let generator = GradualTestGenerator<DistanceUnits>(unitDifference: [
         .millimetres: 10,
@@ -186,85 +188,26 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
     func expected(
         from sign: Signs, to otherSign: Signs, additional: Set<TestParameters>
     ) -> Set<TestParameters> {
-        let creator = TestFunctionBodyCreator<DistanceUnits>()
         let scaleFactor = creator.sanitiseLiteral(literal: "10", sign: otherSign)
-        var newTests: Set<TestParameters> = additional.union(Set([
+        let fn: (String, String, Signs, Signs) -> String
+        if sign.isFloatingPoint && !otherSign.isFloatingPoint {
+            fn = floatToInt
+        } else if !sign.isFloatingPoint && otherSign.isFloatingPoint {
+            fn = intToFloat
+        } else {
+            fn = normal
+        }
+        let f: (String) -> TestParameters = {
             TestParameters(
-                input: creator.sanitiseLiteral(literal: "15", sign: sign),
-                output: "centimetres_" +
-                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "15.0", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "25", sign: sign),
-                output: "centimetres_" +
-                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "25", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "250", sign: sign),
-                output: "centimetres_" +
-                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "250", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "0", sign: sign),
-                output: "centimetres_" +
-                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "0", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "2500", sign: sign),
-                output: "centimetres_" +
-                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "2500", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "25000", sign: sign),
-                output: "centimetres_" +
-                    "\(otherSign)(\(creator.sanitiseLiteral(literal: "25000", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "250000", sign: sign),
-                output: "centimetres_\(otherSign)" +
-                    "(\(creator.sanitiseLiteral(literal: "250000", sign: otherSign)))" +
-                    " / \(scaleFactor)"
-            ),
-            TestParameters(
-                input: creator.sanitiseLiteral(literal: "2500000", sign: sign),
-                output: "centimetres_\(otherSign)" +
-                    "(\(creator.sanitiseLiteral(literal: "2500000", sign: otherSign)))" +
-                    " / \(scaleFactor)"
+                input: self.creator.sanitiseLiteral(literal: $0, sign: sign),
+                output: fn($0, scaleFactor, sign, otherSign)
             )
-        ]))
+        }
+        var newTests: Set<TestParameters> = additional.union(Set(
+            ["15", "25", "250", "0", "2500", "25000", "250000", "2500000"].map(f)
+        ))
         if sign.numericType.isSigned && otherSign.numericType.isSigned {
-            newTests = newTests.union(Set([
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-323", sign: sign),
-                    output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-323", sign: otherSign)))" +
-                        " / \(scaleFactor)"
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-10", sign: sign),
-                    output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-10", sign: otherSign)))" +
-                        " / \(scaleFactor)"
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-1000", sign: sign),
-                    output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-1000", sign: otherSign)))" +
-                        " / \(scaleFactor)"
-                ),
-                TestParameters(
-                    input: creator.sanitiseLiteral(literal: "-5", sign: sign),
-                    output: "centimetres_" +
-                        "\(otherSign)(\(creator.sanitiseLiteral(literal: "-5", sign: otherSign)))" +
-                        " / \(scaleFactor)"
-                )
-            ]))
+            newTests = newTests.union(Set(["-323", "-10", "-1000", "-5"].map(f)))
         }
         if sign.numericType.isSigned && !otherSign.numericType.isSigned {
             newTests = newTests.union(Set([
@@ -287,6 +230,21 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
             ]))
         }
         return newTests
+    }
+
+    private func floatToInt(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
+        "centimetres_\(otherSign)((\(creator.sanitiseLiteral(literal: "\(value)", sign: sign)) / " +
+            creator.sanitiseLiteral(literal: scaleFactor, sign: sign) + ").rounded())"
+    }
+
+    private func intToFloat(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
+        "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "\(value)", sign: otherSign))) / " +
+            creator.sanitiseLiteral(literal: scaleFactor, sign: otherSign)
+    }
+
+    private func normal(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
+        "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "\(value)", sign: sign))) / " +
+            creator.sanitiseLiteral(literal: scaleFactor, sign: otherSign)
     }
 
     // swiftlint:enable function_body_length
