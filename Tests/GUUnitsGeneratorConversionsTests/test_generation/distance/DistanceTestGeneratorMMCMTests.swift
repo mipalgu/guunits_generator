@@ -60,6 +60,7 @@ import XCTest
 /// Test class for DistanceTestGenerator millimetre to centimetre tests.
 final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, TestConversionTestable {
 
+    /// Helper object for sanitising literal strings.
     let creator = TestFunctionBodyCreator<DistanceUnits>()
 
     /// The generator under test.
@@ -177,8 +178,6 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
         }
     }
 
-    // swiftlint:disable function_body_length
-
     /// The default test parameters for this conversion.
     /// - Parameters:
     ///   - sign: The sign to convert from.
@@ -232,21 +231,40 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
         return newTests
     }
 
+    /// Conversion string for float to int conversion.
+    /// - Parameters:
+    ///   - value: The value to convert.
+    ///   - scaleFactor: The scale factor in the conversion.
+    ///   - sign: The sign of the value.
+    ///   - otherSign: The new sign.
+    /// - Returns: An expected value in a test case for a float to int conversion.
     private func floatToInt(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
         "centimetres_\(otherSign)((\(creator.sanitiseLiteral(literal: "\(value)", sign: sign)) / " +
             creator.sanitiseLiteral(literal: scaleFactor, sign: sign) + ").rounded())"
     }
 
+    /// Conversion string for int to float conversion.
+    /// - Parameters:
+    ///   - value: The value to convert.
+    ///   - scaleFactor: The scale factor in the conversion.
+    ///   - sign: The sign of the value.
+    ///   - otherSign: The new sign.
+    /// - Returns: An expected value in a test case for an int to float conversion.
     private func intToFloat(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
         "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "\(value)", sign: otherSign))) / " +
             creator.sanitiseLiteral(literal: scaleFactor, sign: otherSign)
     }
 
+    /// Conversion string for int to int or float to float conversion.
+    /// - Parameters:
+    ///   - value: The value to convert.
+    ///   - scaleFactor: The scale factor in the conversion.
+    ///   - sign: The sign of the value.
+    ///   - otherSign: The new sign.
+    /// - Returns: An expected value in a test case for a float to float or int to int conversion.
     private func normal(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
         "centimetres_\(otherSign)(\(creator.sanitiseLiteral(literal: "\(value)", sign: sign))) / " +
             creator.sanitiseLiteral(literal: scaleFactor, sign: otherSign)
     }
-
-    // swiftlint:enable function_body_length
 
 }
