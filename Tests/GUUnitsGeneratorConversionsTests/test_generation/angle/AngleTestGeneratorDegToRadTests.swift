@@ -57,6 +57,7 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for AngleTestGenerator degrees to radians conversions.
 final class AngleTestGeneratorDegToRadTests: XCTestCase, TestParameterTestable, TestConversionTestable {
 
     /// Helper object for sanitising literal strings.
