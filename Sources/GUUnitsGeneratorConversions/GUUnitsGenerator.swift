@@ -147,61 +147,63 @@ public struct GUUnitsGenerator {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
         // }
-        // let fileCreator = TestFileCreator<TemperatureTestGenerator>()
-        // let testGenerator = TemperatureTestGenerator()
-        // writeFile(
-        //     at: path,
-        //     with: "TemperatureTests",
-        //     and: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
-        // )
-        // let distanceGenerator = GradualTestGenerator<DistanceUnits>(unitDifference: [
-        //     .millimetres: 10,
-        //     .centimetres: 100
-        // ])
-        // let distanceFileCreator = TestFileCreator<GradualTestGenerator<DistanceUnits>>()
-        // writeFile(
-        //     at: path,
-        //     with: "DistanceTests",
-        //     and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
-        // )
-        // let imageGenerator = SameUnitTestGenerator<ImageUnits>()
-        // let imageFileCreator = TestFileCreator<SameUnitTestGenerator<ImageUnits>>()
-        // writeFile(
-        //     at: path,
-        //     with: "ImageTests",
-        //     and: imageFileCreator.tests(generator: imageGenerator, imports: "import CGUUnits")
-        // )
-        // let percentGenerator = SameUnitTestGenerator<PercentUnits>()
-        // let percentFileCreator = TestFileCreator<SameUnitTestGenerator<PercentUnits>>()
-        // writeFile(
-        //     at: path,
-        //     with: "PercentTests",
-        //     and: percentFileCreator.tests(generator: percentGenerator, imports: "import CGUUnits")
-        // )
-        // let timeGenerator = GradualTestGenerator<TimeUnits>(unitDifference: [
-        //     .microseconds: 1000,
-        //     .milliseconds: 1000
-        // ])
-        // let timeFileCreator = TestFileCreator<GradualTestGenerator<TimeUnits>>()
-        // writeFile(
-        //     at: path,
-        //     with: "TimeTests",
-        //     and: timeFileCreator.tests(generator: timeGenerator, imports: "import CGUUnits")
-        // )
-        // let angleGenerator = AngleTestGenerator()
-        // let angleFileCreator = TestFileCreator<AngleTestGenerator>()
-        // writeFile(
-        //     at: path,
-        //     with: "AngleTests",
-        //     and: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
-        // )
-        // let accelerationGenerator = AccelerationTestGenerator()
-        // let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
-        // writeFile(
-        //     at: path,
-        //     with: "AccelerationTests",
-        //     and: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
-        // )
+        let fileCreator = TestFileCreator<TemperatureTestGenerator>()
+        let testGenerator = TemperatureTestGenerator()
+        writeFile(
+            at: path,
+            with: "TemperatureTests",
+            and: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
+        )
+        let distanceGenerator = GradualTestGenerator<DistanceUnits>(unitDifference: [
+            .millimetres: 10,
+            .centimetres: 100
+        ])
+        let distanceFileCreator = TestFileCreator<GradualTestGenerator<DistanceUnits>>()
+        writeFile(
+            at: path,
+            with: "DistanceTests",
+            and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
+        )
+        let imageGenerator = SameUnitTestGenerator<ImageUnits>()
+        let imageFileCreator = TestFileCreator<SameUnitTestGenerator<ImageUnits>>()
+        writeFile(
+            at: path,
+            with: "ImageTests",
+            and: imageFileCreator.tests(generator: imageGenerator, imports: "import CGUUnits")
+        )
+        let percentGenerator = SameUnitTestGenerator<PercentUnits>()
+        let percentFileCreator = TestFileCreator<SameUnitTestGenerator<PercentUnits>>()
+        writeFile(
+            at: path,
+            with: "PercentTests",
+            and: percentFileCreator.tests(generator: percentGenerator, imports: "import CGUUnits")
+        )
+        let timeGenerator = GradualTestGenerator<TimeUnits>(unitDifference: [
+            .microseconds: 1000,
+            .milliseconds: 1000
+        ])
+        let timeFileCreator = TestFileCreator<GradualTestGenerator<TimeUnits>>()
+        writeFile(
+            at: path,
+            with: "TimeTests",
+            and: timeFileCreator.tests(generator: timeGenerator, imports: "import CGUUnits")
+        )
+        let angleGenerator = AngleTestGenerator()
+        let angleFileCreator = TestFileCreator<AngleTestGenerator>()
+        writeFile(
+            at: path,
+            with: "AngleTests",
+            and: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
+        )
+        let accelerationGenerator = AccelerationTestGenerator()
+        let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
+        writeFile(
+            at: path,
+            with: "AccelerationTests",
+            and: accelerationFileCreator.tests(
+                generator: accelerationGenerator, imports: "import CGUUnits"
+            )
+        )
     }
 
     // swiftlint:enable function_body_length
@@ -242,6 +244,8 @@ public struct GUUnitsGenerator {
         print("Done!")
     }
 
+    /// Generate files that test the swift layer of guunits.
+    /// - Parameter path: The folder containing the test files.
     public func generateSwiftTests(in path: URL) {
         let swiftFileCreator = SwiftTestFileCreator()
         writeFile(
@@ -254,28 +258,41 @@ public struct GUUnitsGenerator {
                 )
             )
         )
-        // writeFile(
-        //     at: path, with: TimeUnits.category, and: swiftFileCreator.generate(for: TimeUnits.self)
-        // )
-        // writeFile(
-        //     at: path, with: AngleUnits.category, and: swiftFileCreator.generate(for: AngleUnits.self)
-        // )
-        // writeFile(
-        //     at: path, with: ImageUnits.category, and: swiftFileCreator.generate(for: ImageUnits.self)
-        // )
-        // writeFile(
-        //     at: path, with: PercentUnits.category, and: swiftFileCreator.generate(for: PercentUnits.self)
-        // )
-        // writeFile(
-        //     at: path,
-        //     with: TemperatureUnits.category,
-        //     and: swiftFileCreator.generate(for: TemperatureUnits.self)
-        // )
-        // writeFile(
-        //     at: path,
-        //     with: AccelerationUnits.category,
-        //     and: swiftFileCreator.generate(for: AccelerationUnits.self)
-        // )
+        writeFile(
+            at: path, with: "\(TimeUnits.category)Tests", and: swiftFileCreator.generate(
+                with: GradualTestGenerator<TimeUnits>(
+                    unitDifference: [
+                        .microseconds: 1000,
+                        .milliseconds: 1000
+                    ]
+                )
+            )
+        )
+        writeFile(
+            at: path,
+            with: "\(AngleUnits.category)Tests",
+            and: swiftFileCreator.generate(with: AngleTestGenerator())
+        )
+        writeFile(
+            at: path,
+            with: "\(ImageUnits.category)Tests",
+            and: swiftFileCreator.generate(with: SameUnitTestGenerator<ImageUnits>())
+        )
+        writeFile(
+            at: path,
+            with: "\(PercentUnits.category)Tests",
+            and: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
+        )
+        writeFile(
+            at: path,
+            with: "\(TemperatureUnits.category)Tests",
+            and: swiftFileCreator.generate(with: TemperatureTestGenerator())
+        )
+        writeFile(
+            at: path,
+            with: "\(AccelerationUnits.category)Tests",
+            and: swiftFileCreator.generate(with: AccelerationTestGenerator())
+        )
     }
 
     /// Write a Swift source file to a location.
