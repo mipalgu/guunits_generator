@@ -54,21 +54,32 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Swift file creator for generating XCTest based files.
 public struct SwiftTestFileCreator {
 
+    /// Default init.
     public init() {}
 
+    /// Generate the contents for a test file by using a given test generator.
+    /// - Parameter generator: The generator creating the test parameters.
+    /// - Returns: The contents of the test file.
     func generate<T: TestGenerator>(with generator: T) -> String {
         prefix(name: "\(T.UnitType.category)Tests") + "\n\n" +
             T.UnitType.allCases.flatMap { unit in
                 Signs.allCases.map { sign in
-                    createTestStruct(from: unit, with: sign, using: generator)
+                    createTestClass(from: unit, with: sign, using: generator)
                 }
             }
             .joined(separator: "\n\n") + "\n"
     }
 
-    private func createTestStruct<T: TestGenerator>(
+    /// Creates a class containing test for a given unit and sign.
+    /// - Parameters:
+    ///   - unit: The unit to convert from in the unit tests.
+    ///   - sign: The sign of the unit.
+    ///   - generator: The generator creating the test parameters.
+    /// - Returns: The Swift class enacting the unit tests.
+    private func createTestClass<T: TestGenerator>(
         from unit: T.UnitType, with sign: Signs, using generator: T
     ) -> String {
         let testCases: String = Signs.allCases.map { otherSign in
@@ -86,11 +97,13 @@ public struct SwiftTestFileCreator {
         }
         .joined(separator: "\n\n")
         let numericTests = NumericTypes.allCases.map { numeric in
-            generator.testParameters(from: unit, with: sign, to: numeric).map { toTest in
+            generator.testParameters(from: unit, with: sign, to: numeric)
+            .map { toTest in
                 createTest(from: unit, with: sign, to: numeric, and: toTest)
             }
             .joined(separator: "\n\n") + "\n\n" +
-            generator.testParameters(from: numeric, to: unit, with: sign).map { fromTest in
+            generator.testParameters(from: numeric, to: unit, with: sign)
+            .map { fromTest in
                 createTest(from: numeric, to: unit, with: sign, and: fromTest)
             }
             .joined(separator: "\n\n")
@@ -109,6 +122,14 @@ public struct SwiftTestFileCreator {
         """
     }
 
+    /// Create a test case for a unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: The parameters used in the test.
+    /// - Returns: The swift code performing the test.
     private func createTest<T: UnitProtocol>(
         from unit: T, with sign: Signs, to otherUnit: T, with otherSign: Signs, and parameters: TestParameters
     ) -> String where T: RawRepresentable, T.RawValue == String {
@@ -152,6 +173,13 @@ public struct SwiftTestFileCreator {
         """
     }
 
+    /// Create a unit test for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    ///   - parameters: The parameters used in the test.
+    /// - Returns: The swift code enacting the test.
     private func createTest<T: UnitProtocol>(
         from unit: T, with sign: Signs, to numeric: NumericTypes, and parameters: TestParameters
     ) -> String where T: RawRepresentable, T.RawValue == String {
@@ -168,6 +196,13 @@ public struct SwiftTestFileCreator {
         """
     }
 
+    /// Create a unit test for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    ///   - parameters: The parameters used in the test.
+    /// - Returns: The swift code enacting the unit test.
     private func createTest<T: UnitProtocol>(
         from numeric: NumericTypes, to unit: T, with sign: Signs, and parameters: TestParameters
     ) -> String where T: RawRepresentable, T.RawValue == String {
