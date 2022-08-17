@@ -72,6 +72,136 @@ final class TemperatureTestGeneratorKToDegFTests: XCTestCase, TestParameterTesta
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .t, parameters: [
                 TestParameters(input: "CInt.min", output: "CInt.min"),
                 TestParameters(input: "CInt.max", output: "CInt.max")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                TestParameters(input: "CInt.min", output: "CUnsignedInt.min"),
+                TestParameters(
+                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .u)
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .f)
+                ),
+                TestParameters(
+                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .f)
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .d)
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .t, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .t)
+                ),
+                TestParameters(input: "CUnsignedInt.max", output: "CInt.max")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: "CUnsignedInt.min"
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max", output: "CUnsignedInt.max"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .f)
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max",
+                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .f)
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max",
+                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .d)
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .t, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "CInt.min"
+                ),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "CInt.max")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "CUnsignedInt.min"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: "-Float.greatestFiniteMagnitude"
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: "Float.greatestFiniteMagnitude"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: conversion(value: "-Float.greatestFiniteMagnitude", sign: .f, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: conversion(value: "Float.greatestFiniteMagnitude", sign: .f, otherSign: .d)
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .t, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "CInt.min"
+                ),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "CInt.max")
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "CUnsignedInt.min"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "-Float.greatestFiniteMagnitude"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "Float.greatestFiniteMagnitude"
+                )
+            ]),
+            ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: "-Double.greatestFiniteMagnitude"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: "Double.greatestFiniteMagnitude"
+                )
             ])
         ]
     }
