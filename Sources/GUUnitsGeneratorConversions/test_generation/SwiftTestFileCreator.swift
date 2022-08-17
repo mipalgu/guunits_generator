@@ -112,6 +112,7 @@ public struct SwiftTestFileCreator {
     private func createTest<T: UnitProtocol>(
         from unit: T, with sign: Signs, to otherUnit: T, with otherSign: Signs, and parameters: TestParameters
     ) -> String where T: RawRepresentable, T.RawValue == String {
+        let creator = TestFunctionBodyCreator<T>()
         let helper = FunctionHelpers<T>()
         let fnTestName = helper.testFunctionName(
             from: unit, with: sign, to: otherUnit, with: otherSign, using: parameters
@@ -119,13 +120,34 @@ public struct SwiftTestFileCreator {
         let fnName = helper.functionName(
             forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: true
         )
-        let structName = "\(T.category.capitalized)"
-        let initialiser = "\(structName)(\(unit.rawValue.capitalized)_\(sign.rawValue)(\(parameters.input)))"
+        let unit = "\(unit.rawValue.capitalized)_\(sign)(\(parameters.input))"
+        let conversion = "\(otherUnit.rawValue.capitalized)_\(otherSign)(unit)"
+        if parameters.input == "Double.greatestFiniteMagnitude" ||
+            parameters.input == "-Double.greatestFiniteMagnitude" {
+            return """
+                func \(fnTestName)() {
+                    let unit = \(unit)
+                    let expected = \(fnName)(\(parameters.input))
+                    let result = \(conversion).rawValue
+                    XCTAssertEqual(expected, result)
+                }
+            """
+        }
+        let tolerance = creator.sanitiseLiteral(literal: "1", sign: otherSign)
+        let categoryConversion = "\(T.category.capitalized)(unit).\(otherUnit.rawValue)_\(otherSign)"
         return """
             func \(fnTestName)() {
+                let unit = \(unit)
                 let expected = \(fnName)(\(parameters.input))
-                let result = \(initialiser).\(otherUnit.rawValue)_\(otherSign.rawValue).rawValue
+                let result = \(conversion).rawValue
                 XCTAssertEqual(expected, result)
+                let tolerance: \(otherUnit.rawValue)_\(otherSign) = \(tolerance)
+                let categoryResult = \(categoryConversion).rawValue
+                if categoryResult > expected {
+                    XCTAssertLessThanOrEqual(categoryResult - expected, tolerance)
+                } else {
+                    XCTAssertLessThanOrEqual(expected - categoryResult, tolerance)
+                }
             }
         """
     }
