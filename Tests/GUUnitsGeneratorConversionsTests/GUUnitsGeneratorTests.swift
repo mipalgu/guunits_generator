@@ -123,6 +123,12 @@ final class GUUnitsGeneratorTests: XCTestCase {
             XCTFail("Failed to ascertain package path.")
             return
         }
+        let manager = FileManager()
+        try manager.removeItem(at: guunitsTests)
+        try manager.createDirectory(at: guunitsTests, withIntermediateDirectories: true)
+        var gitignore = guunitsTests
+        gitignore.appendPathComponent(".gitignore", isDirectory: false)
+        manager.createFile(atPath: gitignore.path, contents: "*\n".data(using: .utf8))
         // let guunitsTests = packageURL.appendingPathComponent("Tests/guunitsTests")
         // let swiftTests = packageURL.appendingPathComponent("Tests/swift_GUUnitsTests")
         try generator.generateCFiles(in: guunitsDirectory)
