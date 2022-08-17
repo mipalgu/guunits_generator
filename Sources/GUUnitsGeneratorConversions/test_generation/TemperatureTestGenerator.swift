@@ -634,8 +634,6 @@ struct TemperatureTestGenerator: TestGenerator {
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }
 
-    // swiftlint:disable function_body_length
-
     /// Creates a Test parameters for a conversion function.
     /// - Parameters:
     ///   - value: The value to convert.
@@ -655,47 +653,17 @@ struct TemperatureTestGenerator: TestGenerator {
         let literal = creator.sanitiseLiteral(literal: value, sign: sign)
         switch (unit, otherUnit) {
         case (.fahrenheit, .celsius):
-            if sign == .d {
-                let valueLiteral = creator.sanitiseLiteral(literal: value, to: .double)
-                calculation = "\(valueLiteral) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
-            } else {
-                calculation = "Double(\(literal)) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
-            }
+            calculation = "Double(\(literal)) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
         case (.celsius, .fahrenheit):
-            if sign == .d {
-                let valueLiteral = creator.sanitiseLiteral(literal: value, to: .double)
-                calculation = "\(valueLiteral) * 1.8 + 32.0"
-            } else {
-                calculation = "Double(\(literal)) * 1.8 + 32.0"
-            }
+            calculation = "Double(\(literal)) * 1.8 + 32.0"
         case (.celsius, .kelvin):
-            if sign == .d {
-                let valueLiteral = creator.sanitiseLiteral(literal: value, to: .double)
-                calculation = "\(valueLiteral) + 273.15"
-            } else {
-                calculation = "Double(\(literal)) + 273.15"
-            }
+            calculation = "Double(\(literal)) + 273.15"
         case (.kelvin, .celsius):
-            if sign == .d {
-                let valueLiteral = creator.sanitiseLiteral(literal: value, to: .double)
-                calculation = "\(valueLiteral) - 273.15"
-            } else {
-                calculation = "Double(\(literal)) - 273.15"
-            }
+            calculation = "Double(\(literal)) - 273.15"
         case (.kelvin, .fahrenheit):
-            if sign == .d {
-                let valueLiteral = creator.sanitiseLiteral(literal: value, to: .double)
-                calculation = "(\(valueLiteral) - 273.15) * 1.8 + 32.0"
-            } else {
-                calculation = "(Double(\(literal)) - 273.15) * 1.8 + 32.0"
-            }
+            calculation = "(Double(\(literal)) - 273.15) * 1.8 + 32.0"
         case (.fahrenheit, .kelvin):
-            if sign == .d {
-                let valueLiteral = creator.sanitiseLiteral(literal: value, to: .double)
-                calculation = "(\(valueLiteral) * (5.0 / 9.0)) - (32.0 * (5.0 / 9.0)) + 273.15"
-            } else {
-                calculation = "(Double(\(literal)) * (5.0 / 9.0)) - (32.0 * (5.0 / 9.0)) + 273.15"
-            }
+            calculation = "(Double(\(literal)) * (5.0 / 9.0)) - (32.0 * (5.0 / 9.0)) + 273.15"
         default:
             fatalError("Same unit type not supported in this function!")
         }
@@ -710,8 +678,6 @@ struct TemperatureTestGenerator: TestGenerator {
             output: "\(otherUnit)_\(otherSign)(\(calculation))"
         )
     }
-
-    // swiftlint:enable function_body_length
 
 }
 

@@ -270,14 +270,6 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
     ///   - otherSign: The sign of the converted value.
     /// - Returns: A string performing the conversion.
     private func conversion(value: String, sign: Signs, otherSign: Signs) -> String {
-        guard sign != .d else {
-            let literal = self.creator.sanitiseLiteral(literal: value, to: .double)
-            let calculation = "\(literal) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
-            guard otherSign.isFloatingPoint else {
-                return "celsius_\(otherSign)((\(calculation)).rounded())"
-            }
-            return "celsius_\(otherSign)(\(calculation))"
-        }
         let literal = creator.sanitiseLiteral(literal: value, sign: sign)
         guard otherSign.isFloatingPoint else {
             return "celsius_\(otherSign)((Double(\(literal)) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)).rounded())"
