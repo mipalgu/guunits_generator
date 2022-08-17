@@ -355,16 +355,35 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToFahrenheitDouble() {
         let result = creator.createFunction(unit: .kelvin, to: .fahrenheit, sign: .d, otherSign: .d)
-        let conversion = "(kelvin - 273.15) * 1.8 + 32.0"
-        let expected = "    return ((fahrenheit_d) (\(conversion)));"
+        let expected = """
+            const double maxValue = (((double) (DBL_MAX)) - 32.0) / 1.8 + 273.15;
+            const double minValue = ((double) (-DBL_MAX)) / 1.8 - 32.0 / 1.8 + 273.15;
+            const double value = ((double) (kelvin));
+            if (value > maxValue) {
+                return DBL_MAX;
+            }
+            if (value < minValue) {
+                return -DBL_MAX;
+            }
+            return ((fahrenheit_d) ((value - 273.15) * 1.8 + 32.0));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testKelvinToFahrenheitInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .fahrenheit, sign: .t, otherSign: .t)
-        let conversion = "(((double) (kelvin)) - 273.15) * 1.8 + 32.0"
-        let minString = "MIN(((double) (INT_MAX)), (round(\(conversion))))"
-        let expected = "    return ((fahrenheit_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        let expected = """
+            const double maxValue = (((double) (INT_MAX)) - 32.0) / 1.8 + 273.15;
+            const double minValue = ((double) (INT_MIN)) / 1.8 - 32.0 / 1.8 + 273.15;
+            const double value = ((double) (kelvin));
+            if (value > maxValue) {
+                return INT_MAX;
+            }
+            if (value < minValue) {
+                return INT_MIN;
+            }
+            return ((fahrenheit_t) (round((value - 273.15) * 1.8 + 32.0)));
+        """
         XCTAssertEqual(result, expected)
     }
 

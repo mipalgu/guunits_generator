@@ -335,16 +335,24 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     ///   - otherSign: The sign of the fahrenheit parameter.
     /// - Returns: The function body that implements the conversion.
     private func kelvinToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
-        if valueSign == .d && otherSign == .d {
-            let conversion = "(kelvin - 273.15) * 1.8 + 32.0"
-            return "    return ((fahrenheit_d) (\(conversion)));"
-        }
-        let conversion = "(((double) (kelvin)) - 273.15) * 1.8 + 32.0"
+        let conversion = "(value - 273.15) * 1.8 + 32.0"
         let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
+        let upperLimit = otherSign.numericType.limits.1
+        let lowerLimit = otherSign.numericType.limits.0
+        let max = "(((double) (\(upperLimit))) - 32.0) / 1.8 + 273.15"
+        let min = "((double) (\(lowerLimit))) / 1.8 - 32.0 / 1.8 + 273.15"
+        return """
+            const double maxValue = \(max);
+            const double minValue = \(min);
+            const double value = ((double) (kelvin));
+            if (value > maxValue) {
+                return \(upperLimit);
+            }
+            if (value < minValue) {
+                return \(lowerLimit);
+            }
+            return ((fahrenheit_\(otherSign)) (\(roundedConversion)));
+        """
     }
 
     /// Implement conversion function for a type that loses precision.
