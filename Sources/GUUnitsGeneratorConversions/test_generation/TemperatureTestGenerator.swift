@@ -446,6 +446,11 @@ struct TemperatureTestGenerator: TestGenerator {
                         TestParameters(input: lowerLimit, output: otherLowerLimit),
                         testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
                     ]
+                case (.u, .t):
+                    newTests += [
+                        testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                        TestParameters(input: upperLimit, output: otherUpperLimit)
+                    ]
                 case (.f, .d):
                     newTests += [
                         testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
@@ -456,7 +461,7 @@ struct TemperatureTestGenerator: TestGenerator {
                         TestParameters(input: lowerLimit, output: otherLowerLimit),
                         TestParameters(input: upperLimit, output: otherUpperLimit)
                     ]
-                case (.u, .t), (_, .f), (_, .d):
+                case (_, .f), (_, .d):
                     newTests += [
                         testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
                         testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)

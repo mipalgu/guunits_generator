@@ -109,7 +109,7 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
                 ),
                 TestParameters(
                     input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .t)
+                    output: "CInt.max"
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .u, parameters: [
