@@ -113,7 +113,8 @@ final class TemperatureTestGeneratorDegFToKTests: XCTestCase, TestParameterTesta
             ]),
             ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .kelvin, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min", output: "CUnsignedInt.min"
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .u)
                 ),
                 TestParameters(
                     input: "CUnsignedInt.max",
@@ -250,7 +251,7 @@ final class TemperatureTestGeneratorDegFToKTests: XCTestCase, TestParameterTesta
         if sign.numericType.isSigned && !otherSign.numericType.isSigned {
             newTests = newTests.union(
                 Set(
-                    ["-250", "-2500", "-25000", "-250000", "-2500000", "-40"].map {
+                    ["-2500", "-25000", "-250000", "-2500000"].map {
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: $0, sign: sign),
                             output: "CUnsignedInt.min"

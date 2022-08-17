@@ -414,29 +414,56 @@ struct TemperatureTestGenerator: TestGenerator {
                     }
                 }
             }
-            if sign.numericType.isSigned && !otherSign.numericType.isSigned {
-                newTests += ["-250", "-2500", "-25000", "-250000", "-2500000", "-40"].map {
-                    let literal = creator.sanitiseLiteral(literal: $0, sign: sign)
-                    return TestParameters(input: literal, output: otherSign.numericType.swiftType.limits.0)
-                }
-            }
             let lowerLimit = sign.numericType.swiftType.limits.0
             let upperLimit = sign.numericType.swiftType.limits.1
             let otherLowerLimit = otherSign.numericType.swiftType.limits.0
             let otherUpperLimit = otherSign.numericType.swiftType.limits.1
-            guard sign != otherSign else {
-                if sign == .u {
-                    newTests += [
-                        TestParameters(input: lowerLimit, output: otherLowerLimit),
-                        testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
-                    ]
-                } else {
+            if otherUnit == .celsius {
+                if sign.numericType.isSigned && !otherSign.numericType.isSigned {
+                    newTests += ["-250", "-2500", "-25000", "-250000", "-2500000", "-40"].map {
+                        let literal = creator.sanitiseLiteral(literal: $0, sign: sign)
+                        return TestParameters(
+                            input: literal, output: otherSign.numericType.swiftType.limits.0
+                        )
+                    }
+                }
+                guard sign != otherSign else {
+                    if sign == .u {
+                        newTests += [
+                            TestParameters(input: lowerLimit, output: otherLowerLimit),
+                            testCase(
+                                value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign
+                            )
+                        ]
+                    } else {
+                        newTests += [
+                            testCase(
+                                value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign
+                            ),
+                            testCase(
+                                value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign
+                            )
+                        ]
+                    }
+                    return newTests
+                }
+            }
+            if otherUnit == .kelvin {
+                if sign.numericType.isSigned && !otherSign.numericType.isSigned {
+                    newTests += ["-2500", "-25000", "-250000", "-2500000"].map {
+                        let literal = creator.sanitiseLiteral(literal: $0, sign: sign)
+                        return TestParameters(
+                            input: literal, output: otherSign.numericType.swiftType.limits.0
+                        )
+                    }
+                }
+                guard sign != otherSign else {
                     newTests += [
                         testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
                         testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
                     ]
+                    return newTests
                 }
-                return newTests
             }
             switch otherUnit {
             case .celsius, .kelvin:
