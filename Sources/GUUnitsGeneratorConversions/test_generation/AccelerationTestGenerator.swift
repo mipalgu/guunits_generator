@@ -79,7 +79,12 @@ struct AccelerationTestGenerator: TestGenerator {
             return []
         }
         guard unit != otherUnit else {
-            return self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
+            return self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign) + [
+                TestParameters(
+                    input: creator.sanitiseLiteral(literal: "5", sign: sign),
+                    output: creator.sanitiseLiteral(literal: "5", sign: otherSign)
+                )
+            ]
         }
         var newTests: [TestParameters] = (
             ["250", "0", "2500", "25000", "250000", "2500000", "9.807"] +
