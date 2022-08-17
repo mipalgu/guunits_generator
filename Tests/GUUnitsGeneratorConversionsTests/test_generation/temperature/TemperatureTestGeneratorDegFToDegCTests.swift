@@ -77,6 +77,123 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
                 TestParameters(
                     input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .t)
                 )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "CInt.min", output: "CUnsignedInt.min"
+                ),
+                TestParameters(
+                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .u)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .f)
+                ),
+                TestParameters(
+                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .f)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .d)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .t)
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max",
+                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .t)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min", output: "CUnsignedInt.min"
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max",
+                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .u)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .f)
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max",
+                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .f)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "CUnsignedInt.min",
+                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "CUnsignedInt.max",
+                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .d)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "CInt.min"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "CInt.max")
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "CUnsignedInt.min"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "CUnsignedInt.max")
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: conversion(value: "-Float.greatestFiniteMagnitude", sign: .f, otherSign: .f)
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: conversion(value: "Float.greatestFiniteMagnitude", sign: .f, otherSign: .f)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Float.greatestFiniteMagnitude",
+                    output: conversion(value: "-Float.greatestFiniteMagnitude", sign: .f, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "Float.greatestFiniteMagnitude",
+                    output: conversion(value: "Float.greatestFiniteMagnitude", sign: .f, otherSign: .d)
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .t, parameters: [
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "CInt.min"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "CInt.max")
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .u, parameters: [
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "CUnsignedInt.min"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "CUnsignedInt.max")
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .f, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude", output: "-Float.greatestFiniteMagnitude"
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude", output: "Float.greatestFiniteMagnitude"
+                )
+            ]),
+            ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .d, parameters: [
+                TestParameters(
+                    input: "-Double.greatestFiniteMagnitude",
+                    output: conversion(value: "-Double.greatestFiniteMagnitude", sign: .d, otherSign: .d)
+                ),
+                TestParameters(
+                    input: "Double.greatestFiniteMagnitude",
+                    output: conversion(value: "Double.greatestFiniteMagnitude", sign: .d, otherSign: .d)
+                )
             ])
         ]
     }
@@ -137,7 +254,7 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
                     ["-250", "-2500", "-25000", "-250000", "-2500000", "-40"].map {
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: $0, sign: sign),
-                            output: "0"
+                            output: "CUnsignedInt.min"
                         )
                     }
                 )
@@ -155,7 +272,7 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
     private func conversion(value: String, sign: Signs, otherSign: Signs) -> String {
         guard sign != .d else {
             let literal = self.creator.sanitiseLiteral(literal: value, to: .double)
-            let calculation = "(\(literal)* (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
+            let calculation = "\(literal) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
             guard otherSign.isFloatingPoint else {
                 return "celsius_\(otherSign)((\(calculation)).rounded())"
             }
