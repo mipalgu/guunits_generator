@@ -101,14 +101,13 @@ final class TemperatureTestGeneratorKToDegFTests: XCTestCase, TestParameterTesta
         var newTests: Set<TestParameters> = additional.union(
             Set(
                 [
-                    "250",
+                    "260",
                     "2500",
                     "25000",
                     "250000",
                     "2500000",
                     "273.15",
-                    "300",
-                    "100"
+                    "300"
                 ].map(f)
             )
         )

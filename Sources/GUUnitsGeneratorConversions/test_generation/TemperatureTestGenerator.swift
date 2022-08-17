@@ -622,12 +622,63 @@ struct TemperatureTestGenerator: TestGenerator {
                     ]
                 }
             case .fahrenheit:
-                newTests.append(
-                    TestParameters(
-                        input: creator.sanitiseLiteral(literal: "273.15", sign: sign),
-                        output: creator.sanitiseLiteral(literal: "32", sign: otherSign)
-                    )
-                )
+                newTests += [
+                    "260",
+                    "2500",
+                    "25000",
+                    "250000",
+                    "2500000",
+                    "273.15",
+                    "300"
+                ].map { testCase(value: $0, from: unit, with: sign, to: otherUnit, with: otherSign) }
+                if otherSign.numericType.isSigned {
+                    newTests += ["0", "20", "10", "15", "12", "25"].map {
+                        testCase(value: $0, from: unit, with: sign, to: otherUnit, with: otherSign)
+                    }
+                }
+                if sign.numericType.isSigned && otherSign.numericType.isSigned {
+                    newTests += ["-250", "-2500", "-25000", "-250000", "-2500000", "-40"].map {
+                        testCase(value: $0, from: unit, with: sign, to: otherUnit, with: otherSign)
+                    }
+                }
+                if sign.numericType.isSigned && !otherSign.numericType.isSigned {
+                    newTests += ["-2500", "-25000", "-250000", "-2500000"].map {
+                        TestParameters(
+                            input: creator.sanitiseLiteral(literal: $0, sign: sign),
+                            output: "CUnsignedInt.min"
+                        )
+                    }
+                }
+                let lowerLimit = sign.numericType.swiftType.limits.0
+                let upperLimit = sign.numericType.swiftType.limits.1
+                let otherLowerLimit = otherSign.numericType.swiftType.limits.0
+                let otherUpperLimit = otherSign.numericType.swiftType.limits.1
+                guard sign != otherSign else {
+                    newTests += [
+                        TestParameters(input: lowerLimit, output: otherLowerLimit),
+                        TestParameters(input: upperLimit, output: otherUpperLimit)
+                    ]
+                    return newTests
+                }
+                switch (sign, otherSign) {
+                case (_, .d), (.u, .f), (.t, .f):
+                    newTests += [
+                        testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                        testCase(value: upperLimit, from: unit, with: sign, to: otherUnit, with: otherSign)
+                    ]
+                case (.t, .u), (.d, _), (.f, _):
+                    newTests += [
+                        TestParameters(input: lowerLimit, output: otherLowerLimit),
+                        TestParameters(input: upperLimit, output: otherUpperLimit)
+                    ]
+                case (.u, .t):
+                    newTests += [
+                        testCase(value: lowerLimit, from: unit, with: sign, to: otherUnit, with: otherSign),
+                        TestParameters(input: upperLimit, output: otherUpperLimit)
+                    ]
+                default:
+                    break
+                }
             default:
                 newTests += self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
                 newTests += [
