@@ -439,7 +439,7 @@ struct TemperatureTestGenerator: TestGenerator {
                 return newTests
             }
             switch otherUnit {
-            case .celsius:
+            case .celsius, .kelvin:
                 switch (sign, otherSign) {
                 case (.t, .u):
                     newTests += [
@@ -469,8 +469,6 @@ struct TemperatureTestGenerator: TestGenerator {
                 default:
                     break
                 }
-            case .kelvin:
-                break
             default:
                 newTests += self.defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
                 newTests += [
