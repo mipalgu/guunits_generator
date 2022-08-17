@@ -117,8 +117,8 @@ final class GUUnitsGeneratorTests: XCTestCase {
         guard
             let guunitsDirectory = guunitsDirectory,
             let swiftGUUnitsDirectory = swiftGUUnitsDirectory,
-            let guunitsTests = guunitsTests
-            // let swiftGUUnitsTests = swiftGUUnitsTests
+            let guunitsTests = guunitsTests,
+            let swiftGUUnitsTests = swiftGUUnitsTests
         else {
             XCTFail("Failed to ascertain package path.")
             return
@@ -134,6 +134,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         try generator.generateCFiles(in: guunitsDirectory)
         generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
         generator.generateCTests(in: guunitsTests)
+        generator.generateSwiftTests(in: swiftGUUnitsTests)
     }
 
 }
