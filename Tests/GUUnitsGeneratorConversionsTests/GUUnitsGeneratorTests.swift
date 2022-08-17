@@ -124,8 +124,8 @@ final class GUUnitsGeneratorTests: XCTestCase {
             return
         }
         let manager = FileManager()
-        try manager.removeItem(at: guunitsTests)
-        try manager.createDirectory(at: guunitsTests, withIntermediateDirectories: true)
+        _ = try? manager.removeItem(at: guunitsTests)
+        _ = try? manager.createDirectory(at: guunitsTests, withIntermediateDirectories: true)
         var gitignore = guunitsTests
         gitignore.appendPathComponent(".gitignore", isDirectory: false)
         manager.createFile(atPath: gitignore.path, contents: "*\n".data(using: .utf8))
