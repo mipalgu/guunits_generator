@@ -364,10 +364,10 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         literal: String
     ) -> String {
         if otherSign == .d && valueSign == .d {
-            let conversion = "(\(value.rawValue) - \(literal)) * (5.0 / 9.0)"
+            let conversion = "\(value.rawValue) * (5.0 / 9.0) - \(literal) * (5.0 / 9.0)"
             return "    return ((\(other.rawValue)_d) (\(conversion)));"
         }
-        let conversion = "(((double) (\(value.rawValue))) - \(literal)) * (5.0 / 9.0)"
+        let conversion = "((double) (\(value.rawValue))) * (5.0 / 9.0) - \(literal) * (5.0 / 9.0)"
         let roundedConversion = round(value: conversion, from: .d, to: otherSign)
         let typeLimits = otherSign.numericType.limits
         let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
