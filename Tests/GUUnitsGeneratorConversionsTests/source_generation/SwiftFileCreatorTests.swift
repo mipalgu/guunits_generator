@@ -68,13 +68,11 @@ final class SwiftFileCreatorTests: XCTestCase {
     /// The creator being tested.
     let creator = SwiftFileCreator()
 
-    // swiftlint:disable type_contents_order
-
     /// Test that the unit code is generated correctly.
-    func testGenerate() {
-        let result = creator.generate(for: FakeUnit.self)
-        // XCTAssertEqual(result, expected + "\n")
-    }
+    // func testGenerate() {
+    //     let result = creator.generate(for: FakeUnit.self)
+    //     XCTAssertEqual(result, expected + "\n")
+    // }
 
     /// The expected output from the generate function.
     let expected = """
@@ -2844,8 +2842,6 @@ final class SwiftFileCreatorTests: XCTestCase {
 
         }
         """
-
-    // swiftlint:enable type_contents_order
 
 }
 
