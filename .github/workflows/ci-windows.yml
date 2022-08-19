@@ -28,18 +28,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Debug Build
-        shell: pwsh
-        run: swift build -c debug
-
-      - name: Release build
-        shell: pwsh
-        run: swift build -c release
-
       - name: Debug Test
         shell: pwsh
         run: swift test
 
       - name: Release Test
         shell: pwsh
-        run: swift test -c release
+        run: swift test -c release -Xswiftc -DRELEASE_BUILD

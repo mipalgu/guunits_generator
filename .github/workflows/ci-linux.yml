@@ -42,7 +42,7 @@ jobs:
         run: swift test --enable-code-coverage
 
       - name: Release Test
-        run: swift test -c release
+        run: swift test -c release -Xswiftc -DRELEASE_BUILD
 
       - name: Coverage Report
         uses: mattpolzin/swift-codecov-action@0.7.3

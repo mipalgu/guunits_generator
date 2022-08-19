@@ -103,10 +103,15 @@ final class GUUnitsGeneratorTests: XCTestCase {
         print("Using package url: \(packageURL.path)")
         try generatePackage()
         fflush(stdout)
+        #if RELEASE_BUILD
+        let configuration = "release"
+        #else
+        let configuration = "debug"
+        #endif
         let process = Process()
         process.currentDirectoryURL = packageURL
         process.executableURL = URL(fileURLWithPath: "/usr/bin/env", isDirectory: false)
-        process.arguments = ["swift", "test"]
+        process.arguments = ["swift", "test", "-c", configuration]
         try process.run()
         process.waitUntilExit()
         XCTAssertEqual(EXIT_SUCCESS, process.terminationStatus)

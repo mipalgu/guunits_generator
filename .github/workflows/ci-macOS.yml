@@ -40,4 +40,4 @@ jobs:
         run: swift test
 
       - name: Release Test
-        run: swift test -c release
+        run: swift test -c release -Xswiftc -DRELEASE_BUILD
