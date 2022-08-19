@@ -234,7 +234,8 @@ public struct SwiftFileCreator {
         let cases = type.allCases.flatMap { unit in
             Signs.allCases.map { sign in
                 let unitType = "\(unit)_\(sign)".lowercased()
-                return "        case \(unitType)(_ \(unitType.lowercased()): \(unit.description.capitalized)_\(sign))"
+                return "        case \(unitType)(_ \(unitType.lowercased()): " +
+                    "\(unit.description.capitalized)_\(sign))"
             }
         }
         .joined(separator: "\n\n")
@@ -278,7 +279,16 @@ public struct SwiftFileCreator {
         }
     }
 
-    private func switchValues<T: UnitProtocol>(for type: T.Type, with name: String = "rawValue", to perform: (String) -> String) -> String {
+    /// Generate a switch statement over a CategoryTypes enum.
+    /// - Parameters:
+    ///   - type: The type of the unit.
+    ///   - name: The name of the variable containing an instance of the enum type.
+    ///   - perform: A conversion function which generates code containing the objects
+    ///              contained within the enum cases.
+    /// - Returns: A generated switch stated using the perform function.
+    private func switchValues<T: UnitProtocol>(
+        for type: T.Type, with name: String = "rawValue", to perform: (String) -> String
+    ) -> String {
         let cases = type.allCases.flatMap { unit in
             Signs.allCases.map { sign in
                 let unitType = "\(unit)_\(sign)".lowercased()
@@ -434,13 +444,17 @@ public struct SwiftFileCreator {
         let body: String
         switch numeric {
         case .Double, .Int64, .UInt64:
-            body = "self.rawValue = .\(value.description.lowercased())_d(\(value.description.capitalized)_d(value))"
+            body = "self.rawValue = .\(value.description.lowercased())_d" +
+                "(\(value.description.capitalized)_d(value))"
         case .Float:
-            body = "self.rawValue = .\(value.description.lowercased())_f(\(value.description.capitalized)_f(value))"
+            body = "self.rawValue = .\(value.description.lowercased())_f" +
+                "(\(value.description.capitalized)_f(value))"
         case .Int, .CInt, .Int16, .Int8, .Int32:
-            body = "self.rawValue = .\(value.description.lowercased())_t(\(value.description.capitalized)_t(value))"
+            body = "self.rawValue = .\(value.description.lowercased())_t" +
+                "(\(value.description.capitalized)_t(value))"
         case .UInt, .CUnsignedInt, .UInt8, .UInt16, .UInt32:
-            body = "self.rawValue = .\(value.description.lowercased())_u(\(value.description.capitalized)_u(value))"
+            body = "self.rawValue = .\(value.description.lowercased())_u" +
+                "(\(value.description.capitalized)_u(value))"
         }
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
