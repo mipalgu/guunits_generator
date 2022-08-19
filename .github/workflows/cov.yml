@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - main
-      - development 
+      - development
   push:
     branches: [development, main]
 
@@ -17,6 +17,16 @@ jobs:
       - uses: swift-actions/setup-swift@v1
         with:
             swift-version: "5.6"
+
+      - name: Setup SSH Key
+        run: | 
+            rm -rf ~/.ssh
+            mkdir -m 0700 ~/.ssh
+            echo "${{ secrets.WORKFLOWS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+            echo "${{ secrets.WORKFLOWS_SSH_PUBLIC_KEY }}" > ~/.ssh/id_ed25519.pub
+            chmod 0600 ~/.ssh/id_ed25519
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/id_ed25519
 
       - name: Checkout repo
         uses: actions/checkout@v2

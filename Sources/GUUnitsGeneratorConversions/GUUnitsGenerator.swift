@@ -200,7 +200,9 @@ public struct GUUnitsGenerator {
         writeFile(
             at: path,
             with: "AccelerationTests",
-            and: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
+            and: accelerationFileCreator.tests(
+                generator: accelerationGenerator, imports: "import CGUUnits"
+            )
         )
     }
 
@@ -240,6 +242,57 @@ public struct GUUnitsGenerator {
             and: swiftFileCreator.generate(for: AccelerationUnits.self)
         )
         print("Done!")
+    }
+
+    /// Generate files that test the swift layer of guunits.
+    /// - Parameter path: The folder containing the test files.
+    public func generateSwiftTests(in path: URL) {
+        let swiftFileCreator = SwiftTestFileCreator()
+        writeFile(
+            at: path, with: "\(DistanceUnits.category)Tests", and: swiftFileCreator.generate(
+                with: GradualTestGenerator<DistanceUnits>(
+                    unitDifference: [
+                        .millimetres: 10,
+                        .centimetres: 100
+                    ]
+                )
+            )
+        )
+        writeFile(
+            at: path, with: "\(TimeUnits.category)Tests", and: swiftFileCreator.generate(
+                with: GradualTestGenerator<TimeUnits>(
+                    unitDifference: [
+                        .microseconds: 1000,
+                        .milliseconds: 1000
+                    ]
+                )
+            )
+        )
+        writeFile(
+            at: path,
+            with: "\(AngleUnits.category)Tests",
+            and: swiftFileCreator.generate(with: AngleTestGenerator())
+        )
+        writeFile(
+            at: path,
+            with: "\(ImageUnits.category)Tests",
+            and: swiftFileCreator.generate(with: SameUnitTestGenerator<ImageUnits>())
+        )
+        writeFile(
+            at: path,
+            with: "\(PercentUnits.category)Tests",
+            and: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
+        )
+        writeFile(
+            at: path,
+            with: "\(TemperatureUnits.category)Tests",
+            and: swiftFileCreator.generate(with: TemperatureTestGenerator())
+        )
+        writeFile(
+            at: path,
+            with: "\(AccelerationUnits.category)Tests",
+            and: swiftFileCreator.generate(with: AccelerationTestGenerator())
+        )
     }
 
     /// Write a Swift source file to a location.

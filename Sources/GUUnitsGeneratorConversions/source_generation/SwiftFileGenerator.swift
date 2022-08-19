@@ -194,6 +194,7 @@ public struct SwiftFileCreator {
             /// to.
             """
         let def = "public struct " + type.category + ": Sendable, Hashable, Codable {"
+        let enumDefinition = generateCategoryEnum(for: type)
         let rawProperty = self.indent(self.generateCategoryRawValueProperty(for: type))
         let getters = self.indent(self.generateCategoryGetters(for: type))
         let zeroGetter: String
@@ -208,6 +209,7 @@ public struct SwiftFileCreator {
         let conversionInits = self.indent(self.createCategoryConversionInits(for: type))
         let endef = "}"
         return comment + "\n" + def
+            + "\n\n" + enumDefinition
             + "\n\n" + "// MARK: - Converting Between The Internal Representation"
             + "\n\n" + rawProperty
             + "\n\n" + rawPropertyInit
@@ -224,14 +226,34 @@ public struct SwiftFileCreator {
 
     // swiftlint:enable function_body_length
 
+    /// Create the private unit enum types for the category struct.
+    /// - Parameter type: The type of the category.
+    /// - Returns: A string containing the declaration for the private enum containing
+    ///            the raw values for the category.
+    private func generateCategoryEnum<T: UnitProtocol>( for type: T.Type) -> String {
+        let cases = type.allCases.flatMap { unit in
+            Signs.allCases.map { sign in
+                let unitType = "\(unit)_\(sign)".lowercased()
+                return "        case \(unitType)(_ \(unitType.lowercased()): " +
+                    "\(unit.description.capitalized)_\(sign))"
+            }
+        }
+        .joined(separator: "\n\n")
+        return """
+            enum \(type.category)Types: Sendable, Hashable, Codable {
+
+        \(cases)
+
+            }
+        """
+    }
+
     /// Generates the rawValue property within a category struct.
     /// - Parameter type: The unit type.
     /// - Returns: The rawValue definition.
     private func generateCategoryRawValueProperty<T: UnitProtocol>(for type: T.Type) -> String {
-        let comment = "/// Always store internally as a `"
-            + type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue + "`"
-        let def = "public let rawValue: " + type.highestPrecision.description.capitalized
-            + "_" + Signs.d.rawValue
+        let comment = "/// Always store internally as a `\(type.category.capitalized)Types`"
+        let def = "let rawValue: \(type.category.capitalized)Types"
         return comment + "\n" + def
     }
 
@@ -240,8 +262,7 @@ public struct SwiftFileCreator {
     /// - Returns: The definition of the init.
     private func generateCategoryRawValueInit<T: UnitProtocol>(for type: T.Type) -> String {
         let comment = "/// Initialise `" + type.category + "` from its internally representation."
-        let def = "public init(rawValue: " + type.highestPrecision.description.capitalized
-            + "_" + Signs.d.rawValue + ") {"
+        let def = "init(rawValue: \(T.category.capitalized)Types) {"
         let body = "self.rawValue = rawValue"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
@@ -258,6 +279,30 @@ public struct SwiftFileCreator {
         }
     }
 
+    /// Generate a switch statement over a CategoryTypes enum.
+    /// - Parameters:
+    ///   - type: The type of the unit.
+    ///   - name: The name of the variable containing an instance of the enum type.
+    ///   - perform: A conversion function which generates code containing the objects
+    ///              contained within the enum cases.
+    /// - Returns: A generated switch stated using the perform function.
+    private func switchValues<T: UnitProtocol>(
+        for type: T.Type, with name: String = "rawValue", to perform: (String) -> String
+    ) -> String {
+        let cases = type.allCases.flatMap { unit in
+            Signs.allCases.map { sign in
+                let unitType = "\(unit)_\(sign)".lowercased()
+                return "case .\(unitType)(let value):\n\(self.indent(perform("value")))"
+            }
+        }
+        .joined(separator: "\n")
+        return """
+        switch \(name) {
+        \(cases)
+        }
+        """
+    }
+
     /// Generates a getter for converting the category struct to a case struct.
     /// - Parameters:
     ///   - value: The target unit case type.
@@ -268,7 +313,7 @@ public struct SwiftFileCreator {
         let getterName = value.description + "_" + sign.rawValue
         let comment = "/// Create a `" + targetStruct + "`."
         let def = "public var " + getterName + ": " + targetStruct + " {"
-        let body = "return " + targetStruct + "(self.rawValue)"
+        let body = switchValues(for: T.self) { "return " + targetStruct + "(\($0))" }
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
@@ -355,13 +400,7 @@ public struct SwiftFileCreator {
             """
         let def = "public init(_ value: " + source.description.capitalized + "_" + sign.rawValue + ") {"
         let endef = "}"
-        let body: String
-        if source == T.highestPrecision && sign == .d {
-            body = "self.rawValue = value"
-        } else {
-            body = "self.rawValue = " + T.highestPrecision.description.capitalized
-                + "_" + Signs.d.rawValue + "(value)"
-        }
+        let body = "self.rawValue = .\(source.description.lowercased())_\(sign)(value)"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
@@ -402,13 +441,20 @@ public struct SwiftFileCreator {
             """
         // swiftlint:enable line_length
         let def = "public init(" + value.description + " value: " + numeric.rawValue + ") {"
-        let rawValueStruct = type.highestPrecision.description.capitalized + "_" + Signs.d.rawValue
         let body: String
-        if value == type.highestPrecision && numeric.sign == .d {
-            body = "self.rawValue = " + rawValueStruct + "(value)"
-        } else {
-            body = "self.rawValue = " + rawValueStruct + "(" + value.description.capitalized
-                + "_" + numeric.sign.rawValue + "(value))"
+        switch numeric {
+        case .Double, .Int64, .UInt64:
+            body = "self.rawValue = .\(value.description.lowercased())_d" +
+                "(\(value.description.capitalized)_d(value))"
+        case .Float:
+            body = "self.rawValue = .\(value.description.lowercased())_f" +
+                "(\(value.description.capitalized)_f(value))"
+        case .Int, .CInt, .Int16, .Int8, .Int32:
+            body = "self.rawValue = .\(value.description.lowercased())_t" +
+                "(\(value.description.capitalized)_t(value))"
+        case .UInt, .CUnsignedInt, .UInt8, .UInt16, .UInt32:
+            body = "self.rawValue = .\(value.description.lowercased())_u" +
+                "(\(value.description.capitalized)_u(value))"
         }
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
@@ -430,7 +476,7 @@ public struct SwiftFileCreator {
         let def = "public extension " + extensionType + " {"
         let mark = "// MARK: - Creating a " + extensionType + " From The " + category + " Units"
         let initDef = "init(_ value: " + category + ") {"
-        let initBody = "self.init(value.rawValue)"
+        let initBody = self.switchValues(for: type, with: "value.rawValue") { "self.init(\($0))" }
         let endef = "}"
         let body = initDef + "\n" + self.indent(initBody) + "\n" + endef
         return def
@@ -565,7 +611,7 @@ public struct SwiftFileCreator {
         /// - Parameter value: A `\(sourceStruct)` value to convert to a `\(valueStruct)`.
         """
         let def = "public init(_ value: " + sourceStruct + ") {"
-        let body = "self.init(value.rawValue)"
+        let body = self.switchValues(for: T.self, with: "value.rawValue") { "self.init(\($0))" }
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }

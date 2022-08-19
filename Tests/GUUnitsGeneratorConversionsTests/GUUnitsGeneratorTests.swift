@@ -117,23 +117,29 @@ final class GUUnitsGeneratorTests: XCTestCase {
         guard
             let guunitsDirectory = guunitsDirectory,
             let swiftGUUnitsDirectory = swiftGUUnitsDirectory,
-            let guunitsTests = guunitsTests
-            // let swiftGUUnitsTests = swiftGUUnitsTests
+            let guunitsTests = guunitsTests,
+            let swiftGUUnitsTests = swiftGUUnitsTests
         else {
             XCTFail("Failed to ascertain package path.")
             return
         }
-        let manager = FileManager()
-        _ = try? manager.removeItem(at: guunitsTests)
-        _ = try? manager.createDirectory(at: guunitsTests, withIntermediateDirectories: true)
-        var gitignore = guunitsTests
-        gitignore.appendPathComponent(".gitignore", isDirectory: false)
-        manager.createFile(atPath: gitignore.path, contents: "*\n".data(using: .utf8))
-        // let guunitsTests = packageURL.appendingPathComponent("Tests/guunitsTests")
-        // let swiftTests = packageURL.appendingPathComponent("Tests/swift_GUUnitsTests")
+        clearFolder(at: guunitsTests)
+        clearFolder(at: swiftGUUnitsTests)
         try generator.generateCFiles(in: guunitsDirectory)
         generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
         generator.generateCTests(in: guunitsTests)
+        generator.generateSwiftTests(in: swiftGUUnitsTests)
+    }
+
+    /// Creates an empty folder that can contain files ignored by git.
+    /// - Parameter path: The path of the folder.
+    private func clearFolder(at path: URL) {
+        let manager = FileManager()
+        _ = try? manager.removeItem(at: path)
+        _ = try? manager.createDirectory(at: path, withIntermediateDirectories: true)
+        var gitignore = path
+        gitignore.appendPathComponent(".gitignore", isDirectory: false)
+        manager.createFile(atPath: gitignore.path, contents: "*\n".data(using: .utf8))
     }
 
 }
