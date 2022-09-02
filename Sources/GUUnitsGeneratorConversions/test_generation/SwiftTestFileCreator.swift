@@ -286,7 +286,7 @@ public struct SwiftTestFileCreator {
         */
 
         import CGUUnits
-        import swift_GUUnits
+        import GUUnits
         import XCTest
         """
     }

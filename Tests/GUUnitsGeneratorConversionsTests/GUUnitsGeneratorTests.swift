@@ -91,7 +91,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
 
     /// The swift_GUUnitsTests target in the Tests directory.
     var swiftGUUnitsTests: URL? {
-        packageURL?.appendingPathComponent("Tests").appendingPathComponent("swift_GUUnitsTests")
+        packageURL?.appendingPathComponent("Tests").appendingPathComponent("GUUnitsTests")
     }
 
     /// Generate the guunits package and make sure all generated tests pass.

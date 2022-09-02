@@ -11,8 +11,10 @@ let package = Package(
         // to other packages.
         .library(
             name: "guunits",
-            targets: ["CGUUnits", "swift_GUUnits"]
-        )
+            type: .dynamic,
+            targets: ["CGUUnits", "GUUnits"]
+        ),
+        .library(name: "GUUnits", targets: ["CGUUnits", "GUUnits"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,7 +29,7 @@ let package = Package(
             dependencies: []
         ),
         .target(
-            name: "swift_GUUnits",
+            name: "GUUnits",
             dependencies: ["CGUUnits"]
         ),
         .testTarget(
@@ -35,8 +37,8 @@ let package = Package(
             dependencies: ["CGUUnits"]
         ),
         .testTarget(
-            name: "swift_GUUnitsTests",
-            dependencies: ["swift_GUUnits"]
+            name: "GUUnitsTests",
+            dependencies: ["GUUnits"]
         )
     ]
 )
