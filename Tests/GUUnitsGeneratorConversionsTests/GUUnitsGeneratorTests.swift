@@ -71,7 +71,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         URL(fileURLWithPath: #filePath, isDirectory: false)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
-            .appendingPathComponent("guunits", isDirectory: true)
+            .appendingPathComponent("GUUnits", isDirectory: true)
     }
 
     /// The CGUUnits target in the Source directory.
