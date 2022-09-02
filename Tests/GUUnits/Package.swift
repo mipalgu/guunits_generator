@@ -5,7 +5,7 @@ import PackageDescription
 
 /// Package description.
 let package = Package(
-    name: "guunits",
+    name: "GUUnits",
     products: [
         // Products define the executables and libraries a package produces, and make them visible
         // to other packages.
