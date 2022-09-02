@@ -5,14 +5,16 @@ import PackageDescription
 
 /// Package description.
 let package = Package(
-    name: "guunits",
+    name: "GUUnits",
     products: [
         // Products define the executables and libraries a package produces, and make them visible
         // to other packages.
         .library(
             name: "guunits",
-            targets: ["CGUUnits", "swift_GUUnits"]
-        )
+            type: .dynamic,
+            targets: ["CGUUnits", "GUUnits"]
+        ),
+        .library(name: "GUUnits", targets: ["CGUUnits", "GUUnits"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,7 +29,7 @@ let package = Package(
             dependencies: []
         ),
         .target(
-            name: "swift_GUUnits",
+            name: "GUUnits",
             dependencies: ["CGUUnits"]
         ),
         .testTarget(
@@ -35,8 +37,8 @@ let package = Package(
             dependencies: ["CGUUnits"]
         ),
         .testTarget(
-            name: "swift_GUUnitsTests",
-            dependencies: ["swift_GUUnits"]
+            name: "GUUnitsTests",
+            dependencies: ["GUUnits"]
         )
     ]
 )

@@ -71,7 +71,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
         URL(fileURLWithPath: #filePath, isDirectory: false)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
-            .appendingPathComponent("guunits", isDirectory: true)
+            .appendingPathComponent("GUUnits", isDirectory: true)
     }
 
     /// The CGUUnits target in the Source directory.
@@ -81,7 +81,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
 
     /// The swift_GUUnits target in the Source directory.
     var swiftGUUnitsDirectory: URL? {
-        packageURL?.appendingPathComponent("Sources").appendingPathComponent("swift_GUUnits")
+        packageURL?.appendingPathComponent("Sources").appendingPathComponent("GUUnits")
     }
 
     /// The CGUUnitsTests target in the Tests directory.
@@ -91,7 +91,7 @@ final class GUUnitsGeneratorTests: XCTestCase {
 
     /// The swift_GUUnitsTests target in the Tests directory.
     var swiftGUUnitsTests: URL? {
-        packageURL?.appendingPathComponent("Tests").appendingPathComponent("swift_GUUnitsTests")
+        packageURL?.appendingPathComponent("Tests").appendingPathComponent("GUUnitsTests")
     }
 
     /// Generate the guunits package and make sure all generated tests pass.
