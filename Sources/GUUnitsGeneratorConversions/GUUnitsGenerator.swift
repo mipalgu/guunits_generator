@@ -241,6 +241,9 @@ public struct GUUnitsGenerator {
             with: AccelerationUnits.category,
             and: swiftFileCreator.generate(for: AccelerationUnits.self)
         )
+        writeFile(at: path, with: "GUUnitsFloat", and: GUUnitsPrimitiveHelpers.float)
+        writeFile(at: path, with: "GUUnitsInteger", and: GUUnitsPrimitiveHelpers.integer)
+        writeFile(at: path, with: "GUUnitsType", and: GUUnitsPrimitiveHelpers.type)
         print("Done!")
     }
 
