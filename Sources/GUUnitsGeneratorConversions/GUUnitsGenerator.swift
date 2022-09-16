@@ -90,6 +90,13 @@ public struct GUUnitsGenerator {
                 .centimetres: 100
             ])
         )
+        let currentGenerator = AnyGenerator(
+            generating: CurrentUnits.self,
+            using: CurrentUnitsGenerator(unitDifference: [
+                .microamperes: 1000,
+                .milliamperes: 1000
+            ])
+        )
         let timeGenerator = AnyGenerator(
             generating: TimeUnits.self,
             using: TimeUnitsGenerator(unitDifference: [
@@ -113,6 +120,7 @@ public struct GUUnitsGenerator {
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
+                currentGenerator,
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
@@ -128,6 +136,7 @@ public struct GUUnitsGenerator {
         let cContents = CFileCreator().generate(
             generators: [
                 distanceGenerator,
+                currentGenerator,
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
@@ -163,6 +172,16 @@ public struct GUUnitsGenerator {
             at: path,
             with: "DistanceTests",
             and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
+        )
+        let currentGenerator = GradualTestGenerator<CurrentUnits>(unitDifference: [
+            .microamperes: 1000,
+            .milliamperes: 1000
+        ])
+        let currentFileCreator = TestFileCreator<GradualTestGenerator<CurrentUnits>>()
+        writeFile(
+            at: path,
+            with: "CurrentTests",
+            and: currentFileCreator.tests(generator: currentGenerator, imports: "import CGUUnits")
         )
         let imageGenerator = SameUnitTestGenerator<ImageUnits>()
         let imageFileCreator = TestFileCreator<SameUnitTestGenerator<ImageUnits>>()
@@ -220,6 +239,9 @@ public struct GUUnitsGenerator {
             at: path, with: DistanceUnits.category, and: swiftFileCreator.generate(for: DistanceUnits.self)
         )
         writeFile(
+            at: path, with: CurrentUnits.category, and: swiftFileCreator.generate(for: CurrentUnits.self)
+        )
+        writeFile(
             at: path, with: TimeUnits.category, and: swiftFileCreator.generate(for: TimeUnits.self)
         )
         writeFile(
@@ -257,6 +279,16 @@ public struct GUUnitsGenerator {
                     unitDifference: [
                         .millimetres: 10,
                         .centimetres: 100
+                    ]
+                )
+            )
+        )
+        writeFile(
+            at: path, with: "\(CurrentUnits.category)Tests", and: swiftFileCreator.generate(
+                with: GradualTestGenerator<CurrentUnits>(
+                    unitDifference: [
+                        .microamperes: 1000,
+                        .milliamperes: 1000
                     ]
                 )
             )
