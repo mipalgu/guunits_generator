@@ -90,6 +90,13 @@ public struct GUUnitsGenerator {
                 .centimetres: 100
             ])
         )
+        let currentGenerator = AnyGenerator(
+            generating: CurrentUnits.self,
+            using: CurrentUnitsGenerator(unitDifference: [
+                .microamperes: 1000,
+                .milliamperes: 1000
+            ])
+        )
         let timeGenerator = AnyGenerator(
             generating: TimeUnits.self,
             using: TimeUnitsGenerator(unitDifference: [
@@ -113,6 +120,7 @@ public struct GUUnitsGenerator {
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
+                currentGenerator,
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
@@ -128,6 +136,7 @@ public struct GUUnitsGenerator {
         let cContents = CFileCreator().generate(
             generators: [
                 distanceGenerator,
+                currentGenerator,
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
