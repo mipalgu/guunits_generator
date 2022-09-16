@@ -34,6 +34,42 @@ extension UnitsGenerator where
 
 }
 
+/// CurrentUnits initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<CurrentUnits>,
+    CFunctionDefinitionCreator<CurrentUnits>, NumericTypeConverter> {
+
+    /// Initialise using CurrentUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
+    public init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
+/// CurrentUnits initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<CurrentUnits>,
+    CPPFunctionDefinitionCreator<CurrentUnits>, NumericTypeConverter> {
+
+    /// Initialise using CurrentUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
+    public init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CPPFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
 /// ImageUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>,

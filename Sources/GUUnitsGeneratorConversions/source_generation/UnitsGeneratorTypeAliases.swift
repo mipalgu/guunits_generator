@@ -7,6 +7,15 @@ public typealias DistanceUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Current Units Generator
+public typealias CurrentUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        GradualFunctionCreator<CurrentUnits>,
+        CFunctionDefinitionCreator<CurrentUnits>,
+        NumericTypeConverter
+    >
+>
+
 /// Time Units Generator
 public typealias TimeUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
