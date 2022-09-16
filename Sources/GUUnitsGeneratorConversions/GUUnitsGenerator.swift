@@ -173,6 +173,16 @@ public struct GUUnitsGenerator {
             with: "DistanceTests",
             and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
         )
+        let currentGenerator = GradualTestGenerator<CurrentUnits>(unitDifference: [
+            .microamperes: 1000,
+            .milliamperes: 1000
+        ])
+        let currentFileCreator = TestFileCreator<GradualTestGenerator<CurrentUnits>>()
+        writeFile(
+            at: path,
+            with: "CurrentTests",
+            and: currentFileCreator.tests(generator: currentGenerator, imports: "import CGUUnits")
+        )
         let imageGenerator = SameUnitTestGenerator<ImageUnits>()
         let imageFileCreator = TestFileCreator<SameUnitTestGenerator<ImageUnits>>()
         writeFile(
