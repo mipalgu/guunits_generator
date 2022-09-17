@@ -54,6 +54,8 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+// swiftlint:disable type_body_length
+
 /// Swift file creator for generating XCTest based files.
 public struct SwiftTestFileCreator {
 
@@ -73,6 +75,9 @@ public struct SwiftTestFileCreator {
             .joined(separator: "\n\n") + "\n"
     }
 
+    /// Additional tests needed to test the protocol conformances in the swift abstraction.
+    /// - Parameter category: The unit category.
+    /// - Returns: The new tests.
     private func typeTests<T>(category: T.Type) -> String where T: UnitProtocol {
         T.allCases.map { type in
             let tests = Signs.allCases.map { sign in
@@ -98,6 +103,9 @@ public struct SwiftTestFileCreator {
         .joined(separator: "\n\n")
     }
 
+    /// Tests that are common to both integer and floating point types.
+    /// - Parameter type: The type.
+    /// - Returns: The new tests.
     private func typeGeneralTests(type: String) -> String {
         """
             func test\(type)Equality() {
@@ -132,6 +140,13 @@ public struct SwiftTestFileCreator {
         """
     }
 
+    // swiftlint:disable function_body_length
+
+    /// Additional tests needed for testing the integer protocol conformances.
+    /// - Parameters:
+    ///   - type: The type of the parent struct conforming to the BinaryInteger protocol.
+    ///   - rawType: The raw type of the parent protocol as a swift type.
+    /// - Returns: The tests.
     private func typeIntegerTests(type: String, rawType: String) -> String {
         """
             func test\(type)ExactlyInit() {
@@ -198,13 +213,69 @@ public struct SwiftTestFileCreator {
                 let expected = \(type)(\(rawType)(6) / \(rawType)(3))
                 XCTAssertEqual(\(type)(6) / \(type)(3), expected)
             }
+
+            func test\(type)AddOverflow() {
+                let rawOriginal = \(rawType).max
+                let rawResult = rawOriginal.addingReportingOverflow(\(rawType)(1))
+                let original = \(type)(original)
+                let result = original.addingReportingOverflow(\(type)(1))
+                XCTAssertEqual(result.0, \(type)(rawResult.0))
+                XCTAssertEqual(result.1, rawResult.1)
+                XCTAssertTrue(result.1)
+            }
+
+            func test\(type)MultiplyOverflow() {
+                let rawOriginal = \(rawType).max
+                let rawResult = rawOriginal.multipliedReportingOverflow(\(rawType)(2))
+                let original = \(type)(original)
+                let result = original.multipliedReportingOverflow(\(type)(2))
+                XCTAssertEqual(result.0, \(type)(rawResult.0))
+                XCTAssertEqual(result.1, rawResult.1)
+                XCTAssertTrue(result.1)
+            }
+
+            func test\(type)SubtractOverflow() {
+                let rawOriginal = \(rawType).min
+                let rawResult = rawOriginal.subtractingReportingOverflow(\(rawType)(1))
+                let original = \(type)(original)
+                let result = original.subtractingReportingOverflow(\(type)(1))
+                XCTAssertEqual(result.0, \(type)(rawResult.0))
+                XCTAssertEqual(result.1, rawResult.1)
+                XCTAssertTrue(result.1)
+            }
+
+            func test\(type)DivideOverflow() {
+                let rawOriginal = \(rawType).max
+                let rawResult = rawOriginal.dividedReportingOverflow(\(rawType)(0))
+                let original = \(type)(original)
+                let result = original.dividedReportingOverflow(\(type)(0))
+                XCTAssertEqual(result.0, \(type)(rawResult.0))
+                XCTAssertEqual(result.1, rawResult.1)
+                XCTAssertTrue(result.1)
+            }
+
+            func test\(type)RemainderOverflow() {
+                let rawOriginal = \(rawType).max
+                let rawResult = rawOriginal.remainderReportingOverflow(\(rawType)(0))
+                let original = \(type)(original)
+                let result = original.remainderReportingOverflow(\(type)(0))
+                XCTAssertEqual(result.0, \(type)(rawResult.0))
+                XCTAssertEqual(result.1, rawResult.1)
+                XCTAssertTrue(result.1)
+            }
         """
     }
 
-    private func typeFloatTests(type: String, rawType: String) -> String {
-        """
+    // swiftlint:enable function_body_length
 
-        """
+    /// Provided additional tests for testing the parent swift struct that represents
+    /// a GUUnits floating point unit.
+    /// - Parameters:
+    ///   - type: The type of the parent struct conforming to BinaryFloatingPoint.
+    ///   - rawType: The raw type of the parent struct.
+    /// - Returns: The new tests.
+    private func typeFloatTests(type: String, rawType: String) -> String {
+        ""
     }
 
     /// Creates a class containing test for a given unit and sign.
@@ -426,3 +497,4 @@ public struct SwiftTestFileCreator {
     }
 
 }
+// swiftlint:enable type_body_length
