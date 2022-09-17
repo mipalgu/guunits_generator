@@ -217,7 +217,7 @@ public struct SwiftTestFileCreator {
             func test\(type)AddOverflow() {
                 let rawOriginal = \(rawType).max
                 let rawResult = rawOriginal.addingReportingOverflow(\(rawType)(1))
-                let original = \(type)(original)
+                let original = \(type)(rawOriginal)
                 let result = original.addingReportingOverflow(\(type)(1))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
@@ -226,9 +226,9 @@ public struct SwiftTestFileCreator {
 
             func test\(type)MultiplyOverflow() {
                 let rawOriginal = \(rawType).max
-                let rawResult = rawOriginal.multipliedReportingOverflow(\(rawType)(2))
-                let original = \(type)(original)
-                let result = original.multipliedReportingOverflow(\(type)(2))
+                let rawResult = rawOriginal.multipliedReportingOverflow(by: \(rawType)(2))
+                let original = \(type)(rawOriginal)
+                let result = original.multipliedReportingOverflow(by: \(type)(2))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
                 XCTAssertTrue(result.1)
@@ -237,7 +237,7 @@ public struct SwiftTestFileCreator {
             func test\(type)SubtractOverflow() {
                 let rawOriginal = \(rawType).min
                 let rawResult = rawOriginal.subtractingReportingOverflow(\(rawType)(1))
-                let original = \(type)(original)
+                let original = \(type)(rawOriginal)
                 let result = original.subtractingReportingOverflow(\(type)(1))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
@@ -245,20 +245,20 @@ public struct SwiftTestFileCreator {
             }
 
             func test\(type)DivideOverflow() {
-                let rawOriginal = \(rawType).max
-                let rawResult = rawOriginal.dividedReportingOverflow(\(rawType)(0))
-                let original = \(type)(original)
-                let result = original.dividedReportingOverflow(\(type)(0))
+                let rawOriginal = \(rawType)(1)
+                let rawResult = rawOriginal.dividedReportingOverflow(by: \(rawType).max)
+                let original = \(type)(rawOriginal)
+                let result = original.dividedReportingOverflow(by: \(type)(\(rawType).max))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
                 XCTAssertTrue(result.1)
             }
 
             func test\(type)RemainderOverflow() {
-                let rawOriginal = \(rawType).max
-                let rawResult = rawOriginal.remainderReportingOverflow(\(rawType)(0))
-                let original = \(type)(original)
-                let result = original.remainderReportingOverflow(\(type)(0))
+                let rawOriginal = \(rawType)(1)
+                let rawResult = rawOriginal.remainderReportingOverflow(dividingBy: \(rawType).max)
+                let original = \(type)(rawOriginal)
+                let result = original.remainderReportingOverflow(dividingBy: \(type)(\(rawType).max))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
                 XCTAssertTrue(result.1)
