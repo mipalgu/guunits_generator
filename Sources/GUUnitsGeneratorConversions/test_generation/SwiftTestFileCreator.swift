@@ -64,13 +64,147 @@ public struct SwiftTestFileCreator {
     /// - Parameter generator: The generator creating the test parameters.
     /// - Returns: The contents of the test file.
     func generate<T: TestGenerator>(with generator: T) -> String {
-        prefix(name: "\(T.UnitType.category)Tests") + "\n\n" +
+        prefix(name: "\(T.UnitType.category)Tests") + "\n\n" + typeTests(category: T.UnitType.self) +
             T.UnitType.allCases.flatMap { unit in
                 Signs.allCases.map { sign in
                     createTestClass(from: unit, with: sign, using: generator)
                 }
             }
             .joined(separator: "\n\n") + "\n"
+    }
+
+    private func typeTests<T>(category: T.Type) -> String where T: UnitProtocol {
+        T.allCases.map { type in
+            let tests = Signs.allCases.map { sign in
+                let typeDef = "\(type.description.capitalized)_\(sign)"
+                let primitiveTests = sign.isFloatingPoint ?
+                    typeFloatTests(type: typeDef, rawType: sign.numericType.swiftType.rawValue) :
+                    typeIntegerTests(type: typeDef, rawType: sign.numericType.swiftType.rawValue)
+                return """
+                \(typeGeneralTests(type: typeDef))
+
+                \(primitiveTests)
+                """
+            }
+            .joined(separator: "\n\n")
+            return """
+            final class \(type.description.capitalized)TypeTests: XCTestCase {
+
+            \(tests)
+
+            }
+            """
+        }
+        .joined(separator: "\n\n")
+    }
+
+    private func typeGeneralTests(type: String) -> String {
+        """
+            func test\(type)Equality() {
+                XCTAssertEqual(\(type)(5), \(type)(5))
+            }
+
+            func test\(type)Coding() throws {
+                let encoder = JSONEncoder()
+                let decoder = JSONDecoder()
+                let original = \(type)(10)
+                XCTAssertEqual(
+                    original,
+                    try decoder.decode(\(type).self, from: try encoder.encode(original))
+                )
+            }
+
+            func test\(type)SelfInit() {
+                let expected = \(type)(15)
+                XCTAssertEqual(expected, \(type)(expected))
+            }
+
+            func test\(type)SelfExactlyInit() {
+                let expected = \(type)(15)
+                XCTAssertEqual(expected, \(type)(exactly: expected))
+            }
+
+            func test\(type)Comparable() {
+                let lhs = \(type)(1)
+                let rhs = \(type)(100)
+                XCTAssertLessThan(lhs, rhs)
+            }
+        """
+    }
+
+    private func typeIntegerTests(type: String, rawType: String) -> String {
+        """
+            func test\(type)ExactlyInit() {
+                let expected = \(type)(15)
+                XCTAssertEqual(expected, \(type)(exactly: 15))
+            }
+
+            func test\(type)TruncatingInit() {
+                let expected = \(rawType)(truncatingIfNeeded: UInt64.max)
+                XCTAssertEqual(\(type)(truncatingIfNeeded: UInt64.max), \(type)(expected))
+            }
+
+            func test\(type)ClampingInit() {
+                let expected = \(rawType)(clamping: UInt64.max)
+                XCTAssertEqual(\(type)(clamping: UInt64.max), \(type)(expected))
+            }
+
+            func test\(type)BitWidth() {
+                let expected = \(rawType)(5).bitWidth
+                XCTAssertEqual(\(type)(5).bitWidth, expected)
+            }
+
+            func test\(type)LeadingZeroBitCount() {
+                let expected = \(rawType)(5).leadingZeroBitCount
+                XCTAssertEqual(\(type)(5).leadingZeroBitCount, expected)
+            }
+
+            func test\(type)NonzeroBitCount() {
+                let expected = \(rawType)(5).nonzeroBitCount
+                XCTAssertEqual(\(type)(5).nonzeroBitCount, expected)
+            }
+
+            func test\(type)Magnitude() {
+                let expected = \(rawType)(5).magnitude
+                XCTAssertEqual(\(type)(5).magnitude, expected)
+            }
+
+            func test\(type)IntegerLiteralInit() {
+                let expected = \(rawType)(integerLiteral: \(rawType).max)
+                XCTAssertEqual(\(type)(expected), \(type)(integerLiteral: \(rawType).max))
+            }
+
+            func test\(type)TruncatingBits() {
+                let expected = \(type)(\(rawType)(_truncatingBits: UInt.max))
+                XCTAssertEqual(expected, \(type)(_truncatingBits: UInt.max))
+            }
+
+            func test\(type)Addition() {
+                let expected = \(type)(\(rawType)(5) + \(rawType)(3))
+                XCTAssertEqual(\(type)(5) + \(type)(3), expected)
+            }
+
+            func test\(type)Subtraction() {
+                let expected = \(type)(\(rawType)(5) - \(rawType)(3))
+                XCTAssertEqual(\(type)(5) - \(type)(3), expected)
+            }
+
+            func test\(type)Multiplication() {
+                let expected = \(type)(\(rawType)(5) * \(rawType)(3))
+                XCTAssertEqual(\(type)(5) * \(type)(3), expected)
+            }
+
+            func test\(type)Division() {
+                let expected = \(type)(\(rawType)(6) / \(rawType)(3))
+                XCTAssertEqual(\(type)(6) / \(type)(3), expected)
+            }
+        """
+    }
+
+    private func typeFloatTests(type: String, rawType: String) -> String {
+        """
+
+        """
     }
 
     /// Creates a class containing test for a given unit and sign.
