@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 /// Swift file creator for generating XCTest based files.
@@ -82,11 +83,12 @@ public struct SwiftTestFileCreator {
         T.allCases.map { type in
             let tests = Signs.allCases.map { sign in
                 let typeDef = "\(type.description.capitalized)_\(sign)"
+                let rawType = sign.numericType.swiftType.rawValue
                 let primitiveTests = sign.isFloatingPoint ?
-                    typeFloatTests(type: typeDef, rawType: sign.numericType.swiftType.rawValue) :
-                    typeIntegerTests(type: typeDef, rawType: sign.numericType.swiftType.rawValue)
+                    typeFloatTests(type: typeDef, rawType: rawType) :
+                    typeIntegerTests(type: typeDef, rawType: rawType)
                 return """
-                \(typeGeneralTests(type: typeDef))
+                \(typeGeneralTests(type: typeDef, rawType: rawType))
 
                 \(primitiveTests)
                 """
@@ -106,7 +108,7 @@ public struct SwiftTestFileCreator {
     /// Tests that are common to both integer and floating point types.
     /// - Parameter type: The type.
     /// - Returns: The new tests.
-    private func typeGeneralTests(type: String) -> String {
+    private func typeGeneralTests(type: String, rawType: String) -> String {
         """
             func test\(type)Equality() {
                 XCTAssertEqual(\(type)(5), \(type)(5))
@@ -136,6 +138,11 @@ public struct SwiftTestFileCreator {
                 let lhs = \(type)(1)
                 let rhs = \(type)(100)
                 XCTAssertLessThan(lhs, rhs)
+            }
+
+            func test\(type)Magnitude() {
+                let expected = \(rawType)(5).magnitude
+                XCTAssertEqual(\(type)(5).magnitude, expected)
             }
         """
     }
@@ -172,11 +179,6 @@ public struct SwiftTestFileCreator {
             func test\(type)NonzeroBitCount() {
                 let expected = \(rawType)(5).nonzeroBitCount
                 XCTAssertEqual(\(type)(5).nonzeroBitCount, expected)
-            }
-
-            func test\(type)Magnitude() {
-                let expected = \(rawType)(5).magnitude
-                XCTAssertEqual(\(type)(5).magnitude, expected)
             }
 
             func test\(type)IntegerLiteralInit() {
@@ -256,6 +258,70 @@ public struct SwiftTestFileCreator {
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
             }
+
+            func test\(type)Words() {
+                let original = \(rawType)(1)
+                XCTAssertEqual(\(type)(original).words, original.words)
+            }
+
+            func test\(type)TrailingZeroBitCount() {
+                let original = \(rawType)(1)
+                XCTAssertEqual(\(type)(original).trailingZeroBitCount, original.trailingZeroBitCount)
+            }
+
+            func test\(type)TimesEquals() {
+                var original = \(rawType)(2)
+                original *= 4
+                var result = \(type)(\(rawType)(2))
+                result *= 4
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)DivideEquals() {
+                var original = \(rawType)(4)
+                original /= 2
+                var result = \(type)(\(rawType)(4))
+                result /= 4
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)ModEquals() {
+                var original = \(rawType)(4)
+                original %= 2
+                var result = \(type)(\(rawType)(4))
+                result %= 2
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)AndEquals() {
+                var original = \(rawType)(2)
+                original &= 6
+                var result = \(type)(\(rawType)(2))
+                result &= 6
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)OrEquals() {
+                var original = \(rawType)(2)
+                original |= 4
+                var result = \(type)(\(rawType)(2))
+                result |= 4
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)HatEquals() {
+                var original = \(rawType)(2)
+                original ^= 4
+                var result = \(type)(\(rawType)(2))
+                result ^= 4
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)Mod() {
+                let original = \(rawType)(4)
+                let expected = \(type)(original % 2)
+                XCTAssertEqual(\(type)(original) % 2, expected)
+            }
         """
     }
 
@@ -268,7 +334,13 @@ public struct SwiftTestFileCreator {
     ///   - rawType: The raw type of the parent struct.
     /// - Returns: The new tests.
     private func typeFloatTests(type: String, rawType: String) -> String {
-        ""
+        """
+            func test\(type)Radix() {
+                let original = \(rawType)(5)
+                let expected = original.radix
+                XCTAssertEqual(\(type)(original).radix, expected)
+            }
+        """
     }
 
     /// Creates a class containing test for a given unit and sign.
@@ -491,3 +563,4 @@ public struct SwiftTestFileCreator {
 
 }
 // swiftlint:enable type_body_length
+// swiftlint:enable file_length
