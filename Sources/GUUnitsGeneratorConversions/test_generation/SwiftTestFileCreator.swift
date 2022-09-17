@@ -149,19 +149,14 @@ public struct SwiftTestFileCreator {
     /// - Returns: The tests.
     private func typeIntegerTests(type: String, rawType: String) -> String {
         """
-            func test\(type)ExactlyInit() {
-                let expected = \(type)(15)
-                XCTAssertEqual(expected, \(type)(exactly: 15))
-            }
-
             func test\(type)TruncatingInit() {
-                let expected = \(rawType)(truncatingIfNeeded: UInt64.max)
-                XCTAssertEqual(\(type)(truncatingIfNeeded: UInt64.max), \(type)(expected))
+                let expected = \(type)(\(rawType)(truncatingIfNeeded: UInt64.max))
+                XCTAssertEqual(\(type)(truncatingIfNeeded: expected), expected)
             }
 
             func test\(type)ClampingInit() {
-                let expected = \(rawType)(clamping: UInt64.max)
-                XCTAssertEqual(\(type)(clamping: UInt64.max), \(type)(expected))
+                let expected = \(type)(\(rawType)(clamping: UInt64.max))
+                XCTAssertEqual(\(type)(clamping: expected), expected)
             }
 
             func test\(type)BitWidth() {
@@ -251,7 +246,6 @@ public struct SwiftTestFileCreator {
                 let result = original.dividedReportingOverflow(by: \(type)(\(rawType).max))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
-                XCTAssertTrue(result.1)
             }
 
             func test\(type)RemainderOverflow() {
@@ -261,7 +255,6 @@ public struct SwiftTestFileCreator {
                 let result = original.remainderReportingOverflow(dividingBy: \(type)(\(rawType).max))
                 XCTAssertEqual(result.0, \(type)(rawResult.0))
                 XCTAssertEqual(result.1, rawResult.1)
-                XCTAssertTrue(result.1)
             }
         """
     }
