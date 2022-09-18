@@ -67,13 +67,167 @@ public struct SwiftTestFileCreator {
     /// - Parameter generator: The generator creating the test parameters.
     /// - Returns: The contents of the test file.
     func generate<T: TestGenerator>(with generator: T) -> String {
-        prefix(name: "\(T.UnitType.category)Tests") + "\n\n" + typeTests(category: T.UnitType.self) +
+        prefix(name: "\(T.UnitType.category)Tests") + "\n\n" +
+            typeTests(category: T.UnitType.self) + "\n\n" +
+            typeConversionTests(category: T.UnitType.self) + "\n\n" +
             T.UnitType.allCases.flatMap { unit in
                 Signs.allCases.map { sign in
                     createTestClass(from: unit, with: sign, using: generator)
                 }
             }
             .joined(separator: "\n\n") + "\n"
+    }
+
+    // swiftlint:disable function_body_length
+    // swiftlint:disable closure_body_length
+
+    /// Provides additional tests for particular properties and method in the swift types of GUUnits.
+    /// - Parameter category: The category under test.
+    /// - Returns: The new tests.
+    private func typeConversionTests<T>(category: T.Type) -> String where T: UnitProtocol {
+        T.allCases.map { unit in
+            let tests = Signs.allCases.flatMap { (sign: Signs) -> [String] in
+                T.allCases.flatMap { (otherUnit: T) -> [String] in
+                    Signs.allCases.compactMap { (otherSign: Signs) -> String? in
+                        guard sign != otherSign || unit != otherUnit else {
+                            return nil
+                        }
+                        return conversionTests(
+                            from: unit,
+                            with: sign,
+                            to: otherUnit,
+                            with: otherSign,
+                            category: T.category.capitalized
+                        )
+                    }
+                } + [
+                    categoryTests(
+                        from: unit, with: sign.rawValue, category: T.category.capitalized
+                    )
+                ]
+            }
+            .joined(separator: "\n\n")
+            return """
+            final class \(unit.description.capitalized)ConversionTests: XCTestCase {
+
+            \(tests)
+
+            }
+            """
+        }
+        .joined(separator: "\n\n")
+    }
+
+    // swiftlint:enable closure_body_length
+
+    /// Creates category tests working with a unit type.
+    /// - Parameters:
+    ///   - unit: The unit to work with.
+    ///   - sign: The sign of the unit.
+    ///   - category: The category under test.
+    /// - Returns: A string of tests that test the category with the unit type.
+    private func categoryTests<T>(
+        from unit: T, with sign: String, category: String
+    ) -> String where T: UnitProtocol {
+        let type = unit.description.capitalized + "_\(sign)"
+        let lt = type.lowercased()
+        return """
+            func test\(type)InitFromTypeEnum() {
+                let underlyingType = \(category).\(category)Types.\(lt)(5)
+                let category = \(category)(rawValue: underlyingType)
+                XCTAssertEqual(category.rawValue, underlyingType)
+            }
+
+        \(staticInitTests(unit: unit, sign: sign, category: category))
+        """
+    }
+
+    // swiftlint:disable closure_body_length
+
+    /// Provides test functions for the category type working with a particular unit type.
+    /// - Parameters:
+    ///   - unit: The unit type contained within the category.
+    ///   - sign: The sign of the unit type.
+    ///   - category: The category.
+    /// - Returns: Tests that test the properties and functions of the category with the unit type.
+    private func staticInitTests<T>(unit: T, sign: String, category: String) -> String where T: UnitProtocol {
+        let type = unit.description.capitalized + "_\(sign)"
+        return SwiftNumericTypes.allCases.map {
+            """
+                func test\(category)\(type)\($0)Inits() {
+                    let raw = \($0)(5)
+                    let expected = \(category)(\(unit): raw)
+                    let result = \(category).\(unit)(raw)
+                    XCTAssertEqual(expected, result)
+                    let ctype = \($0.numericType.abbreviation)_to_\(unit.abbreviation)_\(sign)(5)
+                    let expected2 = \($0)(
+                        \(unit.abbreviation)_\(sign)_to_\($0.numericType.abbreviation)(ctype)
+                    )
+                    let result2 = \($0)(expected)
+                    XCTAssertEqual(result2, expected2)
+                }
+
+                func test\(type)\($0)Inits() {
+                    let raw = \($0)(5)
+                    let ctype = \($0.numericType.abbreviation)_to_\(unit.abbreviation)_\(sign)(5)
+                    let expected = \(type)(raw)
+                    XCTAssertEqual(expected.rawValue, ctype)
+                    XCTAssertEqual(
+                        \($0)(expected),
+                        \($0)(\(unit.abbreviation)_\(sign)_to_\($0.numericType.abbreviation)(ctype))
+                    )
+                }
+
+                func test\(type)\($0)RawValueInit() {
+                    let raw = \(unit.description)_\(sign)(5)
+                    let ctype = \(unit.abbreviation)_\(sign)_to_\($0.numericType.abbreviation)(raw)
+                    let expected = \(type)(\($0)(ctype))
+                    XCTAssertEqual(\(type)(rawValue: raw), expected)
+                }
+
+                func test\(type)\(category)\($0)Init() {
+                    let raw = \(type)(\($0)(5))
+                    let category = \(category.capitalized)(raw)
+                    let expected = \(category.capitalized)(rawValue: .\(type.lowercased())(raw))
+                    XCTAssertEqual(category, expected)
+                }
+            """
+        }
+        .joined(separator: "\n\n")
+    }
+
+    // swiftlint:enable closure_body_length
+
+    /// Creates tests for a generic conversion from 1 unit to the other.
+    /// - Parameters:
+    ///   - unit: The unit converting from.
+    ///   - sign: The sign of the first unit.
+    ///   - otherUnit: The unit converting to.
+    ///   - otherSign: The sign of the second unit.
+    ///   - category: The category these units belong to.
+    /// - Returns: The tests performing the conversion.
+    private func conversionTests<T>(
+        from unit: T, with sign: Signs, to otherUnit: T, with otherSign: Signs, category: String
+    ) -> String where T: UnitProtocol {
+        let type = unit.description.capitalized + "_" + sign.rawValue
+        let otherType = otherUnit.description.capitalized + "_" + otherSign.rawValue
+        let category = category.capitalized
+        return """
+            func test\(type)To\(otherType)\(category.capitalized)Conversions() {
+                let original = \(type)(5)
+                let category = \(category)(original)
+                let other = category.\(otherUnit)_\(otherSign)
+                XCTAssertEqual(other, \(otherType)(original))
+            }
+
+            func test\(otherType)To\(type)Conversions() {
+                let ctype1 = \(unit.description)_\(sign)(5)
+                let swiftType1 = \(type)(rawValue: ctype1)
+                let ctype2 = \(unit.abbreviation)_\(sign)_to_\(otherUnit.abbreviation)_\(otherSign)(ctype1)
+                let swiftType2 = \(otherType)(rawValue: ctype2)
+                XCTAssertEqual(swiftType2, \(otherType)(swiftType1))
+            }
+        """
     }
 
     /// Additional tests needed to test the protocol conformances in the swift abstraction.
@@ -139,15 +293,8 @@ public struct SwiftTestFileCreator {
                 let rhs = \(type)(100)
                 XCTAssertLessThan(lhs, rhs)
             }
-
-            func test\(type)Magnitude() {
-                let expected = \(rawType)(5).magnitude
-                XCTAssertEqual(\(type)(5).magnitude, expected)
-            }
         """
     }
-
-    // swiftlint:disable function_body_length
 
     /// Additional tests needed for testing the integer protocol conformances.
     /// - Parameters:
@@ -156,6 +303,11 @@ public struct SwiftTestFileCreator {
     /// - Returns: The tests.
     private func typeIntegerTests(type: String, rawType: String) -> String {
         """
+            func test\(type)Magnitude() {
+                let expected = \(rawType)(5).magnitude
+                XCTAssertEqual(\(type)(5).magnitude, expected)
+            }
+
             func test\(type)TruncatingInit() {
                 let expected = \(type)(\(rawType)(truncatingIfNeeded: UInt64.max))
                 XCTAssertEqual(\(type)(truncatingIfNeeded: expected), expected)
@@ -259,11 +411,6 @@ public struct SwiftTestFileCreator {
                 XCTAssertEqual(result.1, rawResult.1)
             }
 
-            func test\(type)Words() {
-                let original = \(rawType)(1)
-                XCTAssertEqual(\(type)(original).words, original.words)
-            }
-
             func test\(type)TrailingZeroBitCount() {
                 let original = \(rawType)(1)
                 XCTAssertEqual(\(type)(original).trailingZeroBitCount, original.trailingZeroBitCount)
@@ -281,7 +428,7 @@ public struct SwiftTestFileCreator {
                 var original = \(rawType)(4)
                 original /= 2
                 var result = \(type)(\(rawType)(4))
-                result /= 4
+                result /= 2
                 XCTAssertEqual(result, \(type)(original))
             }
 
@@ -325,8 +472,6 @@ public struct SwiftTestFileCreator {
         """
     }
 
-    // swiftlint:enable function_body_length
-
     /// Provided additional tests for testing the parent swift struct that represents
     /// a GUUnits floating point unit.
     /// - Parameters:
@@ -336,12 +481,213 @@ public struct SwiftTestFileCreator {
     private func typeFloatTests(type: String, rawType: String) -> String {
         """
             func test\(type)Radix() {
+                XCTAssertEqual(\(type).radix, \(rawType).radix)
+            }
+
+            func test\(type)ExponentBitCount() {
+                XCTAssertEqual(\(type).exponentBitCount, \(rawType).exponentBitCount)
+            }
+
+            func test\(type)SignificandBitCount() {
+                XCTAssertEqual(\(type).significandBitCount, \(rawType).significandBitCount)
+            }
+
+            func test\(type)Magnitude() {
+                let expected = \(type)(\(rawType)(5).magnitude)
+                XCTAssertEqual(\(type)(5).magnitude, expected)
+            }
+
+            func test\(type)ExactlyInit() {
+                let expected = \(type)(\(rawType)(exactly: Int(5)) ?? \(rawType).infinity)
+                XCTAssertEqual(\(type)(exactly: Int(5)), expected)
+            }
+
+            func test\(type)IsTotallyOrdered() {
+                let param = \(rawType)(100)
+                let other = \(rawType)(5)
+                XCTAssertEqual(
+                    \(type)(param).isTotallyOrdered(belowOrEqualTo: \(type)(other)),
+                    param.isTotallyOrdered(belowOrEqualTo: other)
+                )
+            }
+
+            func test\(type)Binade() {
+                let raw = \(rawType)(5)
+                let expected = \(type)(raw.binade)
+                XCTAssertEqual(\(type)(raw).binade, expected)
+            }
+
+            func test\(type)SignificandWidth() {
+                let raw = \(rawType)(5)
+                XCTAssertEqual(\(type)(raw).significandWidth, raw.significandWidth)
+            }
+
+            func test\(type)DebugDescription() {
+                let raw = \(rawType)(5)
+                XCTAssertEqual(\(type)(raw).debugDescription, raw.debugDescription)
+            }
+
+            func test\(type)DescriptionInit() {
+                let raw = \(rawType)(\"5.0\") ?? \(rawType).nan
+                XCTAssertEqual(\(type)(\"5.0\"), \(type)(raw))
+            }
+
+            func test\(type)StaticVars() {
+                XCTAssertEqual(\(type).nan.isNaN, \(type)(\(rawType).nan).isNaN)
+                XCTAssertEqual(
+                    \(type).signalingNaN.isSignalingNaN,
+                    \(type)(\(rawType).signalingNaN).isSignalingNaN
+                )
+                XCTAssertEqual(\(type).infinity, \(type)(\(rawType).infinity))
+                XCTAssertEqual(\(type).greatestFiniteMagnitude, \(type)(\(rawType).greatestFiniteMagnitude))
+                XCTAssertEqual(\(type).pi, \(type)(\(rawType).pi))
+                XCTAssertEqual(\(type).leastNormalMagnitude, \(type)(\(rawType).leastNormalMagnitude))
+                XCTAssertEqual(\(type).leastNonzeroMagnitude, \(type)(\(rawType).leastNonzeroMagnitude))
+            }
+
+            func test\(type)Ulp() {
+                let raw = \(rawType)(5)
+                XCTAssertEqual(\(type)(raw).ulp, \(type)(raw.ulp))
+            }
+
+            func test\(type)Sign() {
+                let raw = \(rawType)(5)
+                XCTAssertEqual(\(type)(raw).sign, raw.sign)
+            }
+
+            func test\(type)Significand() {
+                let raw = \(rawType)(5)
+                XCTAssertEqual(\(type)(raw).significand, \(type)(raw.significand))
+            }
+
+            func test\(type)NextUp() {
+                let raw = \(rawType)(5)
+                XCTAssertEqual(\(type)(raw).nextUp, \(type)(raw.nextUp))
+            }
+
+            func test\(type)Vars() {
+                XCTAssertEqual(\(type)(5).isNormal, \(rawType)(5).isNormal)
+                XCTAssertEqual(\(type)(5).isFinite, \(rawType)(5).isFinite)
+                XCTAssertEqual(\(type)(5).isZero, \(rawType)(5).isZero)
+                XCTAssertEqual(\(type)(0).isZero, \(rawType)(0).isZero)
+                XCTAssertEqual(\(type)(5).isSubnormal, \(rawType)(5).isSubnormal)
+                XCTAssertEqual(\(type)(5).isInfinite, \(rawType)(5).isInfinite)
+                XCTAssertEqual(\(type).infinity.isInfinite, \(rawType).infinity.isInfinite)
+                XCTAssertEqual(\(type)(5).isNaN, \(rawType)(5).isNaN)
+                XCTAssertEqual(\(type).nan.isNaN, \(rawType).nan.isNaN)
+                XCTAssertEqual(\(type)(5).isSignalingNaN, \(rawType)(5).isSignalingNaN)
+                XCTAssertEqual(\(type).nan.isSignalingNaN, \(rawType).nan.isSignalingNaN)
+                XCTAssertEqual(\(type)(5).isCanonical, \(rawType)(5).isCanonical)
+                XCTAssertEqual(\(type)(5).description, \(rawType)(5).description)
+                XCTAssertEqual(\(type)(5).exponentBitPattern, \(rawType)(5).exponentBitPattern)
+                XCTAssertEqual(\(type)(5).significandBitPattern, \(rawType)(5).significandBitPattern)
+                XCTAssertEqual(\(type)(5).exponent, \(rawType)(5).exponent)
+            }
+
+            func test\(type)FormRemainder() {
+                var original = \(rawType)(4)
+                let denominator = \(rawType)(3)
+                original.formRemainder(dividingBy: denominator)
+                var result = \(type)(\(rawType)(4))
+                result.formRemainder(dividingBy: \(type)(denominator))
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)FormTruncatingRemainder() {
+                var original = \(rawType)(4)
+                let denominator = \(rawType)(3)
+                original.formTruncatingRemainder(dividingBy: denominator)
+                var result = \(type)(\(rawType)(4))
+                result.formTruncatingRemainder(dividingBy: \(type)(denominator))
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)FormSquareRoot() {
+                var original = \(rawType)(4)
+                original.formSquareRoot()
+                var result = \(type)(\(rawType)(4))
+                result.formSquareRoot()
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)AddProduct() {
+                var original = \(rawType)(4)
+                let lhs = \(rawType)(3)
+                let rhs = \(rawType)(5)
+                original.addProduct(lhs, rhs)
+                var result = \(type)(\(rawType)(4))
+                result.addProduct(\(type)(lhs), \(type)(rhs))
+                XCTAssertEqual(result, \(type)(original))
+            }
+
+            func test\(type)IsEqual() {
+                let this = \(type)(5)
+                let other = \(type)(6)
+                XCTAssertTrue(this.isEqual(to: this))
+                XCTAssertFalse(this.isEqual(to: other))
+            }
+
+            func test\(type)IsLess() {
+                let this = \(type)(5)
+                let other = \(type)(6)
+                XCTAssertFalse(this.isLess(than: this))
+                XCTAssertTrue(this.isLess(than: other))
+            }
+
+            func test\(type)IsLessThanOrEqual() {
+                let this = \(type)(5)
+                let other = \(type)(6)
+                let other2 = \(type)(4)
+                XCTAssertTrue(this.isLessThanOrEqualTo(this))
+                XCTAssertTrue(this.isLessThanOrEqualTo(other))
+                XCTAssertFalse(this.isLessThanOrEqualTo(other2))
+            }
+
+            func test\(type)Operations() {
+                let lhs = \(type)(6)
+                let rhs = \(type)(3)
+                XCTAssertEqual(lhs + rhs, \(type)(9))
+                XCTAssertEqual(lhs - rhs, \(type)(3))
+                XCTAssertEqual(lhs * rhs, \(type)(18))
+                XCTAssertEqual(lhs / rhs, \(type)(2))
+            }
+
+            func test\(type)TimesEqual() {
+                var this = \(type)(3)
+                this *= \(type)(4)
+                XCTAssertEqual(this, \(type)(12))
+            }
+
+            func test\(type)DivideEqual() {
+                var this = \(type)(6)
+                this /= \(type)(3)
+                XCTAssertEqual(this, \(type)(2))
+            }
+
+            func test\(type)Round() {
+                var expected = \(rawType)(5.6)
+                expected.round(.up)
+                var result = \(type)(5.6)
+                result.round(.up)
+                XCTAssertEqual(result, \(type)(expected))
+            }
+
+            func test\(type)DistanceTo() {
+                let original = \(rawType)(5.0)
+                let other = \(rawType)(23)
+                let expected = original.distance(to: other)
+                XCTAssertEqual(\(type)(original).distance(to: \(type)(other)), expected)
+            }
+
+            func test\(type)AdvancedBy() {
                 let original = \(rawType)(5)
-                let expected = original.radix
-                XCTAssertEqual(\(type)(original).radix, expected)
+                let expected = original.advanced(by: 3)
+                XCTAssertEqual(\(type)(original).advanced(by: 3), \(type)(expected))
             }
         """
     }
+
+    // swiftlint:enable function_body_length
 
     /// Creates a class containing test for a given unit and sign.
     /// - Parameters:
@@ -556,7 +902,7 @@ public struct SwiftTestFileCreator {
         */
 
         import CGUUnits
-        import GUUnits
+        @testable import GUUnits
         import XCTest
         """
     }
