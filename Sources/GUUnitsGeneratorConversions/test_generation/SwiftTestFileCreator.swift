@@ -67,10 +67,9 @@ public struct SwiftTestFileCreator {
     /// - Parameter generator: The generator creating the test parameters.
     /// - Returns: The contents of the test file.
     func generate<T: TestGenerator>(with generator: T) -> String {
-        prefix(name: "\(T.UnitType.category)Tests") +
-            "\n\n" +
-            typeTests(category: T.UnitType.self) +
-            typeConversionTests(category: T.UnitType.self) +
+        prefix(name: "\(T.UnitType.category)Tests") + "\n\n" +
+            typeTests(category: T.UnitType.self) + "\n\n" +
+            typeConversionTests(category: T.UnitType.self) + "\n\n" +
             T.UnitType.allCases.flatMap { unit in
                 Signs.allCases.map { sign in
                     createTestClass(from: unit, with: sign, using: generator)
@@ -79,26 +78,156 @@ public struct SwiftTestFileCreator {
             .joined(separator: "\n\n") + "\n"
     }
 
+    // swiftlint:disable function_body_length
+    // swiftlint:disable closure_body_length
+
+    /// Provides additional tests for particular properties and method in the swift types of GUUnits.
+    /// - Parameter category: The category under test.
+    /// - Returns: The new tests.
     private func typeConversionTests<T>(category: T.Type) -> String where T: UnitProtocol {
-        T.allCases.flatMap { unit in
-            Signs.allCases.flatMap { (sign: Signs) -> [String] in
-                let type = "\(unit)_\(sign)"
-                return T.allCases.flatMap { (otherUnit: T) -> [String] in
+        T.allCases.map { unit in
+            let tests = Signs.allCases.flatMap { (sign: Signs) -> [String] in
+                T.allCases.flatMap { (otherUnit: T) -> [String] in
                     Signs.allCases.compactMap { (otherSign: Signs) -> String? in
                         guard sign != otherSign || unit != otherUnit else {
                             return nil
                         }
-                        let otherType = "\(otherUnit)_\(otherSign)"
-                        return conversionTests(from: type, to: otherType)
+                        return conversionTests(
+                            from: unit,
+                            with: sign,
+                            to: otherUnit,
+                            with: otherSign,
+                            category: T.category.capitalized
+                        )
                     }
-                }
+                } + [
+                    categoryTests(
+                        from: unit, with: sign.rawValue, category: T.category.capitalized
+                    )
+                ]
             }
+            .joined(separator: "\n\n")
+            return """
+            final class \(unit.description.capitalized)ConversionTests: XCTestCase {
+
+            \(tests)
+
+            }
+            """
         }
         .joined(separator: "\n\n")
     }
 
-    private func conversionTests(from type: String, to otherType: String) -> String {
+    // swiftlint:enable closure_body_length
 
+    /// Creates category tests working with a unit type.
+    /// - Parameters:
+    ///   - unit: The unit to work with.
+    ///   - sign: The sign of the unit.
+    ///   - category: The category under test.
+    /// - Returns: A string of tests that test the category with the unit type.
+    private func categoryTests<T>(
+        from unit: T, with sign: String, category: String
+    ) -> String where T: UnitProtocol {
+        let type = unit.description.capitalized + "_\(sign)"
+        let lt = type.lowercased()
+        return """
+            func test\(type)InitFromTypeEnum() {
+                let underlyingType = \(category).\(category)Types.\(lt)(5)
+                let category = \(category)(rawValue: underlyingType)
+                XCTAssertEqual(category.rawValue, underlyingType)
+            }
+
+        \(staticInitTests(unit: unit, sign: sign, category: category))
+        """
+    }
+
+    // swiftlint:disable closure_body_length
+
+    /// Provides test functions for the category type working with a particular unit type.
+    /// - Parameters:
+    ///   - unit: The unit type contained within the category.
+    ///   - sign: The sign of the unit type.
+    ///   - category: The category.
+    /// - Returns: Tests that test the properties and functions of the category with the unit type.
+    private func staticInitTests<T>(unit: T, sign: String, category: String) -> String where T: UnitProtocol {
+        let type = unit.description.capitalized + "_\(sign)"
+        return SwiftNumericTypes.allCases.map {
+            """
+                func test\(category)\(type)\($0)Inits() {
+                    let raw = \($0)(5)
+                    let expected = \(category)(\(unit): raw)
+                    let result = \(category).\(unit)(raw)
+                    XCTAssertEqual(expected, result)
+                    let ctype = \($0.numericType.abbreviation)_to_\(unit.abbreviation)_\(sign)(5)
+                    let expected2 = \($0)(
+                        \(unit.abbreviation)_\(sign)_to_\($0.numericType.abbreviation)(ctype)
+                    )
+                    let result2 = \($0)(expected)
+                    XCTAssertEqual(result2, expected2)
+                }
+
+                func test\(type)\($0)Inits() {
+                    let raw = \($0)(5)
+                    let ctype = \($0.numericType.abbreviation)_to_\(unit.abbreviation)_\(sign)(5)
+                    let expected = \(type)(raw)
+                    XCTAssertEqual(expected.rawValue, ctype)
+                    XCTAssertEqual(
+                        \($0)(expected),
+                        \($0)(\(unit.abbreviation)_\(sign)_to_\($0.numericType.abbreviation)(ctype))
+                    )
+                }
+
+                func test\(type)\($0)RawValueInit() {
+                    let raw = \(unit.description)_\(sign)(5)
+                    let ctype = \(unit.abbreviation)_\(sign)_to_\($0.numericType.abbreviation)(raw)
+                    let expected = \(type)(\($0)(ctype))
+                    XCTAssertEqual(\(type)(rawValue: raw), expected)
+                }
+
+                func test\(type)\(category)\($0)Init() {
+                    let raw = \(type)(\($0)(5))
+                    let category = \(category.capitalized)(raw)
+                    let expected = \(category.capitalized)(rawValue: .\(type.lowercased())(raw))
+                    XCTAssertEqual(category, expected)
+                }
+            """
+        }
+        .joined(separator: "\n\n")
+    }
+
+    // swiftlint:enable closure_body_length
+
+    /// Creates tests for a generic conversion from 1 unit to the other.
+    /// - Parameters:
+    ///   - unit: The unit converting from.
+    ///   - sign: The sign of the first unit.
+    ///   - otherUnit: The unit converting to.
+    ///   - otherSign: The sign of the second unit.
+    ///   - category: The category these units belong to.
+    /// - Returns: The tests performing the conversion.
+    private func conversionTests<T>(
+        from unit: T, with sign: Signs, to otherUnit: T, with otherSign: Signs, category: String
+    ) -> String where T: UnitProtocol {
+        let type = unit.description.capitalized + "_" + sign.rawValue
+        let otherType = otherUnit.description.capitalized + "_" + otherSign.rawValue
+        let category = category.capitalized
+        return """
+            func test\(type)To\(otherType)\(category.capitalized)Conversions() {
+                let original = \(type)(5)
+                let category = \(category)(original)
+                let other = category.\(otherUnit)_\(otherSign)
+                XCTAssertEqual(other, \(otherType)(original))
+            }
+
+            func test\(otherType)To\(type)Conversions() {
+                let ctype1 = \(unit.description)_\(sign)(5)
+                let swiftType1 = \(type)(rawValue: ctype1)
+                let ctype2 = \(unit.abbreviation)_\(sign)_to_\(otherUnit.abbreviation)_\(otherSign)(ctype1)
+                let swiftType2 = \(otherType)(rawValue: ctype2)
+                XCTAssertEqual(swiftType2, \(otherType)(swiftType1))
+            }
+        """
     }
 
     /// Additional tests needed to test the protocol conformances in the swift abstraction.
@@ -166,8 +295,6 @@ public struct SwiftTestFileCreator {
             }
         """
     }
-
-    // swiftlint:disable function_body_length
 
     /// Additional tests needed for testing the integer protocol conformances.
     /// - Parameters:
@@ -775,7 +902,7 @@ public struct SwiftTestFileCreator {
         */
 
         import CGUUnits
-        import GUUnits
+        @testable import GUUnits
         import XCTest
         """
     }
