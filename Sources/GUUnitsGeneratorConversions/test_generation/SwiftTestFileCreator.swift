@@ -81,9 +81,9 @@ public struct SwiftTestFileCreator {
 
     private func typeConversionTests<T>(category: T.Type) -> String where T: UnitProtocol {
         T.allCases.flatMap { unit in
-            Signs.allCases.flatMap { sign in
+            Signs.allCases.flatMap { (sign: Signs) -> [String] in
                 let type = "\(unit)_\(sign)"
-                T.allCases.flatMap { otherUnit in
+                return T.allCases.flatMap { (otherUnit: T) -> [String] in
                     Signs.allCases.compactMap { (otherSign: Signs) -> String? in
                         guard sign != otherSign || unit != otherUnit else {
                             return nil
