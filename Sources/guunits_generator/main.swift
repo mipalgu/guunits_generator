@@ -52,8 +52,13 @@ private func generate(directory: URL? = URL(string: FileManager().currentDirecto
         fatalError("Failed to find current directory.")
     }
     let generator = GUUnitsGenerator()
-    try generator.generateCFiles(in: directory)
-    generator.generateSwiftFiles(in: directory)
+    let sources = directory.appendingPathComponent("Sources")
+    let tests = directory.appendingPathComponent("Tests")
+    try generator.generateCFiles(in: sources.appendingPathComponent("CGUUnits"))
+    generator.generateSwiftFiles(in: sources.appendingPathComponent("GUUnits"))
+    generator.generateSwiftTests(in: tests.appendingPathComponent("GUUnitsTests"))
+    generator.generateCTests(in: tests.appendingPathComponent("CGUUnitsTests"))
+    generator.generatePackageSwift(in: directory)
 }
 
 /// Main method for generating the guunits sources.

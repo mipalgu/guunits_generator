@@ -64,8 +64,65 @@ public struct GUUnitsGenerator {
     /// The manager that performs the writing.
     let fileManager = FileManager()
 
+    /// The Package.swift file contents.
+    private var package: String {
+        """
+        // swift-tools-version: 5.6
+        // The swift-tools-version declares the minimum version of Swift required to build this package.
+
+        import PackageDescription
+
+        /// Package description.
+        let package = Package(
+            name: "GUUnits",
+            products: [
+                // Products define the executables and libraries a package produces, and make them visible
+                // to other packages.
+                .library(
+                    name: "guunits",
+                    type: .dynamic,
+                    targets: ["CGUUnits"]
+                ),
+                .library(name: "GUUnits", targets: ["CGUUnits", "GUUnits"])
+            ],
+            dependencies: [
+                // Dependencies declare other packages that this package depends on.
+                // .package(url: /* package url */, from: "1.0.0"),
+            ],
+            targets: [
+                // Targets are the basic building blocks of a package.
+                // A target can define a module or a test suite.
+                // Targets can depend on other targets in this package, and on products in packages
+                // this package depends on.
+                .target(
+                    name: "CGUUnits",
+                    dependencies: []
+                ),
+                .target(
+                    name: "GUUnits",
+                    dependencies: ["CGUUnits"]
+                ),
+                .testTarget(
+                    name: "CGUUnitsTests",
+                    dependencies: ["CGUUnits"]
+                ),
+                .testTarget(
+                    name: "GUUnitsTests",
+                    dependencies: ["GUUnits"]
+                )
+            ]
+        )
+        """
+    }
+
     /// Default init.
     public init() {}
+
+    /// Creates the Package.swift file in the folder pointed to by path.
+    /// - Parameter path: A URL to the folder containing the Package.swift file.
+    public func generatePackageSwift(in path: URL) {
+        writeFile(at: path, with: "Package", and: package)
+    }
 
     // swiftlint:disable function_body_length
 
@@ -152,7 +209,7 @@ public struct GUUnitsGenerator {
 
     /// Create the C Test files at a specific location.
     /// - Parameter path: The path to the folder that will contain the test files.
-    func generateCTests(in path: URL) {
+    public func generateCTests(in path: URL) {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
         // }
