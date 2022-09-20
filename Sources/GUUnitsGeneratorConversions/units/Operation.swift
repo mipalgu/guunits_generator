@@ -82,12 +82,26 @@ indirect enum Operation {
         case .constant(let unit):
             return unit.abbreviation
         case .multiplication(let lhs, let rhs):
-            return lhs.abbreviation + "_" + rhs.abbreviation
+            let abbreviation = rhs.abbreviation
+            if abbreviation == "1" {
+                return lhs.abbreviation
+            }
+            return lhs.abbreviation + "_" + abbreviation
         case .division(let lhs, let rhs):
-            return lhs.abbreviation + "_per_" + rhs.abbreviation
+            let abbreviation = rhs.abbreviation
+            if abbreviation == "1" {
+                return lhs.abbreviation
+            }
+            return lhs.abbreviation + "_per_" + abbreviation
         case .precedence(let operation):
             return "_" + operation.abbreviation + "_"
         case .exponentiate(let base, let power):
+            if case let .literal(num) = power, num == 0 {
+                return "1"
+            }
+            if case let .literal(num) = power, num == 1 {
+                return base.abbreviation
+            }
             if case let .literal(num) = power, num == 2 {
                 return base.abbreviation + "_sq"
             }

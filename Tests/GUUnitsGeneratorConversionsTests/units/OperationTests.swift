@@ -60,17 +60,21 @@ import XCTest
 /// Test class for `Operation`.
 final class OperationTests: XCTestCase {
 
-    /// The operation under test.
-    let operation = Operation.division(
+    /// Test the abbreviation is correct.
+    func testAbbreviation() {
+        let operation = Operation.division(
         lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
         rhs: Operation.exponentiate(
             base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
             power: Operation.literal(declaration: 2)
         )
     )
+        XCTAssertEqual(operation.abbreviation, "m_per_s_sq")
+    }
 
-    /// Huge operation.
-    let hugeOperation = Operation.division(
+    /// test abbreviation of huge operation.
+    func testHugeAbbreviation() {
+        let hugeOperation = Operation.division(
         lhs: Operation.multiplication(
             lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: Operation.precedence(
@@ -84,9 +88,15 @@ final class OperationTests: XCTestCase {
             base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
         )
     )
+        XCTAssertEqual(
+            hugeOperation.abbreviation,
+            "m__degC_per_A__per_s_cub"
+        )
+    }
 
-    /// Huge operation 2
-    let hugeOperation2 = Operation.division(
+    /// test abbreviation of huge operation.
+    func testHugeAbbreviation2() {
+        let hugeOperation2 = Operation.division(
         lhs: Operation.multiplication(
             lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: Operation.precedence(
@@ -100,9 +110,15 @@ final class OperationTests: XCTestCase {
             base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 4)
         )
     )
+        XCTAssertEqual(
+            hugeOperation2.abbreviation,
+            "m__degC_per_A__per_s_pwr_4"
+        )
+    }
 
-    /// Huge operation 3
-    let hugeOperation3 = Operation.division(
+    /// test abbreviation of huge operation.
+    func testHugeAbbreviation3() {
+        let hugeOperation3 = Operation.division(
         lhs: Operation.multiplication(
             lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: Operation.precedence(
@@ -116,34 +132,34 @@ final class OperationTests: XCTestCase {
             base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: -4)
         )
     )
-
-    /// Test the abbreviation is correct.
-    func testAbbreviation() {
-        XCTAssertEqual(operation.abbreviation, "m_per_s_sq")
-    }
-
-    /// test abbreviation of huge operation.
-    func testHugeAbbreviation() {
-        XCTAssertEqual(
-            hugeOperation.abbreviation,
-            "m__degC_per_A__per_s_cub"
-        )
-    }
-
-    /// test abbreviation of huge operation.
-    func testHugeAbbreviation2() {
-        XCTAssertEqual(
-            hugeOperation2.abbreviation,
-            "m__degC_per_A__per_s_pwr_4"
-        )
-    }
-
-    /// test abbreviation of huge operation.
-    func testHugeAbbreviation3() {
         XCTAssertEqual(
             hugeOperation3.abbreviation,
             "m__degC_per_A__per_s_pwr_neg4"
         )
+    }
+
+    /// Test the abbreviation is correct.
+    func testAbbreviation0Case() {
+        let operation = Operation.division(
+        lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+        rhs: Operation.exponentiate(
+            base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
+            power: Operation.literal(declaration: 0)
+        )
+    )
+        XCTAssertEqual(operation.abbreviation, "m")
+    }
+
+    /// Test the abbreviation is correct.
+    func testAbbreviation1Case() {
+        let operation = Operation.division(
+        lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+        rhs: Operation.exponentiate(
+            base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
+            power: Operation.literal(declaration: 1)
+        )
+    )
+        XCTAssertEqual(operation.abbreviation, "m_per_s")
     }
 
 }
