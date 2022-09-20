@@ -54,20 +54,29 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Enum for defining common operations in a composite unit.
 indirect enum Operation {
 
+    /// The unit itself as a constant.
     case constant(declaration: AnyUnit)
 
+    /// A literal value, should not be used by itself as a stand-alone unit.
     case literal(declaration: Int)
 
+    /// Two operations multiplied together.
     case multiplication(lhs: Operation, rhs: Operation)
 
+    /// One operation divided by another operation.
     case division(lhs: Operation, rhs: Operation)
 
+    /// Gives this operation precedence over other operations. Equivalent to placing
+    /// brackets around an operation.
     case precedence(operation: Operation)
 
+    /// Raise some operation to a power.
     case exponentiate(base: Operation, power: Operation)
 
+    /// The abbreviation of the operation.
     var abbreviation: String {
         switch self {
         case .constant(let unit):
@@ -93,7 +102,10 @@ indirect enum Operation {
 
 }
 
+/// Add abbreviation to Int.
 private extension Int {
+
+    /// The abbreviation of the Int.
     var abbreviation: String {
         guard self > 0 else {
             return "neg_" + abs(self).abbreviation
@@ -103,4 +115,5 @@ private extension Int {
         }
         return "\(self)"
     }
+
 }

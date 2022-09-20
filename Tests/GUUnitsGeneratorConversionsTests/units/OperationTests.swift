@@ -57,8 +57,10 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for `Operation`.
 final class OperationTests: XCTestCase {
 
+    /// The operation under test.
     let operation = Operation.division(
         lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
         rhs: Operation.exponentiate(
@@ -67,6 +69,7 @@ final class OperationTests: XCTestCase {
         )
     )
 
+    /// Test the abbreviation is correct.
     func testAbbreviation() {
         XCTAssertEqual(operation.abbreviation, "m_per_s_sq")
     }
