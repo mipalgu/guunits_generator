@@ -82,24 +82,38 @@ indirect enum Operation {
         case .constant(let unit):
             return unit.abbreviation
         case .multiplication(let lhs, let rhs):
-            let abbreviation = rhs.abbreviation
-            if abbreviation == "1" {
-                return lhs.abbreviation
+            let rhsAbbreviation = rhs.abbreviation
+            let lhsAbbreviation = lhs.abbreviation
+            if lhsAbbreviation == "1" && rhsAbbreviation == "1" {
+                return "1"
             }
-            return lhs.abbreviation + "_" + abbreviation
+            if lhsAbbreviation == "1" {
+                return rhsAbbreviation
+            }
+            if rhsAbbreviation == "1" {
+                return lhsAbbreviation
+            }
+            return lhsAbbreviation + "_" + rhsAbbreviation
         case .division(let lhs, let rhs):
-            let abbreviation = rhs.abbreviation
-            if abbreviation == "1" {
-                return lhs.abbreviation
+            let rhsAbbreviation = rhs.abbreviation
+            let lhsAbbreviation = lhs.abbreviation
+            if lhsAbbreviation == "1" && rhsAbbreviation == "1" {
+                return "1"
             }
-            return lhs.abbreviation + "_per_" + abbreviation
+            if rhsAbbreviation == "1" {
+                return lhsAbbreviation
+            }
+            if lhsAbbreviation == "1" {
+                return Operation.exponentiate(base: rhs, power: .literal(declaration: -1)).abbreviation
+            }
+            return lhsAbbreviation + "_per_" + rhsAbbreviation
         case .precedence(let operation):
             return "_" + operation.abbreviation + "_"
         case .exponentiate(let base, let power):
             if case let .literal(num) = power, num == 0 {
                 return "1"
             }
-            if case let .literal(num) = power, num == 1 {
+            if power.abbreviation == "1" {
                 return base.abbreviation
             }
             if case let .literal(num) = power, num == 2 {
@@ -123,9 +137,6 @@ private extension Int {
     var abbreviation: String {
         guard self > 0 else {
             return "neg" + abs(self).abbreviation
-        }
-        guard self != 0 else {
-            return ""
         }
         return "\(self)"
     }

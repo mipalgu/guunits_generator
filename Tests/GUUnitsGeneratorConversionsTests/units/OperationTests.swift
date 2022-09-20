@@ -162,4 +162,13 @@ final class OperationTests: XCTestCase {
         XCTAssertEqual(operation.abbreviation, "m_per_s")
     }
 
+    /// Test the abbreviation of the case where the unit is an inverse.
+    func testAbbreviationNeg1Case() {
+        let operation = Operation.division(
+            lhs: .literal(declaration: 1),
+            rhs: Operation.constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+        XCTAssertEqual(operation.abbreviation, "s_pwr_neg1")
+    }
+
 }
