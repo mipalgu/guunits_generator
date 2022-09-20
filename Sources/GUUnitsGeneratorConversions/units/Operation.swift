@@ -82,11 +82,11 @@ indirect enum Operation {
         case .constant(let unit):
             return unit.abbreviation
         case .multiplication(let lhs, let rhs):
-            return lhs.abbreviation + "x" + rhs.abbreviation
+            return lhs.abbreviation + "_" + rhs.abbreviation
         case .division(let lhs, let rhs):
             return lhs.abbreviation + "_per_" + rhs.abbreviation
         case .precedence(let operation):
-            return "__" + operation.abbreviation + "__"
+            return "_" + operation.abbreviation + "_"
         case .exponentiate(let base, let power):
             if case let .literal(num) = power, num == 2 {
                 return base.abbreviation + "_sq"
@@ -94,7 +94,7 @@ indirect enum Operation {
             if case let .literal(num) = power, num == 3 {
                 return base.abbreviation + "_cub"
             }
-            return base.abbreviation + "_pwr\(power.abbreviation)"
+            return base.abbreviation + "_pwr_\(power.abbreviation)"
         case .literal(let literal):
             return literal.abbreviation
         }
@@ -108,7 +108,7 @@ private extension Int {
     /// The abbreviation of the Int.
     var abbreviation: String {
         guard self > 0 else {
-            return "neg_" + abs(self).abbreviation
+            return "neg" + abs(self).abbreviation
         }
         guard self != 0 else {
             return ""

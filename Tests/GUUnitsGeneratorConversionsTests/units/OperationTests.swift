@@ -69,9 +69,81 @@ final class OperationTests: XCTestCase {
         )
     )
 
+    /// Huge operation.
+    let hugeOperation = Operation.division(
+        lhs: Operation.multiplication(
+            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: Operation.precedence(
+                operation: Operation.division(
+                    lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                    rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                )
+            )
+        ),
+        rhs: .exponentiate(
+            base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
+        )
+    )
+
+    /// Huge operation 2
+    let hugeOperation2 = Operation.division(
+        lhs: Operation.multiplication(
+            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: Operation.precedence(
+                operation: Operation.division(
+                    lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                    rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                )
+            )
+        ),
+        rhs: .exponentiate(
+            base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 4)
+        )
+    )
+
+    /// Huge operation 3
+    let hugeOperation3 = Operation.division(
+        lhs: Operation.multiplication(
+            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: Operation.precedence(
+                operation: Operation.division(
+                    lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                    rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                )
+            )
+        ),
+        rhs: .exponentiate(
+            base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: -4)
+        )
+    )
+
     /// Test the abbreviation is correct.
     func testAbbreviation() {
         XCTAssertEqual(operation.abbreviation, "m_per_s_sq")
+    }
+
+    /// test abbreviation of huge operation.
+    func testHugeAbbreviation() {
+        XCTAssertEqual(
+            hugeOperation.abbreviation,
+            "m__degC_per_A__per_s_cub"
+        )
+    }
+
+    /// test abbreviation of huge operation.
+    func testHugeAbbreviation2() {
+        XCTAssertEqual(
+            hugeOperation2.abbreviation,
+            "m__degC_per_A__per_s_pwr_4"
+        )
+    }
+
+    /// test abbreviation of huge operation.
+    func testHugeAbbreviation3() {
+        XCTAssertEqual(
+            hugeOperation3.abbreviation,
+            "m__degC_per_A__per_s_pwr_neg4"
+        )
     }
 
 }
