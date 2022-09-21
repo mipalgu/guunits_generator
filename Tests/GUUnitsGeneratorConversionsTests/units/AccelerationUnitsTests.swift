@@ -72,7 +72,7 @@ final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
 
     /// Test g's.
     func testGs() {
-        assert(value: AccelerationUnits.g, rawValue: "g", abbreviation: "g", description: "g")
+        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
     }
 
     /// Test static vars.

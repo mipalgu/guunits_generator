@@ -76,7 +76,7 @@ public struct AccelerationFunctionCreator: FunctionBodyCreator {
         unit: AccelerationUnits, to otherUnit: AccelerationUnits, sign: Signs, otherSign: Signs
     ) -> String {
         switch(unit, otherUnit) {
-        case (.metresPerSecond2, .g):
+        case (.metresPerSecond2, .gs):
             guard otherSign != .d else {
                 return "    return ((\(otherUnit)_\(otherSign)) (((double) (\(unit))) / 9.807));"
             }
@@ -96,7 +96,7 @@ public struct AccelerationFunctionCreator: FunctionBodyCreator {
                 }
                 return ((\(otherUnit)_\(otherSign)) (\(roundedString)));
             """
-        case (.g, .metresPerSecond2):
+        case (.gs, .metresPerSecond2):
             if sign != .d && otherSign == .d {
                 return "    return ((\(otherUnit)_\(otherSign)) (((double) (\(unit))) * 9.807));"
             }

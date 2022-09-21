@@ -66,7 +66,7 @@ final class AccelerationFunctionCreatorTests: XCTestCase {
     /// Test metresPerSecond2_t to g_t.
     func testMps2TogT() {
         let result = creator.createFunction(
-            unit: .metresPerSecond2, to: .g, sign: .t, otherSign: .t
+            unit: .metresPerSecond2, to: .gs, sign: .t, otherSign: .t
         )
         let expected = """
             const double maxValue = ((double) (INT_MAX)) * 9.807;
@@ -78,32 +78,32 @@ final class AccelerationFunctionCreatorTests: XCTestCase {
             if (value < minValue) {
                 return INT_MIN;
             }
-            return ((g_t) (round(value / 9.807)));
+            return ((gs_t) (round(value / 9.807)));
         """
         XCTAssertEqual(result, expected)
     }
 
     /// Test metresPerSecond2_t to g_d.
     func testMps2TogD() {
-        let result = creator.createFunction(unit: .metresPerSecond2, to: .g, sign: .t, otherSign: .d)
-        let expected = "    return ((g_d) (((double) (metresPerSecond2)) / 9.807));"
+        let result = creator.createFunction(unit: .metresPerSecond2, to: .gs, sign: .t, otherSign: .d)
+        let expected = "    return ((gs_d) (((double) (metresPerSecond2)) / 9.807));"
         XCTAssertEqual(result, expected)
     }
 
     /// Test metresPerSecond2_d to g_d.
     func testMps2DTogD() {
-        let result = creator.createFunction(unit: .metresPerSecond2, to: .g, sign: .d, otherSign: .d)
-        let expected = "    return ((g_d) (((double) (metresPerSecond2)) / 9.807));"
+        let result = creator.createFunction(unit: .metresPerSecond2, to: .gs, sign: .d, otherSign: .d)
+        let expected = "    return ((gs_d) (((double) (metresPerSecond2)) / 9.807));"
         XCTAssertEqual(result, expected)
     }
 
     /// Test g_t to mps2_t.
     func testGToMpsT() {
-        let result = creator.createFunction(unit: .g, to: .metresPerSecond2, sign: .t, otherSign: .t)
+        let result = creator.createFunction(unit: .gs, to: .metresPerSecond2, sign: .t, otherSign: .t)
         let expected = """
             const double maxValue = ((double) (INT_MAX)) / 9.807;
             const double minValue = ((double) (INT_MIN)) / 9.807;
-            const double value = ((double) (g));
+            const double value = ((double) (gs));
             if (value > maxValue) {
                 return INT_MAX;
             }
@@ -117,18 +117,18 @@ final class AccelerationFunctionCreatorTests: XCTestCase {
 
     /// Test g_t to mps_d.
     func testGToMpsD() {
-        let result = creator.createFunction(unit: .g, to: .metresPerSecond2, sign: .t, otherSign: .d)
-        let expected = "    return ((metresPerSecond2_d) (((double) (g)) * 9.807));"
+        let result = creator.createFunction(unit: .gs, to: .metresPerSecond2, sign: .t, otherSign: .d)
+        let expected = "    return ((metresPerSecond2_d) (((double) (gs)) * 9.807));"
         XCTAssertEqual(result, expected)
     }
 
     /// Test g_d to mps2_d.
     func testGDToMpsD() {
-        let result = creator.createFunction(unit: .g, to: .metresPerSecond2, sign: .d, otherSign: .d)
+        let result = creator.createFunction(unit: .gs, to: .metresPerSecond2, sign: .d, otherSign: .d)
         let expected = """
             const double maxValue = ((double) (DBL_MAX)) / 9.807;
             const double minValue = ((double) (-DBL_MAX)) / 9.807;
-            const double value = ((double) (g));
+            const double value = ((double) (gs));
             if (value > maxValue) {
                 return DBL_MAX;
             }
