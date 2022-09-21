@@ -124,3 +124,19 @@ struct AnyUnit {
     }
 
 }
+
+extension AnyUnit: Hashable {
+
+    static func == (lhs: AnyUnit, rhs: AnyUnit) -> Bool {
+        lhs.abbreviation == rhs.abbreviation && lhs.category == rhs.category
+            && lhs.description == rhs.description && lhs.sameZeroPoint == rhs.sameZeroPoint
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(abbreviation)
+        hasher.combine(description)
+        hasher.combine(category)
+        hasher.combine(sameZeroPoint)
+    }
+
+}
