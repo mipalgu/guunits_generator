@@ -206,8 +206,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
         if valueSign == .u && otherSign == .t && operation == "+" {
             return """
-                if (celsius > (INT_MAX - 273)) {
-                    return ((kelvin_t) (INT_MAX));
+                if (celsius > (\(otherSign.numericType.limits.1) - 273)) {
+                    return ((kelvin_t) (\(otherSign.numericType.limits.1)));
                 }
                 return ((kelvin_t) (\(value.rawValue) + 273));
             """

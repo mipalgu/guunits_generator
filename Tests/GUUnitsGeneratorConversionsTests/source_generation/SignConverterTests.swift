@@ -18,7 +18,7 @@ final class SignConverterTests: XCTestCase {
         let result = converter.convert("x", otherUnit: DistanceUnits.centimetres, from: .u, to: .t)
         XCTAssertEqual(
             result,
-            "((centimetres_t) ((x) > ((unsigned int) (INT_MAX)) ? ((unsigned int) (INT_MAX)) : x))"
+            "((centimetres_t) ((x) > ((unsigned long) (LONG_MAX)) ? ((unsigned long) (LONG_MAX)) : x))"
         )
     }
 
@@ -38,9 +38,9 @@ final class SignConverterTests: XCTestCase {
     func testConvertDToT() {
         let result = converter.convert("x", otherUnit: DistanceUnits.centimetres, from: .d, to: .t)
         let round = "round(((double) (x)))"
-        let max = "((double) (INT_MAX))"
-        let min = "((double) (INT_MIN))"
-        let expected = "\(round) < \(max) ? (\(round) > \(min) ? \(round) : INT_MIN) : INT_MAX"
+        let max = "((double) (LONG_MAX))"
+        let min = "((double) (LONG_MIN))"
+        let expected = "\(round) < \(max) ? (\(round) > \(min) ? \(round) : LONG_MIN) : LONG_MAX"
         XCTAssertEqual(result, "((centimetres_t) (\(expected)))")
     }
 

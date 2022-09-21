@@ -429,29 +429,33 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         }
         switch otherSign {
         case .t:
-            guard let val = CInt(input) else {
+            guard let val = CLong(input) else {
                 return nil
             }
             if val > 0 {
-                guard scaleFactor < (CInt.max / val) else {
-                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CInt.max)")
+                guard scaleFactor < (CLong.max / val) else {
+                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CLong.max)")
                 }
             } else {
-                guard scaleFactor < (CInt.min / val) else {
-                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CInt.min)")
+                guard scaleFactor < (CLong.min / val) else {
+                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CLong.min)")
                 }
             }
         case .u:
-            guard let val = CUnsignedInt(input) else {
+            guard let val = CUnsignedLong(input) else {
                 return nil
             }
             if val > 0 {
-                guard scaleFactor < (CUnsignedInt.max / val) else {
-                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CUnsignedInt.max)")
+                guard scaleFactor < (CUnsignedLong.max / val) else {
+                    return TestParameters(
+                        input: input, output: "\(otherUnit)_\(otherSign)(CUnsignedLong.max)"
+                    )
                 }
             } else {
-                guard scaleFactor < (CUnsignedInt.min / val) else {
-                    return TestParameters(input: input, output: "\(otherUnit)_\(otherSign)(CUnsignedInt.min)")
+                guard scaleFactor < (CUnsignedLong.min / val) else {
+                    return TestParameters(
+                        input: input, output: "\(otherUnit)_\(otherSign)(CUnsignedLong.min)"
+                    )
                 }
             }
         case .f:

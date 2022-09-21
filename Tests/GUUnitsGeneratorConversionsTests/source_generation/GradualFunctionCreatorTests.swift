@@ -51,8 +51,8 @@ final class GradualFunctionCreatorTests: XCTestCase {
                 return 0;
             }
             const millimetres_u otherMetres = ((millimetres_u) (metres));
-            if (otherMetres > UINT_MAX / 1000) {
-                return UINT_MAX;
+            if (otherMetres > ULONG_MAX / 1000) {
+                return ULONG_MAX;
             }
             return otherMetres * 1000;
         """
@@ -65,7 +65,7 @@ final class GradualFunctionCreatorTests: XCTestCase {
         // swiftlint:disable line_length
         let expected = """
             const millimetres_u conversion = millimetres / 1000;
-            return ((metres_t) ((conversion) > ((unsigned int) (INT_MAX)) ? ((unsigned int) (INT_MAX)) : conversion));
+            return ((metres_t) ((conversion) > ((unsigned long) (LONG_MAX)) ? ((unsigned long) (LONG_MAX)) : conversion));
         """
         // swiftlint:enable line_length
         XCTAssertEqual(result, expected)

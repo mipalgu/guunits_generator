@@ -69,14 +69,14 @@ final class AccelerationFunctionCreatorTests: XCTestCase {
             unit: .metresPerSecond2, to: .gs, sign: .t, otherSign: .t
         )
         let expected = """
-            const double maxValue = ((double) (INT_MAX)) * 9.807;
-            const double minValue = ((double) (INT_MIN)) * 9.807;
+            const double maxValue = ((double) (LONG_MAX)) * 9.807;
+            const double minValue = ((double) (LONG_MIN)) * 9.807;
             const double value = ((double) (metresPerSecond2));
             if (value > maxValue) {
-                return INT_MAX;
+                return LONG_MAX;
             }
             if (value < minValue) {
-                return INT_MIN;
+                return LONG_MIN;
             }
             return ((gs_t) (round(value / 9.807)));
         """
@@ -101,14 +101,14 @@ final class AccelerationFunctionCreatorTests: XCTestCase {
     func testGToMpsT() {
         let result = creator.createFunction(unit: .gs, to: .metresPerSecond2, sign: .t, otherSign: .t)
         let expected = """
-            const double maxValue = ((double) (INT_MAX)) / 9.807;
-            const double minValue = ((double) (INT_MIN)) / 9.807;
+            const double maxValue = ((double) (LONG_MAX)) / 9.807;
+            const double minValue = ((double) (LONG_MIN)) / 9.807;
             const double value = ((double) (gs));
             if (value > maxValue) {
-                return INT_MAX;
+                return LONG_MAX;
             }
             if (value < minValue) {
-                return INT_MIN;
+                return LONG_MIN;
             }
             return ((metresPerSecond2_t) (round(value * 9.807)));
         """

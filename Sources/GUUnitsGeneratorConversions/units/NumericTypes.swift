@@ -95,6 +95,12 @@ public enum NumericTypes: String {
     /// A double-precision floating point type.
     case double = "double"
 
+    /// A long integer type.
+    case long = "long"
+
+    /// An unsigned long integer type.
+    case ulong = "unsigned long"
+
 }
 
 /// Helper properties.
@@ -127,13 +133,17 @@ extension NumericTypes {
             return "f"
         case .double:
             return "d"
+        case .long:
+            return "l"
+        case .ulong:
+            return "ul"
         }
     }
 
     /// This property returns true when the type is a *signed* type.
     var isSigned: Bool {
         switch self {
-        case .int, .int8, .int16, .int32, .int64, .float, .double:
+        case .int, .int8, .int16, .int32, .int64, .float, .double, .long:
             return true
         default:
             return false
@@ -178,6 +188,10 @@ extension NumericTypes {
             return .float
         case .double:
             return .double
+        case .long:
+            return .ulong
+        case .ulong:
+            return .long
         }
     }
 
@@ -209,6 +223,10 @@ extension NumericTypes {
             return ("-FLT_MAX", "FLT_MAX")
         case .double:
             return ("-DBL_MAX", "DBL_MAX")
+        case .long:
+            return ("LONG_MIN", "LONG_MAX")
+        case .ulong:
+            return ("0", "ULONG_MAX")
         }
     }
 
@@ -239,6 +257,10 @@ extension NumericTypes {
             return .Float
         case .double:
             return .Double
+        case .long:
+            return .CLong
+        case .ulong:
+            return .CUnsignedLong
         }
     }
 
@@ -264,12 +286,18 @@ extension NumericTypes {
             return other != .int8 && other != .int16 && other != .int32 && other != .int
         case .int64:
             return false
+        case .long:
+            return other != .int8 && other != .int16 && other != .int32 && other != .int
+                && other != .long
         case .uint8:
             return true
         case .uint16:
             return other != .uint8
         case .uint32, .uint:
             return other != .uint8 && other != .uint16 && other != .uint32 && other != .uint
+        case .ulong:
+            return other != .uint8 && other != .uint16 && other != .uint32 && other != .uint
+                && other != .ulong
         case .uint64:
             return false
         case .float:

@@ -46,7 +46,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU General Public License for more details.gs_t
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
@@ -71,87 +71,87 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
         [
             ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .t)
+                    input: "CLong.min", output: conversion(value: "CLong.min", sign: .t, otherSign: .t)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .t)
+                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .t)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: "CUnsignedInt.min"
+                    input: "CLong.min", output: "CUnsignedLong.min"
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .u)
+                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .f)
+                    input: "CLong.min", output: conversion(value: "CLong.min", sign: .t, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .f)
+                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .d)
+                    input: "CLong.min", output: conversion(value: "CLong.min", sign: .t, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .d)
+                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .t, parameters: [
-                TestParameters(input: "CUnsignedInt.min", output: "gs_t(CUnsignedInt.min)"),
+                TestParameters(input: "CUnsignedLong.min", output: "gs_t(CUnsignedLong.min)"),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .t)
+                    input: "CUnsignedLong.max",
+                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .t)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min", output: "CUnsignedInt.min"
+                    input: "CUnsignedLong.min", output: "CUnsignedLong.min"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .u)
+                    input: "CUnsignedLong.max",
+                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: "gs_f(CUnsignedInt.min)"
+                    input: "CUnsignedLong.min",
+                    output: "gs_f(CUnsignedLong.min)"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .f)
+                    input: "CUnsignedLong.max",
+                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: "gs_d(CUnsignedInt.min)"
+                    input: "CUnsignedLong.min",
+                    output: "gs_d(CUnsignedLong.min)"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .d)
+                    input: "CUnsignedLong.max",
+                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "CInt.min"
+                    input: "-Float.greatestFiniteMagnitude", output: "CLong.min"
                 ),
                 TestParameters(
                     input: "Float.greatestFiniteMagnitude",
-                    output: "CInt.max"
+                    output: "CLong.max"
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "CUnsignedInt.min"
+                    input: "-Float.greatestFiniteMagnitude", output: "CUnsignedLong.min"
                 ),
                 TestParameters(
-                    input: "Float.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                    input: "Float.greatestFiniteMagnitude", output: "CUnsignedLong.max"
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .f, parameters: [
@@ -176,19 +176,19 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "CInt.min"
+                    input: "-Double.greatestFiniteMagnitude", output: "CLong.min"
                 ),
                 TestParameters(
                     input: "Double.greatestFiniteMagnitude",
-                    output: "CInt.max"
+                    output: "CLong.max"
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "CUnsignedInt.min"
+                    input: "-Double.greatestFiniteMagnitude", output: "CUnsignedLong.min"
                 ),
                 TestParameters(
-                    input: "Double.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                    input: "Double.greatestFiniteMagnitude", output: "CUnsignedLong.max"
                 )
             ]),
             ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .f, parameters: [

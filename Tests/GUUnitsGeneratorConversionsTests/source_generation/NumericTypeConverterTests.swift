@@ -12,7 +12,10 @@ final class NumericTypeConverterTests: XCTestCase {
         let result = converter.convert("x", from: .int, to: DistanceUnits.centimetres, sign: .t)
         XCTAssertEqual(result, "((centimetres_t) (x))")
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .int)
-        XCTAssertEqual(result2, "((int) (x))")
+        XCTAssertEqual(
+            result2,
+            "((int) (MIN(((centimetres_t) (INT_MAX)), MAX(((centimetres_t) (INT_MIN)), x))))"
+        )
     }
 
     /// Tests that a float can be converted to a double unit.
@@ -44,7 +47,7 @@ final class NumericTypeConverterTests: XCTestCase {
         let result = converter.convert("x", from: .int64, to: DistanceUnits.centimetres, sign: .t)
         XCTAssertEqual(
             result,
-            "((centimetres_t) (MIN(((int64_t) (INT_MAX)), MAX(((int64_t) (INT_MIN)), x))))"
+            "((centimetres_t) (MIN(((int64_t) (LONG_MAX)), MAX(((int64_t) (LONG_MIN)), x))))"
         )
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .int64)
         XCTAssertEqual(result2, "((int64_t) (x))")
@@ -61,9 +64,12 @@ final class NumericTypeConverterTests: XCTestCase {
     /// Test case for unsigned to signed conversion.
     func testUToI() {
         let result = converter.convert("x", from: .uint, to: DistanceUnits.centimetres, sign: .t)
-        XCTAssertEqual(result, "((centimetres_t) (MIN(((unsigned int) (INT_MAX)), x)))")
+        XCTAssertEqual(result, "((centimetres_t) (x))")
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .uint)
-        XCTAssertEqual(result2, "((unsigned int) (MAX(((centimetres_t) (0)), x)))")
+        XCTAssertEqual(
+            result2,
+            "((unsigned int) (MAX(((centimetres_t) (0)), x)))"
+        )
     }
 
     /// Test case for double to cm_f conversion.

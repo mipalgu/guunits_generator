@@ -179,7 +179,7 @@ extension TestGenerator {
         switch sign {
         case .t:
             switch numeric {
-            case .int8, .int16, .uint8, .uint16, .uint32, .uint64, .uint:
+            case .int8, .int16, .uint8, .uint16, .uint32, .uint64, .uint, .ulong, .int, .int32:
                 t1 = TestParameters(
                     input: limits.castedLowerLimit, output: limits.numericCastedLowerLimit
                 )
@@ -187,7 +187,7 @@ extension TestGenerator {
                 t1 = TestParameters(input: limits.castedLowerLimit, output: limits.lowerLimitAsNumeric)
             }
             switch numeric {
-            case .int8, .int16, .uint8, .uint16:
+            case .int8, .int16, .uint8, .uint16, .int, .int32, .uint, .uint32:
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.numericCastedUpperLimit)
             default:
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.upperLimitAsNumeric)
@@ -195,7 +195,7 @@ extension TestGenerator {
         case .u:
             t1 = TestParameters(input: limits.castedLowerLimit, output: limits.lowerLimitAsNumeric)
             switch numeric {
-            case .uint8, .uint16, .uint32, .uint, .int8, .int16, .int32, .int:
+            case .uint8, .uint16, .uint32, .uint, .int8, .int16, .int32, .int, .long, .ulong:
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.numericCastedUpperLimit)
             default:
                 t2 = TestParameters(input: limits.castedUpperLimit, output: limits.upperLimitAsNumeric)
@@ -241,15 +241,15 @@ extension TestGenerator {
         switch sign {
         case .t:
             switch numeric {
-            case .float, .double, .int32, .int, .int64:
+            case .float, .double, .int32, .int, .int64, .long:
                 t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.castedLowerLimit)
-            case .uint8, .uint16, .uint32, .uint, .uint64, .int8, .int16:
+            case .uint8, .uint16, .uint32, .uint, .uint64, .int8, .int16, .ulong:
                 t1 = TestParameters(
                     input: limits.numericCastedLowerLimit, output: limits.numericLowerLimitAsUnit
                 )
             }
             switch numeric {
-            case .float, .double, .uint64, .int64, .int32, .uint32, .int, .uint:
+            case .float, .double, .uint64, .int64, .int32, .uint32, .int, .uint, .long, .ulong:
                 t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.castedUpperLimit)
             case .uint8, .uint16, .int8, .int16:
                 t2 = TestParameters(
@@ -259,7 +259,7 @@ extension TestGenerator {
         case .u:
             t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.castedLowerLimit)
             switch numeric {
-            case .uint64, .uint, .uint32, .float, .double, .int64:
+            case .uint64, .uint, .uint32, .float, .double, .int64, .long, .ulong:
                 t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.castedUpperLimit)
             case .int32, .int, .int16, .int8, .uint16, .uint8:
                 t2 = TestParameters(
@@ -270,7 +270,7 @@ extension TestGenerator {
             switch numeric {
             case .float, .double:
                 t1 = TestParameters(input: limits.numericCastedLowerLimit, output: limits.castedLowerLimit)
-            case .int8, .int16, .int32, .int, .int64, .uint8, .uint16, .uint32, .uint, .uint64:
+            case .int8, .int16, .int32, .int, .int64, .uint8, .uint16, .uint32, .uint, .uint64, .long, .ulong:
                 t1 = TestParameters(
                     input: limits.numericCastedLowerLimit, output: limits.numericLowerLimitAsUnit
                 )
@@ -278,7 +278,7 @@ extension TestGenerator {
             switch numeric {
             case .float, .double:
                 t2 = TestParameters(input: limits.numericCastedUpperLimit, output: limits.castedUpperLimit)
-            case .int8, .int16, .int32, .int, .int64, .uint8, .uint16, .uint32, .uint, .uint64:
+            case .int8, .int16, .int32, .int, .int64, .uint8, .uint16, .uint32, .uint, .uint64, .long, .ulong:
                 t2 = TestParameters(
                     input: limits.numericCastedUpperLimit, output: limits.numericUpperLimitAsUnit
                 )

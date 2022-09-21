@@ -70,8 +70,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testCelsiusToKelvinInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .t, otherSign: .t)
         let expected = """
-            if (celsius > (INT_MAX - 273)) {
-                return ((kelvin_t) (INT_MAX));
+            if (celsius > (LONG_MAX - 273)) {
+                return ((kelvin_t) (LONG_MAX));
             }
             return ((kelvin_t) (celsius + 273));
         """
@@ -118,12 +118,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testCelsiusToKelvinFloatToInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .t)
         let expected = """
-            const celsius_f upperLimit = ((celsius_f) (INT_MAX));
-            const celsius_f lowerLimit = ((celsius_f) (INT_MIN));
+            const celsius_f upperLimit = ((celsius_f) (LONG_MAX));
+            const celsius_f lowerLimit = ((celsius_f) (LONG_MIN));
             if (celsius > (upperLimit - 273.15f)) {
-                return ((kelvin_t) (INT_MAX));
+                return ((kelvin_t) (LONG_MAX));
             } else if (celsius < (lowerLimit - 273.15f)) {
-                return ((kelvin_t) (INT_MIN));
+                return ((kelvin_t) (LONG_MIN));
             }
             return ((kelvin_t) (roundf(celsius + 273.15f)));
         """
@@ -133,10 +133,10 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testCelsiusToKelvinFloatToUnsigned() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .f, otherSign: .u)
         let expected = """
-            const celsius_f upperLimit = ((celsius_f) (UINT_MAX));
+            const celsius_f upperLimit = ((celsius_f) (ULONG_MAX));
             const celsius_f lowerLimit = ((celsius_f) (0));
             if (celsius > (upperLimit - 273.15f)) {
-                return ((kelvin_u) (UINT_MAX));
+                return ((kelvin_u) (ULONG_MAX));
             } else if (celsius < (lowerLimit - 273.15f)) {
                 return ((kelvin_u) (0));
             }
@@ -165,8 +165,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testCelsiusToKelvinUnsigned() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .u, otherSign: .u)
         let expected = """
-            if (celsius > (UINT_MAX - 273)) {
-                return ((kelvin_u) (UINT_MAX));
+            if (celsius > (ULONG_MAX - 273)) {
+                return ((kelvin_u) (ULONG_MAX));
             }
             return ((kelvin_u) (celsius + 273));
         """
@@ -176,8 +176,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testCelsiusToKelvinUnsignedToInteger() {
         let result = creator.createFunction(unit: .celsius, to: .kelvin, sign: .u, otherSign: .t)
         let expected = """
-            if (celsius > (INT_MAX - 273)) {
-                return ((kelvin_t) (INT_MAX));
+            if (celsius > (LONG_MAX - 273)) {
+                return ((kelvin_t) (LONG_MAX));
             }
             return ((kelvin_t) (celsius + 273));
         """
@@ -187,8 +187,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testKelvinToCelsiusInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .t, otherSign: .t)
         let expected = """
-            if (kelvin < (INT_MIN + 273)) {
-                return ((celsius_t) (INT_MIN));
+            if (kelvin < (LONG_MIN + 273)) {
+                return ((celsius_t) (LONG_MIN));
             }
             return ((celsius_t) (kelvin - 273));
         """
@@ -232,12 +232,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testKelvinToCelsiusFloatToInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .t)
         let expected = """
-            const kelvin_f upperLimit = ((kelvin_f) (INT_MAX));
-            const kelvin_f lowerLimit = ((kelvin_f) (INT_MIN));
+            const kelvin_f upperLimit = ((kelvin_f) (LONG_MAX));
+            const kelvin_f lowerLimit = ((kelvin_f) (LONG_MIN));
             if (kelvin < (lowerLimit + 273.15f)) {
-                return ((celsius_t) (INT_MIN));
+                return ((celsius_t) (LONG_MIN));
             } else if (kelvin > (upperLimit + 273.15f)) {
-                return ((celsius_t) (INT_MAX));
+                return ((celsius_t) (LONG_MAX));
             }
             return ((celsius_t) (roundf(kelvin - 273.15f)));
         """
@@ -247,12 +247,12 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testKelvinToCelsiusFloatToUnsigned() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .f, otherSign: .u)
         let expected = """
-            const kelvin_f upperLimit = ((kelvin_f) (UINT_MAX));
+            const kelvin_f upperLimit = ((kelvin_f) (ULONG_MAX));
             const kelvin_f lowerLimit = ((kelvin_f) (0));
             if (kelvin < (lowerLimit + 273.15f)) {
                 return ((celsius_u) (0));
             } else if (kelvin > (upperLimit + 273.15f)) {
-                return ((celsius_u) (UINT_MAX));
+                return ((celsius_u) (ULONG_MAX));
             }
             return ((celsius_u) (roundf(kelvin - 273.15f)));
         """
@@ -289,7 +289,7 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testKelvinToCelsiusUnsignedToInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .celsius, sign: .u, otherSign: .t)
-        let comparison = "((unsigned int) (INT_MAX))"
+        let comparison = "((unsigned long) (LONG_MAX))"
         let ternary = "((kelvin - 273) > \(comparison) ? \(comparison) : kelvin - 273)"
         let conversion = "((kelvin_t) \(ternary))"
         let expected = """
@@ -303,8 +303,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToFahrenheitInteger() {
         let result = creator.createFunction(unit: .celsius, to: .fahrenheit, sign: .t, otherSign: .t)
-        let minString = "MIN(((double) (INT_MAX)), (round(((((double) (celsius)) * 1.8) + 32.0))))"
-        let expected = "    return ((fahrenheit_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        let minString = "MIN(((double) (LONG_MAX)), (round(((((double) (celsius)) * 1.8) + 32.0))))"
+        let expected = "    return ((fahrenheit_t) (MAX(((double) (LONG_MIN)), \(minString))));"
         XCTAssertEqual(result, expected)
     }
 
@@ -326,8 +326,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testFahrenheitToCelsiusInteger() {
         let result = creator.createFunction(unit: .fahrenheit, to: .celsius, sign: .t, otherSign: .t)
         let conversion = "((double) (fahrenheit)) * (5.0 / 9.0) - 32.0 * (5.0 / 9.0)"
-        let minString = "MIN(((double) (INT_MAX)), (round(\(conversion))))"
-        let expected = "    return ((celsius_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        let minString = "MIN(((double) (LONG_MAX)), (round(\(conversion))))"
+        let expected = "    return ((celsius_t) (MAX(((double) (LONG_MIN)), \(minString))));"
         XCTAssertEqual(result, expected)
     }
 
@@ -348,8 +348,8 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testFahrenheitToKelvinInteger() {
         let result = creator.createFunction(unit: .fahrenheit, to: .kelvin, sign: .t, otherSign: .t)
         let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0) + 273.15"
-        let minString = "MIN(((double) (INT_MAX)), (round(\(conversion))))"
-        let expected = "    return ((kelvin_t) (MAX(((double) (INT_MIN)), \(minString))));"
+        let minString = "MIN(((double) (LONG_MAX)), (round(\(conversion))))"
+        let expected = "    return ((kelvin_t) (MAX(((double) (LONG_MIN)), \(minString))));"
         XCTAssertEqual(result, expected)
     }
 
@@ -373,14 +373,14 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     func testKelvinToFahrenheitInteger() {
         let result = creator.createFunction(unit: .kelvin, to: .fahrenheit, sign: .t, otherSign: .t)
         let expected = """
-            const double maxValue = (((double) (INT_MAX)) - 32.0) / 1.8 + 273.15;
-            const double minValue = ((double) (INT_MIN)) / 1.8 - 32.0 / 1.8 + 273.15;
+            const double maxValue = (((double) (LONG_MAX)) - 32.0) / 1.8 + 273.15;
+            const double minValue = ((double) (LONG_MIN)) / 1.8 - 32.0 / 1.8 + 273.15;
             const double value = ((double) (kelvin));
             if (value > maxValue) {
-                return INT_MAX;
+                return LONG_MAX;
             }
             if (value < minValue) {
-                return INT_MIN;
+                return LONG_MIN;
             }
             return ((fahrenheit_t) (round((value - 273.15) * 1.8 + 32.0)));
         """
