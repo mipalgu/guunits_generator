@@ -180,6 +180,7 @@ indirect enum Operation: Hashable {
         }
     }
 
+    /// Provides all possible combinations of unit category cases for the operation.
     var allCases: [Operation] {
         switch self {
         case .constant(let unit):
