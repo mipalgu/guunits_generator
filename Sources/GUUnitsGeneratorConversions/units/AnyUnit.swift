@@ -125,13 +125,16 @@ struct AnyUnit {
 
 }
 
+/// Hashable conformance.
 extension AnyUnit: Hashable {
 
+    /// Equality operation.
     static func == (lhs: AnyUnit, rhs: AnyUnit) -> Bool {
         lhs.abbreviation == rhs.abbreviation && lhs.category == rhs.category
             && lhs.description == rhs.description && lhs.sameZeroPoint == rhs.sameZeroPoint
     }
 
+    /// Hash operation.
     func hash(into hasher: inout Hasher) {
         hasher.combine(abbreviation)
         hasher.combine(description)
