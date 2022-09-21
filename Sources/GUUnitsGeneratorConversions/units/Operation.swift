@@ -55,7 +55,7 @@
 // 
 
 /// Enum for defining common operations in a composite unit.
-indirect enum Operation {
+indirect enum Operation: Hashable {
 
     /// The unit itself as a constant.
     case constant(declaration: AnyUnit)
@@ -125,6 +125,91 @@ indirect enum Operation {
             return base.abbreviation + "_pwr_\(power.abbreviation)"
         case .literal(let literal):
             return literal.abbreviation
+        }
+    }
+
+    /// The description of the operation.
+    var description: String {
+        switch self {
+        case .constant(let unit):
+            return unit.description
+        case .multiplication(let lhs, let rhs):
+            let rhsDescription = rhs.description
+            let lhsDescription = lhs.description
+            if lhsDescription == "1" && rhsDescription == "1" {
+                return "1"
+            }
+            if lhsDescription == "1" {
+                return rhsDescription
+            }
+            if rhsDescription == "1" {
+                return lhsDescription
+            }
+            return lhsDescription + "_" + rhsDescription
+        case .division(let lhs, let rhs):
+            let rhsDescription = rhs.description
+            let lhsDescription = lhs.description
+            if lhsDescription == "1" && rhsDescription == "1" {
+                return "1"
+            }
+            if rhsDescription == "1" {
+                return lhsDescription
+            }
+            if lhsDescription == "1" {
+                return Operation.exponentiate(base: rhs, power: .literal(declaration: -1)).abbreviation
+            }
+            return lhsDescription + "_per_" + rhsDescription
+        case .precedence(let operation):
+            return "_" + operation.description + "_"
+        case .exponentiate(let base, let power):
+            if case let .literal(num) = power, num == 0 {
+                return "1"
+            }
+            if power.description == "1" {
+                return base.description
+            }
+            if case let .literal(num) = power, num == 2 {
+                return base.description + "_sq"
+            }
+            if case let .literal(num) = power, num == 3 {
+                return base.description + "_cub"
+            }
+            return base.description + "_pwr_\(power.description)"
+        case .literal(let literal):
+            return literal.description
+        }
+    }
+
+    var allCases: [Operation] {
+        switch self {
+        case .constant(let unit):
+            return unit.allCases.map {
+                Operation.constant(declaration: $0)
+            }
+        case .multiplication(let lhs, let rhs):
+            return lhs.allCases.flatMap { lhsUnit in
+                rhs.allCases.map { rhsUnit in
+                    Operation.multiplication(lhs: lhsUnit, rhs: rhsUnit)
+                }
+            }
+        case .division(let lhs, let rhs):
+            return lhs.allCases.flatMap { lhsUnit in
+                rhs.allCases.map { rhsUnit in
+                    Operation.division(lhs: lhsUnit, rhs: rhsUnit)
+                }
+            }
+        case .precedence(let operation):
+            return operation.allCases.map {
+                Operation.precedence(operation: $0)
+            }
+        case .exponentiate(let base, let power):
+            return base.allCases.flatMap { baseUnit in
+                power.allCases.map { powerUnit in
+                    Operation.exponentiate(base: baseUnit, power: powerUnit)
+                }
+            }
+        case .literal:
+            return [self]
         }
     }
 

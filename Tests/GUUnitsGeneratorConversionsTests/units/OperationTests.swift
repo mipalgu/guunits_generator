@@ -60,34 +60,36 @@ import XCTest
 /// Test class for `Operation`.
 final class OperationTests: XCTestCase {
 
-    /// Test the abbreviation is correct.
-    func testAbbreviation() {
-        let operation = Operation.division(
+    /// Operation under test.
+    let operation = Operation.division(
         lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
         rhs: Operation.exponentiate(
             base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
             power: Operation.literal(declaration: 2)
         )
     )
+
+    /// Test the abbreviation is correct.
+    func testAbbreviation() {
         XCTAssertEqual(operation.abbreviation, "m_per_s_sq")
     }
 
     /// test abbreviation of huge operation.
     func testHugeAbbreviation() {
         let hugeOperation = Operation.division(
-        lhs: Operation.multiplication(
-            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
-            rhs: Operation.precedence(
-                operation: Operation.division(
-                    lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
-                    rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+            lhs: Operation.multiplication(
+                lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: Operation.precedence(
+                    operation: Operation.division(
+                        lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                        rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                    )
                 )
+            ),
+            rhs: .exponentiate(
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
             )
-        ),
-        rhs: .exponentiate(
-            base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
         )
-    )
         XCTAssertEqual(
             hugeOperation.abbreviation,
             "m__degC_per_A__per_s_cub"
@@ -97,19 +99,19 @@ final class OperationTests: XCTestCase {
     /// test abbreviation of huge operation.
     func testHugeAbbreviation2() {
         let hugeOperation2 = Operation.division(
-        lhs: Operation.multiplication(
-            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
-            rhs: Operation.precedence(
-                operation: Operation.division(
-                    lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
-                    rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+            lhs: Operation.multiplication(
+                lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: Operation.precedence(
+                    operation: Operation.division(
+                        lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                        rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                    )
                 )
+            ),
+            rhs: .exponentiate(
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 4)
             )
-        ),
-        rhs: .exponentiate(
-            base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 4)
         )
-    )
         XCTAssertEqual(
             hugeOperation2.abbreviation,
             "m__degC_per_A__per_s_pwr_4"
@@ -119,19 +121,19 @@ final class OperationTests: XCTestCase {
     /// test abbreviation of huge operation.
     func testHugeAbbreviation3() {
         let hugeOperation3 = Operation.division(
-        lhs: Operation.multiplication(
-            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
-            rhs: Operation.precedence(
-                operation: Operation.division(
-                    lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
-                    rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+            lhs: Operation.multiplication(
+                lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: Operation.precedence(
+                    operation: Operation.division(
+                        lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                        rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                    )
                 )
+            ),
+            rhs: .exponentiate(
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: -4)
             )
-        ),
-        rhs: .exponentiate(
-            base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: -4)
         )
-    )
         XCTAssertEqual(
             hugeOperation3.abbreviation,
             "m__degC_per_A__per_s_pwr_neg4"
@@ -141,24 +143,24 @@ final class OperationTests: XCTestCase {
     /// Test the abbreviation is correct.
     func testAbbreviation0Case() {
         let operation = Operation.division(
-        lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
-        rhs: Operation.exponentiate(
-            base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
-            power: Operation.literal(declaration: 0)
+            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: Operation.exponentiate(
+                base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: Operation.literal(declaration: 0)
+            )
         )
-    )
         XCTAssertEqual(operation.abbreviation, "m")
     }
 
     /// Test the abbreviation is correct.
     func testAbbreviation1Case() {
         let operation = Operation.division(
-        lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
-        rhs: Operation.exponentiate(
-            base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
-            power: Operation.literal(declaration: 1)
+            lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: Operation.exponentiate(
+                base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: Operation.literal(declaration: 1)
+            )
         )
-    )
         XCTAssertEqual(operation.abbreviation, "m_per_s")
     }
 
@@ -169,6 +171,65 @@ final class OperationTests: XCTestCase {
             rhs: Operation.constant(declaration: AnyUnit(TimeUnits.seconds))
         )
         XCTAssertEqual(operation.abbreviation, "s_pwr_neg1")
+    }
+
+    /// Test the abbreviation of the case where the unit is a product.
+    func testAbbreviationMultiply() {
+        let operation = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+        XCTAssertEqual(operation.abbreviation, "m_s")
+    }
+
+    /// Test allCases property.
+    func testAllCases() {
+        let operation = Operation.multiplication(
+            lhs: .multiplication(
+                lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+            ),
+            rhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius))
+        )
+        let result = Set(operation.allCases.map(\.abbreviation))
+        let expected = Set(DistanceUnits.allCases.flatMap { x in
+            TimeUnits.allCases.flatMap { t in
+                TemperatureUnits.allCases.map { temp in
+                    "\(x.abbreviation)_\(t.abbreviation)_\(temp.abbreviation)"
+                }
+            }
+        })
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test allCases property for big unit type.
+    func testHugeAllCases() {
+        let result = Set(Operation.division(
+            lhs: Operation.multiplication(
+                lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: Operation.precedence(
+                    operation: Operation.division(
+                        lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                        rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                    )
+                )
+            ),
+            rhs: .exponentiate(
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
+            )
+        )
+        .allCases.map(\.abbreviation))
+        let expected = Set(DistanceUnits.allCases.flatMap { x in
+            TemperatureUnits.allCases.flatMap { temp in
+                CurrentUnits.allCases.flatMap { i in
+                    TimeUnits.allCases.map { (t: TimeUnits) -> String in
+                        "\(x.abbreviation)__\(temp.abbreviation)_per_\(i.abbreviation)__per_" +
+                            "\(t.abbreviation)_cub"
+                    }
+                }
+            }
+        })
+        XCTAssertEqual(result, expected)
     }
 
 }
