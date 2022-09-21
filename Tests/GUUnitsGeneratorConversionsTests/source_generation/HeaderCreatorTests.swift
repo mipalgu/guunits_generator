@@ -220,7 +220,8 @@ final class HeaderCreatorTests: XCTestCase {
             ("// Image Units.", Array(ImageUnits.allCases)),
             ("// Percent Units.", Array(PercentUnits.allCases)),
             ("// Temperature Units.", Array(TemperatureUnits.allCases)),
-            ("// Acceleration Units.", Array(AccelerationUnits.allCases))
+            ("// Acceleration Units.", Array(AccelerationUnits.allCases)),
+            ("// Mass Units.", Array(MassUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in

@@ -176,6 +176,14 @@ public struct GUUnitsGenerator {
         let accelerationGenerator = AnyGenerator(
             generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
         )
+        let massGenerator = AnyGenerator(
+            generating: MassUnits.self, using: MassUnitsGenerator(unitDifference: [
+                .microgram: 1000,
+                .milligram: 1000,
+                .gram: 1000,
+                .kilogram: 1000
+            ])
+        )
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
@@ -185,7 +193,8 @@ public struct GUUnitsGenerator {
                 imageGenerator,
                 percentGenerator,
                 temperatureGenerator,
-                accelerationGenerator
+                accelerationGenerator,
+                massGenerator
             ]
         )
         .data(using: .utf8)
@@ -201,7 +210,8 @@ public struct GUUnitsGenerator {
                 imageGenerator,
                 percentGenerator,
                 temperatureGenerator,
-                accelerationGenerator
+                accelerationGenerator,
+                massGenerator
             ]
         )
         .data(using: .utf8)
@@ -231,6 +241,18 @@ public struct GUUnitsGenerator {
             at: path,
             with: "DistanceTests",
             and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
+        )
+        let massGenerator = GradualTestGenerator<MassUnits>(unitDifference: [
+            .microgram: 1000,
+            .milligram: 1000,
+            .gram: 1000,
+            .kilogram: 1000
+        ])
+        let massFileCreator = TestFileCreator<GradualTestGenerator<MassUnits>>()
+        writeFile(
+            at: path,
+            with: "MassTests",
+            and: massFileCreator.tests(generator: massGenerator, imports: "import CGUUnits")
         )
         let currentGenerator = GradualTestGenerator<CurrentUnits>(unitDifference: [
             .microamperes: 1000,
@@ -322,6 +344,7 @@ public struct GUUnitsGenerator {
             with: AccelerationUnits.category,
             and: swiftFileCreator.generate(for: AccelerationUnits.self)
         )
+        writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
         writeFile(at: path, with: "GUUnitsFloat", and: GUUnitsPrimitiveHelpers.float)
         writeFile(at: path, with: "GUUnitsInteger", and: GUUnitsPrimitiveHelpers.integer)
         writeFile(at: path, with: "GUUnitsType", and: GUUnitsPrimitiveHelpers.type)
@@ -386,6 +409,16 @@ public struct GUUnitsGenerator {
             at: path,
             with: "\(AccelerationUnits.category)Tests",
             and: swiftFileCreator.generate(with: AccelerationTestGenerator())
+        )
+        writeFile(
+            at: path,
+            with: "\(MassUnits.category)Tests",
+            and: swiftFileCreator.generate(with: GradualTestGenerator<MassUnits>(unitDifference: [
+                .microgram: 1000,
+                .milligram: 1000,
+                .gram: 1000,
+                .kilogram: 1000
+            ]))
         )
     }
 
