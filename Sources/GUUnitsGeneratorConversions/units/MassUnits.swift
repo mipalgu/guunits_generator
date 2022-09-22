@@ -54,18 +54,25 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Unit for representing mass.
 public enum MassUnits: String, UnitProtocol {
 
+    /// Micrograms.
     case microgram
 
+    /// Milligrams.
     case milligram
 
+    /// Grams.
     case gram
 
+    /// Kilograms.
     case kilogram
 
+    /// Megagrams or Metric Tonnes.
     case megagram
 
+    /// The abbreviation of the unit.
     public var abbreviation: String {
         switch self {
         case .microgram:
@@ -81,6 +88,7 @@ public enum MassUnits: String, UnitProtocol {
         }
     }
 
+    /// The string equivalent value of the unit.
     public var description: String {
         self.rawValue
     }
