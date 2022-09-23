@@ -86,7 +86,7 @@ struct SignConverter {
             return self.cast("(\(str)) < 0 ? 0 : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         case (.u, .t):
             let uint: Signs = .u
-            let intMax = self.cast("LONG_MAX", to: uint.type)
+            let intMax = self.cast(Signs.t.numericType.limits.1, to: uint.type)
             return self.cast(
                 "(\(str)) > \(intMax) ? \(intMax) : \(str)",
                 to: "\(otherUnit)_\(otherSign.rawValue)"

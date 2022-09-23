@@ -71,92 +71,92 @@ final class AngleTestGeneratorDegToRadTests: XCTestCase, TestParameterTestable, 
         [
             ConversionTest(unit: .degrees, sign: .t, otherUnit: .radians, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CLong.min", output: conversion(value: "CLong.min", sign: .t, otherSign: .t)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .t)
                 ),
                 TestParameters(
-                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .t)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .t)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .t, otherUnit: .radians, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CLong.min", output: "CUnsignedLong.min"
+                    input: "Int64.min", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .u)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .t, otherUnit: .radians, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CLong.min", output: conversion(value: "CLong.min", sign: .t, otherSign: .f)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .f)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .t, otherUnit: .radians, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CLong.min", output: conversion(value: "CLong.min", sign: .t, otherSign: .d)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CLong.max", output: conversion(value: "CLong.max", sign: .t, otherSign: .d)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .u, otherUnit: .radians, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min", output: "radians_t(CUnsignedLong.min)"
+                    input: "UInt64.min", output: "radians_t(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "CUnsignedLong.max",
-                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .t)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .t)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .u, otherUnit: .radians, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min",
-                    output: conversion(value: "CUnsignedLong.min", sign: .u, otherSign: .u)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .u)
                 ),
                 TestParameters(
-                    input: "CUnsignedLong.max",
-                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .u)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .u, otherUnit: .radians, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min",
-                    output: conversion(value: "CUnsignedLong.min", sign: .u, otherSign: .f)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CUnsignedLong.max",
-                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .f)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .u, otherUnit: .radians, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min",
-                    output: conversion(value: "CUnsignedLong.min", sign: .u, otherSign: .d)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CUnsignedLong.max",
-                    output: conversion(value: "CUnsignedLong.max", sign: .u, otherSign: .d)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .f, otherUnit: .radians, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "CLong.min"
+                    input: "-Float.greatestFiniteMagnitude", output: "Int64.min"
                 ),
                 TestParameters(
                     input: "Float.greatestFiniteMagnitude",
-                    output: "CLong.max"
+                    output: "Int64.max"
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .f, otherUnit: .radians, otherSign: .u, parameters: [
                 TestParameters(
                     input: "-Float.greatestFiniteMagnitude",
-                    output: "CUnsignedLong.min"
+                    output: "UInt64.min"
                 ),
                 TestParameters(
                     input: "Float.greatestFiniteMagnitude",
-                    output: "CUnsignedLong.max"
+                    output: "UInt64.max"
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .f, otherUnit: .radians, otherSign: .f, parameters: [
@@ -181,21 +181,21 @@ final class AngleTestGeneratorDegToRadTests: XCTestCase, TestParameterTestable, 
             ]),
             ConversionTest(unit: .degrees, sign: .d, otherUnit: .radians, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "CLong.min"
+                    input: "-Double.greatestFiniteMagnitude", output: "Int64.min"
                 ),
                 TestParameters(
                     input: "Double.greatestFiniteMagnitude",
-                    output: "CLong.max"
+                    output: "Int64.max"
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .d, otherUnit: .radians, otherSign: .u, parameters: [
                 TestParameters(
                     input: "-Double.greatestFiniteMagnitude",
-                    output: "CUnsignedLong.min"
+                    output: "UInt64.min"
                 ),
                 TestParameters(
                     input: "Double.greatestFiniteMagnitude",
-                    output: "CUnsignedLong.max"
+                    output: "UInt64.max"
                 )
             ]),
             ConversionTest(unit: .degrees, sign: .d, otherUnit: .radians, otherSign: .f, parameters: [

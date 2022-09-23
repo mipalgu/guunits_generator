@@ -25,14 +25,14 @@ final class AngleFunctionCreatorTests: XCTestCase {
     func testCreateFunctionRadToDeg() {
         let result = creator.createFunction(unit: .radians, to: .degrees, sign: .d, otherSign: .t)
         let expected = """
-            const double maxValue = ((double) (LONG_MAX)) / 180.0 * M_PI;
-            const double minValue = ((double) (LONG_MIN)) / 180.0 * M_PI;
+            const double maxValue = ((double) (9223372036854775807)) / 180.0 * M_PI;
+            const double minValue = ((double) (-9223372036854775807 - 1)) / 180.0 * M_PI;
             const double castedValue = ((double) (radians));
             if (castedValue > maxValue) {
-                return LONG_MAX;
+                return 9223372036854775807;
             }
             if (castedValue < minValue) {
-                return LONG_MIN;
+                return -9223372036854775807 - 1;
             }
             return ((degrees_t) (round(castedValue / M_PI * 180.0)));
         """

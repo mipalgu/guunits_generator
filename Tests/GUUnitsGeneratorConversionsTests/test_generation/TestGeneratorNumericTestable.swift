@@ -252,7 +252,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
             }
         case .u:
             switch numeric {
-            case .uint64, .float, .double, .int64:
+            case .float, .double:
                 return sign.numericType.swiftType.limits.1
             default:
                 return numeric.swiftType.limits.1

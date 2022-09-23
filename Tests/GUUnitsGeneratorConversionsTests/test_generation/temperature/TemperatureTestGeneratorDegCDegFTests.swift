@@ -67,60 +67,60 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
     var conversions: [ConversionTest<TemperatureUnits>] {
         [
             ConversionTest(unit: .celsius, sign: .t, otherUnit: .fahrenheit, otherSign: .t, parameters: [
-                TestParameters(input: "CLong.min", output: "fahrenheit_t(CLong.min)"),
-                TestParameters(input: "CLong.max", output: "fahrenheit_t(CLong.max)")
+                TestParameters(input: "Int64.min", output: "fahrenheit_t(Int64.min)"),
+                TestParameters(input: "Int64.max", output: "fahrenheit_t(Int64.max)")
             ]),
             ConversionTest(unit: .celsius, sign: .t, otherUnit: .fahrenheit, otherSign: .u, parameters: [
-                TestParameters(input: "CLong.min", output: "fahrenheit_u(CUnsignedLong.min)"),
+                TestParameters(input: "Int64.min", output: "fahrenheit_u(UInt64.min)"),
                 TestParameters(
-                    input: "CLong.max", output: "fahrenheit_u((Double(CLong.max) * 1.8 + 32.0).rounded())"
+                    input: "Int64.max", output: "fahrenheit_u((Double(Int64.max) * 1.8 + 32.0).rounded())"
                 )
             ]),
             ConversionTest(unit: .celsius, sign: .t, otherUnit: .fahrenheit, otherSign: .f, parameters: [
-                TestParameters(input: "CLong.min", output: "fahrenheit_f(Double(CLong.min) * 1.8 + 32.0)"),
-                TestParameters(input: "CLong.max", output: "fahrenheit_f(Double(CLong.max) * 1.8 + 32.0)")
+                TestParameters(input: "Int64.min", output: "fahrenheit_f(Double(Int64.min) * 1.8 + 32.0)"),
+                TestParameters(input: "Int64.max", output: "fahrenheit_f(Double(Int64.max) * 1.8 + 32.0)")
             ]),
             ConversionTest(unit: .celsius, sign: .t, otherUnit: .fahrenheit, otherSign: .d, parameters: [
-                TestParameters(input: "CLong.min", output: "fahrenheit_d(Double(CLong.min) * 1.8 + 32.0)"),
-                TestParameters(input: "CLong.max", output: "fahrenheit_d(Double(CLong.max) * 1.8 + 32.0)")
+                TestParameters(input: "Int64.min", output: "fahrenheit_d(Double(Int64.min) * 1.8 + 32.0)"),
+                TestParameters(input: "Int64.max", output: "fahrenheit_d(Double(Int64.max) * 1.8 + 32.0)")
             ]),
             ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min",
-                    output: "fahrenheit_t((Double(CUnsignedLong.min) * 1.8 + 32.0).rounded())"
+                    input: "UInt64.min",
+                    output: "fahrenheit_t((Double(UInt64.min) * 1.8 + 32.0).rounded())"
                 ),
-                TestParameters(input: "CUnsignedLong.max", output: "fahrenheit_t(CLong.max)")
+                TestParameters(input: "UInt64.max", output: "fahrenheit_t(Int64.max)")
             ]),
             ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 // 0 -> 32 is already tested in default tests.
-                TestParameters(input: "CUnsignedLong.max", output: "fahrenheit_u(CUnsignedLong.max)")
+                TestParameters(input: "UInt64.max", output: "fahrenheit_u(UInt64.max)")
             ]),
             ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min", output: "fahrenheit_f(Double(CUnsignedLong.min) * 1.8 + 32.0)"
+                    input: "UInt64.min", output: "fahrenheit_f(Double(UInt64.min) * 1.8 + 32.0)"
                 ),
                 TestParameters(
-                    input: "CUnsignedLong.max", output: "fahrenheit_f(Double(CUnsignedLong.max) * 1.8 + 32.0)"
+                    input: "UInt64.max", output: "fahrenheit_f(Double(UInt64.max) * 1.8 + 32.0)"
                 )
             ]),
             ConversionTest(unit: .celsius, sign: .u, otherUnit: .fahrenheit, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CUnsignedLong.min", output: "fahrenheit_d(Double(CUnsignedLong.min) * 1.8 + 32.0)"
+                    input: "UInt64.min", output: "fahrenheit_d(Double(UInt64.min) * 1.8 + 32.0)"
                 ),
                 TestParameters(
-                    input: "CUnsignedLong.max", output: "fahrenheit_d(Double(CUnsignedLong.max) * 1.8 + 32.0)"
+                    input: "UInt64.max", output: "fahrenheit_d(Double(UInt64.max) * 1.8 + 32.0)"
                 )
             ]),
             ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .t, parameters: [
-                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "fahrenheit_t(CLong.min)"),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "fahrenheit_t(CLong.max)")
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "fahrenheit_t(Int64.min)"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "fahrenheit_t(Int64.max)")
             ]),
             ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedLong.min)"
+                    input: "-Float.greatestFiniteMagnitude", output: "fahrenheit_u(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "Float.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedLong.max)"
+                    input: "Float.greatestFiniteMagnitude", output: "fahrenheit_u(UInt64.max)"
                 )
             ]),
             ConversionTest(unit: .celsius, sign: .f, otherUnit: .fahrenheit, otherSign: .f, parameters: [
@@ -144,15 +144,15 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
                 )
             ]),
             ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .t, parameters: [
-                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "fahrenheit_t(CLong.min)"),
-                TestParameters(input: "Double.greatestFiniteMagnitude", output: "fahrenheit_t(CLong.max)")
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "fahrenheit_t(Int64.min)"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "fahrenheit_t(Int64.max)")
             ]),
             ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedLong.min)"
+                    input: "-Double.greatestFiniteMagnitude", output: "fahrenheit_u(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "Double.greatestFiniteMagnitude", output: "fahrenheit_u(CUnsignedLong.max)"
+                    input: "Double.greatestFiniteMagnitude", output: "fahrenheit_u(UInt64.max)"
                 )
             ]),
             ConversionTest(unit: .celsius, sign: .d, otherUnit: .fahrenheit, otherSign: .f, parameters: [

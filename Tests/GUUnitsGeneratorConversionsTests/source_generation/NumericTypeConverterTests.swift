@@ -47,7 +47,7 @@ final class NumericTypeConverterTests: XCTestCase {
         let result = converter.convert("x", from: .int64, to: DistanceUnits.centimetres, sign: .t)
         XCTAssertEqual(
             result,
-            "((centimetres_t) (MIN(((int64_t) (LONG_MAX)), MAX(((int64_t) (LONG_MIN)), x))))"
+            "((centimetres_t) (x))"
         )
         let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .int64)
         XCTAssertEqual(result2, "((int64_t) (x))")

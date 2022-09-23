@@ -67,46 +67,46 @@ final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestabl
     var conversions: [ConversionTest<TemperatureUnits>] {
         [
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .t, parameters: [
-                TestParameters(input: "CLong.min", output: "celsius_t(CLong.min)"),
-                TestParameters(input: "CLong.max", output: "celsius_t(CLong.max) - 273")
+                TestParameters(input: "Int64.min", output: "celsius_t(Int64.min)"),
+                TestParameters(input: "Int64.max", output: "celsius_t(Int64.max) - 273")
             ]),
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .u, parameters: [
-                TestParameters(input: "CLong.min", output: "celsius_u(CUnsignedLong.min)"),
-                TestParameters(input: "CLong.max", output: "celsius_u(CLong.max) - 273")
+                TestParameters(input: "Int64.min", output: "celsius_u(UInt64.min)"),
+                TestParameters(input: "Int64.max", output: "celsius_u(Int64.max) - 273")
             ]),
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .d, parameters: [
-                TestParameters(input: "CLong.min", output: "celsius_d(CLong.min) - 273.15"),
-                TestParameters(input: "CLong.max", output: "celsius_d(CLong.max) - 273.15")
+                TestParameters(input: "Int64.min", output: "celsius_d(Int64.min) - 273.15"),
+                TestParameters(input: "Int64.max", output: "celsius_d(Int64.max) - 273.15")
             ]),
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .celsius, otherSign: .f, parameters: [
-                TestParameters(input: "CLong.min", output: "celsius_f(CLong.min) - 273.15"),
-                TestParameters(input: "CLong.max", output: "celsius_f(CLong.max) - 273.15")
+                TestParameters(input: "Int64.min", output: "celsius_f(Int64.min) - 273.15"),
+                TestParameters(input: "Int64.max", output: "celsius_f(Int64.max) - 273.15")
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .t, parameters: [
-                TestParameters(input: "CUnsignedLong.min", output: "celsius_t(CUnsignedLong.min) - 273"),
-                TestParameters(input: "CUnsignedLong.max", output: "celsius_t(CLong.max)")
+                TestParameters(input: "UInt64.min", output: "celsius_t(UInt64.min) - 273"),
+                TestParameters(input: "UInt64.max", output: "celsius_t(Int64.max)")
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .u, parameters: [
-                TestParameters(input: "CUnsignedLong.min", output: "celsius_u(CUnsignedLong.min)"),
-                TestParameters(input: "CUnsignedLong.max", output: "celsius_u(CUnsignedLong.max) - 273")
+                TestParameters(input: "UInt64.min", output: "celsius_u(UInt64.min)"),
+                TestParameters(input: "UInt64.max", output: "celsius_u(UInt64.max) - 273")
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .f, parameters: [
-                TestParameters(input: "CUnsignedLong.min", output: "celsius_f(CUnsignedLong.min) - 273.15"),
-                TestParameters(input: "CUnsignedLong.max", output: "celsius_f(CUnsignedLong.max) - 273.15")
+                TestParameters(input: "UInt64.min", output: "celsius_f(UInt64.min) - 273.15"),
+                TestParameters(input: "UInt64.max", output: "celsius_f(UInt64.max) - 273.15")
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .celsius, otherSign: .d, parameters: [
-                TestParameters(input: "CUnsignedLong.min", output: "celsius_d(CUnsignedLong.min) - 273.15"),
-                TestParameters(input: "CUnsignedLong.max", output: "celsius_d(CUnsignedLong.max) - 273.15")
+                TestParameters(input: "UInt64.min", output: "celsius_d(UInt64.min) - 273.15"),
+                TestParameters(input: "UInt64.max", output: "celsius_d(UInt64.max) - 273.15")
             ]),
             ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .t, parameters: [
-                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "celsius_t(CLong.min)"),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "celsius_t(CLong.max)")
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "celsius_t(Int64.min)"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "celsius_t(Int64.max)")
             ]),
             ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "celsius_u(CUnsignedLong.min)"
+                    input: "-Float.greatestFiniteMagnitude", output: "celsius_u(UInt64.min)"
                 ),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "celsius_u(CUnsignedLong.max)")
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "celsius_u(UInt64.max)")
             ]),
             ConversionTest(unit: .kelvin, sign: .f, otherUnit: .celsius, otherSign: .f, parameters: [
                 TestParameters(
@@ -129,15 +129,15 @@ final class TemperatureTestGeneratorKDegCTests: XCTestCase, TestParameterTestabl
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .t, parameters: [
-                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "celsius_t(CLong.min)"),
-                TestParameters(input: "Double.greatestFiniteMagnitude", output: "celsius_t(CLong.max)")
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "celsius_t(Int64.min)"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "celsius_t(Int64.max)")
             ]),
             ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "celsius_u(CUnsignedLong.min)"
+                    input: "-Double.greatestFiniteMagnitude", output: "celsius_u(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "Double.greatestFiniteMagnitude", output: "celsius_u(CUnsignedLong.max)"
+                    input: "Double.greatestFiniteMagnitude", output: "celsius_u(UInt64.max)"
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .d, otherUnit: .celsius, otherSign: .f, parameters: [
