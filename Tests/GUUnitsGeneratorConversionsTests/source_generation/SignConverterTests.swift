@@ -42,7 +42,7 @@ final class SignConverterTests: XCTestCase {
         let max = "((double) (9223372036854775807))"
         let min = "((double) (-9223372036854775807 - 1))"
         let expected = "\(round) < \(max) ? (\(round) > \(min) ? " +
-            "\(round) : -9223372036854775807 - 1) : 9223372036854775807"
+            "((centimetres_t) (\(round))) : -9223372036854775807 - 1) : 9223372036854775807"
         XCTAssertEqual(result, "((centimetres_t) (\(expected)))")
     }
 
