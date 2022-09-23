@@ -129,7 +129,7 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     ///   - otherSign: The sign of the fahrenheit parameter.
     /// - Returns: The function body that implements the conversion.
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
-        if otherSign == .d && valueSign == .d {
+        if (otherSign == .d && valueSign == .d) || valueSign == .d {
             let conversion = "celsius * 1.8 + 32.0"
             // swiftlint:disable line_length
             return """
@@ -303,16 +303,22 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     ///   - otherSign: The sign of the kelvin parameter.
     /// - Returns: The function body that implements the conversion.
     private func fahrenheitToKelvin(valueSign: Signs, otherSign: Signs) -> String {
+        let scaleFactor = "const double scaleFactor = 5.0 / 9.0;"
         if valueSign == .d && otherSign == .d {
-            let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0) + 273.15"
-            return "    return ((kelvin_d) (\(conversion)));"
+            return """
+                \(scaleFactor)
+                return ((kelvin_d) (fahrenheit * scaleFactor - 32.0 * scaleFactor + 273.15));
+            """
         }
-        let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0) + 273.15"
+        let conversion = "((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15"
         let roundedConversion = round(value: conversion, from: .d, to: otherSign)
         let typeLimits = otherSign.numericType.limits
         let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
         let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((kelvin_\(otherSign)) (\(maxString)));"
+        return """
+            \(scaleFactor)
+            return ((kelvin_\(otherSign)) (\(maxString)));
+        """
     }
 
     /// A literal representation of the difference between kelvin and celsius (273.15 degrees).

@@ -342,16 +342,22 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testFahrenheitToKelvinDouble() {
         let result = creator.createFunction(unit: .fahrenheit, to: .kelvin, sign: .d, otherSign: .d)
-        let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0) + 273.15"
-        let expected = "    return ((kelvin_d) (\(conversion)));"
+        let conversion = "fahrenheit * scaleFactor - 32.0 * scaleFactor + 273.15"
+        let expected = """
+            const double scaleFactor = 5.0 / 9.0;
+            return ((kelvin_d) (\(conversion)));
+        """
         XCTAssertEqual(result, expected)
     }
 
     func testFahrenheitToKelvinInteger() {
         let result = creator.createFunction(unit: .fahrenheit, to: .kelvin, sign: .t, otherSign: .t)
-        let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0) + 273.15"
+        let conversion = "((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15"
         let minString = "MIN(((double) (9223372036854775807)), (round(\(conversion))))"
-        let expected = "    return ((kelvin_t) (MAX(((double) (-9223372036854775807 - 1)), \(minString))));"
+        let expected = """
+            const double scaleFactor = 5.0 / 9.0;
+            return ((kelvin_t) (MAX(((double) (-9223372036854775807 - 1)), \(minString))));
+        """
         XCTAssertEqual(result, expected)
     }
 
