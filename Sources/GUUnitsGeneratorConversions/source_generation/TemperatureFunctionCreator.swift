@@ -129,36 +129,27 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     ///   - otherSign: The sign of the fahrenheit parameter.
     /// - Returns: The function body that implements the conversion.
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
-        if (otherSign == .d && valueSign == .d) || valueSign == .d {
-            let conversion: String
-            if otherSign == .t || otherSign == .u {
-                conversion = round(value: "celsius * 1.8 + 32.0", from: valueSign, to: otherSign)
-            } else {
-                conversion = "celsius * 1.8 + 32.0"
-            }
-            // swiftlint:disable line_length
-            return """
-                const celsius_d upperLimit = nexttoward((\(valueSign.numericType.limits.1) - 32.0) / 1.8, 0.0);
-                const celsius_d lowerLimit = nexttoward((\(valueSign.numericType.limits.0)) / 1.8, 0.0);
-                if (celsius > upperLimit) {
-                    return ((fahrenheit_d) (\(otherSign.numericType.limits.1)));
-                } else if (celsius < lowerLimit) {
-                    return ((fahrenheit_d) (\(otherSign.numericType.limits.0)));
-                }
-                return ((fahrenheit_d) (\(conversion)));
-            """
-            // swiftlint:enable line_length
-        }
-        let conversion = "((((double) (celsius)) * 1.8) + 32.0)"
-        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        guard otherSign != .d else {
-            return "    return ((fahrenheit_\(otherSign)) (\(roundedConversion)));"
-        }
         let typeLimits = otherSign.numericType.limits
+        guard !(otherSign == .d && valueSign == .d) else {
+            return """
+                const celsius_d upperLimit = nexttoward((\(typeLimits.1) - 32.0) / 1.8, 0.0);
+                const celsius_d lowerLimit = nexttoward((\(typeLimits.0)) / 1.8, 0.0);
+                if (celsius > upperLimit) {
+                    return ((fahrenheit_d) (\(typeLimits.1)));
+                } else if (celsius < lowerLimit) {
+                    return ((fahrenheit_d) (\(typeLimits.0)));
+                }
+                return ((fahrenheit_d) (celsius * 1.8 + 32.0));
+            """
+        }
+        let conversion = round(value: "((double) (celsius)) * 1.8 + 32.0", from: .d, to: otherSign)
+        guard !(valueSign != .d && otherSign == .d) else {
+            return "    return ((fahrenheit_d) (\(conversion)));"
+        }
         return """
             const double upperLimit = nexttoward(((double) (\(typeLimits.1))), 0.0);
             const double lowerLimit = nexttoward(((double) (\(typeLimits.0))), 0.0);
-            const double conversion = \(roundedConversion);
+            const double conversion = \(conversion);
             if (conversion > upperLimit) {
                 return \(typeLimits.1);
             }

@@ -306,7 +306,7 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
         let expected = """
             const double upperLimit = nexttoward(((double) (9223372036854775807)), 0.0);
             const double lowerLimit = nexttoward(((double) (-9223372036854775807 - 1)), 0.0);
-            const double conversion = round(((((double) (celsius)) * 1.8) + 32.0));
+            const double conversion = round(((double) (celsius)) * 1.8 + 32.0);
             if (conversion > upperLimit) {
                 return 9223372036854775807;
             }
