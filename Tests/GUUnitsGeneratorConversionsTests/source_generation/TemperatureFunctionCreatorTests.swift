@@ -303,10 +303,18 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
 
     func testCelsiusToFahrenheitInteger() {
         let result = creator.createFunction(unit: .celsius, to: .fahrenheit, sign: .t, otherSign: .t)
-        let minString = "MIN(((double) (9223372036854775807)), " +
-            "(round(((((double) (celsius)) * 1.8) + 32.0))))"
-        let expected = "    return ((fahrenheit_t) (MAX(((double) " +
-            "(-9223372036854775807 - 1)), \(minString))));"
+        let expected = """
+            const double upperLimit = nexttoward(((double) (9223372036854775807)), 0.0);
+            const double lowerLimit = nexttoward(((double) (-9223372036854775807 - 1)), 0.0);
+            const double conversion = round(((((double) (celsius)) * 1.8) + 32.0));
+            if (conversion > upperLimit) {
+                return 9223372036854775807;
+            }
+            if (conversion < lowerLimit) {
+                return -9223372036854775807 - 1;
+            }
+            return ((fahrenheit_t) (conversion));
+        """
         XCTAssertEqual(result, expected)
     }
 

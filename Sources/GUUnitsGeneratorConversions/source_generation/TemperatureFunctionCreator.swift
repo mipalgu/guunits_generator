@@ -130,7 +130,12 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     /// - Returns: The function body that implements the conversion.
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
         if (otherSign == .d && valueSign == .d) || valueSign == .d {
-            let conversion = "celsius * 1.8 + 32.0"
+            let conversion: String
+            if otherSign == .t || otherSign == .u {
+                conversion = round(value: "celsius * 1.8 + 32.0", from: valueSign, to: otherSign)
+            } else {
+                conversion = "celsius * 1.8 + 32.0"
+            }
             // swiftlint:disable line_length
             return """
                 const celsius_d upperLimit = nexttoward((\(valueSign.numericType.limits.1) - 32.0) / 1.8, 0.0);
@@ -150,9 +155,18 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
             return "    return ((fahrenheit_\(otherSign)) (\(roundedConversion)));"
         }
         let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
+        return """
+            const double upperLimit = nexttoward(((double) (\(typeLimits.1))), 0.0);
+            const double lowerLimit = nexttoward(((double) (\(typeLimits.0))), 0.0);
+            const double conversion = \(roundedConversion);
+            if (conversion > upperLimit) {
+                return \(typeLimits.1);
+            }
+            if (conversion < lowerLimit) {
+                return \(typeLimits.0);
+            }
+            return ((fahrenheit_\(otherSign)) (conversion));
+        """
     }
 
     // swiftlint:disable function_body_length
