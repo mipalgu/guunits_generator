@@ -121,7 +121,8 @@ struct SignConverter {
             let min = "((double) (\(otherMin)))"
             let str2 = "round(\(toDouble))"
             return self.cast(
-                "\(str2) < \(max) ? (\(str2) > \(min) ? \(str2) : \(otherMin)) : \(otherMax)",
+                "\(str2) < \(max) ? (\(str2) > \(min) ? ((\(otherUnit)_\(otherSign.rawValue)) (\(str2)))" +
+                    " : \(otherMin)) : \(otherMax)",
                 to: "\(otherUnit)_\(otherSign.rawValue)"
             )
         }

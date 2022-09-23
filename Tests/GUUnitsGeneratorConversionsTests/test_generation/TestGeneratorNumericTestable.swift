@@ -163,11 +163,11 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         let creator = TestFunctionBodyCreator<Generator.UnitType>()
         return [
             TestParameters(
-                input: numeric.swiftType.limits.0,
+                input: "\(numeric.swiftType)(\(numeric.swiftType.limits.0))",
                 output: "\(unit)_\(sign)(\(expectedOtherMin(from: sign, to: numeric)))"
             ),
             TestParameters(
-                input: numeric.swiftType.limits.1,
+                input: "\(numeric.swiftType)(\(numeric.swiftType.limits.1))",
                 output: "\(unit)_\(sign)(\(expectedOtherMax(from: sign, to: numeric)))"
             ),
             TestParameters(
@@ -206,10 +206,14 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
     func numericTest(unit: Generator.UnitType, sign: Signs) {
         NumericTypes.allCases.forEach {
             let expected = self.numericTests(from: unit, with: sign, to: $0)
-                .union(self.numericTests(from: $0, to: unit, with: sign))
-            let result = generator.testParameters(from: unit, with: sign, to: $0) +
-                generator.testParameters(from: $0, to: unit, with: sign)
+            let result = generator.testParameters(from: unit, with: sign, to: $0)
             guard testSet(result: result, expected: expected) else {
+                XCTFail("Failing test for celsius_t to \($0.rawValue) conversion")
+                return
+            }
+            let expected2 = self.numericTests(from: $0, to: unit, with: sign)
+            let result2 = generator.testParameters(from: $0, to: unit, with: sign)
+            guard testSet(result: result2, expected: expected2) else {
                 XCTFail("Failing test for celsius_t to \($0.rawValue) conversion")
                 return
             }
@@ -225,7 +229,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         switch sign {
         case .t:
             switch numeric {
-            case .int16, .int8, .uint, .uint8, .uint16, .uint32, .uint64, .ulong, .int, .int32:
+            case .int16, .int8, .uint, .uint8, .uint16, .uint32, .uint64, .ulong, .int, .int32, .long:
                 return numeric.swiftType.limits.0
             default:
                 return sign.numericType.swiftType.limits.0
@@ -277,7 +281,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         switch sign {
         case .t:
             switch numeric {
-            case .int16, .int8, .uint8, .uint16, .int, .int32, .uint, .uint32:
+            case .int16, .int8, .uint8, .uint16, .int, .int32, .uint, .uint32, .long:
                 return numeric.swiftType.limits.1
             default:
                 return sign.numericType.swiftType.limits.1
