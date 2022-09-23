@@ -151,6 +151,36 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         ]
     }
 
+    /// Create test parameters for a numeric to unit type conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: The test parameters testing the conversion.
+    func numericTests(
+        from numeric: NumericTypes, to unit: Generator.UnitType, with sign: Signs
+    ) -> Set<TestParameters> {
+        let creator = TestFunctionBodyCreator<Generator.UnitType>()
+        return [
+            TestParameters(
+                input: numeric.swiftType.limits.0,
+                output: "\(unit)_\(sign)(\(expectedOtherMin(from: sign, to: numeric)))"
+            ),
+            TestParameters(
+                input: numeric.swiftType.limits.1,
+                output: "\(unit)_\(sign)(\(expectedOtherMax(from: sign, to: numeric)))"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "0.0", to: numeric),
+                output: creator.sanitiseLiteral(literal: "0.0", sign: sign)
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "5.0", to: numeric),
+                output: creator.sanitiseLiteral(literal: "5.0", sign: sign)
+            )
+        ]
+    }
+
     /// Perform a unit test for all sign conversions from a unit type.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -176,7 +206,9 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
     func numericTest(unit: Generator.UnitType, sign: Signs) {
         NumericTypes.allCases.forEach {
             let expected = self.numericTests(from: unit, with: sign, to: $0)
-            let result = generator.testParameters(from: unit, with: sign, to: $0)
+                .union(self.numericTests(from: $0, to: unit, with: sign))
+            let result = generator.testParameters(from: unit, with: sign, to: $0) +
+                generator.testParameters(from: $0, to: unit, with: sign)
             guard testSet(result: result, expected: expected) else {
                 XCTFail("Failing test for celsius_t to \($0.rawValue) conversion")
                 return
