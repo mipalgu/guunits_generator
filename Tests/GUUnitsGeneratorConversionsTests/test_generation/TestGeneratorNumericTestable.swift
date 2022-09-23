@@ -229,7 +229,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         switch sign {
         case .t:
             switch numeric {
-            case .int16, .int8, .uint, .uint8, .uint16, .uint32, .uint64, .ulong, .int, .int32, .long:
+            case .int16, .int8, .uint8, .uint16, .uint32, .uint64, .int32:
                 return numeric.swiftType.limits.0
             default:
                 return sign.numericType.swiftType.limits.0
@@ -281,7 +281,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         switch sign {
         case .t:
             switch numeric {
-            case .int16, .int8, .uint8, .uint16, .int, .int32, .uint, .uint32, .long:
+            case .int16, .int8, .uint8, .uint16, .int32, .uint32:
                 return numeric.swiftType.limits.1
             default:
                 return sign.numericType.swiftType.limits.1

@@ -103,19 +103,13 @@ public enum SwiftNumericTypes: String, Hashable, CaseIterable {
     /// A swift double-precision floating point number.
     case Double
 
-    /// A swift representation of a C long.
-    case CLong
-
-    /// A swift representation of a C unsigned long.
-    case CUnsignedLong
-
     // swiftlint:enable identifier_name
 
     /// An array of all types unique to the swift programming language.
     public static var uniqueTypes: [SwiftNumericTypes] {
         Array(
             Set(SwiftNumericTypes.allCases)
-                .subtracting([.CInt, .CUnsignedInt, .CLong, .CUnsignedLong])
+                .subtracting([.CInt, .CUnsignedInt])
                 .sorted { $0.rawValue < $1.rawValue }
         )
     }
@@ -161,19 +155,15 @@ public enum SwiftNumericTypes: String, Hashable, CaseIterable {
             return .float
         case .Double:
             return .double
-        case .CLong:
-            return .long
-        case .CUnsignedLong:
-            return .ulong
         }
     }
 
     /// The guunits sign for the swift type.
     var sign: Signs {
         switch self {
-        case .Int8, .Int16, .Int32, .Int64, .Int, .CInt, .CLong:
+        case .Int8, .Int16, .Int32, .Int64, .Int, .CInt:
             return .t
-        case .UInt8, .UInt16, .UInt32, .UInt64, .UInt, .CUnsignedInt, .CUnsignedLong:
+        case .UInt8, .UInt16, .UInt32, .UInt64, .UInt, .CUnsignedInt:
             return .u
         case .Float:
             return .f

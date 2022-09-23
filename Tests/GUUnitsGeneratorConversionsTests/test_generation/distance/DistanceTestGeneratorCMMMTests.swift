@@ -245,7 +245,8 @@ final class DistanceTestGeneratorCMMMTests: XCTestCase, TestParameterTestable, T
     ///   - otherSign: The new sign.
     /// - Returns: An expected value in a test case for a float to int conversion.
     private func floatToInt(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
-        "millimetres_\(otherSign)((\(creator.sanitiseLiteral(literal: "\(value)", sign: sign)) * " +
+        "millimetres_\(otherSign)((\(sign.numericType.swiftType)" +
+            "(\(creator.sanitiseLiteral(literal: "\(value)", sign: sign))) * " +
             creator.sanitiseLiteral(literal: scaleFactor, sign: sign) + ").rounded())"
     }
 

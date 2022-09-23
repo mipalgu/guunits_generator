@@ -449,10 +449,10 @@ public struct SwiftFileCreator {
         case .Float:
             body = "self.rawValue = .\(value.description.lowercased())_f" +
                 "(\(value.description.capitalized)_f(value))"
-        case .Int, .CInt, .Int16, .Int8, .Int32, .CLong:
+        case .Int, .CInt, .Int16, .Int8, .Int32:
             body = "self.rawValue = .\(value.description.lowercased())_t" +
                 "(\(value.description.capitalized)_t(value))"
-        case .UInt, .CUnsignedInt, .UInt8, .UInt16, .UInt32, .CUnsignedLong:
+        case .UInt, .CUnsignedInt, .UInt8, .UInt16, .UInt32:
             body = "self.rawValue = .\(value.description.lowercased())_u" +
                 "(\(value.description.capitalized)_u(value))"
         }

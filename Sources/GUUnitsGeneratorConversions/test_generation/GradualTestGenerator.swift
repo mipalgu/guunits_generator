@@ -390,7 +390,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
         }
         return TestParameters(
             input: sanitisedLiteral,
-            output: "\(otherUnit)_\(otherSign)((\(sanitisedLiteral) " +
+            output: "\(otherUnit)_\(otherSign)((\(sign.numericType.swiftType)(\(sanitisedLiteral)) " +
                 "\(operation) \(sanitisedScaleFactor)).rounded())"
         )
     }

@@ -9,12 +9,12 @@ final class NumericTypeConverterTests: XCTestCase {
 
     /// Test the cast works for the same underlying C-type.
     func testSameType() {
-        let result = converter.convert("x", from: .int, to: DistanceUnits.centimetres, sign: .t)
+        let result = converter.convert("x", from: .int32, to: DistanceUnits.centimetres, sign: .t)
         XCTAssertEqual(result, "((centimetres_t) (x))")
-        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .int)
+        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .int32)
         XCTAssertEqual(
             result2,
-            "((int) (MIN(((centimetres_t) (INT_MAX)), MAX(((centimetres_t) (INT_MIN)), x))))"
+            "((int32_t) (MIN(((centimetres_t) (2147483647)), MAX(((centimetres_t) (-2147483648)), x))))"
         )
     }
 
@@ -55,20 +55,20 @@ final class NumericTypeConverterTests: XCTestCase {
 
     /// Test convert int to double.
     func testIntToDouble() {
-        let result = converter.convert("x", from: .int, to: DistanceUnits.centimetres, sign: .d)
+        let result = converter.convert("x", from: .int32, to: DistanceUnits.centimetres, sign: .d)
         XCTAssertEqual(result, "((centimetres_d) (x))")
-        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .d, to: .int)
-        XCTAssertEqual(result2, "d_to_i(((double) (x)))")
+        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .d, to: .int32)
+        XCTAssertEqual(result2, "d_to_i32(((double) (x)))")
     }
 
     /// Test case for unsigned to signed conversion.
     func testUToI() {
-        let result = converter.convert("x", from: .uint, to: DistanceUnits.centimetres, sign: .t)
+        let result = converter.convert("x", from: .uint32, to: DistanceUnits.centimetres, sign: .t)
         XCTAssertEqual(result, "((centimetres_t) (x))")
-        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .uint)
+        let result2 = converter.convert("x", from: DistanceUnits.centimetres, sign: .t, to: .uint32)
         XCTAssertEqual(
             result2,
-            "((unsigned int) (MAX(((centimetres_t) (0)), x)))"
+            "((uint32_t) (MAX(((centimetres_t) (0)), x)))"
         )
     }
 
