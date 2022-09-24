@@ -309,20 +309,20 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     /// - Returns: The function body that implements the conversion.
     private func fahrenheitToKelvin(valueSign: Signs, otherSign: Signs) -> String {
         let scaleFactor = "const double scaleFactor = 5.0 / 9.0;"
-        if valueSign == .d && otherSign == .d {
+        if (valueSign == .d && otherSign == .d) || otherSign == .d {
             return """
                 \(scaleFactor)
-                return ((kelvin_d) (fahrenheit * scaleFactor - 32.0 * scaleFactor + 273.15));
+                return ((kelvin_d) (((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15));
             """
         }
-        let conversion = "((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15"
-        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
+        let conversion = round(
+            value: "((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15",
+            from: .d,
+            to: otherSign
+        )
         return """
             \(scaleFactor)
-            return ((kelvin_\(otherSign)) (\(maxString)));
+            return ((kelvin_\(otherSign)) (d_to_\(otherSign.numericType.abbreviation)(\(conversion))));
         """
     }
 
