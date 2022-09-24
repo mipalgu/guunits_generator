@@ -84,27 +84,25 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
             Signs.allCases.map { sign in
                 (
                     unit.rawValue.capitalized + "_" + sign.rawValue,
-                    group(
-                        tests: (
-                            Unit.allCases.flatMap { otherUnit in
-                                Signs.allCases.flatMap { otherSign in
-                                    self.createTests(
-                                        from: unit,
-                                        with: sign,
-                                        to: otherUnit,
-                                        with: otherSign,
-                                        using: generator
-                                    )
-                                }
-                            } +
-                            NumericTypes.allCases.flatMap { numeric in
-                                self.createTests(from: unit, with: sign, to: numeric, using: generator) +
-                                    self.createTests(from: numeric, to: unit, with: sign, using: generator)
+                    (
+                        Unit.allCases.flatMap { otherUnit in
+                            Signs.allCases.flatMap { otherSign in
+                                self.createTests(
+                                    from: unit,
+                                    with: sign,
+                                    to: otherUnit,
+                                    with: otherSign,
+                                    using: generator
+                                )
                             }
-                        )
-                        .sorted(),
-                        groupSize: 30
+                        } +
+                        NumericTypes.allCases.flatMap { numeric in
+                            self.createTests(from: unit, with: sign, to: numeric, using: generator) +
+                                self.createTests(from: numeric, to: unit, with: sign, using: generator)
+                        }
                     )
+                    .sorted()
+                    .group(size: 30)
                 )
             }
         }
@@ -127,23 +125,6 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
                 )
             }
         }
-    }
-
-    /// Groups an array of strings into groups of a particular size.
-    /// - Parameters:
-    ///   - tests: The strings to group.
-    ///   - groupSize: The size of each group.
-    /// - Returns: An array of grouped strings.
-    private func group(tests: [String], groupSize: Int) -> [[String]] {
-        var classTests: [[String]] = []
-        classTests.reserveCapacity(tests.count + (tests.count % groupSize > 0 ? 1 : 0))
-        var remainingTests = tests
-        while !remainingTests.isEmpty {
-            let maxIndex = min(remainingTests.count, groupSize)
-            classTests.append(Array(remainingTests[0..<maxIndex]))
-            remainingTests = Array(remainingTests.dropFirst(maxIndex))
-        }
-        return classTests
     }
 
     /// Create tests for a unit to unit conversion.
