@@ -46,7 +46,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+// GNU General Public License for more details.gs_t
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see http://www.gnu.org/licenses/
@@ -69,92 +69,92 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
     /// All conversion test parameters to test.
     var conversions: [ConversionTest<AccelerationUnits>] {
         [
-            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .g, otherSign: .t, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .t)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .t)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .t)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .t)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .g, otherSign: .u, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: "CUnsignedInt.min"
+                    input: "Int64.min", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .u)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .u)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .g, otherSign: .f, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .f)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .f)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .f)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .g, otherSign: .d, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .t, otherUnit: .gs, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .d)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .d)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .d)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .g, otherSign: .t, parameters: [
-                TestParameters(input: "CUnsignedInt.min", output: "g_t(CUnsignedInt.min)"),
+            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .t, parameters: [
+                TestParameters(input: "UInt64.min", output: "gs_t(UInt64.min)"),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .t)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .t)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .g, otherSign: .u, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min", output: "CUnsignedInt.min"
+                    input: "UInt64.min", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .u)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .u)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .g, otherSign: .f, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: "g_f(CUnsignedInt.min)"
+                    input: "UInt64.min",
+                    output: "gs_f(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .f)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .f)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .g, otherSign: .d, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .u, otherUnit: .gs, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: "g_d(CUnsignedInt.min)"
+                    input: "UInt64.min",
+                    output: "gs_d(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .d)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .d)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .g, otherSign: .t, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "CInt.min"
+                    input: "-Float.greatestFiniteMagnitude", output: "Int64.min"
                 ),
                 TestParameters(
                     input: "Float.greatestFiniteMagnitude",
-                    output: "CInt.max"
+                    output: "Int64.max"
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .g, otherSign: .u, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "CUnsignedInt.min"
+                    input: "-Float.greatestFiniteMagnitude", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "Float.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                    input: "Float.greatestFiniteMagnitude", output: "UInt64.max"
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .g, otherSign: .f, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .f, parameters: [
                 TestParameters(
                     input: "-Float.greatestFiniteMagnitude",
                     output: conversion(value: "-Float.greatestFiniteMagnitude", sign: .f, otherSign: .f)
@@ -164,7 +164,7 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
                     output: conversion(value: "Float.greatestFiniteMagnitude", sign: .f, otherSign: .f)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .g, otherSign: .d, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .f, otherUnit: .gs, otherSign: .d, parameters: [
                 TestParameters(
                     input: "-Float.greatestFiniteMagnitude",
                     output: conversion(value: "-Float.greatestFiniteMagnitude", sign: .f, otherSign: .d)
@@ -174,24 +174,24 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
                     output: conversion(value: "Float.greatestFiniteMagnitude", sign: .f, otherSign: .d)
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .g, otherSign: .t, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "CInt.min"
+                    input: "-Double.greatestFiniteMagnitude", output: "Int64.min"
                 ),
                 TestParameters(
                     input: "Double.greatestFiniteMagnitude",
-                    output: "CInt.max"
+                    output: "Int64.max"
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .g, otherSign: .u, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "CUnsignedInt.min"
+                    input: "-Double.greatestFiniteMagnitude", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "Double.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                    input: "Double.greatestFiniteMagnitude", output: "UInt64.max"
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .g, otherSign: .f, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .f, parameters: [
                 TestParameters(
                     input: "-Double.greatestFiniteMagnitude",
                     output: "-Float.greatestFiniteMagnitude"
@@ -201,7 +201,7 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
                     output: "Float.greatestFiniteMagnitude"
                 )
             ]),
-            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .g, otherSign: .d, parameters: [
+            ConversionTest(unit: .metresPerSecond2, sign: .d, otherUnit: .gs, otherSign: .d, parameters: [
                 TestParameters(
                     input: "-Double.greatestFiniteMagnitude",
                     output: conversion(value: "-Double.greatestFiniteMagnitude", sign: .d, otherSign: .d)
@@ -293,15 +293,15 @@ final class AccelerationTestGeneratorMps2ToGTests: XCTestCase, TestParameterTest
             let literal = self.creator.sanitiseLiteral(literal: value, to: .double)
             let calculation = "\(literal) / 9.807"
             guard otherSign.isFloatingPoint else {
-                return "g_\(otherSign)((\(calculation)).rounded())"
+                return "gs_\(otherSign)((\(calculation)).rounded())"
             }
-            return "g_\(otherSign)(\(calculation))"
+            return "gs_\(otherSign)(\(calculation))"
         }
         let literal = creator.sanitiseLiteral(literal: value, sign: sign)
         guard otherSign.isFloatingPoint else {
-            return "g_\(otherSign)((Double(\(literal)) / 9.807).rounded())"
+            return "gs_\(otherSign)((Double(\(literal)) / 9.807).rounded())"
         }
-        return "g_\(otherSign)(Double(\(literal)) / 9.807)"
+        return "gs_\(otherSign)(Double(\(literal)) / 9.807)"
     }
 
 }

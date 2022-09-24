@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// Mass.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,43 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// Unit for representing mass.
+public enum MassUnits: String, UnitProtocol {
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+    /// Micrograms.
+    case microgram
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
-        )
+    /// Milligrams.
+    case milligram
+
+    /// Grams.
+    case gram
+
+    /// Kilograms.
+    case kilogram
+
+    /// Megagrams or Metric Tonnes.
+    case megagram
+
+    /// The abbreviation of the unit.
+    public var abbreviation: String {
+        switch self {
+        case .microgram:
+            return "ug"
+        case .milligram:
+            return "mg"
+        case .gram:
+            return "g"
+        case .kilogram:
+            return "kg"
+        case .megagram:
+            return "Mg"
+        }
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
-    }
-
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// The string equivalent value of the unit.
+    public var description: String {
+        self.rawValue
     }
 
 }

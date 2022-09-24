@@ -59,9 +59,6 @@
 /// The numeric types supported by guunits.
 public enum NumericTypes: String {
 
-    /// An integer type.
-    case int = "int"
-
     /// An 8-bit integer type.
     case int8 = "int8_t"
 
@@ -73,9 +70,6 @@ public enum NumericTypes: String {
 
     /// A 64-bit integer type.
     case int64 = "int64_t"
-
-    /// An unsigned integer type.
-    case uint = "unsigned int"
 
     /// An 8-bit unsigned integer type.
     case uint8 = "uint8_t"
@@ -103,8 +97,6 @@ extension NumericTypes {
     /// The guunits abbreviation of the supported types.
     var abbreviation: String {
         switch self {
-        case .int:
-            return "i"
         case .int8:
             return "i8"
         case .int16:
@@ -113,8 +105,6 @@ extension NumericTypes {
             return "i32"
         case .int64:
             return "i64"
-        case .uint:
-            return "u"
         case .uint8:
             return "u8"
         case .uint16:
@@ -133,7 +123,7 @@ extension NumericTypes {
     /// This property returns true when the type is a *signed* type.
     var isSigned: Bool {
         switch self {
-        case .int, .int8, .int16, .int32, .int64, .float, .double:
+        case .int8, .int16, .int32, .int64, .float, .double:
             return true
         default:
             return false
@@ -154,8 +144,6 @@ extension NumericTypes {
     /// int -> uint, int8 -> uint8, etc. Floating point types do not have an opposite.
     var opposite: NumericTypes {
         switch self {
-        case .int:
-            return .uint
         case .int8:
             return .uint8
         case .int16:
@@ -164,8 +152,6 @@ extension NumericTypes {
             return .uint32
         case .int64:
             return .uint64
-        case .uint:
-            return .int
         case .uint8:
             return .int8
         case .uint16:
@@ -187,8 +173,6 @@ extension NumericTypes {
         switch self {
         case .int32:
             return ("-2147483648", "2147483647")
-        case .int:
-            return ("INT_MIN", "INT_MAX")
         case .int8:
             return ("-128", "127")
         case .int16:
@@ -197,8 +181,6 @@ extension NumericTypes {
             return ("-9223372036854775807 - 1", "9223372036854775807")
         case .uint32:
             return ("0", "4294967295U")
-        case .uint:
-            return ("0", "UINT_MAX")
         case .uint8:
             return ("0", "255")
         case .uint16:
@@ -223,8 +205,6 @@ extension NumericTypes {
             return .Int32
         case .int64:
             return .Int64
-        case .int:
-            return .CInt
         case .uint8:
             return .UInt8
         case .uint16:
@@ -233,8 +213,6 @@ extension NumericTypes {
             return .UInt32
         case .uint64:
             return .UInt64
-        case .uint:
-            return .CUnsignedInt
         case .float:
             return .Float
         case .double:
@@ -260,16 +238,16 @@ extension NumericTypes {
             return other != .int8
         case .int16:
             return other != .int8 && other != .int16
-        case .int32, .int:
-            return other != .int8 && other != .int16 && other != .int32 && other != .int
+        case .int32:
+            return other != .int8 && other != .int16 && other != .int32
         case .int64:
             return false
         case .uint8:
             return true
         case .uint16:
             return other != .uint8
-        case .uint32, .uint:
-            return other != .uint8 && other != .uint16 && other != .uint32 && other != .uint
+        case .uint32:
+            return other != .uint8 && other != .uint16 && other != .uint32
         case .uint64:
             return false
         case .float:

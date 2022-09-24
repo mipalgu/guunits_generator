@@ -72,82 +72,82 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
         [
             ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .t)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .t)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .t)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .t)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: "CUnsignedInt.min"
+                    input: "Int64.min", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .u)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .f)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .f)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .t, otherUnit: .celsius, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .d)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .d)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .t)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .t)
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: "CInt.max"
+                    input: "UInt64.max",
+                    output: "Int64.max"
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min", output: "CUnsignedInt.min"
+                    input: "UInt64.min", output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .u)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .f)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .f)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .u, otherUnit: .celsius, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .d)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .d)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .t, parameters: [
-                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "CInt.min"),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "CInt.max")
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "Int64.min"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "Int64.max")
             ]),
             ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .u, parameters: [
-                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "CUnsignedInt.min"),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "CUnsignedInt.max")
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "UInt64.min"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "UInt64.max")
             ]),
             ConversionTest(unit: .fahrenheit, sign: .f, otherUnit: .celsius, otherSign: .f, parameters: [
                 TestParameters(
@@ -170,12 +170,12 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
                 )
             ]),
             ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .t, parameters: [
-                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "CInt.min"),
-                TestParameters(input: "Double.greatestFiniteMagnitude", output: "CInt.max")
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "Int64.min"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "Int64.max")
             ]),
             ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .u, parameters: [
-                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "CUnsignedInt.min"),
-                TestParameters(input: "Double.greatestFiniteMagnitude", output: "CUnsignedInt.max")
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "UInt64.min"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "UInt64.max")
             ]),
             ConversionTest(unit: .fahrenheit, sign: .d, otherUnit: .celsius, otherSign: .f, parameters: [
                 TestParameters(
@@ -254,7 +254,7 @@ final class TemperatureTestGeneratorDegFToDegCTests: XCTestCase,
                     ["-250", "-2500", "-25000", "-250000", "-2500000", "-40"].map {
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: $0, sign: sign),
-                            output: "CUnsignedInt.min"
+                            output: "UInt64.min"
                         )
                     }
                 )

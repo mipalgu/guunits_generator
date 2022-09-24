@@ -151,6 +151,36 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         ]
     }
 
+    /// Create test parameters for a numeric to unit type conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: The test parameters testing the conversion.
+    func numericTests(
+        from numeric: NumericTypes, to unit: Generator.UnitType, with sign: Signs
+    ) -> Set<TestParameters> {
+        let creator = TestFunctionBodyCreator<Generator.UnitType>()
+        return [
+            TestParameters(
+                input: "\(numeric.swiftType)(\(numeric.swiftType.limits.0))",
+                output: "\(unit)_\(sign)(\(expectedOtherMin(from: sign, to: numeric)))"
+            ),
+            TestParameters(
+                input: "\(numeric.swiftType)(\(numeric.swiftType.limits.1))",
+                output: "\(unit)_\(sign)(\(expectedOtherMax(from: sign, to: numeric)))"
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "0.0", to: numeric),
+                output: creator.sanitiseLiteral(literal: "0.0", sign: sign)
+            ),
+            TestParameters(
+                input: creator.sanitiseLiteral(literal: "5.0", to: numeric),
+                output: creator.sanitiseLiteral(literal: "5.0", sign: sign)
+            )
+        ]
+    }
+
     /// Perform a unit test for all sign conversions from a unit type.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -181,6 +211,12 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
                 XCTFail("Failing test for celsius_t to \($0.rawValue) conversion")
                 return
             }
+            let expected2 = self.numericTests(from: $0, to: unit, with: sign)
+            let result2 = generator.testParameters(from: $0, to: unit, with: sign)
+            guard testSet(result: result2, expected: expected2) else {
+                XCTFail("Failing test for celsius_t to \($0.rawValue) conversion")
+                return
+            }
         }
     }
 
@@ -193,7 +229,7 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         switch sign {
         case .t:
             switch numeric {
-            case .int16, .int8, .uint, .uint8, .uint16, .uint32, .uint64:
+            case .int16, .int8, .uint8, .uint16, .uint32, .uint64, .int32:
                 return numeric.swiftType.limits.0
             default:
                 return sign.numericType.swiftType.limits.0
@@ -245,14 +281,14 @@ extension TestGeneratorNumericTestable where Self: TestParameterTestable {
         switch sign {
         case .t:
             switch numeric {
-            case .int16, .int8, .uint8, .uint16:
+            case .int16, .int8, .uint8, .uint16, .int32, .uint32:
                 return numeric.swiftType.limits.1
             default:
                 return sign.numericType.swiftType.limits.1
             }
         case .u:
             switch numeric {
-            case .uint64, .float, .double, .int64:
+            case .float, .double:
                 return sign.numericType.swiftType.limits.1
             default:
                 return numeric.swiftType.limits.1

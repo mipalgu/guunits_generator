@@ -79,12 +79,12 @@ final class FunctionHelpersTests: XCTestCase {
     /// Test create test function name for numeric to unit conversion.
     func testTestFunctionNameUsingNumericToUnitConversion() {
         let result = helper.testFunctionName(
-            from: .int,
+            from: .int32,
             to: TemperatureUnits.fahrenheit,
             with: .u,
             using: TestParameters(input: "2", output: "2")
         )
-        let expected = "testintTofahrenheit_uUsing2Expecting2"
+        let expected = "testint32_tTofahrenheit_uUsing2Expecting2"
         XCTAssertEqual(result, expected)
     }
 

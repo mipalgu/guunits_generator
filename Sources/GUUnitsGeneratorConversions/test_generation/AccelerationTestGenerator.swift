@@ -114,7 +114,7 @@ struct AccelerationTestGenerator: TestGenerator {
         let otherUpperLimit = otherSign.numericType.swiftType.limits.1
         let lowerLimitAsOther = "\(otherUnit)_\(otherSign)(\(lowerLimit))"
         guard sign != otherSign else {
-            if unit == .g {
+            if unit == .gs {
                 newTests += [
                     TestParameters(input: lowerLimit, output: otherLowerLimit),
                     TestParameters(input: upperLimit, output: otherUpperLimit)
@@ -135,7 +135,7 @@ struct AccelerationTestGenerator: TestGenerator {
             return newTests
         }
         switch (unit, otherUnit) {
-        case (.metresPerSecond2, .g):
+        case (.metresPerSecond2, .gs):
             switch (sign, otherSign) {
             case (.t, .u):
                 newTests += [
@@ -160,7 +160,7 @@ struct AccelerationTestGenerator: TestGenerator {
             default:
                 break
             }
-        case (.g, .metresPerSecond2):
+        case (.gs, .metresPerSecond2):
             switch (sign, otherSign) {
             case (.u, .t):
                 newTests += [
@@ -235,13 +235,13 @@ struct AccelerationTestGenerator: TestGenerator {
         let calculation: String
         let literal = creator.sanitiseLiteral(literal: value, sign: sign)
         switch (unit, otherUnit) {
-        case (.metresPerSecond2, .g):
+        case (.metresPerSecond2, .gs):
             if sign == .d {
                 calculation = "\(creator.sanitiseLiteral(literal: value, to: .double)) / 9.807"
             } else {
                 calculation = "Double(\(literal)) / 9.807"
             }
-        case (.g, .metresPerSecond2):
+        case (.gs, .metresPerSecond2):
             if sign == .d {
                 calculation = "\(creator.sanitiseLiteral(literal: value, to: .double)) * 9.807"
             } else {

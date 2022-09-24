@@ -7,6 +7,15 @@ public typealias DistanceUnitsGenerator = UnitsGenerator<
     >
 >
 
+/// Mass Units Generator
+public typealias MassUnitsGenerator = UnitsGenerator<
+    CompositeFunctionCreator<
+        GradualFunctionCreator<MassUnits>,
+        CFunctionDefinitionCreator<MassUnits>,
+        NumericTypeConverter
+    >
+>
+
 /// Current Units Generator
 public typealias CurrentUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<

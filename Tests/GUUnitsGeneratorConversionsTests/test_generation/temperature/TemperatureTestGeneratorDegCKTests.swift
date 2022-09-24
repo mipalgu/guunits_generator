@@ -70,8 +70,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         let expected: Set<TestParameters> = [
             TestParameters(input: "0", output: "273"),
             TestParameters(input: "1", output: "274"),
-            TestParameters(input: "CUnsignedInt.min", output: "kelvin_u(CUnsignedInt.min) + 273"),
-            TestParameters(input: "CUnsignedInt.max", output: "kelvin_u(CUnsignedInt.max)"),
+            TestParameters(input: "UInt64.min", output: "kelvin_u(UInt64.min) + 273"),
+            TestParameters(input: "UInt64.max", output: "kelvin_u(UInt64.max)"),
             TestParameters(input: "5", output: "278")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
@@ -84,8 +84,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1", output: "274"),
             TestParameters(input: "-273", output: "0"),
             TestParameters(input: "-272", output: "1"),
-            TestParameters(input: "CInt.min", output: "kelvin_u(CUnsignedInt.min)"),
-            TestParameters(input: "CInt.max", output: "kelvin_u(CInt.max) + 273"),
+            TestParameters(input: "Int64.min", output: "kelvin_u(UInt64.min)"),
+            TestParameters(input: "Int64.max", output: "kelvin_u(Int64.max) + 273"),
             TestParameters(input: "5", output: "278"),
             TestParameters(input: "-300", output: "0")
         ]
@@ -99,8 +99,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1.0", output: "274"),
             TestParameters(input: "-273.0", output: "0"),
             TestParameters(input: "-272.0", output: "1"),
-            TestParameters(input: "-Float.greatestFiniteMagnitude", output: "kelvin_u(CUnsignedInt.min)"),
-            TestParameters(input: "Float.greatestFiniteMagnitude", output: "kelvin_u(CUnsignedInt.max)"),
+            TestParameters(input: "-Float.greatestFiniteMagnitude", output: "kelvin_u(UInt64.min)"),
+            TestParameters(input: "Float.greatestFiniteMagnitude", output: "kelvin_u(UInt64.max)"),
             TestParameters(input: "5.0", output: "278"),
             TestParameters(input: "-300.0", output: "0")
         ]
@@ -114,8 +114,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1.0", output: "274"),
             TestParameters(input: "-273.0", output: "0"),
             TestParameters(input: "-272.0", output: "1"),
-            TestParameters(input: "-Double.greatestFiniteMagnitude", output: "kelvin_u(CUnsignedInt.min)"),
-            TestParameters(input: "Double.greatestFiniteMagnitude", output: "kelvin_u(CUnsignedInt.max)"),
+            TestParameters(input: "-Double.greatestFiniteMagnitude", output: "kelvin_u(UInt64.min)"),
+            TestParameters(input: "Double.greatestFiniteMagnitude", output: "kelvin_u(UInt64.max)"),
             TestParameters(input: "5.0", output: "278"),
             TestParameters(input: "-300.0", output: "0")
         ]
@@ -127,8 +127,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         let expected: Set<TestParameters> = [
             TestParameters(input: "0", output: "273"),
             TestParameters(input: "1", output: "274"),
-            TestParameters(input: "CUnsignedInt.min", output: "kelvin_t(CUnsignedInt.min) + 273"),
-            TestParameters(input: "CUnsignedInt.max", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "UInt64.min", output: "kelvin_t(UInt64.min) + 273"),
+            TestParameters(input: "UInt64.max", output: "kelvin_t(Int64.max)"),
             TestParameters(input: "5", output: "278")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
@@ -141,8 +141,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1", output: "274"),
             TestParameters(input: "-273", output: "0"),
             TestParameters(input: "-272", output: "1"),
-            TestParameters(input: "CInt.min", output: "kelvin_t(CInt.min) + 273"),
-            TestParameters(input: "CInt.max", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "Int64.min", output: "kelvin_t(Int64.min) + 273"),
+            TestParameters(input: "Int64.max", output: "kelvin_t(Int64.max)"),
             TestParameters(input: "5", output: "278"),
             TestParameters(input: "-300", output: "-27")
         ]
@@ -156,8 +156,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1.0", output: "274"),
             TestParameters(input: "-273.0", output: "0"),
             TestParameters(input: "-272.0", output: "1"),
-            TestParameters(input: "-Float.greatestFiniteMagnitude", output: "kelvin_t(CInt.min)"),
-            TestParameters(input: "Float.greatestFiniteMagnitude", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "-Float.greatestFiniteMagnitude", output: "kelvin_t(Int64.min)"),
+            TestParameters(input: "Float.greatestFiniteMagnitude", output: "kelvin_t(Int64.max)"),
             TestParameters(input: "5.0", output: "278"),
             TestParameters(input: "-300.0", output: "-27")
         ]
@@ -171,8 +171,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1.0", output: "274"),
             TestParameters(input: "-273.0", output: "0"),
             TestParameters(input: "-272.0", output: "1"),
-            TestParameters(input: "-Double.greatestFiniteMagnitude", output: "kelvin_t(CInt.min)"),
-            TestParameters(input: "Double.greatestFiniteMagnitude", output: "kelvin_t(CInt.max)"),
+            TestParameters(input: "-Double.greatestFiniteMagnitude", output: "kelvin_t(Int64.min)"),
+            TestParameters(input: "Double.greatestFiniteMagnitude", output: "kelvin_t(Int64.max)"),
             TestParameters(input: "5.0", output: "278"),
             TestParameters(input: "-300.0", output: "-27")
         ]
@@ -184,8 +184,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         let expected: Set<TestParameters> = [
             TestParameters(input: "0", output: "273.15"),
             TestParameters(input: "1", output: "274.15"),
-            TestParameters(input: "CUnsignedInt.min", output: "kelvin_f(CUnsignedInt.min) + 273.15"),
-            TestParameters(input: "CUnsignedInt.max", output: "kelvin_f(CUnsignedInt.max) + 273.15"),
+            TestParameters(input: "UInt64.min", output: "kelvin_f(UInt64.min) + 273.15"),
+            TestParameters(input: "UInt64.max", output: "kelvin_f(UInt64.max) + 273.15"),
             TestParameters(input: "5", output: "278.15")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
@@ -198,8 +198,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1", output: "274.15"),
             TestParameters(input: "-273", output: "0.15"),
             TestParameters(input: "-272", output: "1.15"),
-            TestParameters(input: "CInt.min", output: "kelvin_f(CInt.min) + 273.15"),
-            TestParameters(input: "CInt.max", output: "kelvin_f(CInt.max) + 273.15"),
+            TestParameters(input: "Int64.min", output: "kelvin_f(Int64.min) + 273.15"),
+            TestParameters(input: "Int64.max", output: "kelvin_f(Int64.max) + 273.15"),
             TestParameters(input: "5", output: "278.15"),
             TestParameters(input: "-300", output: "-26.85")
         ]
@@ -251,8 +251,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
         let expected: Set<TestParameters> = [
             TestParameters(input: "0", output: "273.15"),
             TestParameters(input: "1", output: "274.15"),
-            TestParameters(input: "CUnsignedInt.min", output: "kelvin_d(CUnsignedInt.min) + 273.15"),
-            TestParameters(input: "CUnsignedInt.max", output: "kelvin_d(CUnsignedInt.max) + 273.15"),
+            TestParameters(input: "UInt64.min", output: "kelvin_d(UInt64.min) + 273.15"),
+            TestParameters(input: "UInt64.max", output: "kelvin_d(UInt64.max) + 273.15"),
             TestParameters(input: "5", output: "278.15")
         ]
         XCTAssertTrue(testSet(result: result, expected: expected))
@@ -265,8 +265,8 @@ final class TemperatureTestGeneratorDegCKTests: XCTestCase, TestParameterTestabl
             TestParameters(input: "1", output: "274.15"),
             TestParameters(input: "-273", output: "0.15"),
             TestParameters(input: "-272", output: "1.15"),
-            TestParameters(input: "CInt.min", output: "kelvin_d(CInt.min) + 273.15"),
-            TestParameters(input: "CInt.max", output: "kelvin_d(CInt.max) + 273.15"),
+            TestParameters(input: "Int64.min", output: "kelvin_d(Int64.min) + 273.15"),
+            TestParameters(input: "Int64.max", output: "kelvin_d(Int64.max) + 273.15"),
             TestParameters(input: "5", output: "278.15"),
             TestParameters(input: "-300", output: "-26.85")
         ]

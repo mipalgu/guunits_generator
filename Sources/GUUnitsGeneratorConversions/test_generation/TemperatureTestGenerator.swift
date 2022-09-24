@@ -289,8 +289,8 @@ struct TemperatureTestGenerator: TestGenerator {
                     if sign == .t {
                         newTests.append(
                             TestParameters(
-                                input: "CInt.max",
-                                output: "kelvin_\(otherSign.rawValue)(CInt.max) + " +
+                                input: "Int64.max",
+                                output: "kelvin_\(otherSign.rawValue)(Int64.max) + " +
                                     "\(creator.sanitiseLiteral(literal: "273.15", sign: otherSign))"
                             )
                         )
@@ -298,16 +298,16 @@ struct TemperatureTestGenerator: TestGenerator {
                     if sign == .t && otherSign != .u {
                         newTests.append(
                             TestParameters(
-                                input: "CInt.min",
-                                output: "kelvin_\(otherSign.rawValue)(CInt.min) + " +
+                                input: "Int64.min",
+                                output: "kelvin_\(otherSign.rawValue)(Int64.min) + " +
                                     "\(creator.sanitiseLiteral(literal: "273.15", sign: otherSign))"
                             )
                         )
                     } else if sign == .t && otherSign == .u {
                         newTests.append(
                             TestParameters(
-                                input: "CInt.min",
-                                output: "kelvin_u(CUnsignedInt.min)"
+                                input: "Int64.min",
+                                output: "kelvin_u(UInt64.min)"
                             )
                         )
                     }
@@ -363,8 +363,8 @@ struct TemperatureTestGenerator: TestGenerator {
                 if sign == .u && otherSign != .u {
                     newTests += [
                         TestParameters(
-                            input: "CUnsignedInt.min",
-                            output: "kelvin_\(otherSign.rawValue)(CUnsignedInt.min) + " +
+                            input: "UInt64.min",
+                            output: "kelvin_\(otherSign.rawValue)(UInt64.min) + " +
                                 "\(creator.sanitiseLiteral(literal: "273.15", sign: otherSign))"
                         )
                     ]
@@ -372,14 +372,14 @@ struct TemperatureTestGenerator: TestGenerator {
                 if sign == .u && (otherSign == .f || otherSign == .d) {
                     newTests.append(
                         TestParameters(
-                            input: "CUnsignedInt.max",
-                            output: "kelvin_\(otherSign.rawValue)(CUnsignedInt.max) + 273.15"
+                            input: "UInt64.max",
+                            output: "kelvin_\(otherSign.rawValue)(UInt64.max) + 273.15"
                         )
                     )
                 }
                 if sign == .u && otherSign == .t {
                     newTests.append(
-                        TestParameters(input: "CUnsignedInt.max", output: "kelvin_t(CInt.max)")
+                        TestParameters(input: "UInt64.max", output: "kelvin_t(Int64.max)")
                     )
                 }
             default:
@@ -645,7 +645,7 @@ struct TemperatureTestGenerator: TestGenerator {
                     newTests += ["-2500", "-25000", "-250000", "-2500000"].map {
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: $0, sign: sign),
-                            output: "CUnsignedInt.min"
+                            output: "UInt64.min"
                         )
                     }
                 }
