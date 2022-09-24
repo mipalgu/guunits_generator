@@ -1,4 +1,4 @@
-// CompositeUnit.swift 
+// Velocity.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,41 +54,19 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Defines a category that is created from relationships of other units. This protocol
-/// defines a class of unit that uses different `UnitProtocol` types
-/// in it's definition.
-protocol CompositeUnit: UnitProtocol {
+/// Defines a velocity unit with a base unit of metres per second.
+struct Velocity: CompositeUnit {
 
-    /// The base operation of this unit.
-    static var baseUnit: Operation { get }
+    /// The base unit (SI m/s).
+    static var baseUnit: Operation = .division(
+        lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+    )
 
-    /// A unit type of this category.
-    var unit: Operation { get }
-
-    /// Create a unit that exists within this category.
-    /// - Parameter unit: A specific unit belonging to this category.
-    init(unit: Operation)
+    /// A instance of this unit category.
+    let unit: Operation
 
 }
 
-/// Default Implementation.
-extension CompositeUnit {
-
-    /// The different permutations of the subunits.
-    static var allCases: [Self] {
-        Self.baseUnit.allCases.map {
-            Self(unit: $0)
-        }
-    }
-
-    /// The abbreviation of the unit.
-    var abbreviation: String {
-        unit.abbreviation
-    }
-
-    /// The string representation of the unit.
-    var description: String {
-        unit.description
-    }
-
-}
+/// Hashable conformance.
+extension Velocity: Hashable {}

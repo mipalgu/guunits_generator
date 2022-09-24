@@ -1,4 +1,4 @@
-// CompositeUnit.swift 
+// VelocityTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,41 +54,35 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Defines a category that is created from relationships of other units. This protocol
-/// defines a class of unit that uses different `UnitProtocol` types
-/// in it's definition.
-protocol CompositeUnit: UnitProtocol {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// The base operation of this unit.
-    static var baseUnit: Operation { get }
+/// Test class for `Velocity`.
+final class VelocityTests: XCTestCase {
 
-    /// A unit type of this category.
-    var unit: Operation { get }
+    /// The composite unit under test.
+    let velocity = Velocity(unit: Velocity.baseUnit)
 
-    /// Create a unit that exists within this category.
-    /// - Parameter unit: A specific unit belonging to this category.
-    init(unit: Operation)
-
-}
-
-/// Default Implementation.
-extension CompositeUnit {
-
-    /// The different permutations of the subunits.
-    static var allCases: [Self] {
-        Self.baseUnit.allCases.map {
-            Self(unit: $0)
-        }
+    /// Test unit is set correctly.
+    func testInit() {
+        XCTAssertEqual(velocity.unit, Velocity.baseUnit)
     }
 
-    /// The abbreviation of the unit.
-    var abbreviation: String {
-        unit.abbreviation
+    /// Test abbreviation.
+    func testAbbreviation() {
+        XCTAssertEqual(velocity.abbreviation, "m_per_s")
     }
 
-    /// The string representation of the unit.
-    var description: String {
-        unit.description
+    /// Test description.
+    func testDescription() {
+        XCTAssertEqual(velocity.description, "metres_per_seconds")
+    }
+
+    /// Test allCases property.
+    func testAllCases() {
+        let expected = Velocity.baseUnit.allCases.map { Velocity(unit: $0) }
+        let result = Velocity.allCases
+        XCTAssertEqual(Set(expected), Set(result))
     }
 
 }
