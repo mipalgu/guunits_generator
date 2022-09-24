@@ -351,6 +351,8 @@ public struct GUUnitsGenerator {
         print("Done!")
     }
 
+    // swiftlint:disable function_body_length
+
     /// Generate files that test the swift layer of guunits.
     /// - Parameter path: The folder containing the test files.
     public func generateSwiftTests(in path: URL) {
@@ -421,6 +423,8 @@ public struct GUUnitsGenerator {
             ]))
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Write a Swift source file to a location.
     /// - Parameters:
