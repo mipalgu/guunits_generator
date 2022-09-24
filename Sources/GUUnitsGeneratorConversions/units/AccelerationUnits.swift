@@ -61,7 +61,7 @@ public enum AccelerationUnits: String {
     case metresPerSecond2
 
     /// g's. Acceleration normalised to Earths gravitational acceleration (9.807 m/(s^2))
-    case g
+    case gs
 
 }
 
@@ -73,8 +73,8 @@ extension AccelerationUnits: UnitProtocol {
         switch self {
         case .metresPerSecond2:
             return "mps2"
-        case .g:
-            return "g"
+        case .gs:
+            return "gs"
         }
     }
 

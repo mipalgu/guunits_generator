@@ -160,7 +160,7 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
             switch type {
             case .double, .float:
                 return addNegative(literal: "\(literal).0", isNegative: isNegative)
-            case .uint, .uint8, .uint16, .uint32, .uint64:
+            case .uint8, .uint16, .uint32, .uint64:
                 return isNegative ? "0" : literal
             default:
                 return addNegative(literal: literal, isNegative: isNegative)
@@ -169,7 +169,7 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         switch type {
         case .double, .float:
             return isNegative ? "-" + literal : literal
-        case .uint8, .uint16, .uint32, .uint64, .uint:
+        case .uint8, .uint16, .uint32, .uint64:
             guard let doubleLiteral = Double(literal)?.rounded() else {
                 return isNegative ? "0" : "\(components[0])"
             }

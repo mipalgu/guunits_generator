@@ -85,9 +85,9 @@ extension Signs {
     var numericType: NumericTypes {
         switch self {
         case .t:
-            return .int
+            return .int64
         case .u:
-            return .uint
+            return .uint64
         case .f:
             return .float
         case .d:

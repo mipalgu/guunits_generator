@@ -129,30 +129,35 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     ///   - otherSign: The sign of the fahrenheit parameter.
     /// - Returns: The function body that implements the conversion.
     private func celsiusToFahrenheit(valueSign: Signs, otherSign: Signs) -> String {
-        if otherSign == .d && valueSign == .d {
-            let conversion = "celsius * 1.8 + 32.0"
-            // swiftlint:disable line_length
-            return """
-                const celsius_d upperLimit = nexttoward((\(valueSign.numericType.limits.1) - 32.0) / 1.8, 0.0);
-                const celsius_d lowerLimit = nexttoward((\(valueSign.numericType.limits.0)) / 1.8, 0.0);
-                if (celsius > upperLimit) {
-                    return ((fahrenheit_d) (\(otherSign.numericType.limits.1)));
-                } else if (celsius < lowerLimit) {
-                    return ((fahrenheit_d) (\(otherSign.numericType.limits.0)));
-                }
-                return ((fahrenheit_d) (\(conversion)));
-            """
-            // swiftlint:enable line_length
-        }
-        let conversion = "((((double) (celsius)) * 1.8) + 32.0)"
-        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        guard otherSign != .d else {
-            return "    return ((fahrenheit_\(otherSign)) (\(roundedConversion)));"
-        }
         let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((fahrenheit_\(otherSign)) (\(maxString)));"
+        guard !(otherSign == .d && valueSign == .d) else {
+            return """
+                const celsius_d upperLimit = nexttoward((\(typeLimits.1) - 32.0) / 1.8, 0.0);
+                const celsius_d lowerLimit = nexttoward((\(typeLimits.0)) / 1.8, 0.0);
+                if (celsius > upperLimit) {
+                    return ((fahrenheit_d) (\(typeLimits.1)));
+                } else if (celsius < lowerLimit) {
+                    return ((fahrenheit_d) (\(typeLimits.0)));
+                }
+                return ((fahrenheit_d) (celsius * 1.8 + 32.0));
+            """
+        }
+        let conversion = round(value: "((double) (celsius)) * 1.8 + 32.0", from: .d, to: otherSign)
+        guard !(valueSign != .d && otherSign == .d) else {
+            return "    return ((fahrenheit_d) (\(conversion)));"
+        }
+        return """
+            const double upperLimit = nexttoward(((double) (\(typeLimits.1))), 0.0);
+            const double lowerLimit = nexttoward(((double) (\(typeLimits.0))), 0.0);
+            const double conversion = \(conversion);
+            if (conversion > upperLimit) {
+                return \(typeLimits.1);
+            }
+            if (conversion < lowerLimit) {
+                return \(typeLimits.0);
+            }
+            return ((fahrenheit_\(otherSign)) (conversion));
+        """
     }
 
     // swiftlint:disable function_body_length
@@ -206,8 +211,8 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
         if valueSign == .u && otherSign == .t && operation == "+" {
             return """
-                if (celsius > (INT_MAX - 273)) {
-                    return ((kelvin_t) (INT_MAX));
+                if (celsius > (\(otherSign.numericType.limits.1) - 273)) {
+                    return ((kelvin_t) (\(otherSign.numericType.limits.1)));
                 }
                 return ((kelvin_t) (\(value.rawValue) + 273));
             """
@@ -303,16 +308,22 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
     ///   - otherSign: The sign of the kelvin parameter.
     /// - Returns: The function body that implements the conversion.
     private func fahrenheitToKelvin(valueSign: Signs, otherSign: Signs) -> String {
-        if valueSign == .d && otherSign == .d {
-            let conversion = "(fahrenheit - 32.0) * (5.0 / 9.0) + 273.15"
-            return "    return ((kelvin_d) (\(conversion)));"
+        let scaleFactor = "const double scaleFactor = 5.0 / 9.0;"
+        if (valueSign == .d && otherSign == .d) || otherSign == .d {
+            return """
+                \(scaleFactor)
+                return ((kelvin_d) (((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15));
+            """
         }
-        let conversion = "(((double) (fahrenheit)) - 32.0) * (5.0 / 9.0) + 273.15"
-        let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((kelvin_\(otherSign)) (\(maxString)));"
+        let conversion = round(
+            value: "((double) (fahrenheit)) * scaleFactor - 32.0 * scaleFactor + 273.15",
+            from: .d,
+            to: otherSign
+        )
+        return """
+            \(scaleFactor)
+            return ((kelvin_\(otherSign)) (d_to_\(otherSign.numericType.abbreviation)(\(conversion))));
+        """
     }
 
     /// A literal representation of the difference between kelvin and celsius (273.15 degrees).
@@ -377,10 +388,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
         let conversion = "((double) (\(value.rawValue))) * (5.0 / 9.0) - \(literal) * (5.0 / 9.0)"
         let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((\(other.rawValue)_\(otherSign)) (\(maxString)));"
+        if otherSign == .d {
+            return "    return ((\(other.rawValue)_\(otherSign)) (\(roundedConversion)));"
+        }
+        let delegation = "d_to_\(otherSign.numericType.abbreviation)(\(roundedConversion))"
+        return "    return ((\(other.rawValue)_\(otherSign)) (\(delegation)));"
     }
 
     /// Checks if a conversion needs to a round operation and includes it if necessary.

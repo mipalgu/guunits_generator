@@ -4,22 +4,6 @@ import XCTest
 /// Test class for numeric types.
 final class NumericTypesTests: XCTestCase {
 
-    /// Test int
-    func testInt() {
-        assert(
-            value: .int,
-            rawValue: "int",
-            abbreviation: "i",
-            isSigned: true,
-            isFloat: false,
-            opposite: .uint,
-            limits: ("INT_MIN", "INT_MAX"),
-            swiftType: .CInt,
-            smallerThan: [.int64, .double, .float],
-            largerThan: [.int8, .int16]
-        )
-    }
-
     /// Test int8
     func testInt8() {
         assert(
@@ -80,23 +64,7 @@ final class NumericTypesTests: XCTestCase {
             limits: ("-9223372036854775807 - 1", "9223372036854775807"),
             swiftType: .Int64,
             smallerThan: [],
-            largerThan: [.int8, .int16, .int32, .int, .float]
-        )
-    }
-
-    /// Test uint
-    func testUInt() {
-        assert(
-            value: .uint,
-            rawValue: "unsigned int",
-            abbreviation: "u",
-            isSigned: false,
-            isFloat: false,
-            opposite: .int,
-            limits: ("0", "UINT_MAX"),
-            swiftType: .CUnsignedInt,
-            smallerThan: [.uint64],
-            largerThan: [.uint8, .uint16]
+            largerThan: [.int8, .int16, .int32, .float]
         )
     }
 
