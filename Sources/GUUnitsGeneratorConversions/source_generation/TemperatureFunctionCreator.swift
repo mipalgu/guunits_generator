@@ -388,10 +388,11 @@ public struct TemperatureFunctionCreator: FunctionBodyCreator {
         }
         let conversion = "((double) (\(value.rawValue))) * (5.0 / 9.0) - \(literal) * (5.0 / 9.0)"
         let roundedConversion = round(value: conversion, from: .d, to: otherSign)
-        let typeLimits = otherSign.numericType.limits
-        let minString = "MIN(((double) (\(typeLimits.1))), (\(roundedConversion)))"
-        let maxString = "MAX(((double) (\(typeLimits.0))), \(minString))"
-        return "    return ((\(other.rawValue)_\(otherSign)) (\(maxString)));"
+        if otherSign == .d {
+            return "    return ((\(other.rawValue)_\(otherSign)) (\(roundedConversion)));"
+        }
+        let delegation = "d_to_\(otherSign.numericType.abbreviation)(\(roundedConversion))"
+        return "    return ((\(other.rawValue)_\(otherSign)) (\(delegation)));"
     }
 
     /// Checks if a conversion needs to a round operation and includes it if necessary.
