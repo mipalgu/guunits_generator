@@ -56,6 +56,7 @@
 
 import Foundation
 
+/// Add group method to Array.
 extension Array {
 
     /// Splits the array into sub-arrays of a particular size.
