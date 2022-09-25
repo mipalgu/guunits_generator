@@ -395,3 +395,16 @@ public func generateSwiftTests(in path: URL) {
     )
 }
 ```
+
+## Summary
+
+The entire process for adding additional units can be summarised into 4 easy steps.
+
+1. Define the new unit category with a conformance to ``UnitProtocol``.
+2. Create the source code for the conversion functions by conforming to ``FunctionBodyCreator``.
+3. Create the test parameters for the test code by conforming to ``TestGenerator``.
+4. Modify ``GUUnitsGenerator`` to include the new unit category.
+
+Note well, that steps 2 and 3 are rudimentary when implementing `SI` units by using the existing ``GradualFunctionCreator``
+and ``GradualTestGenerator`` structs. For a more in-depth guide on conforming to ``FunctionBodyCreator``
+and ``TestGenerator``, see [Using Custom Code Generation](usingcustomcodegeneration).
