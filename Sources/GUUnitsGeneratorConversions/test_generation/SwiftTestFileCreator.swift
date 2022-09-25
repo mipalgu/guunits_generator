@@ -233,6 +233,7 @@ public struct SwiftTestFileCreator {
         let type = unit.description.capitalized + "_" + sign.rawValue
         let otherType = otherUnit.description.capitalized + "_" + otherSign.rawValue
         let category = category.capitalized
+        let ctype2 = "\(unit.abbreviation)_\(sign)_to_\(otherUnit.abbreviation)_\(otherSign)(ctype1)"
         return [
             """
                 func test\(type)To\(otherType)\(category.capitalized)Conversions() {
@@ -246,7 +247,7 @@ public struct SwiftTestFileCreator {
                 func test\(otherType)To\(type)Conversions() {
                     let ctype1 = \(unit.description)_\(sign)(5)
                     let swiftType1 = \(type)(rawValue: ctype1)
-                    let ctype2 = \(unit.abbreviation)_\(sign)_to_\(otherUnit.abbreviation)_\(otherSign)(ctype1)
+                    let ctype2 = \(ctype2)
                     let swiftType2 = \(otherType)(rawValue: ctype2)
                     XCTAssertEqual(swiftType2, \(otherType)(swiftType1))
                 }
@@ -608,7 +609,9 @@ public struct SwiftTestFileCreator {
                         \(type)(\(rawType).signalingNaN).isSignalingNaN
                     )
                     XCTAssertEqual(\(type).infinity, \(type)(\(rawType).infinity))
-                    XCTAssertEqual(\(type).greatestFiniteMagnitude, \(type)(\(rawType).greatestFiniteMagnitude))
+                    XCTAssertEqual(
+                        \(type).greatestFiniteMagnitude,\(type)(\(rawType).greatestFiniteMagnitude)
+                    )
                     XCTAssertEqual(\(type).pi, \(type)(\(rawType).pi))
                     XCTAssertEqual(\(type).leastNormalMagnitude, \(type)(\(rawType).leastNormalMagnitude))
                     XCTAssertEqual(\(type).leastNonzeroMagnitude, \(type)(\(rawType).leastNonzeroMagnitude))
