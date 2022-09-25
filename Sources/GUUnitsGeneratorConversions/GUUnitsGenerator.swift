@@ -348,70 +348,49 @@ public struct GUUnitsGenerator {
         print("Creating Swift test code in path: \(path.absoluteString)...")
         fflush(stdout)
         let swiftFileCreator = SwiftTestFileCreator()
-        writeFile(
-            at: path, with: "\(DistanceUnits.category)Tests", and: swiftFileCreator.generate(
-                with: GradualTestGenerator<DistanceUnits>(
+        createTestFiles(at: path, with: swiftFileCreator.generate(
+            with: GradualTestGenerator<DistanceUnits>(
+                unitDifference: [
+                    .millimetres: 10,
+                    .centimetres: 100
+                ]
+            )
+        ))
+        createTestFiles(at: path, with: swiftFileCreator.generate(
+            with: GradualTestGenerator<CurrentUnits>(
+                unitDifference: [
+                    .microamperes: 1000,
+                    .milliamperes: 1000
+                ]
+            )
+        ))
+        createTestFiles(at: path, with: swiftFileCreator.generate(
+            with: GradualTestGenerator<TimeUnits>(
+                unitDifference: [
+                    .microseconds: 1000,
+                    .milliseconds: 1000
+                ]
+            )
+        ))
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: AngleTestGenerator()))
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: SameUnitTestGenerator<ImageUnits>()))
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
+        )
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: TemperatureTestGenerator()))
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: AccelerationTestGenerator()))
+        createTestFiles(
+            at: path,
+            with: swiftFileCreator.generate(
+                with: GradualTestGenerator<MassUnits>(
                     unitDifference: [
-                        .millimetres: 10,
-                        .centimetres: 100
+                        .microgram: 1000,
+                        .milligram: 1000,
+                        .gram: 1000,
+                        .kilogram: 1000
                     ]
                 )
             )
-        )
-        writeFile(
-            at: path, with: "\(CurrentUnits.category)Tests", and: swiftFileCreator.generate(
-                with: GradualTestGenerator<CurrentUnits>(
-                    unitDifference: [
-                        .microamperes: 1000,
-                        .milliamperes: 1000
-                    ]
-                )
-            )
-        )
-        writeFile(
-            at: path, with: "\(TimeUnits.category)Tests", and: swiftFileCreator.generate(
-                with: GradualTestGenerator<TimeUnits>(
-                    unitDifference: [
-                        .microseconds: 1000,
-                        .milliseconds: 1000
-                    ]
-                )
-            )
-        )
-        writeFile(
-            at: path,
-            with: "\(AngleUnits.category)Tests",
-            and: swiftFileCreator.generate(with: AngleTestGenerator())
-        )
-        writeFile(
-            at: path,
-            with: "\(ImageUnits.category)Tests",
-            and: swiftFileCreator.generate(with: SameUnitTestGenerator<ImageUnits>())
-        )
-        writeFile(
-            at: path,
-            with: "\(PercentUnits.category)Tests",
-            and: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
-        )
-        writeFile(
-            at: path,
-            with: "\(TemperatureUnits.category)Tests",
-            and: swiftFileCreator.generate(with: TemperatureTestGenerator())
-        )
-        writeFile(
-            at: path,
-            with: "\(AccelerationUnits.category)Tests",
-            and: swiftFileCreator.generate(with: AccelerationTestGenerator())
-        )
-        writeFile(
-            at: path,
-            with: "\(MassUnits.category)Tests",
-            and: swiftFileCreator.generate(with: GradualTestGenerator<MassUnits>(unitDifference: [
-                .microgram: 1000,
-                .milligram: 1000,
-                .gram: 1000,
-                .kilogram: 1000
-            ]))
         )
         print("Done!")
         fflush(stdout)
