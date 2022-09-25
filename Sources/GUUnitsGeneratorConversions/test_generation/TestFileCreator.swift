@@ -58,7 +58,7 @@
 
 /// Creates the contents for a test file. This struct generates all of the test code required
 /// to fully test a Unit category.
-struct TestFileCreator<TestGeneratorType: TestGenerator> {
+public struct TestFileCreator<TestGeneratorType: TestGenerator> {
 
     /// The unit category to test.
     typealias Unit = TestGeneratorType.UnitType
