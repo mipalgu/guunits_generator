@@ -227,7 +227,7 @@ public struct GUUnitsGenerator {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
         // }
-        print("Creating C Test code in path: \(path.absoluteString)...")
+        print("Creating C Test code in path \(path.absoluteString)...")
         fflush(stdout)
         let fileCreator = TestFileCreator<TemperatureTestGenerator>()
         let testGenerator = TemperatureTestGenerator()
@@ -303,7 +303,7 @@ public struct GUUnitsGenerator {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
         // }
-        print("Writing Swift files to \(path.absoluteString)...")
+        print("Writing Swift files in path \(path.absoluteString)...")
         fflush(stdout)
         let swiftFileCreator = SwiftFileCreator()
         writeFile(
@@ -345,7 +345,7 @@ public struct GUUnitsGenerator {
     /// Generate files that test the swift layer of guunits.
     /// - Parameter path: The folder containing the test files.
     public func generateSwiftTests(in path: URL) {
-        print("Creating Swift test code in path: \(path.absoluteString)...")
+        print("Creating Swift test code in path \(path.absoluteString)...")
         fflush(stdout)
         let swiftFileCreator = SwiftTestFileCreator()
         createTestFiles(at: path, with: swiftFileCreator.generate(
