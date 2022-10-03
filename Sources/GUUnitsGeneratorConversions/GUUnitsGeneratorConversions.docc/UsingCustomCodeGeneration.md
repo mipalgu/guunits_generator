@@ -284,4 +284,92 @@ limits of the underlying numeric types (eg. `Signs.t.numericType.swiftType.limit
 
 Please look at the `AngleTestGenerator` tests in the test target for the code that tests this struct.
 
-## Generating the New Type
+## Performing Code Generation with the New Type
+
+Now we will alter the top-level generator to include our new custom type. The top-level module that performs the
+code generation is ``GUUnitsGenerator`` and provides functions for generating the C and Swift code for `GUUnits`.
+Seen below is the code that you will need to add to ``GUUnitsGenerator`` to perform the code generation of the
+new unit. You will need to modify the `generateCFiles`, `generateCTests`, `generateSwiftFiles` and
+`generateSwiftTests` functions. You will need to use the existing structs for generating the different source and
+test files, namely ``HeaderCreator``, ``CFileCreator``, ``TestFileCreator``, ``SwiftFileCreator``,
+``SwiftTestFileCreator`` and ``AnyGenerator``.
+
+```swift
+import Foundation
+
+public struct GUUnitsGenerator {
+
+    let fileManager = FileManager()
+
+    public func generateCFiles(in path: URL) throws {
+        var hFile = path
+        var cFile = path
+        hFile.appendPathComponent("include", isDirectory: true)
+        if !fileManager.fileExists(atPath: hFile.path) {
+            try fileManager.createDirectory(atPath: hFile.path, withIntermediateDirectories: true)
+        }
+        hFile.appendPathComponent("guunits.h", isDirectory: false)
+        cFile.appendPathComponent("guunits.c", isDirectory: false)
+        
+        // New Code:
+        
+        let angleGenerator = AnyGenerator(generating: AngleUnits.self, using: AngleUnitsGenerator())
+        let fileContents = HeaderCreator().generate(
+            generators: [
+                angleGenerator,
+                // other generators...
+            ]
+        )
+        .data(using: .utf8)
+        fileManager.createFile(atPath: hFile.path, contents: fileContents)
+        let cContents = CFileCreator().generate(
+            generators: [
+                angleGenerator,
+                // other generators...
+            ]
+        )
+        .data(using: .utf8)
+        fileManager.createFile(atPath: cFile.path, contents: cContents)
+    }
+
+    public func generateCTests(in path: URL) {
+        let angleGenerator = AngleTestGenerator()
+        let angleFileCreator = TestFileCreator<AngleTestGenerator>()
+        createTestFiles(
+            at: path, with: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
+        )
+        // other test generators...
+    }
+
+    public func generateSwiftFiles(in path: URL) {
+        let swiftFileCreator = SwiftFileCreator()
+        writeFile(
+            at: path, with: AngleUnits.category, and: swiftFileCreator.generate(for: AngleUnits.self)
+        )
+        // other units...
+    }
+
+    public func generateSwiftTests(in path: URL) {
+        let swiftFileCreator = SwiftTestFileCreator()
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: AngleTestGenerator()))
+        // other units...
+    }
+
+    // End new code.
+
+    private func createTestFiles(at path: URL, with tests: [(String, String)]) {
+        tests.forEach {
+            writeFile(at: path, with: $0, and: $1)
+        }
+    }
+
+    private func writeFile(at path: URL, with name: String, and contents: String) {
+        fileManager.createFile(
+            atPath: path.appendingPathComponent("\(name).swift", isDirectory: false).path,
+            contents: contents.data(using: .utf8)
+        )
+    }
+
+}
+
+```
