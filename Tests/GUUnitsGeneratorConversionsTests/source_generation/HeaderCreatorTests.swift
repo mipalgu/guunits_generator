@@ -214,12 +214,14 @@ final class HeaderCreatorTests: XCTestCase {
     var typeDefs: String {
         let units: [(String, [CustomStringConvertible])] = [
             ("// Distance Units.", Array(DistanceUnits.allCases)),
+            ("// Current Units.", Array(CurrentUnits.allCases)),
             ("// Time Units.", Array(TimeUnits.allCases)),
             ("// Angle Units.", Array(AngleUnits.allCases)),
             ("// Image Units.", Array(ImageUnits.allCases)),
             ("// Percent Units.", Array(PercentUnits.allCases)),
             ("// Temperature Units.", Array(TemperatureUnits.allCases)),
-            ("// Acceleration Units.", Array(AccelerationUnits.allCases))
+            ("// Acceleration Units.", Array(AccelerationUnits.allCases)),
+            ("// Mass Units.", Array(MassUnits.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in

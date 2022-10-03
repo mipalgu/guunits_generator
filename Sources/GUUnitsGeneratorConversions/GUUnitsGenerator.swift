@@ -64,8 +64,67 @@ public struct GUUnitsGenerator {
     /// The manager that performs the writing.
     let fileManager = FileManager()
 
+    /// The Package.swift file contents.
+    private var package: String {
+        """
+        // swift-tools-version: 5.6
+        // The swift-tools-version declares the minimum version of Swift required to build this package.
+
+        import PackageDescription
+
+        /// Package description.
+        let package = Package(
+            name: "GUUnits",
+            products: [
+                // Products define the executables and libraries a package produces, and make them visible
+                // to other packages.
+                .library(
+                    name: "guunits",
+                    type: .dynamic,
+                    targets: ["CGUUnits"]
+                ),
+                .library(name: "GUUnits", targets: ["CGUUnits", "GUUnits"])
+            ],
+            dependencies: [
+                // Dependencies declare other packages that this package depends on.
+                // .package(url: /* package url */, from: "1.0.0"),
+                .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
+            ],
+            targets: [
+                // Targets are the basic building blocks of a package.
+                // A target can define a module or a test suite.
+                // Targets can depend on other targets in this package, and on products in packages
+                // this package depends on.
+                .target(
+                    name: "CGUUnits",
+                    dependencies: []
+                ),
+                .target(
+                    name: "GUUnits",
+                    dependencies: ["CGUUnits"]
+                ),
+                .testTarget(
+                    name: "CGUUnitsTests",
+                    dependencies: ["CGUUnits"]
+                ),
+                .testTarget(
+                    name: "GUUnitsTests",
+                    dependencies: ["GUUnits"]
+                )
+            ]
+        )
+
+        """
+    }
+
     /// Default init.
     public init() {}
+
+    /// Creates the Package.swift file in the folder pointed to by path.
+    /// - Parameter path: A URL to the folder containing the Package.swift file.
+    public func generatePackageSwift(in path: URL) {
+        writeFile(at: path, with: "Package", and: package)
+    }
 
     // swiftlint:disable function_body_length
 
@@ -90,6 +149,13 @@ public struct GUUnitsGenerator {
                 .centimetres: 100
             ])
         )
+        let currentGenerator = AnyGenerator(
+            generating: CurrentUnits.self,
+            using: CurrentUnitsGenerator(unitDifference: [
+                .microamperes: 1000,
+                .milliamperes: 1000
+            ])
+        )
         let timeGenerator = AnyGenerator(
             generating: TimeUnits.self,
             using: TimeUnitsGenerator(unitDifference: [
@@ -110,30 +176,44 @@ public struct GUUnitsGenerator {
         let accelerationGenerator = AnyGenerator(
             generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
         )
+        let massGenerator = AnyGenerator(
+            generating: MassUnits.self, using: MassUnitsGenerator(unitDifference: [
+                .microgram: 1000,
+                .milligram: 1000,
+                .gram: 1000,
+                .kilogram: 1000
+            ])
+        )
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
+                currentGenerator,
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
                 temperatureGenerator,
-                accelerationGenerator
+                accelerationGenerator,
+                massGenerator
             ]
         )
         .data(using: .utf8)
         print("Writing H-file to path \(hFile.absoluteString)...")
+        fflush(stdout)
         fileManager.createFile(atPath: hFile.path, contents: fileContents)
         print("Done!\nWriting C-File to path \(cFile.absoluteString)...")
+        fflush(stdout)
         let cContents = CFileCreator().generate(
             generators: [
                 distanceGenerator,
+                currentGenerator,
                 timeGenerator,
                 angleGenerator,
                 imageGenerator,
                 percentGenerator,
                 temperatureGenerator,
-                accelerationGenerator
+                accelerationGenerator,
+                massGenerator
             ]
         )
         .data(using: .utf8)
@@ -143,67 +223,76 @@ public struct GUUnitsGenerator {
 
     /// Create the C Test files at a specific location.
     /// - Parameter path: The path to the folder that will contain the test files.
-    func generateCTests(in path: URL) {
+    public func generateCTests(in path: URL) {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
         // }
+        print("Creating C Test code in path \(path.absoluteString)...")
+        fflush(stdout)
         let fileCreator = TestFileCreator<TemperatureTestGenerator>()
         let testGenerator = TemperatureTestGenerator()
-        writeFile(
-            at: path,
-            with: "TemperatureTests",
-            and: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
+        createTestFiles(
+            at: path, with: fileCreator.tests(generator: testGenerator, imports: "import CGUUnits")
         )
         let distanceGenerator = GradualTestGenerator<DistanceUnits>(unitDifference: [
             .millimetres: 10,
             .centimetres: 100
         ])
         let distanceFileCreator = TestFileCreator<GradualTestGenerator<DistanceUnits>>()
-        writeFile(
+        createTestFiles(
             at: path,
-            with: "DistanceTests",
-            and: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
+            with: distanceFileCreator.tests(generator: distanceGenerator, imports: "import CGUUnits")
+        )
+        let massGenerator = GradualTestGenerator<MassUnits>(unitDifference: [
+            .microgram: 1000,
+            .milligram: 1000,
+            .gram: 1000,
+            .kilogram: 1000
+        ])
+        let massFileCreator = TestFileCreator<GradualTestGenerator<MassUnits>>()
+        createTestFiles(
+            at: path, with: massFileCreator.tests(generator: massGenerator, imports: "import CGUUnits")
+        )
+        let currentGenerator = GradualTestGenerator<CurrentUnits>(unitDifference: [
+            .microamperes: 1000,
+            .milliamperes: 1000
+        ])
+        let currentFileCreator = TestFileCreator<GradualTestGenerator<CurrentUnits>>()
+        createTestFiles(
+            at: path,
+            with: currentFileCreator.tests(generator: currentGenerator, imports: "import CGUUnits")
         )
         let imageGenerator = SameUnitTestGenerator<ImageUnits>()
         let imageFileCreator = TestFileCreator<SameUnitTestGenerator<ImageUnits>>()
-        writeFile(
-            at: path,
-            with: "ImageTests",
-            and: imageFileCreator.tests(generator: imageGenerator, imports: "import CGUUnits")
+        createTestFiles(
+            at: path, with: imageFileCreator.tests(generator: imageGenerator, imports: "import CGUUnits")
         )
         let percentGenerator = SameUnitTestGenerator<PercentUnits>()
         let percentFileCreator = TestFileCreator<SameUnitTestGenerator<PercentUnits>>()
-        writeFile(
-            at: path,
-            with: "PercentTests",
-            and: percentFileCreator.tests(generator: percentGenerator, imports: "import CGUUnits")
+        createTestFiles(
+            at: path, with: percentFileCreator.tests(generator: percentGenerator, imports: "import CGUUnits")
         )
         let timeGenerator = GradualTestGenerator<TimeUnits>(unitDifference: [
             .microseconds: 1000,
             .milliseconds: 1000
         ])
         let timeFileCreator = TestFileCreator<GradualTestGenerator<TimeUnits>>()
-        writeFile(
-            at: path,
-            with: "TimeTests",
-            and: timeFileCreator.tests(generator: timeGenerator, imports: "import CGUUnits")
+        createTestFiles(
+            at: path, with: timeFileCreator.tests(generator: timeGenerator, imports: "import CGUUnits")
         )
         let angleGenerator = AngleTestGenerator()
         let angleFileCreator = TestFileCreator<AngleTestGenerator>()
-        writeFile(
-            at: path,
-            with: "AngleTests",
-            and: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
+        createTestFiles(
+            at: path, with: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
         )
         let accelerationGenerator = AccelerationTestGenerator()
         let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
-        writeFile(
+        createTestFiles(
             at: path,
-            with: "AccelerationTests",
-            and: accelerationFileCreator.tests(
-                generator: accelerationGenerator, imports: "import CGUUnits"
-            )
+            with: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
         )
+        print("Done!")
+        fflush(stdout)
     }
 
     // swiftlint:enable function_body_length
@@ -214,10 +303,14 @@ public struct GUUnitsGenerator {
         // guard !path.isFileURL else {
         //     fatalError("Path is not a valid directory.")
         // }
-        print("Writing Swift files to \(path.absoluteString)...")
+        print("Writing Swift files in path \(path.absoluteString)...")
+        fflush(stdout)
         let swiftFileCreator = SwiftFileCreator()
         writeFile(
             at: path, with: DistanceUnits.category, and: swiftFileCreator.generate(for: DistanceUnits.self)
+        )
+        writeFile(
+            at: path, with: CurrentUnits.category, and: swiftFileCreator.generate(for: CurrentUnits.self)
         )
         writeFile(
             at: path, with: TimeUnits.category, and: swiftFileCreator.generate(for: TimeUnits.self)
@@ -241,58 +334,76 @@ public struct GUUnitsGenerator {
             with: AccelerationUnits.category,
             and: swiftFileCreator.generate(for: AccelerationUnits.self)
         )
+        writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
+        writeFile(at: path, with: "GUUnitsFloat", and: GUUnitsPrimitiveHelpers.float)
+        writeFile(at: path, with: "GUUnitsInteger", and: GUUnitsPrimitiveHelpers.integer)
+        writeFile(at: path, with: "GUUnitsType", and: GUUnitsPrimitiveHelpers.type)
         print("Done!")
+        fflush(stdout)
     }
 
     /// Generate files that test the swift layer of guunits.
     /// - Parameter path: The folder containing the test files.
     public func generateSwiftTests(in path: URL) {
+        print("Creating Swift test code in path \(path.absoluteString)...")
+        fflush(stdout)
         let swiftFileCreator = SwiftTestFileCreator()
-        writeFile(
-            at: path, with: "\(DistanceUnits.category)Tests", and: swiftFileCreator.generate(
-                with: GradualTestGenerator<DistanceUnits>(
+        createTestFiles(at: path, with: swiftFileCreator.generate(
+            with: GradualTestGenerator<DistanceUnits>(
+                unitDifference: [
+                    .millimetres: 10,
+                    .centimetres: 100
+                ]
+            )
+        ))
+        createTestFiles(at: path, with: swiftFileCreator.generate(
+            with: GradualTestGenerator<CurrentUnits>(
+                unitDifference: [
+                    .microamperes: 1000,
+                    .milliamperes: 1000
+                ]
+            )
+        ))
+        createTestFiles(at: path, with: swiftFileCreator.generate(
+            with: GradualTestGenerator<TimeUnits>(
+                unitDifference: [
+                    .microseconds: 1000,
+                    .milliseconds: 1000
+                ]
+            )
+        ))
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: AngleTestGenerator()))
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: SameUnitTestGenerator<ImageUnits>()))
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
+        )
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: TemperatureTestGenerator()))
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: AccelerationTestGenerator()))
+        createTestFiles(
+            at: path,
+            with: swiftFileCreator.generate(
+                with: GradualTestGenerator<MassUnits>(
                     unitDifference: [
-                        .millimetres: 10,
-                        .centimetres: 100
+                        .microgram: 1000,
+                        .milligram: 1000,
+                        .gram: 1000,
+                        .kilogram: 1000
                     ]
                 )
             )
         )
-        writeFile(
-            at: path, with: "\(TimeUnits.category)Tests", and: swiftFileCreator.generate(
-                with: GradualTestGenerator<TimeUnits>(
-                    unitDifference: [
-                        .microseconds: 1000,
-                        .milliseconds: 1000
-                    ]
-                )
-            )
-        )
-        writeFile(
-            at: path,
-            with: "\(AngleUnits.category)Tests",
-            and: swiftFileCreator.generate(with: AngleTestGenerator())
-        )
-        writeFile(
-            at: path,
-            with: "\(ImageUnits.category)Tests",
-            and: swiftFileCreator.generate(with: SameUnitTestGenerator<ImageUnits>())
-        )
-        writeFile(
-            at: path,
-            with: "\(PercentUnits.category)Tests",
-            and: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
-        )
-        writeFile(
-            at: path,
-            with: "\(TemperatureUnits.category)Tests",
-            and: swiftFileCreator.generate(with: TemperatureTestGenerator())
-        )
-        writeFile(
-            at: path,
-            with: "\(AccelerationUnits.category)Tests",
-            and: swiftFileCreator.generate(with: AccelerationTestGenerator())
-        )
+        print("Done!")
+        fflush(stdout)
+    }
+
+    /// Writes the test files to the correct path.
+    /// - Parameters:
+    ///   - path: The path containing the files.
+    ///   - tests: The tests as an array of tuples containing the file name and the test code.
+    private func createTestFiles(at path: URL, with tests: [(String, String)]) {
+        tests.forEach {
+            writeFile(at: path, with: $0, and: $1)
+        }
     }
 
     /// Write a Swift source file to a location.

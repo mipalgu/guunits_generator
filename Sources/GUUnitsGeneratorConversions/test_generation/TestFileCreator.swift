@@ -58,7 +58,7 @@
 
 /// Creates the contents for a test file. This struct generates all of the test code required
 /// to fully test a Unit category.
-struct TestFileCreator<TestGeneratorType: TestGenerator> {
+public struct TestFileCreator<TestGeneratorType: TestGenerator> {
 
     /// The unit category to test.
     typealias Unit = TestGeneratorType.UnitType
@@ -69,15 +69,16 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
     /// The body creator for generating test function code.
     private let bodyCreator = TestFunctionBodyCreator<Unit>()
 
-    /// Create all of the tests for a Unit category.
+    /// Create all of the tests for a Unit category. This function produces an array of test files
+    /// for the unit category.
     /// - Parameters:
     ///   - generator: A test generator for creating the test parameters for different test functions.
     ///   - imports: Any additional imports required in the test file. XCTest, Foundation and CGUUnits
     ///              are included by default.
-    /// - Returns: All of the test code as a string.
-    func tests(generator: TestGeneratorType, imports: String) -> String {
+    /// - Returns: All of the test code as an array of tuples containing the file name and contents.
+    func tests(generator: TestGeneratorType, imports: String) -> [(String, String)] {
         let head = "\(imports)\nimport Foundation\nimport XCTest"
-        let unitTests: [(String, String)] = Unit.allCases.flatMap { unit in
+        let unitTests: [(String, [[String]])] = Unit.allCases.flatMap { unit in
             Signs.allCases.map { sign in
                 (
                     unit.rawValue.capitalized + "_" + sign.rawValue,
@@ -85,7 +86,11 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
                         Unit.allCases.flatMap { otherUnit in
                             Signs.allCases.flatMap { otherSign in
                                 self.createTests(
-                                    from: unit, with: sign, to: otherUnit, with: otherSign, using: generator
+                                    from: unit,
+                                    with: sign,
+                                    to: otherUnit,
+                                    with: otherSign,
+                                    using: generator
                                 )
                             }
                         } +
@@ -95,17 +100,29 @@ struct TestFileCreator<TestGeneratorType: TestGenerator> {
                         }
                     )
                     .sorted()
-                    .joined(separator: "\n\n")
+                    .group(size: 30)
                 )
             }
         }
-        let sorted = unitTests.sorted { $0.1 <= $1.1 }
-        let body = sorted.map {
-            "final class \(Unit.category)_\($0)" +
-                "Tests: XCTestCase {\n\n\($1)\n\n}"
+        return unitTests.flatMap { testTuple -> [(String, String)] in
+            testTuple.1.enumerated().map { index, tests -> (String, String) in
+                let name = "\(Unit.category)_\(testTuple.0)Tests\(index)"
+                let testString = tests.joined(separator: "\n\n")
+                return (
+                    name,
+                    """
+                    \(head)
+
+                    final class \(name): XCTestCase {
+
+                    \(testString)
+
+                    }
+
+                    """
+                )
+            }
         }
-        .joined(separator: "\n\n")
-        return head + "\n\n" + body + "\n"
     }
 
     /// Create tests for a unit to unit conversion.

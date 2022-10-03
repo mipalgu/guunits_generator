@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// CurrentUnits.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,38 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A unit for describing electrical current. The SI unit is the Ampere (C/s).
+public enum CurrentUnits: String {
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+    /// Microamps.
+    case microamperes
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
-        )
+    /// Milliamps
+    case milliamperes
+
+    /// Amps
+    case amperes
+
+}
+
+/// UnitProtocol conformance.
+extension CurrentUnits: UnitProtocol {
+
+    /// The abbreviation of the unit consistent with SI.
+    public var abbreviation: String {
+        switch self {
+        case .microamperes:
+            return "uA"
+        case .milliamperes:
+            return "mA"
+        case .amperes:
+            return "A"
+        }
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
-    }
-
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// The description of the unit.
+    public var description: String {
+        self.rawValue
     }
 
 }

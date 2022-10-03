@@ -34,6 +34,78 @@ extension UnitsGenerator where
 
 }
 
+/// MassUnits initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<MassUnits>,
+    CFunctionDefinitionCreator<MassUnits>, NumericTypeConverter> {
+
+    /// Initialise using MassUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
+    public init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
+/// MassUnits initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<MassUnits>,
+    CPPFunctionDefinitionCreator<MassUnits>, NumericTypeConverter> {
+
+    /// Initialise using MassUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
+    public init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CPPFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
+/// CurrentUnits initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<CurrentUnits>,
+    CFunctionDefinitionCreator<CurrentUnits>, NumericTypeConverter> {
+
+    /// Initialise using CurrentUnits and c conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
+    public init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
+/// CurrentUnits initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<GradualFunctionCreator<CurrentUnits>,
+    CPPFunctionDefinitionCreator<CurrentUnits>, NumericTypeConverter> {
+
+    /// Initialise using CurrentUnits and cpp conversions.
+    /// - Parameter unitDifference: The magnitude difference between an ordered array
+    ///                             of units.
+    public init(unitDifference: [Creator.Unit: Int]) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: GradualFunctionCreator(unitDifference: unitDifference),
+            definitionCreator: CPPFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
 /// ImageUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<ImageUnits>,
@@ -330,6 +402,32 @@ extension UnitsGenerator where
     public init(
         bodyCreator: DelegatingFunctionCreator<DistanceUnits> = DelegatingFunctionCreator(),
         definitionCreator: CPPFunctionDefinitionCreator<DistanceUnits> = CPPFunctionDefinitionCreator(),
+        numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(),
+        helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
+    ) {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: bodyCreator,
+            definitionCreator: definitionCreator,
+            numericConverter: numericConverter
+        ))
+    }
+
+}
+
+/// MassUnits initialiser for cpp conversions using Delegating function creators.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<DelegatingFunctionCreator<MassUnits>,
+    CPPFunctionDefinitionCreator<MassUnits>, DelegatingNumericConverter> {
+
+    /// Initialise using MassUnits and CPP conversions.
+    /// - Parameters:
+    ///   - bodyCreator: The creator which generates function bodies.
+    ///   - definitionCreator: The definitionCreate which generates function definitions.
+    ///   - numericConverter: The numericConverter which generates numeric type conversions.
+    ///   - helpers: The helpers which generate function names and some definitions.
+    public init(
+        bodyCreator: DelegatingFunctionCreator<MassUnits> = DelegatingFunctionCreator(),
+        definitionCreator: CPPFunctionDefinitionCreator<MassUnits> = CPPFunctionDefinitionCreator(),
         numericConverter: DelegatingNumericConverter = DelegatingNumericConverter(),
         helpers: FunctionHelpers<Creator.Unit> = FunctionHelpers<Creator.Unit>()
     ) {

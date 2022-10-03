@@ -151,7 +151,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     ///   - unique: Whether the function name has to be unique.
     /// - Returns: The generated function name.
     func functionName(from type: NumericTypes, to unit: Unit, sign: Signs, unique: Bool = true) -> String {
-        let uniquePrefix = unique || type == .int || type == .uint ? "\(type.abbreviation)_to_" : ""
+        let uniquePrefix = unique ? "\(type.abbreviation)_to_" : ""
         return uniquePrefix + "\(unit.abbreviation)\(collapse(sign))"
     }
 

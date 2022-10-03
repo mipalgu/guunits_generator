@@ -73,47 +73,47 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
     var conversions: [ConversionTest<DistanceUnits>] {
         [
             ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .t, parameters: [
-                TestParameters(input: "CInt.min", output: "centimetres_t(CInt.min) / 10"),
-                TestParameters(input: "CInt.max", output: "centimetres_t(CInt.max) / 10")
+                TestParameters(input: "Int64.min", output: "centimetres_t(Int64.min) / 10"),
+                TestParameters(input: "Int64.max", output: "centimetres_t(Int64.max) / 10")
             ]),
             ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .u, parameters: [
-                TestParameters(input: "CInt.min", output: "0"),
-                TestParameters(input: "CInt.max", output: "centimetres_u(CInt.max) / 10")
+                TestParameters(input: "Int64.min", output: "0"),
+                TestParameters(input: "Int64.max", output: "centimetres_u(Int64.max) / 10")
             ]),
             ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .f, parameters: [
-                TestParameters(input: "CInt.min", output: "centimetres_f(CInt.min) / 10.0"),
-                TestParameters(input: "CInt.max", output: "centimetres_f(CInt.max) / 10.0")
+                TestParameters(input: "Int64.min", output: "centimetres_f(Int64.min) / 10.0"),
+                TestParameters(input: "Int64.max", output: "centimetres_f(Int64.max) / 10.0")
             ]),
             ConversionTest(unit: .millimetres, sign: .t, otherUnit: .centimetres, otherSign: .d, parameters: [
-                TestParameters(input: "CInt.min", output: "centimetres_d(CInt.min) / 10.0"),
-                TestParameters(input: "CInt.max", output: "centimetres_d(CInt.max) / 10.0")
+                TestParameters(input: "Int64.min", output: "centimetres_d(Int64.min) / 10.0"),
+                TestParameters(input: "Int64.max", output: "centimetres_d(Int64.max) / 10.0")
             ]),
             ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .t, parameters: [
-                TestParameters(input: "CUnsignedInt.min", output: "centimetres_t(CUnsignedInt.min) / 10"),
-                TestParameters(input: "CUnsignedInt.max", output: "centimetres_t(CUnsignedInt.max / 10)")
+                TestParameters(input: "UInt64.min", output: "centimetres_t(UInt64.min) / 10"),
+                TestParameters(input: "UInt64.max", output: "centimetres_t(UInt64.max / 10)")
             ]),
             ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .u, parameters: [
-                TestParameters(input: "CUnsignedInt.min", output: "centimetres_u(CUnsignedInt.min)"),
-                TestParameters(input: "CUnsignedInt.max", output: "centimetres_u(CUnsignedInt.max) / 10")
+                TestParameters(input: "UInt64.min", output: "centimetres_u(UInt64.min)"),
+                TestParameters(input: "UInt64.max", output: "centimetres_u(UInt64.max) / 10")
             ]),
             ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .f, parameters: [
-                TestParameters(input: "CUnsignedInt.min", output: "centimetres_f(CUnsignedInt.min) / 10.0"),
-                TestParameters(input: "CUnsignedInt.max", output: "centimetres_f(CUnsignedInt.max) / 10.0")
+                TestParameters(input: "UInt64.min", output: "centimetres_f(UInt64.min) / 10.0"),
+                TestParameters(input: "UInt64.max", output: "centimetres_f(UInt64.max) / 10.0")
             ]),
             ConversionTest(unit: .millimetres, sign: .u, otherUnit: .centimetres, otherSign: .d, parameters: [
-                TestParameters(input: "CUnsignedInt.min", output: "centimetres_d(CUnsignedInt.min) / 10.0"),
-                TestParameters(input: "CUnsignedInt.max", output: "centimetres_d(CUnsignedInt.max) / 10.0")
+                TestParameters(input: "UInt64.min", output: "centimetres_d(UInt64.min) / 10.0"),
+                TestParameters(input: "UInt64.max", output: "centimetres_d(UInt64.max) / 10.0")
             ]),
             ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .t, parameters: [
-                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "centimetres_t(CInt.min)"),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "centimetres_t(CInt.max)")
+                TestParameters(input: "-Float.greatestFiniteMagnitude", output: "centimetres_t(Int64.min)"),
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "centimetres_t(Int64.max)")
             ]),
             ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Float.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.min)"
+                    input: "-Float.greatestFiniteMagnitude", output: "centimetres_u(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "Float.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.max)"
+                    input: "Float.greatestFiniteMagnitude", output: "centimetres_u(UInt64.max)"
                 )
             ]),
             ConversionTest(unit: .millimetres, sign: .f, otherUnit: .centimetres, otherSign: .f, parameters: [
@@ -137,15 +137,15 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
                 )
             ]),
             ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .t, parameters: [
-                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "centimetres_t(CInt.min)"),
-                TestParameters(input: "Double.greatestFiniteMagnitude", output: "centimetres_t(CInt.max)")
+                TestParameters(input: "-Double.greatestFiniteMagnitude", output: "centimetres_t(Int64.min)"),
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "centimetres_t(Int64.max)")
             ]),
             ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "-Double.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.min)"
+                    input: "-Double.greatestFiniteMagnitude", output: "centimetres_u(UInt64.min)"
                 ),
                 TestParameters(
-                    input: "Double.greatestFiniteMagnitude", output: "centimetres_u(CUnsignedInt.max)"
+                    input: "Double.greatestFiniteMagnitude", output: "centimetres_u(UInt64.max)"
                 )
             ]),
             ConversionTest(unit: .millimetres, sign: .d, otherUnit: .centimetres, otherSign: .f, parameters: [
@@ -245,7 +245,8 @@ final class DistanceTestGeneratorMMCMTests: XCTestCase, TestParameterTestable, T
     ///   - otherSign: The new sign.
     /// - Returns: An expected value in a test case for a float to int conversion.
     private func floatToInt(value: String, scaleFactor: String, sign: Signs, otherSign: Signs) -> String {
-        "centimetres_\(otherSign)((\(creator.sanitiseLiteral(literal: "\(value)", sign: sign)) / " +
+        "centimetres_\(otherSign)((\(sign.numericType.swiftType)" +
+            "(\(creator.sanitiseLiteral(literal: "\(value)", sign: sign))) / " +
             creator.sanitiseLiteral(literal: scaleFactor, sign: sign) + ").rounded())"
     }
 

@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// Array+group.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,30 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+import Foundation
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+/// Add group method to Array.
+extension Array {
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
-        )
-    }
-
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
-    }
-
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// Splits the array into sub-arrays of a particular size.
+    /// - Parameter size: The size of each group.
+    /// - Returns: An array of grouped elements.
+    func group(size: Int) -> [[Element]] {
+        guard size > 0 else {
+            return []
+        }
+        guard count > size else {
+            return [self]
+        }
+        var groups: [[Element]] = []
+        groups.reserveCapacity(self.count / size + (self.count % size > 0 ? 1 : 0))
+        var remainingElements = self
+        while !remainingElements.isEmpty {
+            let maxIndex = Swift.min(remainingElements.count, size)
+            groups.append(Array(remainingElements[0..<maxIndex]))
+            remainingElements = Array(remainingElements.dropFirst(maxIndex))
+        }
+        return groups
     }
 
 }

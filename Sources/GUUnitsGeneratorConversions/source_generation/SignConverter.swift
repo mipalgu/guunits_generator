@@ -59,7 +59,7 @@
 /// A struct that creates c-code for converting a unit between it's signed and unsigned variants.
 /// A unit may need to be represented as a different type in the c-implementation. The functions in
 /// this struct perform a cast into the desired unit without performing any unit conversions.
-struct SignConverter {
+public struct SignConverter {
 
     /// Change the sign of some unit. This function assumes you are converting to the same unit
     /// (eg. centimetres to centimetres). The purpose of this function is to change the
@@ -75,7 +75,7 @@ struct SignConverter {
     /// - Warning: This function assumes that you are converting to the same unit, just with a different
     ///            type (i.e. there is no unit conversion being performed in this function).
     ///            The result of the cast will be incorrect if this is not the case.
-    func convert<Unit: UnitProtocol>(
+    public func convert<Unit: UnitProtocol>(
         _ str: String,
         otherUnit: Unit,
         from sign: Signs,
@@ -86,7 +86,7 @@ struct SignConverter {
             return self.cast("(\(str)) < 0 ? 0 : \(str)", to: "\(otherUnit)_\(otherSign.rawValue)")
         case (.u, .t):
             let uint: Signs = .u
-            let intMax = self.cast("INT_MAX", to: uint.type)
+            let intMax = self.cast(Signs.t.numericType.limits.1, to: uint.type)
             return self.cast(
                 "(\(str)) > \(intMax) ? \(intMax) : \(str)",
                 to: "\(otherUnit)_\(otherSign.rawValue)"
@@ -121,7 +121,8 @@ struct SignConverter {
             let min = "((double) (\(otherMin)))"
             let str2 = "round(\(toDouble))"
             return self.cast(
-                "\(str2) < \(max) ? (\(str2) > \(min) ? \(str2) : \(otherMin)) : \(otherMax)",
+                "\(str2) < \(max) ? (\(str2) > \(min) ? ((\(otherUnit)_\(otherSign.rawValue)) (\(str2)))" +
+                    " : \(otherMin)) : \(otherMax)",
                 to: "\(otherUnit)_\(otherSign.rawValue)"
             )
         }

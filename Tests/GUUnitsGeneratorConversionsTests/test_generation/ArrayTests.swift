@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// ArrayTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,29 +57,28 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for Array+group.
+final class ArrayTests: XCTestCase {
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
-        )
+    /// The array under test.
+    let array = [1, 2, 3, 4, 5]
+
+    /// Test group method works correctly.
+    func testGroup() {
+        let groups = array.group(size: 2)
+        XCTAssertEqual(groups, [[1, 2], [3, 4], [5]])
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
+    /// Test negative size in groups method.
+    func testGroupInvalidSize() {
+        let groups = array.group(size: -1)
+        XCTAssertTrue(groups.isEmpty)
     }
 
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// Test group method for size larger than count.
+    func testGroupLargeSize() {
+        let groups = array.group(size: 200)
+        XCTAssertEqual(groups, [array])
     }
 
 }

@@ -70,81 +70,81 @@ final class TemperatureTestGeneratorKToDegFTests: XCTestCase, TestParameterTesta
     var conversions: [ConversionTest<TemperatureUnits>] {
         [
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .t, parameters: [
-                TestParameters(input: "CInt.min", output: "CInt.min"),
-                TestParameters(input: "CInt.max", output: "CInt.max")
+                TestParameters(input: "Int64.min", output: "Int64.min"),
+                TestParameters(input: "Int64.max", output: "Int64.max")
             ]),
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .u, parameters: [
-                TestParameters(input: "CInt.min", output: "CUnsignedInt.min"),
+                TestParameters(input: "Int64.min", output: "UInt64.min"),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .u)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .u)
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .f)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .f)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .t, otherUnit: .fahrenheit, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CInt.min", output: conversion(value: "CInt.min", sign: .t, otherSign: .d)
+                    input: "Int64.min", output: conversion(value: "Int64.min", sign: .t, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CInt.max", output: conversion(value: "CInt.max", sign: .t, otherSign: .d)
+                    input: "Int64.max", output: conversion(value: "Int64.max", sign: .t, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .t, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .t)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .t)
                 ),
-                TestParameters(input: "CUnsignedInt.max", output: "CInt.max")
+                TestParameters(input: "UInt64.max", output: "Int64.max")
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: "CUnsignedInt.min"
+                    input: "UInt64.min",
+                    output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max", output: "CUnsignedInt.max"
+                    input: "UInt64.max", output: "UInt64.max"
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .f, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .f)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .f)
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .f)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .f)
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .u, otherUnit: .fahrenheit, otherSign: .d, parameters: [
                 TestParameters(
-                    input: "CUnsignedInt.min",
-                    output: conversion(value: "CUnsignedInt.min", sign: .u, otherSign: .d)
+                    input: "UInt64.min",
+                    output: conversion(value: "UInt64.min", sign: .u, otherSign: .d)
                 ),
                 TestParameters(
-                    input: "CUnsignedInt.max",
-                    output: conversion(value: "CUnsignedInt.max", sign: .u, otherSign: .d)
+                    input: "UInt64.max",
+                    output: conversion(value: "UInt64.max", sign: .u, otherSign: .d)
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .t, parameters: [
                 TestParameters(
                     input: "-Float.greatestFiniteMagnitude",
-                    output: "CInt.min"
+                    output: "Int64.min"
                 ),
-                TestParameters(input: "Float.greatestFiniteMagnitude", output: "CInt.max")
+                TestParameters(input: "Float.greatestFiniteMagnitude", output: "Int64.max")
             ]),
             ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 TestParameters(
                     input: "-Float.greatestFiniteMagnitude",
-                    output: "CUnsignedInt.min"
+                    output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "Float.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                    input: "Float.greatestFiniteMagnitude", output: "UInt64.max"
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .f, otherUnit: .fahrenheit, otherSign: .f, parameters: [
@@ -170,17 +170,17 @@ final class TemperatureTestGeneratorKToDegFTests: XCTestCase, TestParameterTesta
             ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .t, parameters: [
                 TestParameters(
                     input: "-Double.greatestFiniteMagnitude",
-                    output: "CInt.min"
+                    output: "Int64.min"
                 ),
-                TestParameters(input: "Double.greatestFiniteMagnitude", output: "CInt.max")
+                TestParameters(input: "Double.greatestFiniteMagnitude", output: "Int64.max")
             ]),
             ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .u, parameters: [
                 TestParameters(
                     input: "-Double.greatestFiniteMagnitude",
-                    output: "CUnsignedInt.min"
+                    output: "UInt64.min"
                 ),
                 TestParameters(
-                    input: "Double.greatestFiniteMagnitude", output: "CUnsignedInt.max"
+                    input: "Double.greatestFiniteMagnitude", output: "UInt64.max"
                 )
             ]),
             ConversionTest(unit: .kelvin, sign: .d, otherUnit: .fahrenheit, otherSign: .f, parameters: [
@@ -261,7 +261,7 @@ final class TemperatureTestGeneratorKToDegFTests: XCTestCase, TestParameterTesta
                     ["-2500", "-25000", "-250000", "-2500000"].map {
                         TestParameters(
                             input: creator.sanitiseLiteral(literal: $0, sign: sign),
-                            output: "CUnsignedInt.min"
+                            output: "UInt64.min"
                         )
                     }
                 )

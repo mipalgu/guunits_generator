@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// MassUnitsTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,29 +57,42 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for `MassUnits`.
+final class MassUnitsTests: XCTestCase, UnitsTestable {
 
-    /// Test mps2.
-    func testMps2() {
+    /// Test microgram case.
+    func testMicrogram() {
         assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
+            value: MassUnits.microgram, rawValue: "microgram", abbreviation: "ug", description: "microgram"
         )
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
+    /// Test milligram case.
+    func testMilligram() {
+        assert(
+            value: MassUnits.milligram, rawValue: "milligram", abbreviation: "mg", description: "milligram"
+        )
     }
 
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// Test gram case.
+    func testGram() {
+        assert(
+            value: MassUnits.gram, rawValue: "gram", abbreviation: "g", description: "gram"
+        )
+    }
+
+    /// Test kilogram case.
+    func testKilogram() {
+        assert(
+            value: MassUnits.kilogram, rawValue: "kilogram", abbreviation: "kg", description: "kilogram"
+        )
+    }
+
+    /// Test megagram case.
+    func testMegaGram() {
+        assert(
+            value: MassUnits.megagram, rawValue: "megagram", abbreviation: "Mg", description: "megagram"
+        )
     }
 
 }

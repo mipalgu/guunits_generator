@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// CurrentUnitsTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,29 +57,44 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for `CurrentUnits`.
+final class CurrentUnitsTests: XCTestCase, UnitsTestable {
 
-    /// Test mps2.
-    func testMps2() {
+    /// Test micro amps.
+    func testMicroAmps() {
         assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
+            value: CurrentUnits.microamperes,
+            rawValue: "microamperes",
+            abbreviation: "uA",
+            description: "microamperes"
         )
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
+    /// Test milliamps.
+    func testMilliAmps() {
+        assert(
+            value: CurrentUnits.milliamperes,
+            rawValue: "milliamperes",
+            abbreviation: "mA",
+            description: "milliamperes"
+        )
     }
 
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// Test amps.
+    func testAmps() {
+        assert(
+            value: CurrentUnits.amperes,
+            rawValue: "amperes",
+            abbreviation: "A",
+            description: "amperes"
+        )
+    }
+
+    /// Test static variables.
+    func testStaticVariables() {
+        XCTAssertEqual(CurrentUnits.category, "Current")
+        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
+        XCTAssertTrue(CurrentUnits.sameZeroPoint)
     }
 
 }
