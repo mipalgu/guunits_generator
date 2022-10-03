@@ -57,7 +57,7 @@
  */
 
 /// Class for storing expected test result from an input.
-struct TestParameters: Hashable, Codable, Sendable {
+public struct TestParameters: Hashable, Codable, Sendable {
 
     /// The input into the test.
     let input: String

@@ -59,7 +59,7 @@
 // swiftlint:disable file_length
 
 /// Conforming types will generate test parameters for a specific unit.
-protocol TestGenerator {
+public protocol TestGenerator {
 
     /// Each generator works on a specific unit type.
     associatedtype UnitType: UnitProtocol where UnitType: RawRepresentable, UnitType.RawValue == String
