@@ -208,5 +208,80 @@ public typealias AngleUnitsGenerator = UnitsGenerator<
 Now we move on to generating the code that will test our generated source code.
 
 Testing this code is incredibly cumbersome, so we have provided protocols with default
-implementations in the test target to make this easier. Please look at the `AngleTestGenerator`
-tests in the test target for the code that tests this struct.
+implementations in the test target to make this easier. To create tests for your new type,
+you will have to conform to ``TestGenerator`` and implement the three functions defined
+in that protocol. Each function represents a type of test (unit to unit conversion, unit
+to numeric conversion or numeric to unit conversion). The purpose of these functions is to
+generate an array of input to output relations using ``TestParameters`` for each conversion.
+The generator code may then take these relations and generate `XCTest` test cases. The
+extensions of ``TestGenerator`` provide functions called `defaultParameters` that provide
+the default implemntation for the numeric conversions. You will need to delegate to these
+functions in your conformance if you wish to use the default parameters. Using the default
+parameters should be sufficient for the numeric conversions. Our new test generator
+will look like the code below to begin with.
+
+```swift
+struct AngleTestGenerator: TestGenerator {
+
+    typealias UnitType = AngleUnits
+
+    func testParameters(
+        from unit: AngleUnits, with sign: Signs, to otherUnit: AngleUnits, with otherSign: Signs
+    ) -> [TestParameters] {
+        // Need to implement...
+    }
+
+    func testParameters(
+        from unit: AngleUnits, with sign: Signs, to numeric: NumericTypes
+    ) -> [TestParameters] {
+        self.defaultParameters(from: unit, with: sign, to: numeric)
+    }
+
+    func testParameters(
+        from numeric: NumericTypes, to unit: AngleUnits, with sign: Signs
+    ) -> [TestParameters] {
+        self.defaultParameters(from: numeric, to: unit, with: sign)
+    }
+
+}
+```
+
+Now, if we wanted to test a conversion from a `degrees_t` value of *180 degrees* to `radians_t`,
+we would introduce a test parameter in our new test generator.
+
+```swift
+struct AngleTestGenerator: TestGenerator {
+
+    typealias UnitType = AngleUnits
+
+    func testParameters(
+        from unit: AngleUnits, with sign: Signs, to otherUnit: AngleUnits, with otherSign: Signs
+    ) -> [TestParameters] {
+        var testParameters: [TestParameters] = []
+        if unit == .degrees && sign == .t && otherUnit == .radians && otherSign == .t {
+            testParameters += [TestParameters(input: "180", output: "3")]
+        }
+        return testParameters
+    }
+
+    func testParameters(
+        from unit: AngleUnits, with sign: Signs, to numeric: NumericTypes
+    ) -> [TestParameters] {
+        self.defaultParameters(from: unit, with: sign, to: numeric)
+    }
+
+    func testParameters(
+        from numeric: NumericTypes, to unit: AngleUnits, with sign: Signs
+    ) -> [TestParameters] {
+        self.defaultParameters(from: numeric, to: unit, with: sign)
+    }
+
+}
+```
+
+You can see how this process can be incredibly cumbersome. You should try and test the edge cases by using the
+limits of the underlying numeric types (eg. `Signs.t.numericType.swiftType.limits`).
+
+Please look at the `AngleTestGenerator` tests in the test target for the code that tests this struct.
+
+## Generating the New Type
