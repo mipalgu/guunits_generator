@@ -59,7 +59,7 @@
 /// A struct that creates c-code for converting a unit between it's signed and unsigned variants.
 /// A unit may need to be represented as a different type in the c-implementation. The functions in
 /// this struct perform a cast into the desired unit without performing any unit conversions.
-struct SignConverter {
+public struct SignConverter {
 
     /// Change the sign of some unit. This function assumes you are converting to the same unit
     /// (eg. centimetres to centimetres). The purpose of this function is to change the
@@ -75,7 +75,7 @@ struct SignConverter {
     /// - Warning: This function assumes that you are converting to the same unit, just with a different
     ///            type (i.e. there is no unit conversion being performed in this function).
     ///            The result of the cast will be incorrect if this is not the case.
-    func convert<Unit: UnitProtocol>(
+    public func convert<Unit: UnitProtocol>(
         _ str: String,
         otherUnit: Unit,
         from sign: Signs,

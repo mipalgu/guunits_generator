@@ -58,7 +58,7 @@
 
 /// Struct used to generate test parameters for units that are convertable using
 /// constant factors. e.g. 10 millimetres in a centimetre.
-struct GradualTestGenerator<Unit>: TestGenerator where
+public struct GradualTestGenerator<Unit>: TestGenerator where
     Unit: UnitProtocol, Unit: RawRepresentable, Unit.RawValue == String {
 
     /// The creator which will sanitise literals.
@@ -78,7 +78,7 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     ///   - otherUnit: The unit to convert to.
     ///   - otherSign: The sign of the unit to convert to.
     /// - Returns: An array of test parameters for the conversion function.
-    func testParameters(
+    public func testParameters(
         from unit: Unit, with sign: Signs, to otherUnit: Unit, with otherSign: Signs
     ) -> [TestParameters] {
         if unit == otherUnit && sign == otherSign {
@@ -306,7 +306,9 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     ///   - sign: The sign of the unit.
     ///   - numeric: The numeric type to convert to.
     /// - Returns: The test parameters testing the conversion.
-    func testParameters(from unit: Unit, with sign: Signs, to numeric: NumericTypes) -> [TestParameters] {
+    public func testParameters(
+        from unit: Unit, with sign: Signs, to numeric: NumericTypes
+    ) -> [TestParameters] {
         self.defaultParameters(from: unit, with: sign, to: numeric)
     }
 
@@ -316,7 +318,9 @@ struct GradualTestGenerator<Unit>: TestGenerator where
     ///   - unit: The unit type to convert to.
     ///   - sign: The sign of the unit type to convert to.
     /// - Returns: An array of test parameters testing the conversion function.
-    func testParameters(from numeric: NumericTypes, to unit: Unit, with sign: Signs) -> [TestParameters] {
+    public func testParameters(
+        from numeric: NumericTypes, to unit: Unit, with sign: Signs
+    ) -> [TestParameters] {
         self.defaultParameters(from: numeric, to: unit, with: sign)
     }
 
