@@ -55,16 +55,20 @@
 // 
 
 /// Defines a velocity unit with a base unit of metres per second.
-struct Velocity: CompositeUnit {
+public struct Velocity: CompositeUnit {
 
     /// The base unit (SI m/s).
-    static var baseUnit: Operation = .division(
+    public static var baseUnit: Operation = .division(
         lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
         rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
     )
 
     /// A instance of this unit category.
-    let unit: Operation
+    public let unit: Operation
+
+    public init(unit: Operation) {
+        self.unit = unit
+    }
 
 }
 

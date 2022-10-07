@@ -72,7 +72,7 @@ public protocol CompositeUnit: UnitProtocol {
 }
 
 /// Default Implementation.
-extension CompositeUnit {
+public extension CompositeUnit {
 
     /// The different permutations of the subunits.
     static var allCases: [Self] {
