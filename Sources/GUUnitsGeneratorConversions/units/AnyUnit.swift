@@ -56,7 +56,7 @@
 
 /// A struct for type-erased units conforming to `UnitProtocol`.
 /// - SeeAlso: `UnitProtocol`.
-struct AnyUnit {
+struct AnyUnit: CustomStringConvertible {
 
     /// A function to retrieve the category.
     private var categoryFn: () -> String
