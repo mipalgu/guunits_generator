@@ -107,12 +107,12 @@ private extension Operation {
     func replace(convertibles: [AnyUnit: AnyUnit]) -> String {
         switch self {
         case .constant(let unit):
-            guard let newVal = convertibles[unit] else {
+            guard let newVal = convertibles[unit], newVal != unit else {
                 return self.cCode
             }
             let u1 = "\(unit)_d"
             let fn = "\(unit.abbreviation)_d_to_\(newVal.abbreviation)_d"
-            return "\(fn)(\(u1)(double(\(unit))))"
+            return "double(\(fn)(\(u1)(double(\(unit)))))"
         case .division(let lhs, let rhs):
             let lhs = lhs.replace(convertibles: convertibles)
             let rhs = rhs.replace(convertibles: convertibles)
