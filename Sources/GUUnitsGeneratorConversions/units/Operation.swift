@@ -58,7 +58,7 @@
 indirect enum Operation: Hashable {
 
     /// The unit itself as a constant.
-    case constant(declaration: AnyUnit)
+    case constant(declaration: AnyUnit, sign: Signs? = nil)
 
     /// A literal value, should not be used by itself as a stand-alone unit.
     case literal(declaration: Int)
@@ -79,8 +79,11 @@ indirect enum Operation: Hashable {
     /// The abbreviation of the operation.
     var abbreviation: String {
         switch self {
-        case .constant(let unit):
-            return unit.abbreviation
+        case .constant(let unit, let sign):
+            guard let sign = sign else {
+                return unit.abbreviation
+            }
+            return AnySignedUnit(unit: unit, sign: sign).abbreviation
         case .multiplication(let lhs, let rhs):
             let rhsAbbreviation = rhs.abbreviation
             let lhsAbbreviation = lhs.abbreviation
@@ -131,8 +134,11 @@ indirect enum Operation: Hashable {
     /// The description of the operation.
     var description: String {
         switch self {
-        case .constant(let unit):
-            return unit.description
+        case .constant(let unit, let sign):
+            guard let sign = sign else {
+                return unit.description
+            }
+            return AnySignedUnit(unit: unit, sign: sign).description
         case .multiplication(let lhs, let rhs):
             let rhsDescription = rhs.description
             let lhsDescription = lhs.description
@@ -183,9 +189,14 @@ indirect enum Operation: Hashable {
     /// Provides all possible combinations of unit category cases for the operation.
     var allCases: [Operation] {
         switch self {
-        case .constant(let unit):
-            return unit.allCases.map {
-                Operation.constant(declaration: $0)
+        case .constant(let unit, let sign):
+            guard let sign = sign else {
+                return unit.allCases.map {
+                    Operation.constant(declaration: $0)
+                }
+            }
+            return AnySignedUnit(unit: unit, sign: sign).allCases.map {
+                Operation.constant(declaration: $0.unit, sign: $0.sign)
             }
         case .multiplication(let lhs, let rhs):
             return lhs.allCases.flatMap { lhsUnit in
