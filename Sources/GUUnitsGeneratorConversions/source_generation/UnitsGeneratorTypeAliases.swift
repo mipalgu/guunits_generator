@@ -1,3 +1,4 @@
+/// Generator used for ``CompositeUnit`` types.
 public typealias OperationalGenerator<Unit: CompositeUnit> = UnitsGenerator<
     CompositeFunctionCreator<
         OperationalFunctionBodyCreator<Unit>,
