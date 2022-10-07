@@ -55,7 +55,7 @@
 // 
 
 /// Enum for defining common operations in a composite unit.
-indirect enum Operation: Hashable {
+@frozen public indirect enum Operation: Hashable {
 
     /// The unit itself as a constant.
     case constant(declaration: AnyUnit)

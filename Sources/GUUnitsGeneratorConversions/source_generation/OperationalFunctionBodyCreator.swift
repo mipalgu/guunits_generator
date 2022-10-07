@@ -54,9 +54,11 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Unit: CompositeUnit {
+public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Unit: CompositeUnit {
 
-    func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+    public init() {}
+
+    public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         guard unit != otherUnit || sign != otherSign else {
             return "return " + unit.description + ";"
         }

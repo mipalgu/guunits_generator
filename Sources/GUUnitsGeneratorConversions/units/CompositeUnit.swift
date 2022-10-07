@@ -57,7 +57,7 @@
 /// Defines a category that is created from relationships of other units. This protocol
 /// defines a class of unit that uses different `UnitProtocol` types
 /// in it's definition.
-protocol CompositeUnit: UnitProtocol {
+public protocol CompositeUnit: UnitProtocol {
 
     /// The base operation of this unit.
     static var baseUnit: Operation { get }

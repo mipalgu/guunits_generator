@@ -56,7 +56,7 @@
 
 /// A struct for type-erased units conforming to `UnitProtocol`.
 /// - SeeAlso: `UnitProtocol`.
-struct AnyUnit: CustomStringConvertible {
+public struct AnyUnit: CustomStringConvertible {
 
     /// A function to retrieve the category.
     private var categoryFn: () -> String
@@ -77,38 +77,38 @@ struct AnyUnit: CustomStringConvertible {
     private var highestPrecisionFn: () -> AnyUnit
 
     /// The category of the unit.
-    var category: String {
+    public var category: String {
         categoryFn()
     }
 
     /// Whether the category has the same zero point accross all units.
-    var sameZeroPoint: Bool {
+    public var sameZeroPoint: Bool {
         sameZeroPointFn()
     }
 
     /// The abbreviation of the unit.
-    var abbreviation: String {
+    public var abbreviation: String {
         abbreviationFn()
     }
 
     /// The string representation of the unit.
-    var description: String {
+    public var description: String {
         descriptionFn()
     }
 
     /// All of the unit cases in the category type.
-    var allCases: [AnyUnit] {
+    public var allCases: [AnyUnit] {
         allCasesFn()
     }
 
     /// The unit in the category with the highest precision.
-    var highestPrecision: AnyUnit {
+    public var highestPrecision: AnyUnit {
         highestPrecisionFn()
     }
 
     /// Type-Erase a type unit conforming to `UnitProtocol`.
     /// - Parameter unit: The unit to type erase.
-    init<T>(_ unit: T) where T: UnitProtocol {
+    public init<T>(_ unit: T) where T: UnitProtocol {
         self.categoryFn = { T.category }
         self.sameZeroPointFn = { T.sameZeroPoint }
         self.abbreviationFn = { unit.abbreviation }
@@ -129,13 +129,13 @@ struct AnyUnit: CustomStringConvertible {
 extension AnyUnit: Hashable {
 
     /// Equality operation.
-    static func == (lhs: AnyUnit, rhs: AnyUnit) -> Bool {
+    public static func == (lhs: AnyUnit, rhs: AnyUnit) -> Bool {
         lhs.abbreviation == rhs.abbreviation && lhs.category == rhs.category
             && lhs.description == rhs.description && lhs.sameZeroPoint == rhs.sameZeroPoint
     }
 
     /// Hash operation.
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(abbreviation)
         hasher.combine(description)
         hasher.combine(category)

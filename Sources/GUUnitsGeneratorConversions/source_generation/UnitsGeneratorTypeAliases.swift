@@ -1,3 +1,11 @@
+public typealias OperationalGenerator<Unit: CompositeUnit> = UnitsGenerator<
+    CompositeFunctionCreator<
+        OperationalFunctionBodyCreator<Unit>,
+        CFunctionDefinitionCreator<Unit>,
+        NumericTypeConverter
+    >
+>
+
 /// Distance Units Generator
 public typealias DistanceUnitsGenerator = UnitsGenerator<
     CompositeFunctionCreator<
