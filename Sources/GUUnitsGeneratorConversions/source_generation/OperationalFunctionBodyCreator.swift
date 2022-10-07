@@ -60,20 +60,21 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Un
 
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         guard unit != otherUnit || sign != otherSign else {
-            return "return " + unit.description + ";"
+            return "    return " + unit.description + ";"
         }
         guard unit != otherUnit else {
             let num0 = sign.numericType
-            let num1 = otherSign.numericType
-            return "return \(otherUnit)_\(otherSign)(" +
-                "\(num0.abbreviation)_to_\(num1.abbreviation)(\(num0.rawValue)(\(unit))));"
+            return "    return \(num0.abbreviation)_to_\(otherUnit.abbreviation)_\(otherSign)" +
+                "(((\(num0.rawValue)) (\(unit))));"
         }
         let convertibles = unit.unit.getUnitConvertibles(comparingTo: otherUnit.unit)
-        let implementation = "\(otherUnit)_d(\(unit.unit.replace(convertibles: convertibles)))"
+        let implementation = "(((\(otherUnit)_d) ((double) (\(unit)))) * " +
+            "(\(unit.unit.replace(convertibles: convertibles))))"
         if otherSign == .d {
-            return "return \(implementation);"
+            return "    return \(implementation);"
         } else {
-            return "return \(otherUnit)_d_to_\(otherUnit)_\(otherSign)(\(implementation));"
+            return "    return \(otherUnit.abbreviation)_d_to_\(otherUnit.abbreviation)_\(otherSign)" +
+                "(\(implementation));"
         }
     }
 
@@ -84,7 +85,7 @@ private extension Operation {
     var cCode: String {
         switch self {
         case .constant(let unit):
-            return "double(\(unit))"
+            return "((double) (\(unit)))"
         case .division(let lhs, let rhs):
             return "\(lhs.cCode) / \(rhs.cCode)"
         case .exponentiate(let base, let power):
@@ -98,7 +99,7 @@ private extension Operation {
             }
             return "pow(\(base.cCode), \(power.cCode))"
         case .literal(let declaration):
-            return "double(\(declaration))"
+            return "((double) (\(declaration)))"
         case .multiplication(let lhs, let rhs):
             return "\(lhs.cCode) * \(rhs.cCode)"
         case .precedence(let operation):
@@ -110,11 +111,11 @@ private extension Operation {
         switch self {
         case .constant(let unit):
             guard let newVal = convertibles[unit], newVal != unit else {
-                return self.cCode
+                return "((double) (1.0))"
             }
             let u1 = "\(unit)_d"
             let fn = "\(unit.abbreviation)_d_to_\(newVal.abbreviation)_d"
-            return "double(\(fn)(\(u1)(double(\(unit)))))"
+            return "((double) (\(fn)(((\(u1)) (1.0)))))"
         case .division(let lhs, let rhs):
             let lhs = lhs.replace(convertibles: convertibles)
             let rhs = rhs.replace(convertibles: convertibles)
@@ -122,7 +123,7 @@ private extension Operation {
         case .exponentiate(let base, let power):
             let base = base.replace(convertibles: convertibles)
             let power = power.replace(convertibles: convertibles)
-            return "pow(double(\(base)), double(\(power)))"
+            return "pow(((double) (\(base))), ((double) (\(power))))"
         case .literal:
             return self.cCode
         case .multiplication(let lhs, let rhs):
