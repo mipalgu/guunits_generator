@@ -95,4 +95,61 @@ final class MassUnitsTests: XCTestCase, UnitsTestable {
         )
     }
 
+    func testUnitDifference() {
+        XCTAssertEqual(
+            MassUnits.unitDifference,
+            [
+                .microgram: 1000,
+                .milligram: 1000,
+                .gram: 1000,
+                .kilogram: 1000
+            ]
+        )
+    }
+
+    func testAllCases() {
+        XCTAssertEqual(
+            MassUnits.allCases,
+            [
+                .microgram,
+                .milligram,
+                .gram,
+                .kilogram,
+                .megagram
+            ]
+        )
+    }
+
+    func testConversionToGreaterUnit() {
+        let result = MassUnits.milligram.conversion(to: .kilogram)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(MassUnits.milligram)), rhs: .literal(declaration: 1000000)
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    func testConversionToSmallerUnit() {
+        let result = MassUnits.kilogram.conversion(to: .milligram)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)), rhs: .literal(declaration: 1000000)
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    func testConversionFromSmallerUnit() {
+        let result = MassUnits.kilogram.conversion(from: .milligram)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(MassUnits.milligram)), rhs: .literal(declaration: 1000000)
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    func testConversionFromGreaterUnit() {
+        let result = MassUnits.milligram.conversion(from: .kilogram)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)), rhs: .literal(declaration: 1000000)
+        )
+        XCTAssertEqual(result, expected)
+    }
+
 }

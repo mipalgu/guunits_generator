@@ -1,4 +1,4 @@
-// Mass.swift 
+// UnitsConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,52 +54,10 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Unit for representing mass.
-public enum MassUnits: String, UnitProtocol, GradualUnitsConvertible {
+protocol UnitsConvertible {
 
-    /// Micrograms.
-    case microgram
+    func conversion(from unit: Self) -> Operation
 
-    /// Milligrams.
-    case milligram
-
-    /// Grams.
-    case gram
-
-    /// Kilograms.
-    case kilogram
-
-    /// Megagrams or Metric Tonnes.
-    case megagram
-
-    public static var unitDifference: [MassUnits: Int] {
-        [
-            .microgram: 1000,
-            .milligram: 1000,
-            .gram: 1000,
-            .kilogram: 1000
-        ]
-    }
-
-    /// The abbreviation of the unit.
-    public var abbreviation: String {
-        switch self {
-        case .microgram:
-            return "ug"
-        case .milligram:
-            return "mg"
-        case .gram:
-            return "g"
-        case .kilogram:
-            return "kg"
-        case .megagram:
-            return "Mg"
-        }
-    }
-
-    /// The string equivalent value of the unit.
-    public var description: String {
-        self.rawValue
-    }
+    func conversion(to unit: Self) -> Operation
 
 }

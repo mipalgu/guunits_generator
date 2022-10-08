@@ -1,4 +1,4 @@
-// Mass.swift 
+// GradualUnitsConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,52 +54,72 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Unit for representing mass.
-public enum MassUnits: String, UnitProtocol, GradualUnitsConvertible {
+protocol GradualUnitsConvertible: UnitsConvertible where Self: Hashable {
 
-    /// Micrograms.
-    case microgram
+    static var unitDifference: [Self: Int] { get }
 
-    /// Milligrams.
-    case milligram
+}
 
-    /// Grams.
-    case gram
+extension GradualUnitsConvertible where Self: UnitProtocol {
 
-    /// Kilograms.
-    case kilogram
-
-    /// Megagrams or Metric Tonnes.
-    case megagram
-
-    public static var unitDifference: [MassUnits: Int] {
-        [
-            .microgram: 1000,
-            .milligram: 1000,
-            .gram: 1000,
-            .kilogram: 1000
-        ]
-    }
-
-    /// The abbreviation of the unit.
-    public var abbreviation: String {
-        switch self {
-        case .microgram:
-            return "ug"
-        case .milligram:
-            return "mg"
-        case .gram:
-            return "g"
-        case .kilogram:
-            return "kg"
-        case .megagram:
-            return "Mg"
+    func conversion(from unit: Self) -> Operation {
+        guard Self.unitDifference.count == Self.allCases.count - 1 else {
+            fatalError("Unit Difference is not complete.")
         }
+        let units = unitsBetween(unit: unit)
+        guard self == units.last || self == units.first else {
+            fatalError("Failed to get units between \(self) and \(unit).")
+        }
+        let totalUnits = self == units.last ? units.dropLast() : units.dropFirst()
+        let total = totalUnits.reduce(1) {
+            guard let val = Self.unitDifference[$1] else {
+                fatalError("Unit Difference is not complete.")
+            }
+            return $0 * val
+        }
+        guard self == units.last else {
+            return .multiplication(
+                lhs: .constant(declaration: AnyUnit(unit)), rhs: .literal(declaration: total)
+            )
+        }
+        return .division(lhs: .constant(declaration: AnyUnit(unit)), rhs: .literal(declaration: total))
     }
 
-    /// The string equivalent value of the unit.
-    public var description: String {
-        self.rawValue
+    func conversion(to unit: Self) -> Operation {
+        guard Self.unitDifference.count == Self.allCases.count - 1 else {
+            fatalError("Unit Difference is not complete.")
+        }
+        let units = unitsBetween(unit: unit)
+        guard self == units.last || self == units.first else {
+            fatalError("Failed to get units between \(self) and \(unit).")
+        }
+        let totalUnits = self == units.last ? units.dropLast() : units.dropFirst()
+        let total = totalUnits.reduce(1) {
+            guard let val = Self.unitDifference[$1] else {
+                fatalError("Unit Difference is not complete.")
+            }
+            return $0 * val
+        }
+        guard self == units.last else {
+            return .division(lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: total))
+        }
+        return .multiplication(lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: total))
+    }
+
+    private func unitsBetween(unit: Self) -> [Self] {
+        guard
+            let me = Self.allCases.firstIndex(where: {
+                $0 == self
+            }),
+            let other = Self.allCases.firstIndex(where: {
+                $0 == unit
+            })
+        else {
+            fatalError("Missing cases in allCases")
+        }
+        let max = max(me, other)
+        let min = min(me, other)
+        return Array(Self.allCases[min...max])
     }
 
 }
