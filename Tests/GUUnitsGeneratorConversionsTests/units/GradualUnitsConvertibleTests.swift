@@ -85,7 +85,7 @@ final class GradualUnitsconvertibleTests: XCTestCase {
 
     func testConversionFromCToA() {
         let conversion = TestUnit.c.conversion(to: TestUnit.a)
-        let expected = Operation.division(
+        let expected = Operation.multiplication(
             lhs: .constant(declaration: AnyUnit(TestUnit.c)),
             rhs: .literal(declaration: .integer(value: 1000000))
         )
