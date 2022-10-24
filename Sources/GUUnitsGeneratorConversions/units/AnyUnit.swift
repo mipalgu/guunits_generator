@@ -76,6 +76,10 @@ public struct AnyUnit: CustomStringConvertible {
     /// A function that retrieves the unit in the category with the highest precision.
     private var highestPrecisionFn: () -> AnyUnit
 
+    private var conversionTo: (AnyUnit) -> Operation
+
+    private var conversionFrom: (AnyUnit) -> Operation
+
     /// The category of the unit.
     public var category: String {
         categoryFn()
@@ -108,7 +112,7 @@ public struct AnyUnit: CustomStringConvertible {
 
     /// Type-Erase a type unit conforming to `UnitProtocol`.
     /// - Parameter unit: The unit to type erase.
-    public init<T>(_ unit: T) where T: UnitProtocol {
+    public init<T>(_ unit: T) where T: UnitProtocol, T: UnitsConvertible {
         self.categoryFn = { T.category }
         self.sameZeroPointFn = { T.sameZeroPoint }
         self.abbreviationFn = { unit.abbreviation }
@@ -121,6 +125,26 @@ public struct AnyUnit: CustomStringConvertible {
         self.highestPrecisionFn = {
             AnyUnit(T.highestPrecision)
         }
+        self.conversionTo = {
+            guard let t = T(description: $0.description) else {
+                fatalError("Trying to convert unit from incorrect category")
+            }
+            return unit.conversion(to: t)
+        }
+        self.conversionFrom = {
+            guard let t = T(description: $0.description) else {
+                fatalError("Trying to convert unit from incorrect category")
+            }
+            return unit.conversion(from: t)
+        }
+    }
+
+    func conversion(to unit: AnyUnit) -> Operation {
+        self.conversionTo(unit)
+    }
+
+    func conversion(from unit: AnyUnit) -> Operation {
+        self.conversionFrom(unit)
     }
 
 }

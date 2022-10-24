@@ -57,7 +57,7 @@
  */
 
 /// A Unit for representing distances.
-public enum DistanceUnits: String {
+public enum DistanceUnits: String, UnitProtocol, GradualUnitsConvertible {
 
     /// Millimetres
     case millimetres
@@ -68,10 +68,11 @@ public enum DistanceUnits: String {
     /// Metres
     case metres
 
-}
-
-/// UnitProtocol conformance.
-extension DistanceUnits: UnitProtocol {
+    static public var unitDifference: [DistanceUnits: Int] = [
+        .millimetres: 1000,
+        .centimetres: 1000,
+        .metres: 1
+    ]
 
     /// The abbreviation of the unit.
     public var abbreviation: String {

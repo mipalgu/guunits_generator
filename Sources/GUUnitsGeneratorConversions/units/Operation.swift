@@ -58,11 +58,17 @@
 @frozen
 public indirect enum Operation: Hashable {
 
+    /// Two operations added together.
+    case addition(lhs: Operation, rhs: Operation)
+
+    /// LHS operation minus RHS operation.
+    case subtraction(lhs: Operation, rhs: Operation)
+
     /// The unit itself as a constant.
     case constant(declaration: AnyUnit)
 
     /// A literal value, should not be used by itself as a stand-alone unit.
-    case literal(declaration: Int)
+    case literal(declaration: Literal)
 
     /// Two operations multiplied together.
     case multiplication(lhs: Operation, rhs: Operation)
@@ -105,27 +111,33 @@ public indirect enum Operation: Hashable {
                 return lhsAbbreviation
             }
             if lhsAbbreviation == "1" {
-                return Operation.exponentiate(base: rhs, power: .literal(declaration: -1)).abbreviation
+                return Operation.exponentiate(
+                    base: rhs, power: .literal(declaration: .integer(value: -1))
+                ).abbreviation
             }
             return lhsAbbreviation + "_per_" + rhsAbbreviation
         case .precedence(let operation):
             return "_" + operation.abbreviation + "_"
         case .exponentiate(let base, let power):
-            if case let .literal(num) = power, num == 0 {
+            if case let .literal(lit) = power, case let .integer(num) = lit, num == 0 {
                 return "1"
             }
             if power.abbreviation == "1" {
                 return base.abbreviation
             }
-            if case let .literal(num) = power, num == 2 {
+            if case let .literal(lit) = power, case let .integer(num) = lit, num == 2 {
                 return base.abbreviation + "_sq"
             }
-            if case let .literal(num) = power, num == 3 {
+            if case let .literal(lit) = power, case let .integer(num) = lit, num == 3 {
                 return base.abbreviation + "_cub"
             }
             return base.abbreviation + "_pwr_\(power.abbreviation)"
         case .literal(let literal):
             return literal.abbreviation
+        case .addition(let lhs, let rhs):
+            return "\(lhs.abbreviation)_plus_\(rhs.abbreviation)"
+        case .subtraction(let lhs, let rhs):
+            return "\(lhs.abbreviation)_minus_\(rhs.abbreviation)"
         }
     }
 
@@ -157,27 +169,33 @@ public indirect enum Operation: Hashable {
                 return lhsDescription
             }
             if lhsDescription == "1" {
-                return Operation.exponentiate(base: rhs, power: .literal(declaration: -1)).abbreviation
+                return Operation.exponentiate(
+                    base: rhs, power: .literal(declaration: .integer(value: -1))
+                ).abbreviation
             }
             return lhsDescription + "_per_" + rhsDescription
         case .precedence(let operation):
             return "_" + operation.description + "_"
         case .exponentiate(let base, let power):
-            if case let .literal(num) = power, num == 0 {
+            if case let .literal(lit) = power, case let .integer(num) = lit, num == 0 {
                 return "1"
             }
             if power.description == "1" {
                 return base.description
             }
-            if case let .literal(num) = power, num == 2 {
+            if case let .literal(lit) = power, case let .integer(num) = lit, num == 2 {
                 return base.description + "_sq"
             }
-            if case let .literal(num) = power, num == 3 {
+            if case let .literal(lit) = power, case let .integer(num) = lit, num == 3 {
                 return base.description + "_cub"
             }
             return base.description + "_pwr_\(power.description)"
         case .literal(let literal):
-            return literal.description
+            return literal.abbreviation
+        case .addition(let lhs, let rhs):
+            return "\(lhs.description)_plus_\(rhs.description)"
+        case .subtraction(let lhs, let rhs):
+            return "\(lhs.description)_minus_\(rhs.description)"
         }
     }
 
@@ -212,20 +230,60 @@ public indirect enum Operation: Hashable {
             }
         case .literal:
             return [self]
+        case .addition(let lhs, let rhs):
+            return lhs.allCases.flatMap { lhsUnit in
+                rhs.allCases.map { rhsUnit in
+                    Operation.addition(lhs: lhsUnit, rhs: rhsUnit)
+                }
+            }
+        case .subtraction(let lhs, let rhs):
+            return lhs.allCases.flatMap { lhsUnit in
+                rhs.allCases.map { rhsUnit in
+                    Operation.subtraction(lhs: lhsUnit, rhs: rhsUnit)
+                }
+            }
         }
     }
 
 }
 
-/// Add abbreviation to Int.
-private extension Int {
+extension Operation: UnitsConvertible {
 
-    /// The abbreviation of the Int.
-    var abbreviation: String {
-        guard self > 0 else {
-            return "neg" + abs(self).abbreviation
-        }
-        return "\(self)"
+    public func conversion(from unit: Operation) -> Operation {
+        unit.conversion(to: self)
     }
+
+    public func conversion(to unit: Operation) -> Operation {
+        fatalError("Not yet implemented!")
+        // let convertibles = self.getUnitConvertibles(comparingTo: unit)
+        // switch self {
+        // case .constant(let me):
+        //     guard let newVal = convertibles[unit], newVal != unit else {
+        //         return self
+        //     }
+        //     return me.conversion(to: AnyUnit(Velocity(unit: unit)))
+        //     let u1 = "\(unit)_d"
+        //     let fn = "\(unit.abbreviation)_d_to_\(newVal.abbreviation)_d"
+        //     return "((double) (\(fn)(((\(u1)) (1.0)))))"
+        // case .division(let lhs, let rhs):
+        //     let lhs = lhs.replace(convertibles: convertibles)
+        //     let rhs = rhs.replace(convertibles: convertibles)
+        //     return "(\(lhs)) / (\(rhs))"
+        // case .exponentiate(let base, let power):
+        //     let base = base.replace(convertibles: convertibles)
+        //     let power = power.replace(convertibles: convertibles)
+        //     return "pow(((double) (\(base))), ((double) (\(power))))"
+        // case .literal:
+        //     return self.cCode
+        // case .multiplication(let lhs, let rhs):
+        //     let lhs = lhs.replace(convertibles: convertibles)
+        //     let rhs = rhs.replace(convertibles: convertibles)
+        //     return "(\(lhs)) * (\(rhs))"
+        // case .precedence(let operation):
+        //     let operation = operation.replace(convertibles: convertibles)
+        //     return "(\(operation))"
+        // }
+    }
+
 
 }

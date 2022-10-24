@@ -65,7 +65,7 @@ final class OperationTests: XCTestCase {
         lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
         rhs: Operation.exponentiate(
             base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
-            power: Operation.literal(declaration: 2)
+            power: Operation.literal(declaration: .integer(value: 2))
         )
     )
 
@@ -87,7 +87,8 @@ final class OperationTests: XCTestCase {
                 )
             ),
             rhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: .literal(declaration: .integer(value: 3))
             )
         )
         XCTAssertEqual(
@@ -109,7 +110,8 @@ final class OperationTests: XCTestCase {
                 )
             ),
             rhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 4)
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: .literal(declaration: .integer(value: 4))
             )
         )
         XCTAssertEqual(
@@ -131,7 +133,8 @@ final class OperationTests: XCTestCase {
                 )
             ),
             rhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: -4)
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: .literal(declaration: .integer(value: -4))
             )
         )
         XCTAssertEqual(
@@ -146,7 +149,7 @@ final class OperationTests: XCTestCase {
             lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: Operation.exponentiate(
                 base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
-                power: Operation.literal(declaration: 0)
+                power: Operation.literal(declaration: .integer(value: 0))
             )
         )
         XCTAssertEqual(operation.abbreviation, "m")
@@ -158,7 +161,7 @@ final class OperationTests: XCTestCase {
             lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: Operation.exponentiate(
                 base: Operation.constant(declaration: AnyUnit(TimeUnits.seconds)),
-                power: Operation.literal(declaration: 1)
+                power: Operation.literal(declaration: .integer(value: 1))
             )
         )
         XCTAssertEqual(operation.abbreviation, "m_per_s")
@@ -167,7 +170,7 @@ final class OperationTests: XCTestCase {
     /// Test the abbreviation of the case where the unit is an inverse.
     func testAbbreviationNeg1Case() {
         let operation = Operation.division(
-            lhs: .literal(declaration: 1),
+            lhs: .literal(declaration: .integer(value: 1)),
             rhs: Operation.constant(declaration: AnyUnit(TimeUnits.seconds))
         )
         XCTAssertEqual(operation.abbreviation, "s_pwr_neg1")
@@ -215,7 +218,8 @@ final class OperationTests: XCTestCase {
                 )
             ),
             rhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(TimeUnits.seconds)), power: .literal(declaration: 3)
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: .literal(declaration: .integer(value: 3))
             )
         )
         .allCases.map(\.abbreviation))

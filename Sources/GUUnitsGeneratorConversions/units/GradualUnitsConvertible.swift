@@ -54,7 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-protocol GradualUnitsConvertible: UnitsConvertible where Self: Hashable {
+public protocol GradualUnitsConvertible: UnitsConvertible where Self: Hashable {
 
     static var unitDifference: [Self: Int] { get }
 
@@ -62,31 +62,15 @@ protocol GradualUnitsConvertible: UnitsConvertible where Self: Hashable {
 
 extension GradualUnitsConvertible where Self: UnitProtocol {
 
-    func conversion(from unit: Self) -> Operation {
-        guard Self.unitDifference.count == Self.allCases.count - 1 else {
-            fatalError("Unit Difference is not complete.")
-        }
-        let units = unitsBetween(unit: unit)
-        guard self == units.last || self == units.first else {
-            fatalError("Failed to get units between \(self) and \(unit).")
-        }
-        let totalUnits = self == units.last ? units.dropLast() : units.dropFirst()
-        let total = totalUnits.reduce(1) {
-            guard let val = Self.unitDifference[$1] else {
-                fatalError("Unit Difference is not complete.")
-            }
-            return $0 * val
-        }
-        guard self == units.last else {
-            return .multiplication(
-                lhs: .constant(declaration: AnyUnit(unit)), rhs: .literal(declaration: total)
-            )
-        }
-        return .division(lhs: .constant(declaration: AnyUnit(unit)), rhs: .literal(declaration: total))
+    public func conversion(from unit: Self) -> Operation {
+        unit.conversion(to: self)
     }
 
-    func conversion(to unit: Self) -> Operation {
-        guard Self.unitDifference.count == Self.allCases.count - 1 else {
+    public func conversion(to unit: Self) -> Operation {
+        guard unit != self else {
+            return .constant(declaration: AnyUnit(self))
+        }
+        guard Self.unitDifference.count == Self.allCases.count else {
             fatalError("Unit Difference is not complete.")
         }
         let units = unitsBetween(unit: unit)
@@ -101,9 +85,13 @@ extension GradualUnitsConvertible where Self: UnitProtocol {
             return $0 * val
         }
         guard self == units.last else {
-            return .division(lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: total))
+            return .division(
+                lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
+            )
         }
-        return .multiplication(lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: total))
+        return .multiplication(
+            lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
+        )
     }
 
     private func unitsBetween(unit: Self) -> [Self] {

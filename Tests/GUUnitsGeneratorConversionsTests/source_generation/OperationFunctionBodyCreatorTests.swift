@@ -62,13 +62,13 @@ final class OperationFunctionBodyCreatorTests: XCTestCase {
 
     let velocity = Velocity(unit: Velocity.baseUnit)
 
-    let creator = OperationalFunctionBodyCreator<Velocity>()
+    let creator = OperationalFunctionBodyCreator<MassUnits>()
 
     func testConversions() {
-        let conversions = Velocity.allCases.flatMap { vel in
+        let conversions = MassUnits.allCases.flatMap { mass in
             Signs.allCases.flatMap { s0 in
                 Signs.allCases.map { s1 in
-                    creator.createFunction(unit: velocity, to: vel, sign: s0, otherSign: s1)
+                    creator.createFunction(unit: .gram, to: mass, sign: s0, otherSign: s1)
                 }
             }
         }

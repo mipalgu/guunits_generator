@@ -1,4 +1,4 @@
-// Mass.swift 
+// Literal.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,53 +54,43 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Unit for representing mass.
-public enum MassUnits: String, UnitProtocol, GradualUnitsConvertible {
+public enum Literal: Hashable {
 
-    /// Micrograms.
-    case microgram
+    case integer(value: Int)
 
-    /// Milligrams.
-    case milligram
+    case decimal(value: Double)
 
-    /// Grams.
-    case gram
-
-    /// Kilograms.
-    case kilogram
-
-    /// Megagrams or Metric Tonnes.
-    case megagram
-
-    public static var unitDifference: [MassUnits: Int] {
-        [
-            .microgram: 1000,
-            .milligram: 1000,
-            .gram: 1000,
-            .kilogram: 1000,
-            .megagram: 1
-        ]
-    }
-
-    /// The abbreviation of the unit.
-    public var abbreviation: String {
+    var abbreviation: String {
         switch self {
-        case .microgram:
-            return "ug"
-        case .milligram:
-            return "mg"
-        case .gram:
-            return "g"
-        case .kilogram:
-            return "kg"
-        case .megagram:
-            return "Mg"
+        case .integer(let value):
+            return value.abbreviation
+        case .decimal(let value):
+            return value.abbreviation
         }
     }
 
-    /// The string equivalent value of the unit.
-    public var description: String {
-        self.rawValue
+}
+
+/// Add abbreviation to Int.
+private extension Int {
+
+    /// The abbreviation of the Int.
+    var abbreviation: String {
+        guard self > 0 else {
+            return "neg" + abs(self).abbreviation
+        }
+        return "\(self)"
+    }
+
+}
+
+private extension Double {
+
+    var abbreviation: String {
+        guard self > 0 else {
+            return "neg" + abs(self).abbreviation
+        }
+        return String(format: "%.2f", arguments: [self])
     }
 
 }

@@ -57,7 +57,7 @@
  */
 
 /// A type for representing different time units.
-public enum TimeUnits: String {
+public enum TimeUnits: String, UnitProtocol, GradualUnitsConvertible {
 
     /// Microseconds.
     case microseconds
@@ -68,10 +68,11 @@ public enum TimeUnits: String {
     /// Seconds
     case seconds
 
-}
-
-/// UnitProtocol conformance.
-extension TimeUnits: UnitProtocol {
+    static public var unitDifference: [TimeUnits: Int] = [
+        .microseconds: 1000,
+        .milliseconds: 1000,
+        .seconds: 1
+    ]
 
     /// The abbreviation of the time unit.
     public var abbreviation: String {

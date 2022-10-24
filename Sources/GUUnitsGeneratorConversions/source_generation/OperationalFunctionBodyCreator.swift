@@ -54,143 +54,32 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Unit: CompositeUnit {
+public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Unit: UnitProtocol, Unit: UnitsConvertible {
 
     public init() {}
 
+    // public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+    //     guard unit != otherUnit || sign != otherSign else {
+    //         return "    return " + unit.description + ";"
+    //     }
+    //     guard unit != otherUnit else {
+    //         let num0 = sign.numericType
+    //         return "    return \(num0.abbreviation)_to_\(otherUnit.abbreviation)_\(otherSign)" +
+    //             "(((\(num0.rawValue)) (\(unit))));"
+    //     }
+    //     let convertibles = unit.unit.getUnitConvertibles(comparingTo: otherUnit.unit)
+    //     let implementation = "(((\(otherUnit)_d) ((double) (\(unit)))) * " +
+    //         "(\(unit.unit.replace(convertibles: convertibles))))"
+    //     if otherSign == .d {
+    //         return "    return \(implementation);"
+    //     } else {
+    //         return "    return \(otherUnit.abbreviation)_d_to_\(otherUnit.abbreviation)_\(otherSign)" +
+    //             "(\(implementation));"
+    //     }
+    // }
+
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        guard unit != otherUnit || sign != otherSign else {
-            return "    return " + unit.description + ";"
-        }
-        guard unit != otherUnit else {
-            let num0 = sign.numericType
-            return "    return \(num0.abbreviation)_to_\(otherUnit.abbreviation)_\(otherSign)" +
-                "(((\(num0.rawValue)) (\(unit))));"
-        }
-        let convertibles = unit.unit.getUnitConvertibles(comparingTo: otherUnit.unit)
-        let implementation = "(((\(otherUnit)_d) ((double) (\(unit)))) * " +
-            "(\(unit.unit.replace(convertibles: convertibles))))"
-        if otherSign == .d {
-            return "    return \(implementation);"
-        } else {
-            return "    return \(otherUnit.abbreviation)_d_to_\(otherUnit.abbreviation)_\(otherSign)" +
-                "(\(implementation));"
-        }
-    }
-
-}
-
-private extension Operation {
-
-    var cCode: String {
-        switch self {
-        case .constant(let unit):
-            return "((double) (\(unit)))"
-        case .division(let lhs, let rhs):
-            return "\(lhs.cCode) / \(rhs.cCode)"
-        case .exponentiate(let base, let power):
-            if power == .literal(declaration: 2) {
-                return Operation.multiplication(lhs: base, rhs: base).cCode
-            }
-            if power == .literal(declaration: 3) {
-                return Operation.multiplication(
-                    lhs: base, rhs: .multiplication(lhs: base, rhs: base)
-                ).cCode
-            }
-            return "pow(\(base.cCode), \(power.cCode))"
-        case .literal(let declaration):
-            return "((double) (\(declaration)))"
-        case .multiplication(let lhs, let rhs):
-            return "\(lhs.cCode) * \(rhs.cCode)"
-        case .precedence(let operation):
-            return "(\(operation.cCode))"
-        }
-    }
-
-    func replace(convertibles: [AnyUnit: AnyUnit]) -> String {
-        switch self {
-        case .constant(let unit):
-            guard let newVal = convertibles[unit], newVal != unit else {
-                return "((double) (1.0))"
-            }
-            let u1 = "\(unit)_d"
-            let fn = "\(unit.abbreviation)_d_to_\(newVal.abbreviation)_d"
-            return "((double) (\(fn)(((\(u1)) (1.0)))))"
-        case .division(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return "(\(lhs)) / (\(rhs))"
-        case .exponentiate(let base, let power):
-            let base = base.replace(convertibles: convertibles)
-            let power = power.replace(convertibles: convertibles)
-            return "pow(((double) (\(base))), ((double) (\(power))))"
-        case .literal:
-            return self.cCode
-        case .multiplication(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return "(\(lhs)) * (\(rhs))"
-        case .precedence(let operation):
-            let operation = operation.replace(convertibles: convertibles)
-            return "(\(operation))"
-        }
-    }
-
-    func getUnitConvertibles(comparingTo operation: Operation) -> [AnyUnit: AnyUnit] {
-        switch self {
-        case .constant(let unit):
-            guard case let .constant(otherUnit) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            var acc2: [AnyUnit: AnyUnit] = [:]
-            acc2[unit] = otherUnit
-            return acc2
-        case .division(let lhs, let rhs):
-            guard case let .division(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .exponentiate(let base, let power):
-            guard case let .exponentiate(base2, power2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: base, comparingTo: base2, and: power, comparingTo: power2)
-        case .literal:
-            return [:]
-        case .multiplication(let lhs, let rhs):
-            guard case let .multiplication(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .precedence(let op):
-            guard case let .precedence(op2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return op.getUnitConvertibles(comparingTo: op2)
-        }
-    }
-
-    private func getConvertibles(
-        in op1: Operation, comparingTo op11: Operation, and op2: Operation, comparingTo op22: Operation
-    ) -> [AnyUnit: AnyUnit] {
-        var op1Acc = op1.getUnitConvertibles(comparingTo: op11)
-        let op2Acc = op2.getUnitConvertibles(comparingTo: op22)
-        guard valid(acc1: op1Acc, acc2: op2Acc) else {
-            fatalError("Duplicate conversion in operation")
-        }
-        op2Acc.keys.forEach {
-            op1Acc[$0] = op2Acc[$0]
-        }
-        return op1Acc
-    }
-
-    private func valid(acc1: [AnyUnit: AnyUnit], acc2: [AnyUnit: AnyUnit]) -> Bool {
-        for k in acc1.keys {
-            guard acc1[k] == acc2[k] || acc2[k] == nil else {
-                return false
-            }
-        }
-        return true
+        "    return ((\(otherUnit)_\(otherSign)) (\(unit.conversion(to: otherUnit).cCode)));"
     }
 
 }

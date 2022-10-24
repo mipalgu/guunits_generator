@@ -1,4 +1,4 @@
-// MassUnitsTests.swift 
+// GradualUnitsConvertibleTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,104 +57,39 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for `MassUnits`.
-final class MassUnitsTests: XCTestCase, UnitsTestable {
+final class GradualUnitsconvertibleTests: XCTestCase {
 
-    /// Test microgram case.
-    func testMicrogram() {
-        assert(
-            value: MassUnits.microgram, rawValue: "microgram", abbreviation: "ug", description: "microgram"
-        )
+    enum TestUnit: String, GradualUnitsConvertible, UnitProtocol {
+
+        case a
+
+        case b
+
+        case c
+
+        static let unitDifference: [GradualUnitsconvertibleTests.TestUnit: Int] = [
+            .a: 1000,
+            .b: 1000,
+            .c: 1
+        ]
+
+        var abbreviation: String {
+            self.rawValue
+        }
+
+        var description: String {
+            self.rawValue
+        }
+
     }
 
-    /// Test milligram case.
-    func testMilligram() {
-        assert(
-            value: MassUnits.milligram, rawValue: "milligram", abbreviation: "mg", description: "milligram"
-        )
-    }
-
-    /// Test gram case.
-    func testGram() {
-        assert(
-            value: MassUnits.gram, rawValue: "gram", abbreviation: "g", description: "gram"
-        )
-    }
-
-    /// Test kilogram case.
-    func testKilogram() {
-        assert(
-            value: MassUnits.kilogram, rawValue: "kilogram", abbreviation: "kg", description: "kilogram"
-        )
-    }
-
-    /// Test megagram case.
-    func testMegaGram() {
-        assert(
-            value: MassUnits.megagram, rawValue: "megagram", abbreviation: "Mg", description: "megagram"
-        )
-    }
-
-    func testUnitDifference() {
-        XCTAssertEqual(
-            MassUnits.unitDifference,
-            [
-                .microgram: 1000,
-                .milligram: 1000,
-                .gram: 1000,
-                .kilogram: 1000,
-                .megagram: 1
-            ]
-        )
-    }
-
-    func testAllCases() {
-        XCTAssertEqual(
-            MassUnits.allCases,
-            [
-                .microgram,
-                .milligram,
-                .gram,
-                .kilogram,
-                .megagram
-            ]
-        )
-    }
-
-    func testConversionToGreaterUnit() {
-        let result = MassUnits.milligram.conversion(to: .kilogram)
+    func testConversionFromCToA() {
+        let conversion = TestUnit.c.conversion(to: TestUnit.a)
         let expected = Operation.division(
-            lhs: .constant(declaration: AnyUnit(MassUnits.milligram)),
+            lhs: .constant(declaration: AnyUnit(TestUnit.c)),
             rhs: .literal(declaration: .integer(value: 1000000))
         )
-        XCTAssertEqual(result, expected)
-    }
-
-    func testConversionToSmallerUnit() {
-        let result = MassUnits.kilogram.conversion(to: .milligram)
-        let expected = Operation.multiplication(
-            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)),
-            rhs: .literal(declaration: .integer(value: 1000000))
-        )
-        XCTAssertEqual(result, expected)
-    }
-
-    func testConversionFromSmallerUnit() {
-        let result = MassUnits.kilogram.conversion(from: .milligram)
-        let expected = Operation.division(
-            lhs: .constant(declaration: AnyUnit(MassUnits.milligram)),
-            rhs: .literal(declaration: .integer(value: 1000000))
-        )
-        XCTAssertEqual(result, expected)
-    }
-
-    func testConversionFromGreaterUnit() {
-        let result = MassUnits.milligram.conversion(from: .kilogram)
-        let expected = Operation.multiplication(
-            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)),
-            rhs: .literal(declaration: .integer(value: 1000000))
-        )
-        XCTAssertEqual(result, expected)
+        XCTAssertEqual(conversion, expected)
     }
 
 }

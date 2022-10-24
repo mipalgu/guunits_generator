@@ -55,7 +55,7 @@
 // 
 
 /// A unit for describing electrical current. The SI unit is the Ampere (C/s).
-public enum CurrentUnits: String {
+public enum CurrentUnits: String, UnitProtocol, GradualUnitsConvertible {
 
     /// Microamps.
     case microamperes
@@ -66,10 +66,11 @@ public enum CurrentUnits: String {
     /// Amps
     case amperes
 
-}
-
-/// UnitProtocol conformance.
-extension CurrentUnits: UnitProtocol {
+    static public var unitDifference: [CurrentUnits: Int] = [
+        .microamperes: 1000,
+        .milliamperes: 1000,
+        .amperes: 1
+    ]
 
     /// The abbreviation of the unit consistent with SI.
     public var abbreviation: String {
