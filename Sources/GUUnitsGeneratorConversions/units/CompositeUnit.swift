@@ -62,6 +62,9 @@ public protocol CompositeUnit: UnitProtocol {
     /// The base operation of this unit.
     static var baseUnit: Operation { get }
 
+    /// Any units in Self that have a name.
+    static var namedUnit: [Operation: String] { get }
+
     /// A unit type of this category.
     var unit: Operation { get }
 
@@ -79,6 +82,11 @@ public extension CompositeUnit {
         Self.baseUnit.allCases.map {
             Self(unit: $0)
         }
+    }
+
+    /// The default `namedUnit` is an empty dictionary.
+    static var namedUnit: [Operation: String] {
+        [:]
     }
 
     /// The abbreviation of the unit.
