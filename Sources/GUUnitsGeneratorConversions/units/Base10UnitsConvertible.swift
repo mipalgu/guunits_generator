@@ -64,10 +64,6 @@ public protocol Base10UnitsConvertible: UnitsConvertible where Self: Hashable {
 
 extension Base10UnitsConvertible where Self: UnitProtocol {
 
-    public func conversion(from unit: Self) -> Operation {
-        unit.conversion(to: self)
-    }
-
     public func conversion(to unit: Self) -> Operation {
         guard unit != self else {
             return .constant(declaration: AnyUnit(self))

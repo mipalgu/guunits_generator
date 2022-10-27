@@ -55,7 +55,7 @@
 // 
 
 /// Defines a velocity unit with a base unit of metres per second.
-public struct Velocity: CompositeUnit {
+public struct Velocity: CompositeUnit, UnitsConvertible {
 
     /// The base unit (SI m/s).
     public static var baseUnit: Operation = .division(

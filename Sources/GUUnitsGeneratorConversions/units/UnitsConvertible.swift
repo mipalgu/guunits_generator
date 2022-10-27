@@ -62,39 +62,18 @@ public protocol UnitsConvertible {
 
 }
 
-extension UnitsConvertible where Self: CompositeUnit {
+public extension UnitsConvertible {
 
     func conversion(from unit: Self) -> Operation {
         unit.conversion(to: self)
     }
 
+}
+
+public extension UnitsConvertible where Self: CompositeUnit {
+
     func conversion(to unit: Self) -> Operation {
-        fatalError("Not yet implemented!")
-        // let convertibles = self.unit.getUnitConvertibles(comparingTo: unit.unit)
-        // switch self.unit {
-        // case .constant(let unit):
-        //     guard let newVal = convertibles[unit], newVal != unit else {
-        //         return .constant(declaration: AnyUnit(self))
-        //     }
-        //     return AnyUnit(self).conversion(to: newVal)
-        // case .division(let lhs, let rhs):
-        //     let lhs = lhs.replace(convertibles: convertibles)
-        //     let rhs = rhs.replace(convertibles: convertibles)
-        //     return "(\(lhs)) / (\(rhs))"
-        // case .exponentiate(let base, let power):
-        //     let base = base.replace(convertibles: convertibles)
-        //     let power = power.replace(convertibles: convertibles)
-        //     return "pow(((double) (\(base))), ((double) (\(power))))"
-        // case .literal:
-        //     return self.cCode
-        // case .multiplication(let lhs, let rhs):
-        //     let lhs = lhs.replace(convertibles: convertibles)
-        //     let rhs = rhs.replace(convertibles: convertibles)
-        //     return "(\(lhs)) * (\(rhs))"
-        // case .precedence(let operation):
-        //     let operation = operation.replace(convertibles: convertibles)
-        //     return "(\(operation))"
-        // }
+        self.unit.conversion(to: unit.unit)
     }
 
 }
