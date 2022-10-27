@@ -73,7 +73,12 @@ extension Operation {
             }
             return "pow(\(base.cCode), \(power.cCode))"
         case .literal(let declaration):
-            return "((double) (\(declaration)))"
+            switch declaration {
+            case .integer(let value):
+                return "((double) (\(value)))"
+            case .decimal(let value):
+                return "\(value)"
+            }
         case .multiplication(let lhs, let rhs):
             return "\(lhs.cCode) * \(rhs.cCode)"
         case .precedence(let operation):
