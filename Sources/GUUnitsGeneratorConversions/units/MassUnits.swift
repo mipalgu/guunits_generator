@@ -72,13 +72,13 @@ public enum MassUnits: String, UnitProtocol, GradualUnitsConvertible {
     /// Megagrams or Metric Tonnes.
     case megagram
 
-    public static var unitDifference: [MassUnits: Int] {
+    public static var unitDifference: [MassUnits: ConversionLiteral] {
         [
-            .microgram: 1000,
-            .milligram: 1000,
-            .gram: 1000,
-            .kilogram: 1000,
-            .megagram: 1
+            .microgram: ConversionLiteral(base10: .integer(value: -6)),
+            .milligram: ConversionLiteral(base10: .integer(value: -3)),
+            .gram: ConversionLiteral(base10: .integer(value: 0)),
+            .kilogram: ConversionLiteral(base10: .integer(value: 3)),
+            .megagram: ConversionLiteral(base10: .integer(value: 6))
         ]
     }
 

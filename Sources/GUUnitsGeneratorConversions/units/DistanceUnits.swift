@@ -68,10 +68,10 @@ public enum DistanceUnits: String, UnitProtocol, GradualUnitsConvertible {
     /// Metres
     case metres
 
-    static public var unitDifference: [DistanceUnits: Int] = [
-        .millimetres: 1000,
-        .centimetres: 1000,
-        .metres: 1
+    static public var unitDifference: [DistanceUnits: ConversionLiteral] = [
+        .millimetres: ConversionLiteral(base10: .integer(value: -3)),
+        .centimetres: ConversionLiteral(base10: .integer(value: -2)),
+        .metres: ConversionLiteral(base10: .integer(value: 0))
     ]
 
     /// The abbreviation of the unit.

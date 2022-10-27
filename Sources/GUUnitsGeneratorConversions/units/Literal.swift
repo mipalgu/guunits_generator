@@ -69,6 +69,33 @@ public enum Literal: Hashable {
         }
     }
 
+    var asDouble: Double {
+        switch self {
+        case .integer(let value):
+            return Double(value)
+        case .decimal(let value):
+            return value
+        }
+    }
+
+    var asInteger: Int {
+        switch self {
+        case .integer(let value):
+            return value
+        case .decimal(let value):
+            return Int(value)
+        }
+    }
+
+    var isFloat: Bool {
+        switch self {
+        case .integer:
+            return false
+        case .decimal:
+            return true
+        }
+    }
+
 }
 
 /// Add abbreviation to Int.

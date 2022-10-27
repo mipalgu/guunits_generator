@@ -1,4 +1,4 @@
-// CurrentUnits.swift 
+// ConversionLiteral.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,39 +54,22 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit for describing electrical current. The SI unit is the Ampere (C/s).
-public enum CurrentUnits: String, UnitProtocol, GradualUnitsConvertible {
+public struct ConversionLiteral {
 
-    /// Microamps.
-    case microamperes
+    let base: Literal
 
-    /// Milliamps
-    case milliamperes
+    let exponent: Literal
 
-    /// Amps
-    case amperes
-
-    static public var unitDifference: [CurrentUnits: ConversionLiteral] = [
-        .microamperes: ConversionLiteral(base10: .integer(value: -6)),
-        .milliamperes: ConversionLiteral(base10: .integer(value: -3)),
-        .amperes: ConversionLiteral(base10: .integer(value: 0))
-    ]
-
-    /// The abbreviation of the unit consistent with SI.
-    public var abbreviation: String {
-        switch self {
-        case .microamperes:
-            return "uA"
-        case .milliamperes:
-            return "mA"
-        case .amperes:
-            return "A"
-        }
+    init(base: Literal, exponent: Literal) {
+        self.base = base
+        self.exponent = exponent
     }
 
-    /// The description of the unit.
-    public var description: String {
-        self.rawValue
+    init(base10 exponent: Literal) {
+        self.base = .integer(value: 10)
+        self.exponent = exponent
     }
 
 }
+
+extension ConversionLiteral: Equatable {}

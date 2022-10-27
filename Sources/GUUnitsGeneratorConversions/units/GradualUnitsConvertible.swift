@@ -54,9 +54,11 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
+
 public protocol GradualUnitsConvertible: UnitsConvertible where Self: Hashable {
 
-    static var unitDifference: [Self: Int] { get }
+    static var unitDifference: [Self: ConversionLiteral] { get }
 
 }
 
@@ -70,44 +72,108 @@ extension GradualUnitsConvertible where Self: UnitProtocol {
         guard unit != self else {
             return .constant(declaration: AnyUnit(self))
         }
-        guard Self.unitDifference.count == Self.allCases.count else {
-            fatalError("Unit Difference is not complete.")
+        guard let selfLiteral = Self.unitDifference[self], let otherLiteral = Self.unitDifference[unit] else {
+            fatalError("Unit difference array is not complete. Cannot find \(self) or \(unit).")
         }
-        let units = unitsBetween(unit: unit)
-        guard self == units.last || self == units.first else {
-            fatalError("Failed to get units between \(self) and \(unit).")
+        guard selfLiteral.base == otherLiteral.base else {
+            fatalError("Invalid base")
         }
-        let totalUnits = self == units.last ? units.dropLast() : units.dropFirst()
-        let total = totalUnits.reduce(1) {
-            guard let val = Self.unitDifference[$1] else {
-                fatalError("Unit Difference is not complete.")
-            }
-            return $0 * val
+        guard case .integer(let base) = selfLiteral.base else {
+            fatalError("Blah")
         }
-        guard self == units.last else {
+        guard
+            case .integer(let value) = selfLiteral.exponent,
+            case .integer(let otherValue) = otherLiteral.exponent
+        else {
+            fatalError("invalid exponents")
+        }
+        let exponent = (otherValue - value)
+        let literal = Array(repeating: base, count: abs(exponent)).reduce(1, *)
+        if exponent < 0 {
+            return .multiplication(
+                lhs: .constant(declaration: AnyUnit(self)),
+                rhs: .literal(declaration: .integer(value: literal))
+            )
+        } else if exponent == 0 {
+            return .constant(declaration: AnyUnit(self))
+        } else {
             return .division(
-                lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
+                lhs: .constant(declaration: AnyUnit(self)),
+                rhs: .literal(declaration: .integer(value: literal))
             )
         }
-        return .multiplication(
-            lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
-        )
     }
 
-    private func unitsBetween(unit: Self) -> [Self] {
-        guard
-            let me = Self.allCases.firstIndex(where: {
-                $0 == self
-            }),
-            let other = Self.allCases.firstIndex(where: {
-                $0 == unit
-            })
-        else {
-            fatalError("Missing cases in allCases")
-        }
-        let max = max(me, other)
-        let min = min(me, other)
-        return Array(Self.allCases[min...max])
-    }
+    // public func conversion(to unit: Self) -> Operation {
+    //     guard unit != self else {
+    //         return .constant(declaration: AnyUnit(self))
+    //     }
+    //     guard Self.unitDifference.count == Self.allCases.count else {
+    //         fatalError("Unit Difference is not complete.")
+    //     }
+    //     let units = unitsBetween(unit: unit)
+    //     guard self == units.last || self == units.first else {
+    //         fatalError("Failed to get units between \(self) and \(unit).")
+    //     }
+    //     let isUpwards = self == units.last
+    //     let requiresDouble = self.requiresDouble(for: units, isUpwards: isUpwards)
+    //     let totalUnits = isUpwards ? units.dropLast() : units.dropFirst()
+    //     guard !requiresDouble else {
+    //         let total = totalUnits.reduce(1.0) {
+    //             guard let conversion = Self.unitDifference[$1] else {
+    //                 fatalError("Unit Difference is not complete.")
+    //             }
+    //             let val = isUpwards ? conversion.upwards : conversion.downwards
+    //             return $0 * val.asDouble
+    //         }
+    //         guard self == units.last else {
+    //             return .division(
+    //                 lhs: .constant(declaration: AnyUnit(self)),
+    //                 rhs: .literal(declaration: .decimal(value: total))
+    //             )
+    //         }
+    //         return .multiplication(
+    //             lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .decimal(value: total))
+    //         )
+    //     }
+    //     let total = totalUnits.reduce(1) {
+    //         guard let conversion = Self.unitDifference[$1] else {
+    //             fatalError("Unit Difference is not complete.")
+    //         }
+    //         let val = isUpwards ? conversion.upwards : conversion.downwards
+    //         return $0 * val.asInteger
+    //     }
+    //     guard self == units.last else {
+    //         return .division(
+    //             lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
+    //         )
+    //     }
+    //     return .multiplication(
+    //         lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
+    //     )
+    // }
+
+    // private func unitsBetween(unit: Self) -> [Self] {
+    //     guard
+    //         let me = Self.allCases.firstIndex(where: {
+    //             $0 == self
+    //         }),
+    //         let other = Self.allCases.firstIndex(where: {
+    //             $0 == unit
+    //         })
+    //     else {
+    //         fatalError("Missing cases in allCases")
+    //     }
+    //     let max = max(me, other)
+    //     let min = min(me, other)
+    //     return Array(Self.allCases[min...max])
+    // }
+
+    // private func requiresDouble(for units: [Self], isUpwards: Bool) -> Bool {
+    //     units.contains {
+    //         let val = isUpwards ? Self.unitDifference[$0]?.upwards : Self.unitDifference[$0]?.downwards
+    //         return val?.isFloat == true
+    //     }
+    // }
 
 }

@@ -184,7 +184,7 @@ public struct GUUnitsGenerator {
                 .kilogram: 1000
             ])
         )
-        let velocityGenerator = AnyGenerator(generating: Velocity.self, using: OperationalGenerator())
+        // let velocityGenerator = AnyGenerator(generating: Velocity.self, using: OperationalGenerator())
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
@@ -195,8 +195,8 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
-                massGenerator,
-                velocityGenerator
+                massGenerator
+                // velocityGenerator
             ]
         )
         .data(using: .utf8)
@@ -215,8 +215,8 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
-                massGenerator,
-                velocityGenerator
+                massGenerator
+                // velocityGenerator
             ]
         )
         .data(using: .utf8)

@@ -67,10 +67,10 @@ final class GradualUnitsconvertibleTests: XCTestCase {
 
         case c
 
-        static let unitDifference: [GradualUnitsconvertibleTests.TestUnit: Int] = [
-            .a: 1000,
-            .b: 1000,
-            .c: 1
+        static let unitDifference: [GradualUnitsconvertibleTests.TestUnit: ConversionLiteral] = [
+            .a: ConversionLiteral(base10: .integer(value: -6)),
+            .b: ConversionLiteral(base10: .integer(value: -2)),
+            .c: ConversionLiteral(base10: .integer(value: 0))
         ]
 
         var abbreviation: String {
@@ -87,7 +87,51 @@ final class GradualUnitsconvertibleTests: XCTestCase {
         let conversion = TestUnit.c.conversion(to: TestUnit.a)
         let expected = Operation.multiplication(
             lhs: .constant(declaration: AnyUnit(TestUnit.c)),
-            rhs: .literal(declaration: .integer(value: 1000000))
+            rhs: .literal(declaration: .integer(value: 1_000_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testconversionFromAToC() {
+        let conversion = TestUnit.a.conversion(to: TestUnit.c)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.a)),
+            rhs: .literal(declaration: .integer(value: 1_000_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromBToC() {
+        let conversion = TestUnit.b.conversion(to: TestUnit.c)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.b)),
+            rhs: .literal(declaration: .integer(value: 100))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromCToB() {
+        let conversion = TestUnit.c.conversion(to: TestUnit.b)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(TestUnit.c)), rhs: .literal(declaration: .integer(value: 100))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromAToB() {
+        let conversion = TestUnit.a.conversion(to: TestUnit.b)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.a)),
+            rhs: .literal(declaration: .integer(value: 10_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromBToA() {
+        let conversion = TestUnit.b.conversion(to: TestUnit.a)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(TestUnit.b)),
+            rhs: .literal(declaration: .integer(value: 10_000))
         )
         XCTAssertEqual(conversion, expected)
     }

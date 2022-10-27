@@ -68,10 +68,10 @@ public enum TimeUnits: String, UnitProtocol, GradualUnitsConvertible {
     /// Seconds
     case seconds
 
-    static public var unitDifference: [TimeUnits: Int] = [
-        .microseconds: 1000,
-        .milliseconds: 1000,
-        .seconds: 1
+    static public var unitDifference: [TimeUnits: ConversionLiteral] = [
+        .microseconds: ConversionLiteral(base10: .integer(value: -6)),
+        .milliseconds: ConversionLiteral(base10: .integer(value: -3)),
+        .seconds: ConversionLiteral(base10: .integer(value: 0))
     ]
 
     /// The abbreviation of the time unit.

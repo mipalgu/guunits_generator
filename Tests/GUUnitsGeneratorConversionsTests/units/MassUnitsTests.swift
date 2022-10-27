@@ -99,11 +99,11 @@ final class MassUnitsTests: XCTestCase, UnitsTestable {
         XCTAssertEqual(
             MassUnits.unitDifference,
             [
-                .microgram: 1000,
-                .milligram: 1000,
-                .gram: 1000,
-                .kilogram: 1000,
-                .megagram: 1
+                .microgram: ConversionLiteral(base10: .integer(value: -6)),
+                .milligram: ConversionLiteral(base10: .integer(value: -3)),
+                .gram: ConversionLiteral(base10: .integer(value: 0)),
+                .kilogram: ConversionLiteral(base10: .integer(value: 3)),
+                .megagram: ConversionLiteral(base10: .integer(value: 6))
             ]
         )
     }
@@ -153,6 +153,15 @@ final class MassUnitsTests: XCTestCase, UnitsTestable {
         let expected = Operation.multiplication(
             lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)),
             rhs: .literal(declaration: .integer(value: 1000000))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    func testConversionFromMicrogramToMegaGram() {
+        let result = MassUnits.microgram.conversion(to: .megagram)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(MassUnits.microgram)),
+            rhs: .literal(declaration: .integer(value: 1_000_000_000_000))
         )
         XCTAssertEqual(result, expected)
     }
