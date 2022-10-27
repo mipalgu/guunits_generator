@@ -54,8 +54,12 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// ``UnitsConvertible`` conformance.
 extension Operation: UnitsConvertible {
 
+    /// Create conversion ``Operation`` for a unit that is expressed with the same operations as `Self`.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The ``Operation`` that converts `Self` to `unit`.
     func matchedConversion(to unit: Operation) -> Operation {
         switch self {
         case .constant(let me):
@@ -103,6 +107,9 @@ extension Operation: UnitsConvertible {
         }
     }
 
+    /// Default implementation uses the `matchedConversion` function.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: An ``Operation`` that converts from `Self` to `unit`.
     public func conversion(to unit: Operation) -> Operation {
         matchedConversion(to: unit)
     }
