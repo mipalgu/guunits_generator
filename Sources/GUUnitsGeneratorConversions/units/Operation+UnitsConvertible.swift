@@ -56,8 +56,7 @@
 
 extension Operation: UnitsConvertible {
 
-    public func conversion(to unit: Operation) -> Operation {
-        // let convertibles = self.getUnitConvertibles(comparingTo: unit)
+    func matchedConversion(to unit: Operation) -> Operation {
         switch self {
         case .constant(let me):
             guard case .constant(let other) = unit else {
@@ -102,6 +101,10 @@ extension Operation: UnitsConvertible {
             }
             return .subtraction(lhs: lhs.conversion(to: otherLhs), rhs: rhs.conversion(to: otherRhs))
         }
+    }
+
+    public func conversion(to unit: Operation) -> Operation {
+        matchedConversion(to: unit)
     }
 
 }
