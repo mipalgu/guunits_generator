@@ -57,6 +57,8 @@
 public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
     Unit: UnitProtocol, Unit: UnitsConvertible {
 
+    let converter = NumericTypeConverter()
+
     public init() {}
 
     // public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
@@ -81,7 +83,6 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
 
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         let cSign = sign.isFloatingPoint || otherSign.isFloatingPoint ? Signs.d : sign
-        let converter = NumericTypeConverter()
         let conversion = unit.conversion(to: otherUnit).cCode(sign: cSign)
         return "    return " +
             converter.convert(conversion, from: cSign.numericType, to: otherUnit, sign: otherSign) + ";"
