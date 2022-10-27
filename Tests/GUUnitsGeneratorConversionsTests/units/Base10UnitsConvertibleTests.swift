@@ -1,4 +1,4 @@
-// ConversionLiteral.swift 
+// GradualUnitsConvertibleTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,22 +54,86 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-public struct ConversionLiteral {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    let base: Literal
+final class Base10UnitsConvertibleTests: XCTestCase {
 
-    let exponent: Literal
+    enum TestUnit: String, Base10UnitsConvertible, UnitProtocol {
 
-    init(base: Literal, exponent: Literal) {
-        self.base = base
-        self.exponent = exponent
+        case a
+
+        case b
+
+        case c
+
+        static let exponents: [Base10UnitsConvertibleTests.TestUnit: Int] = [
+            .a: -6,
+            .b: -2,
+            .c: 0
+        ]
+
+        var abbreviation: String {
+            self.rawValue
+        }
+
+        var description: String {
+            self.rawValue
+        }
+
     }
 
-    init(base10 exponent: Literal) {
-        self.base = .integer(value: 10)
-        self.exponent = exponent
+    func testConversionFromCToA() {
+        let conversion = TestUnit.c.conversion(to: TestUnit.a)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(TestUnit.c)),
+            rhs: .literal(declaration: .integer(value: 1_000_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testconversionFromAToC() {
+        let conversion = TestUnit.a.conversion(to: TestUnit.c)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.a)),
+            rhs: .literal(declaration: .integer(value: 1_000_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromBToC() {
+        let conversion = TestUnit.b.conversion(to: TestUnit.c)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.b)),
+            rhs: .literal(declaration: .integer(value: 100))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromCToB() {
+        let conversion = TestUnit.c.conversion(to: TestUnit.b)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(TestUnit.c)), rhs: .literal(declaration: .integer(value: 100))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromAToB() {
+        let conversion = TestUnit.a.conversion(to: TestUnit.b)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.a)),
+            rhs: .literal(declaration: .integer(value: 10_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    func testConversionFromBToA() {
+        let conversion = TestUnit.b.conversion(to: TestUnit.a)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(TestUnit.b)),
+            rhs: .literal(declaration: .integer(value: 10_000))
+        )
+        XCTAssertEqual(conversion, expected)
     }
 
 }
-
-extension ConversionLiteral: Equatable {}

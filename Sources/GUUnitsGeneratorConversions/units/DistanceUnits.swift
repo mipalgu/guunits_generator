@@ -57,7 +57,7 @@
  */
 
 /// A Unit for representing distances.
-public enum DistanceUnits: String, UnitProtocol, GradualUnitsConvertible {
+public enum DistanceUnits: String, UnitProtocol, Base10UnitsConvertible {
 
     /// Millimetres
     case millimetres
@@ -68,10 +68,10 @@ public enum DistanceUnits: String, UnitProtocol, GradualUnitsConvertible {
     /// Metres
     case metres
 
-    static public var unitDifference: [DistanceUnits: ConversionLiteral] = [
-        .millimetres: ConversionLiteral(base10: .integer(value: -3)),
-        .centimetres: ConversionLiteral(base10: .integer(value: -2)),
-        .metres: ConversionLiteral(base10: .integer(value: 0))
+    static public var exponents: [DistanceUnits: Int] = [
+        .millimetres: -3,
+        .centimetres: -2,
+        .metres: 0
     ]
 
     /// The abbreviation of the unit.

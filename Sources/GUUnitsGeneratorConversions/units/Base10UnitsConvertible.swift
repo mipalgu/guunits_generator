@@ -56,13 +56,13 @@
 
 import Foundation
 
-public protocol GradualUnitsConvertible: UnitsConvertible where Self: Hashable {
+public protocol Base10UnitsConvertible: UnitsConvertible where Self: Hashable {
 
-    static var unitDifference: [Self: ConversionLiteral] { get }
+    static var exponents: [Self: Int] { get }
 
 }
 
-extension GradualUnitsConvertible where Self: UnitProtocol {
+extension Base10UnitsConvertible where Self: UnitProtocol {
 
     public func conversion(from unit: Self) -> Operation {
         unit.conversion(to: self)
@@ -72,23 +72,11 @@ extension GradualUnitsConvertible where Self: UnitProtocol {
         guard unit != self else {
             return .constant(declaration: AnyUnit(self))
         }
-        guard let selfLiteral = Self.unitDifference[self], let otherLiteral = Self.unitDifference[unit] else {
-            fatalError("Unit difference array is not complete. Cannot find \(self) or \(unit).")
-        }
-        guard selfLiteral.base == otherLiteral.base else {
-            fatalError("Invalid base")
-        }
-        guard case .integer(let base) = selfLiteral.base else {
-            fatalError("Blah")
-        }
-        guard
-            case .integer(let value) = selfLiteral.exponent,
-            case .integer(let otherValue) = otherLiteral.exponent
-        else {
-            fatalError("invalid exponents")
+        guard let value = Self.exponents[self], let otherValue = Self.exponents[unit] else {
+            fatalError("Exponents static var is incomplete. Missing \(self) or \(unit).")
         }
         let exponent = (otherValue - value)
-        let literal = Array(repeating: base, count: abs(exponent)).reduce(1, *)
+        let literal = Array(repeating: 10, count: abs(exponent)).reduce(1, *)
         if exponent < 0 {
             return .multiplication(
                 lhs: .constant(declaration: AnyUnit(self)),
