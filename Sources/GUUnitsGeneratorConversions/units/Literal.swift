@@ -87,6 +87,15 @@ public enum Literal: Hashable {
         }
     }
 
+    var asString: String {
+        switch self {
+        case .integer(let value):
+            return "\(value)"
+        case .decimal(let value):
+            return "\(value)"
+        }
+    }
+
     var isFloat: Bool {
         switch self {
         case .integer:

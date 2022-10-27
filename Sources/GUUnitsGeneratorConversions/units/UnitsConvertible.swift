@@ -73,7 +73,10 @@ public extension UnitsConvertible {
 public extension UnitsConvertible where Self: CompositeUnit {
 
     func conversion(to unit: Self) -> Operation {
-        self.unit.conversion(to: unit.unit)
+        .multiplication(
+            lhs: .constant(declaration: AnyUnit(self)), rhs: self.unit.conversion(to: unit.unit)
+        )
+        .replace(convertibles: [AnyUnit(self): AnyUnit(self)])
     }
 
 }
