@@ -236,4 +236,12 @@ final class OperationTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    func testHasFloat() {
+        let operation = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
+            rhs: .literal(declaration: .integer(value: 2))
+        )
+        XCTAssertFalse(operation.hasFloatOperation)
+    }
+
 }
