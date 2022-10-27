@@ -68,7 +68,8 @@ public enum TimeUnits: String, UnitProtocol, Base10UnitsConvertible {
     /// Seconds
     case seconds
 
-    static public var exponents: [TimeUnits: Int] = [
+    /// The exponents of the units expressed as base 10.
+    public static let exponents: [TimeUnits: Int] = [
         .microseconds: -6,
         .milliseconds: -3,
         .seconds: 0

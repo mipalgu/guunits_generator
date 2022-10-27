@@ -68,7 +68,8 @@ public enum DistanceUnits: String, UnitProtocol, Base10UnitsConvertible {
     /// Metres
     case metres
 
-    static public var exponents: [DistanceUnits: Int] = [
+    /// The exponents of the units expressed as base 10.
+    public static let exponents: [DistanceUnits: Int] = [
         .millimetres: -3,
         .centimetres: -2,
         .metres: 0

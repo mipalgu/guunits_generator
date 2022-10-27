@@ -72,15 +72,14 @@ public enum MassUnits: String, UnitProtocol, Base10UnitsConvertible {
     /// Megagrams or Metric Tonnes.
     case megagram
 
-    public static var exponents: [MassUnits: Int] {
-        [
-            .microgram: -6,
-            .milligram: -3,
-            .gram: 0,
-            .kilogram: 3,
-            .megagram: 6
-        ]
-    }
+    /// The exponents of the units expressed as base 10.
+    public static let exponents: [MassUnits: Int] = [
+        .microgram: -6,
+        .milligram: -3,
+        .gram: 0,
+        .kilogram: 3,
+        .megagram: 6
+    ]
 
     /// The abbreviation of the unit.
     public var abbreviation: String {

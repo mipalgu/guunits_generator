@@ -66,7 +66,8 @@ public enum CurrentUnits: String, UnitProtocol, Base10UnitsConvertible {
     /// Amps
     case amperes
 
-    static public var exponents: [CurrentUnits: Int] = [
+    /// The exponents of the units expressed as base 10.
+    public static let exponents: [CurrentUnits: Int] = [
         .microamperes: -6,
         .milliamperes: -3,
         .amperes: 0
