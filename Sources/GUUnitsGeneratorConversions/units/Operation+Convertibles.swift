@@ -56,142 +56,143 @@
 
 extension Operation {
 
-    var cCode: String {
+    func cCode(sign: Signs) -> String {
         switch self {
         case .constant(let unit):
-            return "((double) (\(unit)))"
+            return "((\(sign.numericType.rawValue)) (\(unit)))"
         case .division(let lhs, let rhs):
-            return "\(lhs.cCode) / \(rhs.cCode)"
+            return "\(lhs.cCode(sign: sign)) / \(rhs.cCode(sign: sign))"
         case .exponentiate(let base, let power):
             if power == .literal(declaration: .integer(value: 2)) {
-                return Operation.multiplication(lhs: base, rhs: base).cCode
+                return Operation.multiplication(lhs: base, rhs: base).cCode(sign: sign)
             }
             if power == .literal(declaration: .integer(value: 3)) {
                 return Operation.multiplication(
                     lhs: base, rhs: .multiplication(lhs: base, rhs: base)
-                ).cCode
+                )
+                .cCode(sign: sign)
             }
-            return "pow(\(base.cCode), \(power.cCode))"
+            return "pow(\(base.cCode(sign: sign)), \(power.cCode(sign: sign)))"
         case .literal(let declaration):
             switch declaration {
             case .integer(let value):
-                return "((double) (\(value)))"
+                return "((\(sign.numericType)) (\(value)))"
             case .decimal(let value):
-                return "\(value)"
+                return "((\(sign.numericType)) (\(value)))"
             }
         case .multiplication(let lhs, let rhs):
-            return "\(lhs.cCode) * \(rhs.cCode)"
+            return "\(lhs.cCode(sign: sign)) * \(rhs.cCode(sign: sign))"
         case .precedence(let operation):
-            return "(\(operation.cCode))"
+            return "(\(operation.cCode(sign: sign)))"
         case .addition(let lhs, let rhs):
-            return "\(lhs.cCode) + \(rhs.cCode)"
+            return "\(lhs.cCode(sign: sign)) + \(rhs.cCode(sign: sign))"
         case .subtraction(let lhs, let rhs):
-            return "\(lhs.cCode) - \(rhs.cCode)"
+            return "\(lhs.cCode(sign: sign)) - \(rhs.cCode(sign: sign))"
         }
     }
 
-    func replace(convertibles: [AnyUnit: AnyUnit]) -> String {
-        switch self {
-        case .constant(let unit):
-            guard let newVal = convertibles[unit], newVal != unit else {
-                return "((double) (1.0))"
-            }
-            let u1 = "\(unit)_d"
-            let fn = "\(unit.abbreviation)_d_to_\(newVal.abbreviation)_d"
-            return "((double) (\(fn)(((\(u1)) (1.0)))))"
-        case .division(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return "(\(lhs)) / (\(rhs))"
-        case .exponentiate(let base, let power):
-            let base = base.replace(convertibles: convertibles)
-            let power = power.replace(convertibles: convertibles)
-            return "pow(((double) (\(base))), ((double) (\(power))))"
-        case .literal:
-            return self.cCode
-        case .multiplication(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return "(\(lhs)) * (\(rhs))"
-        case .precedence(let operation):
-            let operation = operation.replace(convertibles: convertibles)
-            return "(\(operation))"
-        case .addition(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return "(\(lhs)) + (\(rhs))"
-        case .subtraction(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return "(\(lhs)) - (\(rhs))"
-        }
-    }
+    // func replace(convertibles: [AnyUnit: AnyUnit]) -> String {
+    //     switch self {
+    //     case .constant(let unit):
+    //         guard let newVal = convertibles[unit], newVal != unit else {
+    //             return "((double) (1.0))"
+    //         }
+    //         let u1 = "\(unit)_d"
+    //         let fn = "\(unit.abbreviation)_d_to_\(newVal.abbreviation)_d"
+    //         return "((double) (\(fn)(((\(u1)) (1.0)))))"
+    //     case .division(let lhs, let rhs):
+    //         let lhs = lhs.replace(convertibles: convertibles)
+    //         let rhs = rhs.replace(convertibles: convertibles)
+    //         return "(\(lhs)) / (\(rhs))"
+    //     case .exponentiate(let base, let power):
+    //         let base = base.replace(convertibles: convertibles)
+    //         let power = power.replace(convertibles: convertibles)
+    //         return "pow(((double) (\(base))), ((double) (\(power))))"
+    //     case .literal:
+    //         return self.cCode
+    //     case .multiplication(let lhs, let rhs):
+    //         let lhs = lhs.replace(convertibles: convertibles)
+    //         let rhs = rhs.replace(convertibles: convertibles)
+    //         return "(\(lhs)) * (\(rhs))"
+    //     case .precedence(let operation):
+    //         let operation = operation.replace(convertibles: convertibles)
+    //         return "(\(operation))"
+    //     case .addition(let lhs, let rhs):
+    //         let lhs = lhs.replace(convertibles: convertibles)
+    //         let rhs = rhs.replace(convertibles: convertibles)
+    //         return "(\(lhs)) + (\(rhs))"
+    //     case .subtraction(let lhs, let rhs):
+    //         let lhs = lhs.replace(convertibles: convertibles)
+    //         let rhs = rhs.replace(convertibles: convertibles)
+    //         return "(\(lhs)) - (\(rhs))"
+    //     }
+    // }
 
-    func getUnitConvertibles(comparingTo operation: Operation) -> [AnyUnit: AnyUnit] {
-        switch self {
-        case .constant(let unit):
-            guard case let .constant(otherUnit) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            var acc2: [AnyUnit: AnyUnit] = [:]
-            acc2[unit] = otherUnit
-            return acc2
-        case .division(let lhs, let rhs):
-            guard case let .division(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .exponentiate(let base, let power):
-            guard case let .exponentiate(base2, power2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: base, comparingTo: base2, and: power, comparingTo: power2)
-        case .literal:
-            return [:]
-        case .multiplication(let lhs, let rhs):
-            guard case let .multiplication(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .precedence(let op):
-            guard case let .precedence(op2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return op.getUnitConvertibles(comparingTo: op2)
-        case .addition(let lhs, let rhs):
-            guard case let .addition(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .subtraction(let lhs, let rhs):
-            guard case let .subtraction(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        }
-    }
+    // func getUnitConvertibles(comparingTo operation: Operation) -> [AnyUnit: AnyUnit] {
+    //     switch self {
+    //     case .constant(let unit):
+    //         guard case let .constant(otherUnit) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         var acc2: [AnyUnit: AnyUnit] = [:]
+    //         acc2[unit] = otherUnit
+    //         return acc2
+    //     case .division(let lhs, let rhs):
+    //         guard case let .division(lhs2, rhs2) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
+    //     case .exponentiate(let base, let power):
+    //         guard case let .exponentiate(base2, power2) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         return getConvertibles(in: base, comparingTo: base2, and: power, comparingTo: power2)
+    //     case .literal:
+    //         return [:]
+    //     case .multiplication(let lhs, let rhs):
+    //         guard case let .multiplication(lhs2, rhs2) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
+    //     case .precedence(let op):
+    //         guard case let .precedence(op2) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         return op.getUnitConvertibles(comparingTo: op2)
+    //     case .addition(let lhs, let rhs):
+    //         guard case let .addition(lhs2, rhs2) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
+    //     case .subtraction(let lhs, let rhs):
+    //         guard case let .subtraction(lhs2, rhs2) = operation else {
+    //             fatalError("Operation mismatch between same units.")
+    //         }
+    //         return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
+    //     }
+    // }
 
-    private func getConvertibles(
-        in op1: Operation, comparingTo op11: Operation, and op2: Operation, comparingTo op22: Operation
-    ) -> [AnyUnit: AnyUnit] {
-        var op1Acc = op1.getUnitConvertibles(comparingTo: op11)
-        let op2Acc = op2.getUnitConvertibles(comparingTo: op22)
-        guard valid(acc1: op1Acc, acc2: op2Acc) else {
-            fatalError("Duplicate conversion in operation")
-        }
-        op2Acc.keys.forEach {
-            op1Acc[$0] = op2Acc[$0]
-        }
-        return op1Acc
-    }
+    // private func getConvertibles(
+    //     in op1: Operation, comparingTo op11: Operation, and op2: Operation, comparingTo op22: Operation
+    // ) -> [AnyUnit: AnyUnit] {
+    //     var op1Acc = op1.getUnitConvertibles(comparingTo: op11)
+    //     let op2Acc = op2.getUnitConvertibles(comparingTo: op22)
+    //     guard valid(acc1: op1Acc, acc2: op2Acc) else {
+    //         fatalError("Duplicate conversion in operation")
+    //     }
+    //     op2Acc.keys.forEach {
+    //         op1Acc[$0] = op2Acc[$0]
+    //     }
+    //     return op1Acc
+    // }
 
-    private func valid(acc1: [AnyUnit: AnyUnit], acc2: [AnyUnit: AnyUnit]) -> Bool {
-        for k in acc1.keys {
-            guard acc1[k] == acc2[k] || acc2[k] == nil else {
-                return false
-            }
-        }
-        return true
-    }
+    // private func valid(acc1: [AnyUnit: AnyUnit], acc2: [AnyUnit: AnyUnit]) -> Bool {
+    //     for k in acc1.keys {
+    //         guard acc1[k] == acc2[k] || acc2[k] == nil else {
+    //             return false
+    //         }
+    //     }
+    //     return true
+    // }
 
 }

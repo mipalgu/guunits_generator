@@ -54,7 +54,8 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Unit: UnitProtocol, Unit: UnitsConvertible {
+public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
+    Unit: UnitProtocol, Unit: UnitsConvertible {
 
     public init() {}
 
@@ -79,7 +80,11 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where Un
     // }
 
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-        "    return ((\(otherUnit)_\(otherSign)) (\(unit.conversion(to: otherUnit).cCode)));"
+        let cSign = sign.isFloatingPoint || otherSign.isFloatingPoint ? Signs.d : sign
+        let converter = NumericTypeConverter()
+        let conversion = unit.conversion(to: otherUnit).cCode(sign: cSign)
+        return "    return " +
+            converter.convert(conversion, from: cSign.numericType, to: otherUnit, sign: otherSign) + ";"
     }
 
 }
