@@ -75,6 +75,7 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``Base10UnitsConvertible``
 - ``CompositeUnit``
 - ``Literal``
+- ``NamedUnit``
 - ``NumericTypes``
 - ``Operation``
 - ``Signs``
