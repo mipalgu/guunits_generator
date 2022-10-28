@@ -70,7 +70,7 @@ public protocol Base10UnitsConvertible: UnitsConvertible where Self: Hashable {
 }
 
 /// Default implementation of ``Base10UnitsConvertible`` where the conforming type also
-/// conformas to ``UnitProtocol``.
+/// conforms to ``UnitProtocol``.
 extension Base10UnitsConvertible where Self: UnitProtocol {
 
     /// Convert `self` to another unit withing `Self`.
