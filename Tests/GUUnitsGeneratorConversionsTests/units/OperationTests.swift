@@ -195,44 +195,50 @@ final class OperationTests: XCTestCase {
             rhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius))
         )
         let result = Set(operation.allCases.map(\.abbreviation))
-        let expected = Set(DistanceUnits.allCases.flatMap { x in
-            TimeUnits.allCases.flatMap { t in
-                TemperatureUnits.allCases.map { temp in
-                    "\(x.abbreviation)_\(t.abbreviation)_\(temp.abbreviation)"
+        let expected = Set(
+            DistanceUnits.allCases.flatMap { x in
+                TimeUnits.allCases.flatMap { t in
+                    TemperatureUnits.allCases.map { temp in
+                        "\(x.abbreviation)_\(t.abbreviation)_\(temp.abbreviation)"
+                    }
                 }
             }
-        })
+        )
         XCTAssertEqual(result, expected)
     }
 
     /// Test allCases property for big unit type.
     func testHugeAllCases() {
-        let result = Set(Operation.division(
-            lhs: Operation.multiplication(
-                lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
-                rhs: Operation.precedence(
-                    operation: Operation.division(
-                        lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
-                        rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+        let result = Set(
+            Operation.division(
+                lhs: Operation.multiplication(
+                    lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
+                    rhs: Operation.precedence(
+                        operation: Operation.division(
+                            lhs: .constant(declaration: AnyUnit(TemperatureUnits.celsius)),
+                            rhs: .constant(declaration: AnyUnit(CurrentUnits.amperes))
+                        )
                     )
+                ),
+                rhs: .exponentiate(
+                    base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                    power: .literal(declaration: .integer(value: 3))
                 )
-            ),
-            rhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
-                power: .literal(declaration: .integer(value: 3))
             )
+            .allCases.map(\.abbreviation)
         )
-        .allCases.map(\.abbreviation))
-        let expected = Set(DistanceUnits.allCases.flatMap { x in
-            TemperatureUnits.allCases.flatMap { temp in
-                CurrentUnits.allCases.flatMap { i in
-                    TimeUnits.allCases.map { (t: TimeUnits) -> String in
-                        "\(x.abbreviation)__\(temp.abbreviation)_per_\(i.abbreviation)__per_" +
-                            "\(t.abbreviation)_cub"
+        let expected = Set(
+            DistanceUnits.allCases.flatMap { x in
+                TemperatureUnits.allCases.flatMap { temp in
+                    CurrentUnits.allCases.flatMap { i in
+                        TimeUnits.allCases.map { (t: TimeUnits) -> String in
+                            "\(x.abbreviation)__\(temp.abbreviation)_per_\(i.abbreviation)__per_" +
+                                "\(t.abbreviation)_cub"
+                        }
                     }
                 }
             }
-        })
+        )
         XCTAssertEqual(result, expected)
     }
 
