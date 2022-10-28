@@ -1,4 +1,4 @@
-// Velocity.swift 
+// AngularVelocity.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,17 +54,14 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Defines a velocity unit with a base unit of metres per second.
-public struct Velocity: CompositeUnit, UnitsConvertible {
+struct AngularVelocity: CompositeUnit, UnitsConvertible {
 
-    /// The base unit (SI m/s).
     public static let baseUnit: Operation = .division(
-        lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
         rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
     )
 
-    /// A instance of this unit category.
-    public let unit: Operation
+    public var unit: Operation
 
     public init(unit: Operation) {
         self.unit = unit
@@ -72,5 +69,4 @@ public struct Velocity: CompositeUnit, UnitsConvertible {
 
 }
 
-/// Hashable conformance.
-extension Velocity: Hashable {}
+extension AngularVelocity: Hashable {}

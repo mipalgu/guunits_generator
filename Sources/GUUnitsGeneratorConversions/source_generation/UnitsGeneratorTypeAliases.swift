@@ -1,11 +1,11 @@
 /// Generator used for ``CompositeUnit`` types.
-// public typealias OperationalGenerator<Unit: CompositeUnit> = UnitsGenerator<
-//     CompositeFunctionCreator<
-//         OperationalFunctionBodyCreator<Unit>,
-//         CFunctionDefinitionCreator<Unit>,
-//         NumericTypeConverter
-//     >
-// >
+public typealias OperationalGenerator<Unit: CompositeUnit> = UnitsGenerator<
+    CompositeFunctionCreator<
+        OperationalFunctionBodyCreator<Unit>,
+        CFunctionDefinitionCreator<Unit>,
+        NumericTypeConverter
+    >
+> where Unit: UnitsConvertible
 
 /// Distance Units Generator
 public typealias DistanceUnitsGenerator = UnitsGenerator<

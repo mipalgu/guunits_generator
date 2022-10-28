@@ -36,37 +36,69 @@ extension UnitsGenerator where
 
 }
 
-// /// Velocity initialiser for C conversions.
-// extension UnitsGenerator where
-//     Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<Velocity>,
-//     CFunctionDefinitionCreator<Velocity>, NumericTypeConverter> {
+/// Velocity initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<Velocity>,
+    CFunctionDefinitionCreator<Velocity>, NumericTypeConverter> {
 
-//     /// Initialise using Velocity and c conversions.
-//     public init() {
-//         self.init(creator: CompositeFunctionCreator(
-//             bodyCreator: OperationalFunctionBodyCreator(),
-//             definitionCreator: CFunctionDefinitionCreator(),
-//             numericConverter: NumericTypeConverter()
-//         ))
-//     }
+    /// Initialise using Velocity and c conversions.
+    public init() {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: OperationalFunctionBodyCreator(),
+            definitionCreator: CFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
 
-// }
+}
 
-// /// Velocity initialiser for CPP conversions.
-// extension UnitsGenerator where
-//     Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<Velocity>,
-//     CPPFunctionDefinitionCreator<Velocity>, NumericTypeConverter> {
+/// Velocity initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<Velocity>,
+    CPPFunctionDefinitionCreator<Velocity>, NumericTypeConverter> {
 
-//     /// Initialise using Velocity and cpp conversions.
-//     public init() {
-//         self.init(creator: CompositeFunctionCreator(
-//             bodyCreator: OperationalFunctionBodyCreator(),
-//             definitionCreator: CPPFunctionDefinitionCreator(),
-//             numericConverter: NumericTypeConverter()
-//         ))
-//     }
+    /// Initialise using Velocity and cpp conversions.
+    public init() {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: OperationalFunctionBodyCreator(),
+            definitionCreator: CPPFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
 
-// }
+}
+
+/// AngularVelocity initialiser for C conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<AngularVelocity>,
+    CFunctionDefinitionCreator<AngularVelocity>, NumericTypeConverter> {
+
+    /// Initialise using AngularVelocity and c conversions.
+    public init() {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: OperationalFunctionBodyCreator(),
+            definitionCreator: CFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
+
+/// AngularVelocity initialiser for CPP conversions.
+extension UnitsGenerator where
+    Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<AngularVelocity>,
+    CPPFunctionDefinitionCreator<AngularVelocity>, NumericTypeConverter> {
+
+    /// Initialise using AngularVelocity and cpp conversions.
+    public init() {
+        self.init(creator: CompositeFunctionCreator(
+            bodyCreator: OperationalFunctionBodyCreator(),
+            definitionCreator: CPPFunctionDefinitionCreator(),
+            numericConverter: NumericTypeConverter()
+        ))
+    }
+
+}
 
 /// MassUnits initialiser for C conversions.
 extension UnitsGenerator where

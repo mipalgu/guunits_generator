@@ -86,3 +86,38 @@ extension AngleUnits: UnitProtocol {
     }
 
 }
+
+extension AngleUnits: UnitsConvertible {
+
+    public func conversion(to unit: AngleUnits) -> Operation {
+        switch self {
+        case .degrees:
+            switch unit {
+            case .degrees:
+                return .constant(declaration: AnyUnit(self))
+            case .radians:
+                return .multiplication(
+                    lhs: .division(
+                        lhs: .constant(declaration: AnyUnit(self)),
+                        rhs: .literal(declaration: .integer(value: 180))
+                    ),
+                    rhs: .literal(declaration: .decimal(value: Double.pi))
+                )
+            }
+        case .radians:
+            switch unit {
+            case .degrees:
+                return .multiplication(
+                    lhs: .division(
+                        lhs: .constant(declaration: AnyUnit(self)),
+                        rhs: .literal(declaration: .decimal(value: Double.pi))
+                    ),
+                    rhs: .literal(declaration: .integer(value: 180))
+                )
+            case .radians:
+                return .constant(declaration: AnyUnit(self))
+            }
+        }
+    }
+
+}
