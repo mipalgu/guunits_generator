@@ -66,6 +66,9 @@ public struct Velocity: CompositeUnit, UnitsConvertible {
     /// A instance of this unit category.
     public let unit: Operation
 
+    /// Initialise the Velocity from a derivation of the `baseUnit`.
+    /// - Parameter unit: The operation representing this unit. This parameter
+    /// must be a derivation of `baseUnit`. It cannot have a different structure.
     public init(unit: Operation) {
         self.unit = unit
     }

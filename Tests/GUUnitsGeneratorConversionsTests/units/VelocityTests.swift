@@ -85,4 +85,13 @@ final class VelocityTests: XCTestCase {
         XCTAssertEqual(Set(expected), Set(result))
     }
 
+    /// Test base unit represents the base SI unit for Velocity.
+    func testBaseUnit() {
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+        XCTAssertEqual(Velocity.baseUnit, expected)
+    }
+
 }
