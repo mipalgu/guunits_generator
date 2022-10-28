@@ -1,4 +1,4 @@
-// CompositeUnit.swift 
+// NamedUnit.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,55 +54,27 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Defines a category that is created from relationships of other units. This protocol
-/// defines a class of unit that uses different `UnitProtocol` types
-/// in it's definition.
-public protocol CompositeUnit: UnitProtocol {
+/// A struct containing the data for a named unit.
+public struct NamedUnit: CustomStringConvertible {
 
-    /// The base operation of this unit.
-    static var baseUnit: Operation { get }
-
-    /// Any units in Self that have a name.
-    static var namedUnit: [Operation: NamedUnit] { get }
-
-    /// A unit type of this category.
-    var unit: Operation { get }
-
-    /// Create a unit that exists within this category.
-    /// - Parameter unit: A specific unit belonging to this category.
-    init(unit: Operation)
-
-}
-
-/// Default Implementation.
-public extension CompositeUnit {
-
-    /// The different permutations of the subunits.
-    static var allCases: [Self] {
-        Self.baseUnit.allCases.map {
-            Self(unit: $0)
-        }
-    }
-
-    /// The default `namedUnit` is an empty dictionary.
-    static var namedUnit: [Operation: NamedUnit] {
-        [:]
-    }
+    /// The name of the unit.
+    public let name: String
 
     /// The abbreviation of the unit.
-    var abbreviation: String {
-        guard let name = Self.namedUnit[unit] else {
-            return unit.abbreviation
-        }
-        return name.abbreviation
+    public let abbreviation: String
+
+    /// The description of the named unit.
+    public var description: String {
+        name
     }
 
-    /// The string representation of the unit.
-    var description: String {
-        guard let name = Self.namedUnit[unit] else {
-            return unit.description
-        }
-        return name.description
+    /// Initialise this data with a name and abbreviation.
+    /// - Parameters:
+    ///   - name: The name of the unit.
+    ///   - abbreviation: The abbreviation of the unit.
+    public init(name: String, abbreviation: String) {
+        self.name = name
+        self.abbreviation = abbreviation
     }
 
 }

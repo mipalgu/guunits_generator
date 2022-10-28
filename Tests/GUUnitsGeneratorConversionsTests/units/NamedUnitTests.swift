@@ -1,4 +1,4 @@
-// CompositeUnit.swift 
+// NamedUnitTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,55 +54,18 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Defines a category that is created from relationships of other units. This protocol
-/// defines a class of unit that uses different `UnitProtocol` types
-/// in it's definition.
-public protocol CompositeUnit: UnitProtocol {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// The base operation of this unit.
-    static var baseUnit: Operation { get }
+/// Test class for ``NamedUnit``.
+final class NamedUnitTests: XCTestCase {
 
-    /// Any units in Self that have a name.
-    static var namedUnit: [Operation: NamedUnit] { get }
-
-    /// A unit type of this category.
-    var unit: Operation { get }
-
-    /// Create a unit that exists within this category.
-    /// - Parameter unit: A specific unit belonging to this category.
-    init(unit: Operation)
-
-}
-
-/// Default Implementation.
-public extension CompositeUnit {
-
-    /// The different permutations of the subunits.
-    static var allCases: [Self] {
-        Self.baseUnit.allCases.map {
-            Self(unit: $0)
-        }
-    }
-
-    /// The default `namedUnit` is an empty dictionary.
-    static var namedUnit: [Operation: NamedUnit] {
-        [:]
-    }
-
-    /// The abbreviation of the unit.
-    var abbreviation: String {
-        guard let name = Self.namedUnit[unit] else {
-            return unit.abbreviation
-        }
-        return name.abbreviation
-    }
-
-    /// The string representation of the unit.
-    var description: String {
-        guard let name = Self.namedUnit[unit] else {
-            return unit.description
-        }
-        return name.description
+    /// Test init works correctly.
+    func testInit() {
+        let name = NamedUnit(name: "Decimans", abbreviation: "D")
+        XCTAssertEqual(name.name, "Decimans")
+        XCTAssertEqual(name.abbreviation, "D")
+        XCTAssertEqual(name.description, name.name)
     }
 
 }
