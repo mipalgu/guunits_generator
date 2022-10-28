@@ -1,4 +1,4 @@
-// UnitsConvertible.swift 
+// UnitsConvertibleTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,47 +54,48 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// This protocol provides conversion functions for units within the same category.
-/// The conversion functions produce an ``Operation`` that will define the function required
-/// to perform the conversion.
-/// - SeeAlso: ``Operation``.
-public protocol UnitsConvertible {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// Convert from a unit within the same category to `self`.
-    /// - Parameter unit: The unit to convert from.
-    /// - Returns: An ``Operation`` that converts `unit` to `self`.
-    func conversion(from unit: Self) -> Operation
+/// Test class for ``UnitsConvertible``.
+final class UnitsConvertibleTests: XCTestCase {
 
-    /// Convert to a unit within the same category.
-    /// - Parameter unit: The unit to convert to.
-    /// - Returns: An ``Operation`` converting `unit` to `self`.
-    func conversion(to unit: Self) -> Operation
+    /// A mock composite unit equivalent to ``DistanceUnits``.
+    struct MockDistance: CompositeUnit, UnitsConvertible {
 
-}
+        /// The base unit is a metre.
+        static let baseUnit: GUUnitsGeneratorConversions.Operation = .constant(
+            declaration: AnyUnit(DistanceUnits.metres)
+        )
 
-/// Default implementation.
-public extension UnitsConvertible {
+        /// A unit instance.
+        let unit: GUUnitsGeneratorConversions.Operation
 
-    /// Default implementation simply calls conversion(to:) using passed unit.
-    /// - Parameter unit: The unit to convert from.
-    /// - Returns: An operation converting `unit` to `self`.
-    func conversion(from unit: Self) -> Operation {
-        unit.conversion(to: self)
+        /// Default init.
+        init(unit: GUUnitsGeneratorConversions.Operation) {
+            self.unit = unit
+        }
+
     }
 
-}
+    /// The unit under test.
+    let unit = MockDistance(unit: MockDistance.baseUnit)
 
-/// Default implementation when the conforming type is also a ``CompositeUnit``.
-public extension UnitsConvertible where Self: CompositeUnit {
+    /// A unit to convert from/to.
+    let otherUnit = MockDistance(unit: .constant(declaration: AnyUnit(DistanceUnits.centimetres)))
 
-    /// Convert to a unit within the same category.
-    /// - Parameter unit: The unit to convert to.
-    /// - Returns: An ``Operation`` converting `unit` to `self`.
-    func conversion(to unit: Self) -> Operation {
-        .multiplication(
-            lhs: .constant(declaration: AnyUnit(self)), rhs: self.unit.conversion(to: unit.unit)
+    /// Test conversion(from:) calls conversion(to:) on passed unit.
+    func testFromConversion() {
+        XCTAssertEqual(unit.conversion(from: otherUnit), otherUnit.conversion(to: unit))
+    }
+
+    /// Test conversion(to:) produces correct operation using default implementation.
+    func testToConversion() {
+        let expected = GUUnitsGeneratorConversions.Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(unit)),
+            rhs: .literal(declaration: .integer(value: 100))
         )
-        .replace(convertibles: [AnyUnit(self): AnyUnit(self)])
+        XCTAssertEqual(expected, unit.conversion(to: otherUnit))
     }
 
 }
