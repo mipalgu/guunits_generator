@@ -9,7 +9,7 @@ on:
 jobs:
 
   exec-mac-ci-release:
-    runs-on: pc157870-osx
+    runs-on: self-hosted 
 
     steps:
       - name: Remove everything
