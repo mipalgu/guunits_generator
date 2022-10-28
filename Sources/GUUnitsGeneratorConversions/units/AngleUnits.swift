@@ -87,8 +87,12 @@ extension AngleUnits: UnitProtocol {
 
 }
 
+/// ``UnitsConvertible`` conformance.
 extension AngleUnits: UnitsConvertible {
 
+    /// Convert `self` to another unit representation in `Self`.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The operation that will convert `self` into `unit`.
     public func conversion(to unit: AngleUnits) -> Operation {
         switch self {
         case .degrees:
