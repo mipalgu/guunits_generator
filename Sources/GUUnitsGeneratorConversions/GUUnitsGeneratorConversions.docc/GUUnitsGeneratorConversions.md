@@ -34,6 +34,7 @@ Usage: guunits_generator [-h] [-d <directory>]
 - <doc:GettingStarted>
 - <doc:CreatingNewUnits>
 - <doc:UsingCustomCodeGeneration>
+- <doc:CreatingCompositeUnits>
 
 ### C Source Generation
 - ``AccelerationFunctionCreator``
