@@ -252,8 +252,8 @@ public struct SwiftFileCreator {
     /// - Parameter type: The unit type.
     /// - Returns: The rawValue definition.
     private func generateCategoryRawValueProperty<T: UnitProtocol>(for type: T.Type) -> String {
-        let comment = "/// Always store internally as a `\(type.category.capitalized)Types`"
-        let def = "let rawValue: \(type.category.capitalized)Types"
+        let comment = "/// Always store internally as a `\(type.category)Types`"
+        let def = "let rawValue: \(type.category)Types"
         return comment + "\n" + def
     }
 
@@ -262,7 +262,7 @@ public struct SwiftFileCreator {
     /// - Returns: The definition of the init.
     private func generateCategoryRawValueInit<T: UnitProtocol>(for type: T.Type) -> String {
         let comment = "/// Initialise `" + type.category + "` from its internally representation."
-        let def = "init(rawValue: \(T.category.capitalized)Types) {"
+        let def = "init(rawValue: \(T.category)Types) {"
         let body = "self.rawValue = rawValue"
         let endef = "}"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
@@ -400,7 +400,8 @@ public struct SwiftFileCreator {
             """
         let def = "public init(_ value: " + source.description.capitalized + "_" + sign.rawValue + ") {"
         let endef = "}"
-        let body = "self.rawValue = .\(source.description.lowercased())_\(sign)(value)"
+        let body = "self.rawValue = \(type.category)Types." +
+            "\(source.description.lowercased())_\(sign)(value)"
         return comment + "\n" + def + "\n" + self.indent(body) + "\n" + endef
     }
 
@@ -444,16 +445,16 @@ public struct SwiftFileCreator {
         let body: String
         switch numeric {
         case .Double, .Int64, .UInt64:
-            body = "self.rawValue = .\(value.description.lowercased())_d" +
+            body = "self.rawValue = \(type.category)Types.\(value.description.lowercased())_d" +
                 "(\(value.description.capitalized)_d(value))"
         case .Float:
-            body = "self.rawValue = .\(value.description.lowercased())_f" +
+            body = "self.rawValue = \(type.category)Types.\(value.description.lowercased())_f" +
                 "(\(value.description.capitalized)_f(value))"
         case .Int, .CInt, .Int16, .Int8, .Int32:
-            body = "self.rawValue = .\(value.description.lowercased())_t" +
+            body = "self.rawValue = \(type.category)Types.\(value.description.lowercased())_t" +
                 "(\(value.description.capitalized)_t(value))"
         case .UInt, .CUnsignedInt, .UInt8, .UInt16, .UInt32:
-            body = "self.rawValue = .\(value.description.lowercased())_u" +
+            body = "self.rawValue = \(type.category)Types.\(value.description.lowercased())_u" +
                 "(\(value.description.capitalized)_u(value))"
         }
         let endef = "}"
