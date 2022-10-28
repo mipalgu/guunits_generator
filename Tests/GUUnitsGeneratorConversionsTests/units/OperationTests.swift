@@ -236,12 +236,24 @@ final class OperationTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test hasFloatOperation produces correct result for different operations.
     func testHasFloat() {
         let operation = Operation.multiplication(
             lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
             rhs: .literal(declaration: .integer(value: 2))
         )
         XCTAssertFalse(operation.hasFloatOperation)
+        XCTAssertTrue(Operation.literal(declaration: .decimal(value: 1.0)).hasFloatOperation)
+        let operation2 = Operation.division(
+            lhs: .literal(declaration: .integer(value: 1)),
+            rhs: .literal(declaration: .integer(value: 1000))
+        )
+        XCTAssertTrue(operation2.hasFloatOperation)
+        let operation3 = Operation.division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+        XCTAssertFalse(operation3.hasFloatOperation)
     }
 
 }
