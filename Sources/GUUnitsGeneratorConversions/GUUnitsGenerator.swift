@@ -185,7 +185,9 @@ public struct GUUnitsGenerator {
             ])
         )
         let velocityGenerator = AnyGenerator(generating: Velocity.self, using: OperationalGenerator())
-        let angularVelocityGenerator = AnyGenerator(generating: AngularVelocity.self, using: OperationalGenerator())
+        let angularVelocityGenerator = AnyGenerator(
+            generating: AngularVelocity.self, using: OperationalGenerator()
+        )
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
@@ -354,8 +356,6 @@ public struct GUUnitsGenerator {
         fflush(stdout)
     }
 
-    // swiftlint:disable function_body_length
-
     /// Generate files that test the swift layer of guunits.
     /// - Parameter path: The folder containing the test files.
     public func generateSwiftTests(in path: URL) {
@@ -419,8 +419,6 @@ public struct GUUnitsGenerator {
             writeFile(at: path, with: $0, and: $1)
         }
     }
-
-    // swiftlint:enable function_body_length
 
     /// Write a Swift source file to a location.
     /// - Parameters:
