@@ -54,33 +54,23 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// A ``FunctionBodyCreator`` that works with ``UnitsConvertible`` types.
 public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
     Unit: UnitProtocol, Unit: UnitsConvertible {
 
+    /// A helper converter.
     let converter = NumericTypeConverter()
 
+    /// Default initialiser.
     public init() {}
 
-    // public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
-    //     guard unit != otherUnit || sign != otherSign else {
-    //         return "    return " + unit.description + ";"
-    //     }
-    //     guard unit != otherUnit else {
-    //         let num0 = sign.numericType
-    //         return "    return \(num0.abbreviation)_to_\(otherUnit.abbreviation)_\(otherSign)" +
-    //             "(((\(num0.rawValue)) (\(unit))));"
-    //     }
-    //     let convertibles = unit.unit.getUnitConvertibles(comparingTo: otherUnit.unit)
-    //     let implementation = "(((\(otherUnit)_d) ((double) (\(unit)))) * " +
-    //         "(\(unit.unit.replace(convertibles: convertibles))))"
-    //     if otherSign == .d {
-    //         return "    return \(implementation);"
-    //     } else {
-    //         return "    return \(otherUnit.abbreviation)_d_to_\(otherUnit.abbreviation)_\(otherSign)" +
-    //             "(\(implementation));"
-    //     }
-    // }
-
+    /// Create the C code to convert one unit with sign into another unit with sign.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The C code that converts `unit` with `sign` to `otherUnit` with `otherSign`.
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         guard unit != otherUnit || sign != otherSign else {
             return "return \(unit);"
