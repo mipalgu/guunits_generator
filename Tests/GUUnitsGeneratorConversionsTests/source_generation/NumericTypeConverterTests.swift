@@ -80,6 +80,7 @@ final class NumericTypeConverterTests: XCTestCase {
         XCTAssertEqual(result2, "((double) (x))")
     }
 
+    /// Test double to i64 conversion.
     func testDToI64() {
         let result = converter.convert("x", from: .double, to: DistanceUnits.centimetres, sign: .t)
         XCTAssertEqual(result, "((centimetres_t) (d_to_i64(x)))")
