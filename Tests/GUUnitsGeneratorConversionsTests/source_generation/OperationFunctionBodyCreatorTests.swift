@@ -54,68 +54,68 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
-@testable import GUUnitsGeneratorConversions
-import XCTest
+// import Foundation
+// @testable import GUUnitsGeneratorConversions
+// import XCTest
 
-final class OperationFunctionBodyCreatorTests: XCTestCase {
+// final class OperationFunctionBodyCreatorTests: XCTestCase {
 
-    let velocity = Velocity(unit: Velocity.baseUnit)
+//     let velocity = Velocity(unit: Velocity.baseUnit)
 
-    let creator = OperationalFunctionBodyCreator<MassUnits>()
+//     let creator = OperationalFunctionBodyCreator<MassUnits>()
 
-    func testMassConversions() {
-        // let conversions = MassUnits.allCases.flatMap { mass in
-        //     Signs.allCases.flatMap { s0 in
-        //         Signs.allCases.map { s1 in
-        //             creator.createFunction(unit: .gram, to: mass, sign: s0, otherSign: s1)
-        //         }
-        //     }
-        // }
-        // print(conversions.joined(separator: "\n\n"))
-        // fflush(stdout)
-    }
+//     func testMassConversions() {
+//         // let conversions = MassUnits.allCases.flatMap { mass in
+//         //     Signs.allCases.flatMap { s0 in
+//         //         Signs.allCases.map { s1 in
+//         //             creator.createFunction(unit: .gram, to: mass, sign: s0, otherSign: s1)
+//         //         }
+//         //     }
+//         // }
+//         // print(conversions.joined(separator: "\n\n"))
+//         // fflush(stdout)
+//     }
 
-    func testVelocityConversions() {
-        // let creator = OperationalFunctionBodyCreator<Velocity>()
-        // let conversions = Velocity.allCases.flatMap { velocity in
-        //     Signs.allCases.flatMap { s0 in
-        //         Signs.allCases.map { s1 -> String in
-        //             let unit = Velocity(
-        //                 unit: .division(
-        //                     lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
-        //                     rhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds))
-        //                 )
-        //             )
-        //             return creator.createFunction(
-        //                 unit: unit, to: velocity, sign: s0, otherSign: s1
-        //             )
-        //         }
-        //     }
-        // }
-        // print(conversions.joined(separator: "\n\n"))
-        // fflush(stdout)
-    }
+//     func testVelocityConversions() {
+//         // let creator = OperationalFunctionBodyCreator<Velocity>()
+//         // let conversions = Velocity.allCases.flatMap { velocity in
+//         //     Signs.allCases.flatMap { s0 in
+//         //         Signs.allCases.map { s1 -> String in
+//         //             let unit = Velocity(
+//         //                 unit: .division(
+//         //                     lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
+//         //                     rhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds))
+//         //                 )
+//         //             )
+//         //             return creator.createFunction(
+//         //                 unit: unit, to: velocity, sign: s0, otherSign: s1
+//         //             )
+//         //         }
+//         //     }
+//         // }
+//         // print(conversions.joined(separator: "\n\n"))
+//         // fflush(stdout)
+//     }
 
-    func testAngularVelocityConversions() {
-        // let creator = OperationalFunctionBodyCreator<AngularVelocity>()
-        // let conversions = AngularVelocity.allCases.flatMap { velocity in
-        //     Signs.allCases.flatMap { s0 in
-        //         Signs.allCases.map { s1 -> String in
-        //             let unit = AngularVelocity(
-        //                 unit: .division(
-        //                     lhs: .constant(declaration: AnyUnit(AngleUnits.degrees)),
-        //                     rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
-        //                 )
-        //             )
-        //             return creator.createFunction(
-        //                 unit: unit, to: velocity, sign: s0, otherSign: s1
-        //             )
-        //         }
-        //     }
-        // }
-        // print(conversions.joined(separator: "\n\n"))
-        // fflush(stdout)
-    }
+//     func testAngularVelocityConversions() {
+//         // let creator = OperationalFunctionBodyCreator<AngularVelocity>()
+//         // let conversions = AngularVelocity.allCases.flatMap { velocity in
+//         //     Signs.allCases.flatMap { s0 in
+//         //         Signs.allCases.map { s1 -> String in
+//         //             let unit = AngularVelocity(
+//         //                 unit: .division(
+//         //                     lhs: .constant(declaration: AnyUnit(AngleUnits.degrees)),
+//         //                     rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+//         //                 )
+//         //             )
+//         //             return creator.createFunction(
+//         //                 unit: unit, to: velocity, sign: s0, otherSign: s1
+//         //             )
+//         //         }
+//         //     }
+//         // }
+//         // print(conversions.joined(separator: "\n\n"))
+//         // fflush(stdout)
+//     }
 
-}
+// }
