@@ -9,7 +9,7 @@ on:
 jobs:
 
   exec-mac-ci-release:
-    runs-on: macStudio 
+    runs-on: [self-hosted, macOS, ARM64]
 
     steps:
       - name: Remove everything
