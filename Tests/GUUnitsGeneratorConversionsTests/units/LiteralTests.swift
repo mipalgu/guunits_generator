@@ -1,4 +1,4 @@
-// Literal.swift 
+// LiteralTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,79 +54,31 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-public enum Literal: Hashable {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    case integer(value: Int)
+/// Test class for ``Literal``.
+final class LiteralTests: XCTestCase {
 
-    case decimal(value: Double)
+    let intLiteral = Literal.integer(value: 5)
 
-    var abbreviation: String {
-        switch self {
-        case .integer(let value):
-            return value.abbreviation
-        case .decimal(let value):
-            return value.abbreviation
-        }
+    let doubleLiteral = Literal.decimal(value: 12.3456)
+
+    func testAbbreviation() {
+        XCTAssertEqual(intLiteral.abbreviation, "5")
+        XCTAssertEqual(doubleLiteral.abbreviation, "12_35")
     }
 
-    var asDouble: Double {
-        switch self {
-        case .integer(let value):
-            return Double(value)
-        case .decimal(let value):
-            return value
-        }
+    func testAsDouble() {
+        XCTAssertEqual(5.0, intLiteral.asDouble)
+        XCTAssertEqual(12.3456, doubleLiteral.asDouble)
     }
 
-    var asInteger: Int {
-        switch self {
-        case .integer(let value):
-            return value
-        case .decimal(let value):
-            return Int(value.rounded())
-        }
-    }
-
-    var asString: String {
-        switch self {
-        case .integer(let value):
-            return "\(value)"
-        case .decimal(let value):
-            return "\(value)"
-        }
-    }
-
-    var isFloat: Bool {
-        switch self {
-        case .integer:
-            return false
-        case .decimal:
-            return true
-        }
-    }
-
-}
-
-/// Add abbreviation to Int.
-private extension Int {
-
-    /// The abbreviation of the Int.
-    var abbreviation: String {
-        guard self > 0 else {
-            return "neg" + abs(self).abbreviation
-        }
-        return "\(self)"
-    }
-
-}
-
-private extension Double {
-
-    var abbreviation: String {
-        guard self > 0 else {
-            return "neg" + abs(self).abbreviation
-        }
-        return String(format: "%.2f", arguments: [self]).replacingOccurrences(of: ".", with: "_")
+    func testAsInteger() {
+        XCTAssertEqual(5, intLiteral.asInteger)
+        XCTAssertEqual(12, doubleLiteral.asInteger)
+        let literal3 = Literal.decimal(value: 7.6)
+        XCTAssertEqual(8, literal3.asInteger)
     }
 
 }
