@@ -90,4 +90,12 @@ final class AnyUnitTests: XCTestCase {
         XCTAssertEqual(highest, unitHighest)
     }
 
+    /// Test conversion function produce the same result of the typed unit.
+    func testConversionFunctions() {
+        XCTAssertEqual(rawUnit.conversion(to: .metres), unit.conversion(to: AnyUnit(DistanceUnits.metres)))
+        XCTAssertEqual(
+            rawUnit.conversion(from: .centimetres), unit.conversion(from: AnyUnit(DistanceUnits.centimetres))
+        )
+    }
+
 }

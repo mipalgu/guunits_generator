@@ -54,9 +54,10 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A struct for type-erased units conforming to `UnitProtocol`.
+/// A struct for type-erased units conforming to ``UnitProtocol`` and ``UnitsConvertible``.
 /// - SeeAlso: `UnitProtocol`.
-public struct AnyUnit: CustomStringConvertible {
+/// - SeeAlso: ``UnitsConvertible``.
+public struct AnyUnit: CustomStringConvertible, UnitsConvertible {
 
     /// A function to retrieve the category.
     private var categoryFn: () -> String
@@ -76,8 +77,10 @@ public struct AnyUnit: CustomStringConvertible {
     /// A function that retrieves the unit in the category with the highest precision.
     private var highestPrecisionFn: () -> AnyUnit
 
+    /// A function that generates an ``Operation`` converting `self` to a new unit within the same category.
     private var conversionTo: (AnyUnit) -> Operation
 
+    /// A function that produces an operation that converts a unit in the same category to `self`.
     private var conversionFrom: (AnyUnit) -> Operation
 
     /// The category of the unit.
@@ -139,11 +142,17 @@ public struct AnyUnit: CustomStringConvertible {
         }
     }
 
-    func conversion(to unit: AnyUnit) -> Operation {
+    /// Convert to another unit within the same unit category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The operation converting `self` to `unit`.
+    public func conversion(to unit: AnyUnit) -> Operation {
         self.conversionTo(unit)
     }
 
-    func conversion(from unit: AnyUnit) -> Operation {
+    /// Convert from another unit to within the same unit category to `self`.
+    /// - Parameter unit: The unit to convert from.
+    /// - Returns: The operation converting from `unit` to `self`.
+    public func conversion(from unit: AnyUnit) -> Operation {
         self.conversionFrom(unit)
     }
 
