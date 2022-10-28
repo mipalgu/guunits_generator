@@ -166,4 +166,15 @@ final class MassUnitsTests: XCTestCase, UnitsTestable {
         XCTAssertEqual(result, expected)
     }
 
+    func testExponents() {
+        let expected: [MassUnits: Int] = [
+            .microgram: -6,
+            .milligram: -3,
+            .gram: 0,
+            .kilogram: 3,
+            .megagram: 6
+        ]
+        XCTAssertEqual(MassUnits.exponents, expected)
+    }
+
 }

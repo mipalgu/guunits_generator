@@ -97,4 +97,14 @@ final class CurrentUnitsTests: XCTestCase, UnitsTestable {
         XCTAssertTrue(CurrentUnits.sameZeroPoint)
     }
 
+    /// Test exponents is correct.
+    func testExponents() {
+        let expected: [CurrentUnits: Int] = [
+            .microamperes: -6,
+            .milliamperes: -3,
+            .amperes: 0
+        ]
+        XCTAssertEqual(CurrentUnits.exponents, expected)
+    }
+
 }
