@@ -84,4 +84,103 @@ final class TemperatureUnitsTests: XCTestCase, UnitsTestable {
         assert(value: TemperatureUnits.kelvin, rawValue: "kelvin", abbreviation: "K", description: "kelvin")
     }
 
+    /// Test same conversion produces constant operation.
+    func testSameConversion() {
+        let celsius = TemperatureUnits.celsius
+        let fahrenheit = TemperatureUnits.fahrenheit
+        let kelvin = TemperatureUnits.kelvin
+        XCTAssertEqual(celsius.conversion(to: .celsius), .constant(declaration: AnyUnit(celsius)))
+        XCTAssertEqual(fahrenheit.conversion(to: .fahrenheit), .constant(declaration: AnyUnit(fahrenheit)))
+        XCTAssertEqual(kelvin.conversion(to: .kelvin), .constant(declaration: AnyUnit(kelvin)))
+    }
+
+    /// Test celsius to Kelvin conversion is correct.
+    func testCelsiusToKelvinConversion() {
+        let unit = TemperatureUnits.celsius
+        let expected = Operation.addition(
+            lhs: .constant(declaration: AnyUnit(unit)),
+            rhs: .literal(declaration: .decimal(value: 273.15))
+        )
+        XCTAssertEqual(expected, unit.conversion(to: .kelvin))
+    }
+
+    /// Test celsius to fahrenheit conversion is correct.
+    func testCelsiusToFahrenheitConversion() {
+        let unit = TemperatureUnits.celsius
+        let expected = Operation.addition(
+            lhs: .multiplication(
+                lhs: .constant(declaration: AnyUnit(unit)),
+                rhs: .literal(declaration: .decimal(value: 1.8))
+            ),
+            rhs: .literal(declaration: .integer(value: 32))
+        )
+        XCTAssertEqual(expected, unit.conversion(to: .fahrenheit))
+    }
+
+    /// Test kelvin to celsius conversion is correct.
+    func testKelvinToCelsiusConversion() {
+        let unit = TemperatureUnits.kelvin
+        let expected = Operation.subtraction(
+            lhs: .constant(declaration: AnyUnit(unit)), rhs: .literal(declaration: .decimal(value: 273.15))
+        )
+        XCTAssertEqual(expected, unit.conversion(to: .celsius))
+    }
+
+    /// Test kelvin to fahrenheit conversion is correct.
+    func testKelvinToFahrenheitConversion() {
+        let unit = TemperatureUnits.kelvin
+        let expected = Operation.addition(
+            lhs: .multiplication(
+                lhs: .precedence(
+                    operation: .subtraction(
+                        lhs: .constant(declaration: AnyUnit(unit)),
+                        rhs: .literal(declaration: .decimal(value: 273.15))
+                    )
+                ),
+                rhs: .literal(declaration: .decimal(value: 1.8))
+            ),
+            rhs: .literal(declaration: .integer(value: 32))
+        )
+        XCTAssertEqual(expected, unit.conversion(to: .fahrenheit))
+    }
+
+    /// Test fahrenheit to celsius conversion is correct.
+    func testFahrenheitToCelsiusConversion() {
+        let unit = TemperatureUnits.fahrenheit
+        let expected = Operation.multiplication(
+            lhs: .precedence(
+                operation: .subtraction(
+                    lhs: .constant(declaration: AnyUnit(unit)),
+                    rhs: .literal(declaration: .integer(value: 32))
+                )
+            ),
+            rhs: .division(
+                lhs: .literal(declaration: .integer(value: 5)),
+                rhs: .literal(declaration: .integer(value: 9))
+            )
+        )
+        XCTAssertEqual(expected, unit.conversion(to: .celsius))
+    }
+
+    /// Test fahrenheit to Kelvin conversion is correct.
+    func testFahrenheitToKelvinConversion() {
+        let unit = TemperatureUnits.fahrenheit
+        let expected = Operation.addition(
+            lhs: .multiplication(
+                lhs: .precedence(
+                    operation: .subtraction(
+                        lhs: .constant(declaration: AnyUnit(unit)),
+                        rhs: .literal(declaration: .integer(value: 32))
+                    )
+                ),
+                rhs: .division(
+                    lhs: .literal(declaration: .integer(value: 5)),
+                    rhs: .literal(declaration: .integer(value: 9))
+                )
+            ),
+            rhs: .literal(declaration: .decimal(value: 273.15))
+        )
+        XCTAssertEqual(expected, unit.conversion(to: .kelvin))
+    }
+
 }

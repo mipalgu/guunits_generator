@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// GradualUnitsConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,50 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+import Foundation
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+/// Protocol that helps units conformance to ``UnitsConvertible`` that use units
+/// that are displaced using base10 increments. For example, this protocol can be used
+/// with SI units utilising the SI prefixes nano (10^-9), micro (10^-6), milli (10^-3),
+/// centi (10^-2), kilo (10^3), mega (10^6), etc. The `exponents` static constant expresses
+/// each unit to the exponent used in the base 10 calculation, E.g. millimetres would have
+/// an exponent of -3 since it uses the milli prefix.
+public protocol Base10UnitsConvertible: UnitsConvertible where Self: Hashable {
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
-    }
+    /// The exponents of the base 10 representation of each unit.
+    static var exponents: [Self: Int] { get }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
+}
 
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
+/// Default implementation of ``Base10UnitsConvertible`` where the conforming type also
+/// conforms to ``UnitProtocol``.
+extension Base10UnitsConvertible where Self: UnitProtocol {
 
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Convert `self` to another unit withing `Self`.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The operation that converts `self` to `unit`.
+    public func conversion(to unit: Self) -> Operation {
+        guard unit != self else {
+            return .constant(declaration: AnyUnit(self))
+        }
+        guard let value = Self.exponents[self], let otherValue = Self.exponents[unit] else {
+            fatalError("Exponents static var is incomplete. Missing \(self) or \(unit).")
+        }
+        let exponent = (otherValue - value)
+        let literal = Array(repeating: 10, count: abs(exponent)).reduce(1, *)
+        if exponent < 0 {
+            return .multiplication(
+                lhs: .constant(declaration: AnyUnit(self)),
+                rhs: .literal(declaration: .integer(value: literal))
+            )
+        } else if exponent == 0 {
+            return .constant(declaration: AnyUnit(self))
+        } else {
+            return .division(
+                lhs: .constant(declaration: AnyUnit(self)),
+                rhs: .literal(declaration: .integer(value: literal))
+            )
+        }
     }
 
 }

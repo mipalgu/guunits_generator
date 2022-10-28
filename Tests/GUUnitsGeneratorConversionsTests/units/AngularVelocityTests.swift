@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// AngularVelocityTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,54 +57,22 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for ``AngularVelocity``.
+final class AngularVelocityTests: XCTestCase {
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
+    /// Test the baseUnit is the SI unit radians per second (rad/s).
+    func testBaseUnit() {
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
         )
+        XCTAssertEqual(AngularVelocity.baseUnit, expected)
     }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Test init sets unit correctly.
+    func testInit() {
+        let unit = AngularVelocity(unit: AngularVelocity.baseUnit)
+        XCTAssertEqual(unit.unit, AngularVelocity.baseUnit)
     }
 
 }

@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// Velocity.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,26 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// Defines a velocity unit with a base unit of metres per second.
+public struct Velocity: CompositeUnit, UnitsConvertible {
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+    /// The base unit (SI m/s).
+    public static let baseUnit: Operation = .division(
+        lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+    )
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
-    }
+    /// A instance of this unit category.
+    public let unit: Operation
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Initialise the Velocity from a derivation of the `baseUnit`.
+    /// - Parameter unit: The operation representing this unit. This parameter
+    /// must be a derivation of `baseUnit`. It cannot have a different structure.
+    public init(unit: Operation) {
+        self.unit = unit
     }
 
 }
+
+/// Hashable conformance.
+extension Velocity: Hashable {}

@@ -184,6 +184,10 @@ public struct GUUnitsGenerator {
                 .kilogram: 1000
             ])
         )
+        let velocityGenerator = AnyGenerator(generating: Velocity.self, using: OperationalGenerator())
+        let angularVelocityGenerator = AnyGenerator(
+            generating: AngularVelocity.self, using: OperationalGenerator()
+        )
         let fileContents = HeaderCreator().generate(
             generators: [
                 distanceGenerator,
@@ -194,7 +198,9 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
-                massGenerator
+                massGenerator,
+                velocityGenerator,
+                angularVelocityGenerator
             ]
         )
         .data(using: .utf8)
@@ -213,7 +219,9 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
-                massGenerator
+                massGenerator,
+                velocityGenerator,
+                angularVelocityGenerator
             ]
         )
         .data(using: .utf8)
@@ -335,6 +343,12 @@ public struct GUUnitsGenerator {
             and: swiftFileCreator.generate(for: AccelerationUnits.self)
         )
         writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
+        writeFile(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
+        writeFile(
+            at: path,
+            with: AngularVelocity.category,
+            and: swiftFileCreator.generate(for: AngularVelocity.self)
+        )
         writeFile(at: path, with: "GUUnitsFloat", and: GUUnitsPrimitiveHelpers.float)
         writeFile(at: path, with: "GUUnitsInteger", and: GUUnitsPrimitiveHelpers.integer)
         writeFile(at: path, with: "GUUnitsType", and: GUUnitsPrimitiveHelpers.type)

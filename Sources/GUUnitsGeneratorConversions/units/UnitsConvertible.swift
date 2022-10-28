@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// UnitsConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,47 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// This protocol provides conversion functions for units within the same category.
+/// The conversion functions produce an ``Operation`` that will define the function required
+/// to perform the conversion.
+/// - SeeAlso: ``Operation``.
+public protocol UnitsConvertible {
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+    /// Convert from a unit within the same category to `self`.
+    /// - Parameter unit: The unit to convert from.
+    /// - Returns: An ``Operation`` that converts `unit` to `self`.
+    func conversion(from unit: Self) -> Operation
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
+    /// Convert to a unit within the same category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: An ``Operation`` converting `unit` to `self`.
+    func conversion(to unit: Self) -> Operation
+
+}
+
+/// Default implementation.
+public extension UnitsConvertible {
+
+    /// Default implementation simply calls conversion(to:) using passed unit.
+    /// - Parameter unit: The unit to convert from.
+    /// - Returns: An operation converting `unit` to `self`.
+    func conversion(from unit: Self) -> Operation {
+        unit.conversion(to: self)
+    }
+
+}
+
+/// Default implementation when the conforming type is also a ``CompositeUnit``.
+public extension UnitsConvertible where Self: CompositeUnit {
+
+    /// Convert to a unit within the same category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: An ``Operation`` converting `unit` to `self`.
+    func conversion(to unit: Self) -> Operation {
+        .multiplication(
+            lhs: .constant(declaration: AnyUnit(self)), rhs: self.unit.conversion(to: unit.unit)
         )
-    }
-
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+        .replace(convertibles: [AnyUnit(self): AnyUnit(self)])
     }
 
 }

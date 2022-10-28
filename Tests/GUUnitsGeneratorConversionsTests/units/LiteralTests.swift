@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// LiteralTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,54 +57,45 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for ``Literal``.
+final class LiteralTests: XCTestCase {
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
+    /// Int literal under test.
+    let intLiteral = Literal.integer(value: 5)
+
+    /// Double Literal under test.
+    let doubleLiteral = Literal.decimal(value: 12.3456)
+
+    /// Test abbreviation is correct.
+    func testAbbreviation() {
+        XCTAssertEqual(intLiteral.abbreviation, "5")
+        XCTAssertEqual(doubleLiteral.abbreviation, "12_35")
     }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
+    /// Test double conversion is correct.
+    func testAsDouble() {
+        XCTAssertEqual(5.0, intLiteral.asDouble)
+        XCTAssertEqual(12.3456, doubleLiteral.asDouble)
     }
 
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
+    /// Test integer conversion is correct.
+    func testAsInteger() {
+        XCTAssertEqual(5, intLiteral.asInteger)
+        XCTAssertEqual(12, doubleLiteral.asInteger)
+        let literal3 = Literal.decimal(value: 7.6)
+        XCTAssertEqual(8, literal3.asInteger)
     }
 
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
+    /// Test string representation maintains the underlying values.
+    func testAsString() {
+        XCTAssertEqual("5", intLiteral.asString)
+        XCTAssertEqual("12.3456", doubleLiteral.asString)
     }
 
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Test isFloat is correct.
+    func testIsFloat() {
+        XCTAssertFalse(intLiteral.isFloat)
+        XCTAssertTrue(doubleLiteral.isFloat)
     }
 
 }

@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// VelocityTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,54 +57,46 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for `Velocity`.
+final class VelocityTests: XCTestCase {
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
+    /// The composite unit under test.
+    let velocity = Velocity(unit: Velocity.baseUnit)
+
+    /// Test unit is set correctly.
+    func testInit() {
+        XCTAssertEqual(velocity.unit, Velocity.baseUnit)
+    }
+
+    /// Test abbreviation.
+    func testAbbreviation() {
+        XCTAssertEqual(velocity.abbreviation, "m_per_s")
+    }
+
+    /// Test description.
+    func testDescription() {
+        XCTAssertEqual(velocity.description, "metres_per_seconds")
+    }
+
+    /// Test allCases property.
+    func testAllCases() {
+        let expected = Velocity.baseUnit.allCases.map { Velocity(unit: $0) }
+        let result = Velocity.allCases
+        XCTAssertEqual(Set(expected), Set(result))
+    }
+
+    /// Test base unit represents the base SI unit for Velocity.
+    func testBaseUnit() {
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
         )
+        XCTAssertEqual(Velocity.baseUnit, expected)
     }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Test named unit is empty.
+    func testNamedUnit() {
+        XCTAssertTrue(Velocity.namedUnit.isEmpty)
     }
 
 }

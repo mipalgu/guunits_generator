@@ -183,7 +183,7 @@ public struct NumericTypeConverter: NumericConverterProtocol {
             return "((\(resultType)) (\(str)))"
         }
         guard currentType != type.rawValue else {
-            return "\(type.abbreviation)_to_\(otherType.abbreviation)(\(str))"
+            return self.cast("\(type.abbreviation)_to_\(otherType.abbreviation)(\(str))", to: resultType)
         }
         return "\(type.abbreviation)_to_\(otherType.abbreviation)(((\(type.rawValue)) (\(str))))"
     }

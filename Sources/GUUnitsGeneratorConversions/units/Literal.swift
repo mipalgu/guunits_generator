@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// Literal.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,91 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// Enumeration for representating different types of primitive values. These types represent
+/// different real and rational numbers with differing precision.
+public enum Literal: Hashable {
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+    /// An integer.
+    case integer(value: Int)
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
+    /// A decimal number that would contain a decimal point. This value is approximated
+    /// as a `Double`.
+    case decimal(value: Double)
+
+    /// A concise string representation of the underlying value.
+    var abbreviation: String {
+        switch self {
+        case .integer(let value):
+            return value.abbreviation
+        case .decimal(let value):
+            return value.abbreviation
+        }
     }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
+    /// The underlying value represented as a `Double` type.
+    var asDouble: Double {
+        switch self {
+        case .integer(let value):
+            return Double(value)
+        case .decimal(let value):
+            return value
+        }
     }
 
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
+    /// The underlying value represented as an `Int` type.
+    var asInteger: Int {
+        switch self {
+        case .integer(let value):
+            return value
+        case .decimal(let value):
+            return Int(value.rounded())
+        }
     }
 
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
+    /// The underlying value represented as a `String`.
+    var asString: String {
+        switch self {
+        case .integer(let value):
+            return "\(value)"
+        case .decimal(let value):
+            return "\(value)"
+        }
     }
 
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// True when the underlying value is a floating point number. False otherwise.
+    var isFloat: Bool {
+        switch self {
+        case .integer:
+            return false
+        case .decimal:
+            return true
+        }
+    }
+
+}
+
+/// Add abbreviation to Int.
+private extension Int {
+
+    /// The abbreviation of the Int.
+    var abbreviation: String {
+        guard self > 0 else {
+            return "neg" + abs(self).abbreviation
+        }
+        return "\(self)"
+    }
+
+}
+
+/// Add abbreviation to Double.
+private extension Double {
+
+    /// An small string representation of a Double value.
+    var abbreviation: String {
+        guard self > 0 else {
+            return "neg" + abs(self).abbreviation
+        }
+        return String(format: "%.2f", arguments: [self]).replacingOccurrences(of: ".", with: "_")
     }
 
 }

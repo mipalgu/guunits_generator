@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// AngularVelocity.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,27 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A unit for describing rotational velocity. This unit uses the SI unit
+/// radians per second (rad/s) as the base unit.
+public struct AngularVelocity: CompositeUnit, UnitsConvertible {
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+    /// The base unit of Angular Velocity is radians per second (rad/s).
+    public static let baseUnit: Operation = .division(
+        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
+        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+    )
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
-    }
+    /// The unit instance of this category.
+    public var unit: Operation
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Instantiate the category from an instance of a unit.
+    /// - Parameter unit: The unit instance of this category. This unit should
+    /// be a derivation of the `baseUnit`.
+    public init(unit: Operation) {
+        self.unit = unit
     }
 
 }
+
+/// Hashable conformance.
+extension AngularVelocity: Hashable {}

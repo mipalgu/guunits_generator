@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// Operation+CConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,33 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A ``FunctionBodyCreator`` that works with ``UnitsConvertible`` types.
+public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
+    Unit: UnitProtocol, Unit: UnitsConvertible {
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+    /// A helper converter.
+    let converter = NumericTypeConverter()
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
-    }
+    /// Default initialiser.
+    public init() {}
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// Create the C code to convert one unit with sign into another unit with sign.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - sign: The sign of the first unit.
+    ///   - otherSign: The sign of the second unit.
+    /// - Returns: The C code that converts `unit` with `sign` to `otherUnit` with `otherSign`.
+    public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+        guard unit != otherUnit || sign != otherSign else {
+            return "return \(unit);"
+        }
+        let conversion = unit.conversion(to: otherUnit)
+        let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
+        let cSign = needsDouble ? Signs.d : sign
+        let code = conversion.cCode(sign: cSign)
+        return "    return " +
+            converter.convert(code, from: cSign.numericType, to: otherUnit, sign: otherSign) + ";"
     }
 
 }

@@ -110,4 +110,15 @@ extension UnitProtocol {
         true
     }
 
+    /// Initialise the unit from a string description.
+    /// - Parameter desciption: The description of the unit.
+    init?(description: String) {
+        guard let unit = Self.allCases.first(where: {
+            $0.description == description
+        }) else {
+            return nil
+        }
+        self = unit
+    }
+
 }

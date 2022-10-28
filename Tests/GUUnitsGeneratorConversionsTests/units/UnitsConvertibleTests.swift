@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// UnitsConvertibleTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,54 +57,45 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for ``UnitsConvertible``.
+final class UnitsConvertibleTests: XCTestCase {
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
+    /// A mock composite unit equivalent to ``DistanceUnits``.
+    struct MockDistance: CompositeUnit, UnitsConvertible {
+
+        /// The base unit is a metre.
+        static let baseUnit: GUUnitsGeneratorConversions.Operation = .constant(
+            declaration: AnyUnit(DistanceUnits.metres)
         )
+
+        /// A unit instance.
+        let unit: GUUnitsGeneratorConversions.Operation
+
+        /// Default init.
+        init(unit: GUUnitsGeneratorConversions.Operation) {
+            self.unit = unit
+        }
+
     }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
+    /// The unit under test.
+    let unit = MockDistance(unit: MockDistance.baseUnit)
+
+    /// A unit to convert from/to.
+    let otherUnit = MockDistance(unit: .constant(declaration: AnyUnit(DistanceUnits.centimetres)))
+
+    /// Test conversion(from:) calls conversion(to:) on passed unit.
+    func testFromConversion() {
+        XCTAssertEqual(unit.conversion(from: otherUnit), otherUnit.conversion(to: unit))
+    }
+
+    /// Test conversion(to:) produces correct operation using default implementation.
+    func testToConversion() {
+        let expected = GUUnitsGeneratorConversions.Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(unit)),
+            rhs: .literal(declaration: .integer(value: 100))
         )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+        XCTAssertEqual(expected, unit.conversion(to: otherUnit))
     }
 
 }

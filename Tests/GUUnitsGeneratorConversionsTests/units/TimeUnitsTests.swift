@@ -41,4 +41,14 @@ final class TimeUnitsTests: XCTestCase, UnitsTestable {
         XCTAssertTrue(TimeUnits.sameZeroPoint)
     }
 
+    /// Test exponents is correct.
+    func testExponents() {
+        let expected: [TimeUnits: Int] = [
+            .microseconds: -6,
+            .milliseconds: -3,
+            .seconds: 0
+        ]
+        XCTAssertEqual(TimeUnits.exponents, expected)
+    }
+
 }

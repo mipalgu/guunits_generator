@@ -172,7 +172,9 @@ public struct HeaderCreator {
             ("// Percent Units.", Array(PercentUnits.allCases)),
             ("// Temperature Units.", Array(TemperatureUnits.allCases)),
             ("// Acceleration Units.", Array(AccelerationUnits.allCases)),
-            ("// Mass Units.", Array(MassUnits.allCases))
+            ("// Mass Units.", Array(MassUnits.allCases)),
+            ("// Velocity Units.", Array(Velocity.allCases)),
+            ("// Angular Velocity Units.", Array(AngularVelocity.allCases))
         ]
         let signs = Signs.allCases
         let typeDefs = units.flatMap { comment, units in

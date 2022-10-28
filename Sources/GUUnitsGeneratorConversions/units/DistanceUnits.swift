@@ -57,7 +57,7 @@
  */
 
 /// A Unit for representing distances.
-public enum DistanceUnits: String {
+public enum DistanceUnits: String, UnitProtocol, Base10UnitsConvertible {
 
     /// Millimetres
     case millimetres
@@ -68,10 +68,12 @@ public enum DistanceUnits: String {
     /// Metres
     case metres
 
-}
-
-/// UnitProtocol conformance.
-extension DistanceUnits: UnitProtocol {
+    /// The exponents of the units expressed as base 10.
+    public static let exponents: [DistanceUnits: Int] = [
+        .millimetres: -3,
+        .centimetres: -2,
+        .metres: 0
+    ]
 
     /// The abbreviation of the unit.
     public var abbreviation: String {

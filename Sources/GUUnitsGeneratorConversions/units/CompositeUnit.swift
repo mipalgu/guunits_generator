@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// CompositeUnit.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,57 +54,49 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// Defines a category that is created from relationships of other units. This protocol
+/// defines a class of unit that uses different `UnitProtocol` types
+/// in it's definition.
+public protocol CompositeUnit: UnitProtocol {
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+    /// The base operation of this unit.
+    static var baseUnit: Operation { get }
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
-        )
+    /// Any units in Self that have a name.
+    static var namedUnit: [Operation: String] { get }
+
+    /// A unit type of this category.
+    var unit: Operation { get }
+
+    /// Create a unit that exists within this category.
+    /// - Parameter unit: A specific unit belonging to this category.
+    init(unit: Operation)
+
+}
+
+/// Default Implementation.
+public extension CompositeUnit {
+
+    /// The different permutations of the subunits.
+    static var allCases: [Self] {
+        Self.baseUnit.allCases.map {
+            Self(unit: $0)
+        }
     }
 
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
+    /// The default `namedUnit` is an empty dictionary.
+    static var namedUnit: [Operation: String] {
+        [:]
     }
 
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
+    /// The abbreviation of the unit.
+    var abbreviation: String {
+        unit.abbreviation
     }
 
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
+    /// The string representation of the unit.
+    var description: String {
+        unit.description
     }
 
 }

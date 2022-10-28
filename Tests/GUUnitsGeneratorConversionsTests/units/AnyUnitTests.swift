@@ -1,4 +1,4 @@
-// CurrentUnitsTests.swift 
+// AnyUnitTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,54 +57,45 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for `CurrentUnits`.
-final class CurrentUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for `AnyUnit`.
+final class AnyUnitTests: XCTestCase {
 
-    /// Test micro amps.
-    func testMicroAmps() {
-        assert(
-            value: CurrentUnits.microamperes,
-            rawValue: "microamperes",
-            abbreviation: "uA",
-            description: "microamperes"
+    /// The typed unit.
+    let rawUnit = DistanceUnits.millimetres
+
+    /// The type-erased unit under test.
+    var unit: AnyUnit {
+        AnyUnit(rawUnit)
+    }
+
+    /// Test property values correspond to typed unit properties.
+    func testProperties() {
+        XCTAssertEqual(rawUnit.abbreviation, unit.abbreviation)
+        XCTAssertEqual(unit.category, DistanceUnits.category)
+        XCTAssertEqual(unit.description, rawUnit.description)
+        XCTAssertEqual(unit.sameZeroPoint, DistanceUnits.sameZeroPoint)
+    }
+
+    /// Test the allCases property.
+    func testAllCases() {
+        let allCases = Set(unit.allCases.map(\.description))
+        let distanceAllCases = Set(DistanceUnits.allCases.map(\.description))
+        XCTAssertEqual(allCases, distanceAllCases)
+    }
+
+    /// Test the highest precision is the same as the raw unit type. 
+    func testHighestPrecision() {
+        let highest = DistanceUnits.highestPrecision.description
+        let unitHighest = unit.highestPrecision.description
+        XCTAssertEqual(highest, unitHighest)
+    }
+
+    /// Test conversion function produce the same result of the typed unit.
+    func testConversionFunctions() {
+        XCTAssertEqual(rawUnit.conversion(to: .metres), unit.conversion(to: AnyUnit(DistanceUnits.metres)))
+        XCTAssertEqual(
+            rawUnit.conversion(from: .centimetres), unit.conversion(from: AnyUnit(DistanceUnits.centimetres))
         )
-    }
-
-    /// Test milliamps.
-    func testMilliAmps() {
-        assert(
-            value: CurrentUnits.milliamperes,
-            rawValue: "milliamperes",
-            abbreviation: "mA",
-            description: "milliamperes"
-        )
-    }
-
-    /// Test amps.
-    func testAmps() {
-        assert(
-            value: CurrentUnits.amperes,
-            rawValue: "amperes",
-            abbreviation: "A",
-            description: "amperes"
-        )
-    }
-
-    /// Test static variables.
-    func testStaticVariables() {
-        XCTAssertEqual(CurrentUnits.category, "Current")
-        XCTAssertEqual(CurrentUnits.highestPrecision, .microamperes)
-        XCTAssertTrue(CurrentUnits.sameZeroPoint)
-    }
-
-    /// Test exponents is correct.
-    func testExponents() {
-        let expected: [CurrentUnits: Int] = [
-            .microamperes: -6,
-            .milliamperes: -3,
-            .amperes: 0
-        ]
-        XCTAssertEqual(CurrentUnits.exponents, expected)
     }
 
 }
