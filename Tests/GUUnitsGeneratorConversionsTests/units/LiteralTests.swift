@@ -60,25 +60,42 @@ import XCTest
 /// Test class for ``Literal``.
 final class LiteralTests: XCTestCase {
 
+    /// Int literal under test.
     let intLiteral = Literal.integer(value: 5)
 
+    /// Double Literal under test.
     let doubleLiteral = Literal.decimal(value: 12.3456)
 
+    /// Test abbreviation is correct.
     func testAbbreviation() {
         XCTAssertEqual(intLiteral.abbreviation, "5")
         XCTAssertEqual(doubleLiteral.abbreviation, "12_35")
     }
 
+    /// Test double conversion is correct.
     func testAsDouble() {
         XCTAssertEqual(5.0, intLiteral.asDouble)
         XCTAssertEqual(12.3456, doubleLiteral.asDouble)
     }
 
+    /// Test integer conversion is correct.
     func testAsInteger() {
         XCTAssertEqual(5, intLiteral.asInteger)
         XCTAssertEqual(12, doubleLiteral.asInteger)
         let literal3 = Literal.decimal(value: 7.6)
         XCTAssertEqual(8, literal3.asInteger)
+    }
+
+    /// Test string representation maintains the underlying values.
+    func testAsString() {
+        XCTAssertEqual("5", intLiteral.asString)
+        XCTAssertEqual("12.3456", doubleLiteral.asString)
+    }
+
+    /// Test isFloat is correct.
+    func testIsFloat() {
+        XCTAssertFalse(intLiteral.isFloat)
+        XCTAssertTrue(doubleLiteral.isFloat)
     }
 
 }

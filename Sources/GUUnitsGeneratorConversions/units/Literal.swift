@@ -54,12 +54,18 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Enumeration for representating different types of primitive values. These types represent
+/// different real and rational numbers with differing precision.
 public enum Literal: Hashable {
 
+    /// An integer.
     case integer(value: Int)
 
+    /// A decimal number that would contain a decimal point. This value is approximated
+    /// as a `Double`.
     case decimal(value: Double)
 
+    /// A concise string representation of the underlying value.
     var abbreviation: String {
         switch self {
         case .integer(let value):
@@ -69,6 +75,7 @@ public enum Literal: Hashable {
         }
     }
 
+    /// The underlying value represented as a `Double` type.
     var asDouble: Double {
         switch self {
         case .integer(let value):
@@ -78,6 +85,7 @@ public enum Literal: Hashable {
         }
     }
 
+    /// The underlying value represented as an `Int` type.
     var asInteger: Int {
         switch self {
         case .integer(let value):
@@ -87,6 +95,7 @@ public enum Literal: Hashable {
         }
     }
 
+    /// The underlying value represented as a `String`.
     var asString: String {
         switch self {
         case .integer(let value):
@@ -96,6 +105,7 @@ public enum Literal: Hashable {
         }
     }
 
+    /// True when the underlying value is a floating point number. False otherwise.
     var isFloat: Bool {
         switch self {
         case .integer:
@@ -120,8 +130,10 @@ private extension Int {
 
 }
 
+/// Add abbreviation to Double.
 private extension Double {
 
+    /// An small string representation of a Double value.
     var abbreviation: String {
         guard self > 0 else {
             return "neg" + abs(self).abbreviation
