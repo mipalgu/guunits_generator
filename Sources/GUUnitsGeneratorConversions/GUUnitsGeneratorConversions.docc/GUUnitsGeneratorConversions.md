@@ -52,6 +52,7 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``HeaderCreator``
 - ``NumericConverterProtocol``
 - ``NumericTypeConverter``
+- ``OperationalFunctionBodyCreator``
 - ``SignConverter``
 - ``TemperatureFunctionCreator``
 - ``UnitsGeneratable``
@@ -70,19 +71,28 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``SwiftTestFileCreator``
 
 ### Unit Definitions
+- ``Base10UnitsConvertible``
+- ``CompositeUnit``
+- ``Literal``
+- ``NumericTypes``
+- ``Operation``
+- ``Signs``
+- ``SwiftNumericTypes``
+- ``UnitProtocol``
+- ``UnitsConvertible``
+
+### Supported Units
 - ``AccelerationUnits``
 - ``AngleUnits``
+- ``AngularVelocity``
 - ``CurrentUnits``
 - ``DistanceUnits``
 - ``ImageUnits``
 - ``MassUnits``
-- ``NumericTypes``
 - ``PercentUnits``
-- ``Signs``
-- ``SwiftNumericTypes``
 - ``TemperatureUnits``
 - ``TimeUnits``
-- ``UnitProtocol``
+- ``Velocity``
 
 ### Top Module
 - ``GUUnitsGenerator``
