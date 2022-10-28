@@ -54,8 +54,10 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Adds helper functions and properties for generating C code.
 extension Operation {
 
+    /// True if the Operation requires floating-point precision.
     var hasFloatOperation: Bool {
         switch self {
         case .constant:
@@ -80,6 +82,9 @@ extension Operation {
         }
     }
 
+    /// Generate the C code for this operation.
+    /// - Parameter sign: The sign of the units in the operation.
+    /// - Returns: A String of C code representing this operation.
     func cCode(sign: Signs) -> String {
         switch self {
         case .constant(let unit):
@@ -115,6 +120,15 @@ extension Operation {
         }
     }
 
+    // swiftlint:disable function_body_length
+
+    /// Replace units within this operation with an equivalent unit. This function will replace
+    /// units within the `convertibles` dictionary with an equivalent unit. Units that are not
+    /// in the `convertibles` dictionary will be removed from the operation and replaced with
+    /// an identity equivalent operation. This function will also optimise the operation to
+    /// remove redundent operations such as multiplying by 1, dividing by 1, etc.
+    /// - Parameter convertibles: The units to convert in this operation.
+    /// - Returns: The new operation with the units converted.
     func replace(convertibles: [AnyUnit: AnyUnit]) -> Operation {
         switch self {
         case .constant(let unit):
@@ -166,6 +180,11 @@ extension Operation {
         }
     }
 
+    // swiftlint:enable function_body_length
+
+    /// Compare 2 operations of the same form and create a dictionary of the difference between units.
+    /// - Parameter operation: The operation to compare to.
+    /// - Returns: The units different between `self` and `operation`.
     func getUnitConvertibles(comparingTo operation: Operation) -> [AnyUnit: AnyUnit] {
         switch self {
         case .constant(let unit):
@@ -210,6 +229,7 @@ extension Operation {
         }
     }
 
+    /// Merges operation convertibles into a single dictionary.
     private func getConvertibles(
         in op1: Operation, comparingTo op11: Operation, and op2: Operation, comparingTo op22: Operation
     ) -> [AnyUnit: AnyUnit] {
@@ -224,6 +244,11 @@ extension Operation {
         return op1Acc
     }
 
+    /// Checks for duplicate keys between 2 dictionary.
+    /// - Parameters:
+    ///   - acc1: The first dictionary.
+    ///   - acc2: The second dictionary.
+    /// - Returns: Whether `acc1` and `acc2` have differing values at the same key.
     private func valid(acc1: [AnyUnit: AnyUnit], acc2: [AnyUnit: AnyUnit]) -> Bool {
         for k in acc1.keys {
             guard acc1[k] == acc2[k] || acc2[k] == nil else {
