@@ -57,32 +57,46 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+/// Test class for ``Base10UnitsConvertible``.
 final class Base10UnitsConvertibleTests: XCTestCase {
 
+    /// A Test unit category that conforms to ``Base10UnitsConvertible``.
     enum TestUnit: String, Base10UnitsConvertible, UnitProtocol {
 
+        /// The lowest unit.
         case a
 
+        /// The middle unit.
         case b
 
+        /// The base unit.
         case c
 
+        /// The highest unit.
+        case d
+
+        /// The exponents of each unit type. This represents each unit as displaced by some power
+        /// of 10 from the base unit.
         static let exponents: [Base10UnitsConvertibleTests.TestUnit: Int] = [
             .a: -6,
             .b: -2,
-            .c: 0
+            .c: 0,
+            .d: 1
         ]
 
+        /// The abbreviation of the units.
         var abbreviation: String {
             self.rawValue
         }
 
+        /// The description of the units.
         var description: String {
             self.rawValue
         }
 
     }
 
+    /// Test conversion from C to A is correct.
     func testConversionFromCToA() {
         let conversion = TestUnit.c.conversion(to: TestUnit.a)
         let expected = Operation.multiplication(
@@ -92,6 +106,7 @@ final class Base10UnitsConvertibleTests: XCTestCase {
         XCTAssertEqual(conversion, expected)
     }
 
+    /// Test conversion from A to C is correct.
     func testconversionFromAToC() {
         let conversion = TestUnit.a.conversion(to: TestUnit.c)
         let expected = Operation.division(
@@ -101,6 +116,7 @@ final class Base10UnitsConvertibleTests: XCTestCase {
         XCTAssertEqual(conversion, expected)
     }
 
+    /// Test conversion from B to C is correct.
     func testConversionFromBToC() {
         let conversion = TestUnit.b.conversion(to: TestUnit.c)
         let expected = Operation.division(
@@ -110,6 +126,7 @@ final class Base10UnitsConvertibleTests: XCTestCase {
         XCTAssertEqual(conversion, expected)
     }
 
+    /// Test conversion from C to B is correct.
     func testConversionFromCToB() {
         let conversion = TestUnit.c.conversion(to: TestUnit.b)
         let expected = Operation.multiplication(
@@ -118,6 +135,7 @@ final class Base10UnitsConvertibleTests: XCTestCase {
         XCTAssertEqual(conversion, expected)
     }
 
+    /// Test conversion from A to B is correct.
     func testConversionFromAToB() {
         let conversion = TestUnit.a.conversion(to: TestUnit.b)
         let expected = Operation.division(
@@ -127,11 +145,49 @@ final class Base10UnitsConvertibleTests: XCTestCase {
         XCTAssertEqual(conversion, expected)
     }
 
+    /// Test conversion from B to A is correct.
     func testConversionFromBToA() {
         let conversion = TestUnit.b.conversion(to: TestUnit.a)
         let expected = Operation.multiplication(
             lhs: .constant(declaration: AnyUnit(TestUnit.b)),
             rhs: .literal(declaration: .integer(value: 10_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    /// Test conversion from B to B creates constant operation.
+    func testConversionFromBToB() {
+        let conversion = TestUnit.b.conversion(from: TestUnit.b)
+        let expected = Operation.constant(declaration: AnyUnit(TestUnit.b))
+        XCTAssertEqual(conversion, expected)
+    }
+
+    /// Test conversion from A to D is correct.
+    func testconversionFromAToD() {
+        let conversion = TestUnit.a.conversion(to: TestUnit.d)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.a)),
+            rhs: .literal(declaration: .integer(value: 10_000_000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    /// Test conversion from B to D is correct.
+    func testConversionFromBToD() {
+        let conversion = TestUnit.b.conversion(to: TestUnit.d)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.b)),
+            rhs: .literal(declaration: .integer(value: 1000))
+        )
+        XCTAssertEqual(conversion, expected)
+    }
+
+    /// Test conversion from C to D is correct.
+    func testConversionFromCToD() {
+        let conversion = TestUnit.c.conversion(to: TestUnit.d)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(TestUnit.c)),
+            rhs: .literal(declaration: .integer(value: 10))
         )
         XCTAssertEqual(conversion, expected)
     }

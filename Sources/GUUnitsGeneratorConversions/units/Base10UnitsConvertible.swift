@@ -56,14 +56,26 @@
 
 import Foundation
 
+/// Protocol that helps units conformance to ``UnitsConvertible`` that use units
+/// that are displaced using base10 increments. For example, this protocol can be used
+/// with SI units utilising the SI prefixes nano (10^-9), micro (10^-6), milli (10^-3),
+/// centi (10^-2), kilo (10^3), mega (10^6), etc. The `exponents` static constant expresses
+/// each unit to the exponent used in the base 10 calculation, E.g. millimetres would have
+/// an exponent of -3 since it uses the milli prefix.
 public protocol Base10UnitsConvertible: UnitsConvertible where Self: Hashable {
 
+    /// The exponents of the base 10 representation of each unit.
     static var exponents: [Self: Int] { get }
 
 }
 
+/// Default implementation of ``Base10UnitsConvertible`` where the conforming type also
+/// conformas to ``UnitProtocol``.
 extension Base10UnitsConvertible where Self: UnitProtocol {
 
+    /// Convert `self` to another unit withing `Self`.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The operation that converts `self` to `unit`.
     public func conversion(to unit: Self) -> Operation {
         guard unit != self else {
             return .constant(declaration: AnyUnit(self))
@@ -87,77 +99,5 @@ extension Base10UnitsConvertible where Self: UnitProtocol {
             )
         }
     }
-
-    // public func conversion(to unit: Self) -> Operation {
-    //     guard unit != self else {
-    //         return .constant(declaration: AnyUnit(self))
-    //     }
-    //     guard Self.unitDifference.count == Self.allCases.count else {
-    //         fatalError("Unit Difference is not complete.")
-    //     }
-    //     let units = unitsBetween(unit: unit)
-    //     guard self == units.last || self == units.first else {
-    //         fatalError("Failed to get units between \(self) and \(unit).")
-    //     }
-    //     let isUpwards = self == units.last
-    //     let requiresDouble = self.requiresDouble(for: units, isUpwards: isUpwards)
-    //     let totalUnits = isUpwards ? units.dropLast() : units.dropFirst()
-    //     guard !requiresDouble else {
-    //         let total = totalUnits.reduce(1.0) {
-    //             guard let conversion = Self.unitDifference[$1] else {
-    //                 fatalError("Unit Difference is not complete.")
-    //             }
-    //             let val = isUpwards ? conversion.upwards : conversion.downwards
-    //             return $0 * val.asDouble
-    //         }
-    //         guard self == units.last else {
-    //             return .division(
-    //                 lhs: .constant(declaration: AnyUnit(self)),
-    //                 rhs: .literal(declaration: .decimal(value: total))
-    //             )
-    //         }
-    //         return .multiplication(
-    //             lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .decimal(value: total))
-    //         )
-    //     }
-    //     let total = totalUnits.reduce(1) {
-    //         guard let conversion = Self.unitDifference[$1] else {
-    //             fatalError("Unit Difference is not complete.")
-    //         }
-    //         let val = isUpwards ? conversion.upwards : conversion.downwards
-    //         return $0 * val.asInteger
-    //     }
-    //     guard self == units.last else {
-    //         return .division(
-    //             lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
-    //         )
-    //     }
-    //     return .multiplication(
-    //         lhs: .constant(declaration: AnyUnit(self)), rhs: .literal(declaration: .integer(value: total))
-    //     )
-    // }
-
-    // private func unitsBetween(unit: Self) -> [Self] {
-    //     guard
-    //         let me = Self.allCases.firstIndex(where: {
-    //             $0 == self
-    //         }),
-    //         let other = Self.allCases.firstIndex(where: {
-    //             $0 == unit
-    //         })
-    //     else {
-    //         fatalError("Missing cases in allCases")
-    //     }
-    //     let max = max(me, other)
-    //     let min = min(me, other)
-    //     return Array(Self.allCases[min...max])
-    // }
-
-    // private func requiresDouble(for units: [Self], isUpwards: Bool) -> Bool {
-    //     units.contains {
-    //         let val = isUpwards ? Self.unitDifference[$0]?.upwards : Self.unitDifference[$0]?.downwards
-    //         return val?.isFloat == true
-    //     }
-    // }
 
 }
