@@ -86,7 +86,6 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
             return "return \(unit);"
         }
         let conversion = unit.conversion(to: otherUnit)
-        print(conversion)
         let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
         let cSign = needsDouble ? Signs.d : sign
         let code = conversion.cCode(sign: cSign)
