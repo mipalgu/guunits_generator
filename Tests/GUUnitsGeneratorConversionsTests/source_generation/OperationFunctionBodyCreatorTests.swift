@@ -72,8 +72,8 @@ final class OperationFunctionBodyCreatorTests: XCTestCase {
                 }
             }
         }
-        print(conversions.joined(separator: "\n\n"))
-        fflush(stdout)
+        // print(conversions.joined(separator: "\n\n"))
+        // fflush(stdout)
     }
 
     func testVelocityConversions() {
@@ -85,6 +85,27 @@ final class OperationFunctionBodyCreatorTests: XCTestCase {
                         unit: .division(
                             lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
                             rhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds))
+                        )
+                    )
+                    return creator.createFunction(
+                        unit: unit, to: velocity, sign: s0, otherSign: s1
+                    )
+                }
+            }
+        }
+        // print(conversions.joined(separator: "\n\n"))
+        // fflush(stdout)
+    }
+
+    func testAngularVelocityConversions() {
+        let creator = OperationalFunctionBodyCreator<AngularVelocity>()
+        let conversions = AngularVelocity.allCases.flatMap { velocity in
+            Signs.allCases.flatMap { s0 in
+                Signs.allCases.map { s1 -> String in
+                    let unit = AngularVelocity(
+                        unit: .division(
+                            lhs: .constant(declaration: AnyUnit(AngleUnits.degrees)),
+                            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
                         )
                     )
                     return creator.createFunction(
