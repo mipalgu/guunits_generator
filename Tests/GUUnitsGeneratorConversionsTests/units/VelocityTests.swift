@@ -94,4 +94,9 @@ final class VelocityTests: XCTestCase {
         XCTAssertEqual(Velocity.baseUnit, expected)
     }
 
+    /// Test named unit is empty.
+    func testNamedUnit() {
+        XCTAssertTrue(Velocity.namedUnit.isEmpty)
+    }
+
 }
