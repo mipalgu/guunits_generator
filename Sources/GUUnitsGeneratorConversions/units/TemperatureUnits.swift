@@ -92,62 +92,65 @@ extension TemperatureUnits: UnitProtocol {
 
 }
 
+/// ``UnitsConvertible`` conformance.
 extension TemperatureUnits: UnitsConvertible {
 
-    public func conversion(from unit: TemperatureUnits) -> Operation {
-        unit.conversion(to: self)
-    }
+    // swiftlint:disable function_body_length
 
+    /// Convert from `self` to a new unit within the same category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The operation that will convert `self` to `unit`.
     public func conversion(to unit: TemperatureUnits) -> Operation {
-        guard self != unit else {
+        switch (self, unit) {
+        case (.celsius, .celsius), (.fahrenheit, .fahrenheit), (.kelvin, .kelvin):
             return .constant(declaration: AnyUnit(self))
-        }
-        switch self {
-        case .celsius:
-            switch unit {
-            case .kelvin:
-                return .addition(
+        case (.celsius, .kelvin):
+            return .addition(
+                lhs: .constant(declaration: AnyUnit(self)),
+                rhs: .literal(declaration: .decimal(value: 273.15))
+            )
+        case (.celsius, .fahrenheit):
+            return .addition(
+                lhs: .multiplication(
                     lhs: .constant(declaration: AnyUnit(self)),
-                    rhs: .literal(declaration: .decimal(value: 273.15))
-                )
-            case .fahrenheit:
-                return .addition(
-                    lhs: .multiplication(
+                    rhs: .literal(declaration: .decimal(value: 1.8))
+                ),
+                rhs: .literal(declaration: .integer(value: 32))
+            )
+        case (.kelvin, .celsius):
+            return .subtraction(
+                lhs: .constant(declaration: AnyUnit(self)),
+                rhs: .literal(declaration: .decimal(value: 273.15))
+            )
+        case (.kelvin, .fahrenheit):
+            return .addition(
+                lhs: .multiplication(
+                    lhs: .precedence(
+                        operation: .subtraction(
+                            lhs: .constant(declaration: AnyUnit(self)),
+                            rhs: .literal(declaration: .decimal(value: 273.15))
+                        )
+                    ),
+                    rhs: .literal(declaration: .decimal(value: 1.8))
+                ),
+                rhs: .literal(declaration: .integer(value: 32))
+            )
+        case (.fahrenheit, .celsius):
+            return .multiplication(
+                lhs: .precedence(
+                    operation: .subtraction(
                         lhs: .constant(declaration: AnyUnit(self)),
-                        rhs: .literal(declaration: .decimal(value: 1.8))
-                    ),
-                    rhs: .literal(declaration: .integer(value: 32))
+                        rhs: .literal(declaration: .integer(value: 32))
+                    )
+                ),
+                rhs: .division(
+                    lhs: .literal(declaration: .integer(value: 5)),
+                    rhs: .literal(declaration: .integer(value: 9))
                 )
-            case .celsius:
-                return .constant(declaration: AnyUnit(self))
-            }
-        case .kelvin:
-            switch unit {
-            case .celsius:
-                return .subtraction(
-                    lhs: .constant(declaration: AnyUnit(self)),
-                    rhs: .literal(declaration: .decimal(value: 273.15))
-                )
-            case .fahrenheit:
-                return .addition(
-                    lhs: .multiplication(
-                        lhs: .precedence(
-                            operation: .subtraction(
-                                lhs: .constant(declaration: AnyUnit(self)),
-                                rhs: .literal(declaration: .decimal(value: 273.15))
-                            )
-                        ),
-                        rhs: .literal(declaration: .decimal(value: 1.8))
-                    ),
-                    rhs: .literal(declaration: .integer(value: 32))
-                )
-            case .kelvin:
-                return .constant(declaration: AnyUnit(self))
-            }
-        case .fahrenheit:
-            switch unit {
-            case .celsius:
-                return .multiplication(
+            )
+        case (.fahrenheit, .kelvin):
+            return .addition(
+                lhs: .multiplication(
                     lhs: .precedence(
                         operation: .subtraction(
                             lhs: .constant(declaration: AnyUnit(self)),
@@ -158,27 +161,12 @@ extension TemperatureUnits: UnitsConvertible {
                         lhs: .literal(declaration: .integer(value: 5)),
                         rhs: .literal(declaration: .integer(value: 9))
                     )
-                )
-            case .kelvin:
-                return .addition(
-                    lhs: .multiplication(
-                        lhs: .precedence(
-                            operation: .subtraction(
-                                lhs: .constant(declaration: AnyUnit(self)),
-                                rhs: .literal(declaration: .integer(value: 32))
-                            )
-                        ),
-                        rhs: .division(
-                            lhs: .literal(declaration: .integer(value: 5)),
-                            rhs: .literal(declaration: .integer(value: 9))
-                        )
-                    ),
-                    rhs: .literal(declaration: .decimal(value: 273.15))
-                )
-            case .fahrenheit:
-                return .constant(declaration: AnyUnit(self))
-            }
+                ),
+                rhs: .literal(declaration: .decimal(value: 273.15))
+            )
         }
     }
+
+    // swiftlint:enable function_body_length
 
 }
