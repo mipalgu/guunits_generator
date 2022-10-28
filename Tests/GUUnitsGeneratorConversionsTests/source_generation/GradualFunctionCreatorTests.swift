@@ -47,11 +47,11 @@ final class GradualFunctionCreatorTests: XCTestCase {
     func testDownCast() {
         let result = creator.createFunction(unit: .metres, to: .millimetres, sign: .t, otherSign: .u)
         let expected = """
-            if (metres < 0) {
+            if (metres < (0)) {
                 return 0;
             }
             const millimetres_u otherMetres = ((millimetres_u) (metres));
-            if (otherMetres > 18446744073709551615U / 1000) {
+            if (otherMetres > ((18446744073709551615U) / 1000)) {
                 return 18446744073709551615U;
             }
             return otherMetres * 1000;

@@ -196,7 +196,7 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
         case (.u, .u):
             let upperLimit = sign.numericType.limits.1
             return """
-                if (\(unit) > \(upperLimit) / \(value)) {
+                if (\(unit) > ((\(upperLimit)) / \(value))) {
                     return \(upperLimit);
                 }
                 return \(unitAsOther) * \(otherValue);
@@ -205,28 +205,28 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
             let upperLimit = sign.numericType.limits.1
             let lowerLimit = sign.numericType.limits.0
             return """
-                if (\(unit) < \(lowerLimit) / \(value)) {
+                if (\(unit) < ((\(lowerLimit)) / \(value))) {
                     return \(lowerLimit);
                 }
-                if (\(unit) > \(upperLimit) / \(value)) {
+                if (\(unit) > ((\(upperLimit)) / \(value))) {
                     return \(upperLimit);
                 }
                 return \(unitAsOther) * \(otherValue);
             """
         case (.t, .u):
-            let maxLimit = "\(otherSign.numericType.limits.1) / \(otherValue)"
+            let maxLimit = "(\(otherSign.numericType.limits.1)) / \(otherValue)"
             return """
-                if (\(unit) < \(otherSign.numericType.limits.0)) {
+                if (\(unit) < (\(otherSign.numericType.limits.0))) {
                     return \(otherSign.numericType.limits.0);
                 }
                 const \(otherUnit)_\(otherSign) \(unitAsOtherName) = \(unitAsOther);
-                if (\(unitAsOtherName) > \(maxLimit)) {
+                if (\(unitAsOtherName) > (\(maxLimit))) {
                     return \(otherSign.numericType.limits.1);
                 }
                 return \(unitAsOtherName) * \(otherValue);
             """
         case (.u, .t):
-            let maxLimit = "\(otherSign.numericType.limits.1) / \(otherValue)"
+            let maxLimit = "(\(otherSign.numericType.limits.1)) / \(otherValue)"
             let castedMaxLimit = "((\(unit)_\(sign)) (\(maxLimit)))"
             return """
                 if (\(unit) > \(castedMaxLimit)) {
@@ -240,10 +240,10 @@ public struct GradualFunctionCreator<Unit: UnitProtocol>: FunctionBodyCreator
             let maxLimit = "((\(unit)_\(sign)) (\(otherSign.numericType.limits.1))) / \(value)"
             let minLimit = "((\(unit)_\(sign)) (\(otherSign.numericType.limits.0))) / \(value)"
             return """
-                if (\(unit) > \(maxLimit)) {
+                if (\(unit) > (\(maxLimit))) {
                     return \(otherSign.numericType.limits.1);
                 }
-                if (\(unit) < \(minLimit)) {
+                if (\(unit) < (\(minLimit))) {
                     return \(otherSign.numericType.limits.0);
                 }
                 return ((\(otherUnit)_\(otherSign)) (\(unit) * \(value)));
