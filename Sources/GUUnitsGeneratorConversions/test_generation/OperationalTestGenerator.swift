@@ -71,7 +71,8 @@ public struct OperationalTestGenerator<UnitType>: TestGenerator where
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {
         let metaData = ConversionMetaData(unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign)
-        return UnitType.testParameters[metaData] ?? []
+        return (UnitType.testParameters[metaData] ?? []) +
+            defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
     }
 
     /// Generate test parameters for a unit to numeric conversion.

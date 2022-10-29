@@ -69,15 +69,21 @@ final class OperationalTestGeneratorTests: XCTestCase {
         let result = generator.testParameters(
             from: metaData.unit, with: metaData.sign, to: metaData.otherUnit, with: metaData.otherSign
         )
-        let parameters = FakeUnit.testParameters[metaData]
-        XCTAssertEqual(parameters, result)
+        guard let parameters = FakeUnit.testParameters[metaData] else {
+            XCTFail("No test parameters for conversion")
+            return
+        }
+        let defaults = generator.defaultParameters(
+            from: metaData.unit, with: metaData.sign, to: metaData.otherUnit, with: metaData.otherSign
+        )
+        XCTAssertEqual(parameters + defaults, result)
     }
 
     /// Test testParameters function returns empty array for conversion that is not present in testParameters
     /// dictionary.
     func testParametersForNilCase() {
         let result = generator.testParameters(from: .second, with: .t, to: .second, with: .u)
-        XCTAssertTrue(result.isEmpty)
+        XCTAssertEqual(result, generator.testParameters(from: .second, with: .t, to: .second, with: .u))
     }
 
 }
