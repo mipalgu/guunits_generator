@@ -62,3 +62,43 @@ public protocol OperationalTestable where Self: UnitProtocol {
     static var testParameters: [ConversionMetaData<Self>: [TestParameters]] { get }
 
 }
+
+extension OperationalTestable where Self: UnitsConvertible {
+
+    public static var testParameters: [ConversionMetaData<Self>: [TestParameters]] {
+        let inputs = [-50000, -5000, -500, -50, -5, 0, 5, 50, 500, 5000, 50000]
+        return Self.allCases.reduce(into: [:]) { parameters, unit in
+            Signs.allCases.forEach { sign in
+                Self.allCases.forEach { otherUnit in
+                    Signs.allCases.forEach { otherSign in
+                        guard unit != otherUnit || sign != otherSign else {
+                            return
+                        }
+                        let data = ConversionMetaData(
+                            unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign
+                        )
+                        let testParams: [TestParameters] = inputs.lazy.filter {
+                            ($0 < 0 && sign != .u) || $0 >= 0
+                        }
+                        .map {
+                            let input = "\($0)"
+                            let conversion = unit.conversion(to: otherUnit).replace(
+                                convertibles: [
+                                    AnyUnit(unit): Operation.literal(declaration: .integer(value: $0))
+                                ]
+                            )
+                            let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint ||
+                                conversion.hasFloatOperation
+                            let swiftSign = needsDouble ? Signs.d : sign
+                            let code = "\(otherUnit.description.capitalized)_\(otherSign)" +
+                                "(\(conversion.swiftCode(sign: swiftSign)))"
+                            return TestParameters(input: input, output: code)
+                        }
+                        parameters[data] = testParams
+                    }
+                }
+            }
+        }
+    }
+
+}
