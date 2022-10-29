@@ -77,3 +77,6 @@ public struct Velocity: CompositeUnit, UnitsConvertible {
 
 /// Hashable conformance.
 extension Velocity: Hashable {}
+
+/// OperationalTestable conformance.
+extension Velocity: OperationalTestable {}
