@@ -56,7 +56,7 @@
 
 /// A struct for storing information about a unit conversion within the same
 /// category.
-public struct ConversionMetaData<Unit>: Hashable where Unit: UnitProtocol {
+public struct ConversionMetaData<Unit>: Hashable, CustomStringConvertible where Unit: UnitProtocol {
 
     /// The original unit.
     public let unit: Unit
@@ -69,5 +69,9 @@ public struct ConversionMetaData<Unit>: Hashable where Unit: UnitProtocol {
 
     /// The sign of the unit to convert to.
     public let otherSign: Signs
+
+    public var description: String {
+        "\(unit)_\(sign) -> \(otherUnit)_\(otherSign)"
+    }
 
 }
