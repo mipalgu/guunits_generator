@@ -71,11 +71,3 @@ public struct ConversionMetaData<Unit>: Hashable where Unit: UnitProtocol {
     public let otherSign: Signs
 
 }
-
-extension ConversionMetaData where Unit: RawRepresentable, Unit.RawValue == String {
-
-    var limits: LimitStruct<Unit> {
-        LimitStruct(unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign)
-    }
-
-}
