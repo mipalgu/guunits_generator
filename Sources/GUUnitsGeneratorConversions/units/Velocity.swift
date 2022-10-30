@@ -79,4 +79,8 @@ public struct Velocity: CompositeUnit, UnitsConvertible {
 extension Velocity: Hashable {}
 
 /// OperationalTestable conformance.
-extension Velocity: OperationalTestable {}
+extension Velocity: OperationalTestable {
+
+    public static let testParameters: [ConversionMetaData<Velocity>: [TestParameters]] = defaultParameters
+
+}

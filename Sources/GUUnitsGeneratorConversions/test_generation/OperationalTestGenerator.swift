@@ -70,6 +70,9 @@ public struct OperationalTestGenerator<UnitType>: TestGenerator where
     public func testParameters(
         from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
     ) -> [TestParameters] {
+        guard unit != otherUnit || sign != otherSign else {
+            return []
+        }
         let metaData = ConversionMetaData(unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign)
         return (UnitType.testParameters[metaData] ?? []) +
             defaultParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
