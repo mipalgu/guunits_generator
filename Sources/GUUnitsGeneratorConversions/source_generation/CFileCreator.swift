@@ -62,7 +62,8 @@ import Foundation
 public struct CFileCreator {
 
     /// The prefix which appears at the top of the file.
-    private var prefix = """
+    private var prefix: String = {
+        let includes = """
         /*
         * guunits.c
         * guunits
@@ -137,6 +138,18 @@ public struct CFileCreator {
         #define M_PI 3.14159265358979323846
         #endif
         """
+        let functionDefs = Signs.allCases.map { sign in
+            let type = sign.numericType.rawValue
+            return """
+            \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b);
+            \(type) divide_\(sign.rawValue)(\(type) a, \(type) b);
+            \(type) addition_\(sign.rawValue)(\(type) a, \(type) b);
+            \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b);
+            """
+        }
+        .joined(separator: "\n\n")
+        return includes + "\n\n" + functionDefs
+    }()
 
     /// The suffix which appears at the end of the file.
     var suffix: String {

@@ -90,7 +90,7 @@ extension Operation {
         case .constant(let unit):
             return "((\(sign.numericType.rawValue)) (\(unit)))"
         case .division(let lhs, let rhs):
-            return "(\(lhs.cCode(sign: sign)) / \(rhs.cCode(sign: sign)))"
+            return "divide_\(sign.rawValue)((\(lhs.cCode(sign: sign))), (\(rhs.cCode(sign: sign))))"
         case .exponentiate(let base, let power):
             if power == .literal(declaration: .integer(value: 2)) {
                 return Operation.multiplication(lhs: base, rhs: base).cCode(sign: sign)
@@ -110,13 +110,13 @@ extension Operation {
                 return "((\(sign.numericType.rawValue)) (\(value)))"
             }
         case .multiplication(let lhs, let rhs):
-            return "(\(lhs.cCode(sign: sign)) * \(rhs.cCode(sign: sign)))"
+            return "multiply_\(sign.rawValue)((\(lhs.cCode(sign: sign))), (\(rhs.cCode(sign: sign))))"
         case .precedence(let operation):
             return "(\(operation.cCode(sign: sign)))"
         case .addition(let lhs, let rhs):
-            return "(\(lhs.cCode(sign: sign)) + \(rhs.cCode(sign: sign)))"
+            return "addition_\(sign.rawValue)((\(lhs.cCode(sign: sign))), (\(rhs.cCode(sign: sign))))"
         case .subtraction(let lhs, let rhs):
-            return "(\(lhs.cCode(sign: sign)) - \(rhs.cCode(sign: sign)))"
+            return "subtraction_\(sign.rawValue)((\(lhs.cCode(sign: sign))), (\(rhs.cCode(sign: sign))))"
         }
     }
 
