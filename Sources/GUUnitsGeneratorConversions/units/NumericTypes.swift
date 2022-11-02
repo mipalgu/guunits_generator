@@ -280,4 +280,12 @@ extension NumericTypes: Comparable {
         lhs.swiftType.max > rhs.swiftType.max
     }
 
+    public static func >= (lhs: NumericTypes, rhs: NumericTypes) -> Bool {
+        (lhs > rhs) || (lhs == rhs)
+    }
+
+    public static func <= (lhs: NumericTypes, rhs: NumericTypes) -> Bool {
+        (lhs < rhs) || (lhs == rhs)
+    }
+
 }

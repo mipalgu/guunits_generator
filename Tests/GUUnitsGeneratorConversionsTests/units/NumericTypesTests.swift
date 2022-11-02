@@ -170,6 +170,8 @@ final class NumericTypesTests: XCTestCase {
         let rhs = NumericTypes.uint64
         XCTAssertTrue(lhs > rhs)
         XCTAssertTrue(lhs < rhs)
+        XCTAssertTrue(lhs >= rhs)
+        XCTAssertTrue(lhs <= rhs)
     }
 
     // swiftlint:disable function_parameter_count
