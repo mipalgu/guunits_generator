@@ -269,3 +269,15 @@ extension NumericTypes {
 extension NumericTypes: CaseIterable {}
 
 extension NumericTypes: Hashable {}
+
+extension NumericTypes: Comparable {
+
+    public static func < (lhs: NumericTypes, rhs: NumericTypes) -> Bool {
+        lhs.swiftType.min < rhs.swiftType.min
+    }
+
+    public static func > (lhs: NumericTypes, rhs: NumericTypes) -> Bool {
+        lhs.swiftType.max > rhs.swiftType.max
+    }
+
+}
