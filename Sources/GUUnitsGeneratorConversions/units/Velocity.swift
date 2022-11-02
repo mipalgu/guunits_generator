@@ -81,6 +81,72 @@ extension Velocity: Hashable {}
 /// OperationalTestable conformance.
 extension Velocity: OperationalTestable {
 
-    public static let testParameters: [ConversionMetaData<Velocity>: [TestParameters]] = defaultParameters
+    public static let testParameters: [ConversionMetaData<Velocity>: [TestParameters]] = {
+        var params: [ConversionMetaData<Velocity>: [TestParameters]] = [:]
+        Self.allCases.forEach { v0 in
+            Self.allCases.forEach { v1 in
+                let operation = v0.conversion(to: v1)
+                Signs.allCases.forEach { s0 in
+                    let s0Limits = s0.numericType.swiftType.limits
+                    Signs.allCases.forEach { s1 in
+                        guard v0 != v1 || s0 != s1 else {
+                            return
+                        }
+                        let metaData = ConversionMetaData(unit: v0, sign: s0, otherUnit: v1, otherSign: s1)
+                        let operationSign = operation.hasFloatOperation || s1.isFloatingPoint ? Signs.d : s0
+                        let s1Limits = s1.numericType.swiftType.limits
+                        let otherType = "\(v1)_\(s1)"
+                        let lowerCode = operation.swiftCode(sign: operationSign)
+                            .replacingOccurrences(of: "\(v0)", with: s0Limits.0)
+                        let upperCode = operation.swiftCode(sign: operationSign)
+                            .replacingOccurrences(of: "\(v0)", with: s0Limits.1)
+                        let lowerOutput: String
+                        let upperOutput: String
+                        let increasingParams = [AnyUnit(v0)]
+                        if operation.isIncreasing(parameters: increasingParams) {
+                            if s1.numericType > s0.numericType {
+                                let signDifference = s1.numericType.swiftType.max /
+                                    s0.numericType.swiftType.max
+                                let difference = operation.increasingDifference(parameters: increasingParams)
+                                if abs(difference) > abs(signDifference) {
+                                    upperOutput = s1Limits.1
+                                } else {
+                                    upperOutput = upperCode
+                                }
+                            } else {
+                                upperOutput = s1Limits.1
+                            }
+                        } else {
+                            upperOutput = s1.numericType >= s0.numericType ? upperCode : s1Limits.1
+                        }
+                        if operation.isIncreasingNegative(parameters: increasingParams) {
+                            lowerOutput = s1.numericType <= s0.numericType ? lowerCode : s1Limits.0
+                        } else {
+                            if s1.numericType < s0.numericType {
+                                let signDifference = s1.numericType.swiftType.min /
+                                    s0.numericType.swiftType.min
+                                let difference = operation.increasingDifferenceNegative(
+                                    parameters: increasingParams
+                                )
+                                if abs(difference) > abs(signDifference) {
+                                    lowerOutput = s1Limits.0
+                                } else {
+                                    lowerOutput = lowerCode
+                                }
+                            } else {
+                                lowerOutput = s1Limits.0
+                            }
+                        }
+                        params[metaData] = [
+                            TestParameters(input: s0Limits.0, output: "\(otherType)(\(lowerOutput))"),
+                            TestParameters(input: s0Limits.1, output: "\(otherType)(\(upperOutput))")
+                        ]
+                    }
+                }
+            }
+        }
+        params.merge(defaultParameters, uniquingKeysWith: +)
+        return params
+    }()
 
 }
