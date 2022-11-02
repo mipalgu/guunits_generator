@@ -65,7 +65,7 @@ public protocol OperationalTestable where Self: UnitProtocol {
 
 extension OperationalTestable where Self: UnitsConvertible {
 
-    public static var defaultParameters: [ConversionMetaData<Self>: [TestParameters]] {
+    static var defaultParameters: [ConversionMetaData<Self>: [TestParameters]] {
         let inputs = [-50000, -5000, -500, -50, -5, 0, 5, 50, 500, 5000, 50000]
         return Self.allCases.reduce(into: [:]) { parameters, unit in
             Signs.allCases.forEach { sign in
@@ -93,22 +93,25 @@ extension OperationalTestable where Self: UnitsConvertible {
                             let code: String
                             if swiftSign != .d && swiftSign != .f && !sign.isFloatingPoint &&
                                 !otherSign.isFloatingPoint {
-                                code = "\(otherUnit)_\(otherSign)" +
-                                    "(\(otherSign.numericType.swiftType.rawValue)" +
-                                    "(clamping: \(conversion.swiftCode(sign: swiftSign))))"
+                                code = "\(otherSign.numericType.swiftType.rawValue)" +
+                                    "(clamping: \(conversion.swiftCode(sign: swiftSign)))"
                             } else if !otherSign.isFloatingPoint {
                                 let conversion = "\(conversion.swiftCode(sign: swiftSign))"
                                 let max = "\(swiftSign.numericType.swiftType)" +
                                     "(\(otherSign.numericType.swiftType.limits.1))"
                                 let min = "\(swiftSign.numericType.swiftType)" +
                                     "(\(otherSign.numericType.swiftType.limits.0))"
-                                let clamping = "max(\(min), min(\(max), \(conversion)))"
-                                code = "\(otherUnit)_\(otherSign)(\(clamping))"
+                                code = "max(\(min), min(\(max), \(conversion)))"
                             } else {
-                                code = "\(otherUnit)_\(otherSign)" +
-                                    "(\(conversion.swiftCode(sign: swiftSign)))"
+                                code = "\(conversion.swiftCode(sign: swiftSign))"
                             }
-                            return TestParameters(input: input, output: code)
+                            guard swiftSign.isFloatingPoint && !otherSign.isFloatingPoint else {
+                                return TestParameters(
+                                    input: input, output: "\(otherUnit)_\(otherSign)(\(code))"
+                                )
+                            }
+                            let output = "\(otherUnit)_\(otherSign)((\(code)).rounded())"
+                            return TestParameters(input: input, output: output)
                         }
                         parameters[data] = testParams
                     }
