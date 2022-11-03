@@ -67,7 +67,7 @@ final class OperationFunctionBodyCreatorTests: XCTestCase {
             rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
         )
     )
-    
+
     /// Helper velocity unit.
     let v2 = Velocity(
         unit: .division(
