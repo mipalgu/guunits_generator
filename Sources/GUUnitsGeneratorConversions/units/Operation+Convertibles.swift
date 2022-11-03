@@ -122,6 +122,9 @@ extension Operation {
         }
     }
 
+    /// Generate the equivalent swift code for this operation.
+    /// - Parameter sign: The sign of the units within the operation.
+    /// - Returns: A string of swift code performing this operation.
     func swiftCode(sign: Signs) -> String {
         switch self {
         case .constant(let unit):
@@ -212,6 +215,7 @@ extension Operation {
         }
     }
 
+    /// See replace.
     func replace(convertibles: [AnyUnit: Operation]) -> Operation {
         switch self {
         case .constant(let unit):
@@ -267,81 +271,5 @@ extension Operation {
     }
 
     // swiftlint:enable function_body_length
-
-    /// Compare 2 operations of the same form and create a dictionary of the difference between units.
-    /// - Parameter operation: The operation to compare to.
-    /// - Returns: The units different between `self` and `operation`.
-    func getUnitConvertibles(comparingTo operation: Operation) -> [AnyUnit: AnyUnit] {
-        switch self {
-        case .constant(let unit):
-            guard case let .constant(otherUnit) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            var acc2: [AnyUnit: AnyUnit] = [:]
-            acc2[unit] = otherUnit
-            return acc2
-        case .division(let lhs, let rhs):
-            guard case let .division(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .exponentiate(let base, let power):
-            guard case let .exponentiate(base2, power2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: base, comparingTo: base2, and: power, comparingTo: power2)
-        case .literal:
-            return [:]
-        case .multiplication(let lhs, let rhs):
-            guard case let .multiplication(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .precedence(let op):
-            guard case let .precedence(op2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return op.getUnitConvertibles(comparingTo: op2)
-        case .addition(let lhs, let rhs):
-            guard case let .addition(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        case .subtraction(let lhs, let rhs):
-            guard case let .subtraction(lhs2, rhs2) = operation else {
-                fatalError("Operation mismatch between same units.")
-            }
-            return getConvertibles(in: lhs, comparingTo: lhs2, and: rhs, comparingTo: rhs2)
-        }
-    }
-
-    /// Merges operation convertibles into a single dictionary.
-    private func getConvertibles(
-        in op1: Operation, comparingTo op11: Operation, and op2: Operation, comparingTo op22: Operation
-    ) -> [AnyUnit: AnyUnit] {
-        var op1Acc = op1.getUnitConvertibles(comparingTo: op11)
-        let op2Acc = op2.getUnitConvertibles(comparingTo: op22)
-        guard valid(acc1: op1Acc, acc2: op2Acc) else {
-            fatalError("Duplicate conversion in operation")
-        }
-        op2Acc.keys.forEach {
-            op1Acc[$0] = op2Acc[$0]
-        }
-        return op1Acc
-    }
-
-    /// Checks for duplicate keys between 2 dictionary.
-    /// - Parameters:
-    ///   - acc1: The first dictionary.
-    ///   - acc2: The second dictionary.
-    /// - Returns: Whether `acc1` and `acc2` have differing values at the same key.
-    private func valid(acc1: [AnyUnit: AnyUnit], acc2: [AnyUnit: AnyUnit]) -> Bool {
-        for k in acc1.keys {
-            guard acc1[k] == acc2[k] || acc2[k] == nil else {
-                return false
-            }
-        }
-        return true
-    }
 
 }
