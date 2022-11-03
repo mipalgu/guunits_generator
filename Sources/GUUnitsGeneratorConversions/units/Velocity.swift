@@ -81,43 +81,6 @@ extension Velocity: Hashable {}
 /// OperationalTestable conformance.
 extension Velocity: OperationalTestable {
 
-    public static let testParameters: [ConversionMetaData<Velocity>: [TestParameters]] = {
-        var params: [ConversionMetaData<Velocity>: [TestParameters]] = [:]
-        Self.allCases.forEach { v0 in
-            Self.allCases.forEach { v1 in
-                let operation = v0.conversion(to: v1)
-                Signs.allCases.forEach { s0 in
-                    let s0Limits = s0.numericType.swiftType.limits
-                    Signs.allCases.forEach { s1 in
-                        guard v0 != v1 || s0 != s1 else {
-                            return
-                        }
-                        let metaData = ConversionMetaData(unit: v0, sign: s0, otherUnit: v1, otherSign: s1)
-                        let operationSign = operation.hasFloatOperation || s1.isFloatingPoint ? Signs.d : s0
-                        let s1Limits = s1.numericType.swiftType.limits
-                        let otherType = "\(v1)_\(s1)"
-                        let lowerCode = operation.swiftCode(sign: operationSign)
-                            .replacingOccurrences(of: "\(v0)", with: s0Limits.0)
-                        let upperCode = operation.swiftCode(sign: operationSign)
-                            .replacingOccurrences(of: "\(v0)", with: s0Limits.1)
-                        let lowerOutput: String
-                        if !s0.numericType.isSigned {
-                            lowerOutput = operationSign.isFloatingPoint ? "(\(lowerCode)).rounded()" :
-                                lowerCode
-                        } else {
-                            lowerOutput = s1Limits.0
-                        }
-                        let upperOutput = s1Limits.1
-                        params[metaData] = [
-                            TestParameters(input: s0Limits.0, output: "\(otherType)(\(lowerOutput))"),
-                            TestParameters(input: s0Limits.1, output: "\(otherType)(\(upperOutput))")
-                        ]
-                    }
-                }
-            }
-        }
-        params.merge(defaultParameters, uniquingKeysWith: +)
-        return params
-    }()
+    public static let testParameters: [ConversionMetaData<Velocity>: [TestParameters]] = defaultParameters
 
 }

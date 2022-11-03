@@ -67,7 +67,9 @@ extension OperationalTestable where Self: UnitsConvertible {
 
     static var defaultParameters: [ConversionMetaData<Self>: [TestParameters]] {
         let inputs = [-50000, -5000, -500, -50, -5, 0, 5, 50, 500, 5000, 50000]
-        return Self.allCases.reduce(into: [:]) { parameters, unit in
+        var params: [ConversionMetaData<Self>: [TestParameters]] = Self.allCases.reduce(
+            into: [:]
+        ) { parameters, unit in
             Signs.allCases.forEach { sign in
                 Self.allCases.forEach { otherUnit in
                     Signs.allCases.forEach { otherSign in
@@ -119,6 +121,44 @@ extension OperationalTestable where Self: UnitsConvertible {
                 }
             }
         }
+        params.merge(edgeParameters, uniquingKeysWith: +)
+        return params
+    }
+
+    private static var edgeParameters: [ConversionMetaData<Self>: [TestParameters]] {
+        var params: [ConversionMetaData<Self>: [TestParameters]] = [:]
+        Self.allCases.forEach { v0 in
+            Self.allCases.forEach { v1 in
+                let operation = v0.conversion(to: v1)
+                Signs.allCases.forEach { s0 in
+                    let s0Limits = s0.numericType.swiftType.limits
+                    Signs.allCases.forEach { s1 in
+                        guard v0 != v1 || s0 != s1 else {
+                            return
+                        }
+                        let metaData = ConversionMetaData(unit: v0, sign: s0, otherUnit: v1, otherSign: s1)
+                        let operationSign = operation.hasFloatOperation || s1.isFloatingPoint ? Signs.d : s0
+                        let s1Limits = s1.numericType.swiftType.limits
+                        let otherType = "\(v1)_\(s1)"
+                        let lowerCode = operation.swiftCode(sign: operationSign)
+                            .replacingOccurrences(of: "\(v0)", with: s0Limits.0)
+                        let lowerOutput: String
+                        if !s0.numericType.isSigned {
+                            lowerOutput = operationSign.isFloatingPoint ? "(\(lowerCode)).rounded()" :
+                                lowerCode
+                        } else {
+                            lowerOutput = s1Limits.0
+                        }
+                        let upperOutput = s1Limits.1
+                        params[metaData] = [
+                            TestParameters(input: s0Limits.0, output: "\(otherType)(\(lowerOutput))"),
+                            TestParameters(input: s0Limits.1, output: "\(otherType)(\(upperOutput))")
+                        ]
+                    }
+                }
+            }
+        }
+        return params
     }
 
 }
