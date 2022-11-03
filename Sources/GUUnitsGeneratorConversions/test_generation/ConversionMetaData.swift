@@ -70,6 +70,7 @@ public struct ConversionMetaData<Unit>: Hashable, CustomStringConvertible where 
     /// The sign of the unit to convert to.
     public let otherSign: Signs
 
+    /// A print-friendly description of this conversion.
     public var description: String {
         "\(unit)_\(sign) -> \(otherUnit)_\(otherSign)"
     }

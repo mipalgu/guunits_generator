@@ -63,8 +63,17 @@ public protocol OperationalTestable where Self: UnitProtocol {
 
 }
 
+/// Helper static variables providing default test parameters for convertible units.
 extension OperationalTestable where Self: UnitsConvertible {
 
+    // swiftlint:disable closure_body_length
+
+    /// This property provides the default parameters that should accompany any unit category.
+    /// These parameters include some calculations using some predefined values and the edge
+    /// cases of the underlying C types (e.g. UINT64_MAX and UINT64_MIN). These parameters
+    /// assume that a conversion will clamp all operations protecting from overflows and
+    /// underflows. If an overflow occurs, then these tests will make sure that it is detected
+    /// and corrected.
     static var defaultParameters: [ConversionMetaData<Self>: [TestParameters]] {
         let inputs = [-50000, -5000, -500, -50, -5, 0, 5, 50, 500, 5000, 50000]
         var params: [ConversionMetaData<Self>: [TestParameters]] = Self.allCases.reduce(
@@ -125,6 +134,7 @@ extension OperationalTestable where Self: UnitsConvertible {
         return params
     }
 
+    /// The parameters for the underlying C type edge cases.
     private static var edgeParameters: [ConversionMetaData<Self>: [TestParameters]] {
         var params: [ConversionMetaData<Self>: [TestParameters]] = [:]
         Self.allCases.forEach { v0 in
@@ -160,5 +170,7 @@ extension OperationalTestable where Self: UnitsConvertible {
         }
         return params
     }
+
+    // swiftlint:enable closure_body_length
 
 }

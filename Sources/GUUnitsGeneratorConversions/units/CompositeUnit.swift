@@ -105,6 +105,7 @@ public extension CompositeUnit {
         return name.description
     }
 
+    /// The rawValue is the Operation rawValue by default.
     var rawValue: RawValue {
         guard let name = Self.namedUnit[unit] else {
             return unit.description
@@ -112,8 +113,9 @@ public extension CompositeUnit {
         return name.description
     }
 
+    /// Initialiser for `RawRepresentable` conformance. Not implemented yet.
     init?(rawValue: RawValue) {
-        nil
+        fatalError("Invalid call, Not yet implemented.")
     }
 
 }
