@@ -82,28 +82,29 @@ extension OperationalTestable where Self: UnitsConvertible {
                         }
                         .map {
                             let input = "\($0)"
-                            let conversion = unit.conversion(to: otherUnit).replace(
+                            let conversion = unit.conversion(to: otherUnit)
+                            let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint ||
+                                conversion.hasFloatOperation
+                            let simplifiedConversion = conversion.replace(
                                 convertibles: [
                                     AnyUnit(unit): Operation.literal(declaration: .integer(value: $0))
                                 ]
                             )
-                            let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint ||
-                                conversion.hasFloatOperation
                             let swiftSign = needsDouble ? Signs.d : sign
                             let code: String
                             if swiftSign != .d && swiftSign != .f && !sign.isFloatingPoint &&
                                 !otherSign.isFloatingPoint {
                                 code = "\(otherSign.numericType.swiftType.rawValue)" +
-                                    "(clamping: \(conversion.swiftCode(sign: swiftSign)))"
+                                    "(clamping: \(simplifiedConversion.swiftCode(sign: swiftSign)))"
                             } else if !otherSign.isFloatingPoint {
-                                let conversion = "\(conversion.swiftCode(sign: swiftSign))"
+                                let conversion = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
                                 let max = "\(swiftSign.numericType.swiftType)" +
                                     "(\(otherSign.numericType.swiftType.limits.1))"
                                 let min = "\(swiftSign.numericType.swiftType)" +
                                     "(\(otherSign.numericType.swiftType.limits.0))"
                                 code = "max(\(min), min(\(max), \(conversion)))"
                             } else {
-                                code = "\(conversion.swiftCode(sign: swiftSign))"
+                                code = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
                             }
                             guard swiftSign.isFloatingPoint && !otherSign.isFloatingPoint else {
                                 return TestParameters(
