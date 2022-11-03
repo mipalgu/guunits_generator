@@ -60,30 +60,38 @@ import XCTest
 /// Test class for ``OperationalTestGenerator``.
 final class OperationalTestGeneratorTests: XCTestCase {
 
+    /// Helper velocity unit.
+    let v1 = Velocity(
+        unit: .division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+    )
+
+    /// Helper velocity unit.
+    let v2 = Velocity(
+        unit: .division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+    )
+
     /// The generator under test.
-    let generator = OperationalTestGenerator<FakeUnit>()
+    let generator = OperationalTestGenerator<Velocity>()
 
     /// Verify that the testParameters function returns parameters stored in testParameters dictionary.
     func testParameters() {
-        let metaData = ConversionMetaData<FakeUnit>(unit: .first, sign: .f, otherUnit: .first, otherSign: .d)
-        let result = generator.testParameters(
-            from: metaData.unit, with: metaData.sign, to: metaData.otherUnit, with: metaData.otherSign
+        let conversion = ConversionMetaData(unit: v1, sign: .t, otherUnit: v2, otherSign: .u)
+        XCTAssertEqual(
+            generator.testParameters(from: v1, with: .t, to: v2, with: .u),
+            Velocity.testParameters[conversion]
         )
-        guard let parameters = FakeUnit.testParameters[metaData] else {
-            XCTFail("No test parameters for conversion")
-            return
-        }
-        let defaults = generator.defaultParameters(
-            from: metaData.unit, with: metaData.sign, to: metaData.otherUnit, with: metaData.otherSign
-        )
-        XCTAssertEqual(parameters + defaults, result)
     }
 
     /// Test testParameters function returns empty array for conversion that is not present in testParameters
     /// dictionary.
     func testParametersForNilCase() {
-        let result = generator.testParameters(from: .second, with: .t, to: .second, with: .u)
-        XCTAssertEqual(result, generator.testParameters(from: .second, with: .t, to: .second, with: .u))
+        XCTAssertTrue(generator.testParameters(from: v1, with: .t, to: v1, with: .t).isEmpty)
     }
 
 }
