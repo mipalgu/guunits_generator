@@ -122,104 +122,6 @@ extension Operation {
         }
     }
 
-    var execute: Int {
-        switch self {
-        case .constant:
-            fatalError("Cannot execute unit.")
-        case .division(let lhs, let rhs):
-            return (lhs.execute) / (rhs.execute)
-        case .exponentiate(let base, let power):
-            if power == .literal(declaration: .integer(value: 2)) {
-                return Operation.multiplication(lhs: base, rhs: base).execute
-            }
-            if power == .literal(declaration: .integer(value: 3)) {
-                return Operation.multiplication(
-                    lhs: base, rhs: .multiplication(lhs: base, rhs: base)
-                )
-                .execute
-            }
-            fatalError("Cannot Exponentiate with integer.")
-        case .literal(let declaration):
-            switch declaration {
-            case .integer(let value):
-                return value
-            case .decimal:
-                fatalError("Not integer")
-            }
-        case .multiplication(let lhs, let rhs):
-            return lhs.execute * rhs.execute
-        case .precedence(let operation):
-            return operation.execute
-        case .addition(let lhs, let rhs):
-            return lhs.execute + rhs.execute
-        case .subtraction(let lhs, let rhs):
-            return lhs.execute - rhs.execute
-        }
-    }
-
-    var executeDouble: Double {
-        switch self {
-        case .constant:
-            fatalError("Cannot execute unit.")
-        case .division(let lhs, let rhs):
-            return (lhs.executeDouble) / (rhs.executeDouble)
-        case .exponentiate(let base, let power):
-            if power == .literal(declaration: .integer(value: 2)) {
-                return Operation.multiplication(lhs: base, rhs: base).executeDouble
-            }
-            if power == .literal(declaration: .integer(value: 3)) {
-                return Operation.multiplication(
-                    lhs: base, rhs: .multiplication(lhs: base, rhs: base)
-                )
-                .executeDouble
-            }
-            fatalError("Cannot Exponentiate with integer.")
-        case .literal(let declaration):
-            switch declaration {
-            case .integer(let value):
-                return Double(value)
-            case .decimal(let value):
-                return value
-            }
-        case .multiplication(let lhs, let rhs):
-            return lhs.executeDouble * rhs.executeDouble
-        case .precedence(let operation):
-            return operation.executeDouble
-        case .addition(let lhs, let rhs):
-            return lhs.executeDouble + rhs.executeDouble
-        case .subtraction(let lhs, let rhs):
-            return lhs.executeDouble - rhs.executeDouble
-        }
-    }
-
-    func isIncreasing(parameters: [AnyUnit]) -> Bool {
-        let convertibles: [AnyUnit: Operation] = Dictionary(uniqueKeysWithValues: parameters.map {
-            ($0, .literal(declaration: .integer(value: 1_000_000)))
-        })
-        return self.replace(convertibles: convertibles).executeDouble >= 1_000_000
-    }
-
-    func isIncreasingNegative(parameters: [AnyUnit]) -> Bool {
-        let convertibles: [AnyUnit: Operation] = Dictionary(uniqueKeysWithValues: parameters.map {
-            ($0, .literal(declaration: .integer(value: -1_000_000)))
-        })
-        return self.replace(convertibles: convertibles).executeDouble >= -1_000_000
-    }
-
-    func increasingDifference(parameters: [AnyUnit]) -> Double {
-        let convertibles: [AnyUnit: Operation] = Dictionary(uniqueKeysWithValues: parameters.map {
-            ($0, .literal(declaration: .integer(value: 1_000_000)))
-        })
-        return self.replace(convertibles: convertibles).executeDouble / 1_000_000
-    }
-
-    func increasingDifferenceNegative(parameters: [AnyUnit]) -> Double {
-        let convertibles: [AnyUnit: Operation] = Dictionary(uniqueKeysWithValues: parameters.map {
-            ($0, .literal(declaration: .integer(value: -1_000_000)))
-        })
-        return self.replace(convertibles: convertibles).executeDouble / -1_000_000
-    }
-
     func swiftCode(sign: Signs) -> String {
         switch self {
         case .constant(let unit):
@@ -248,10 +150,6 @@ extension Operation {
         case .subtraction(let lhs, let rhs):
             return "(\(lhs.swiftCode(sign: sign))) + (\(rhs.swiftCode(sign: sign)))"
         }
-    }
-
-    func swiftCast(to type: String, originalSign sign: Signs) -> String {
-        "\(type)(\(swiftCode(sign: sign)))"
     }
 
     // swiftlint:disable function_body_length

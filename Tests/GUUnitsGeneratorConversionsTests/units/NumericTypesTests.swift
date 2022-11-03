@@ -164,16 +164,6 @@ final class NumericTypesTests: XCTestCase {
         )
     }
 
-    /// Test < and > operators.
-    func testComparableConformance() {
-        let lhs = NumericTypes.float
-        let rhs = NumericTypes.uint64
-        XCTAssertTrue(lhs > rhs)
-        XCTAssertTrue(lhs < rhs)
-        XCTAssertTrue(lhs >= rhs)
-        XCTAssertTrue(lhs <= rhs)
-    }
-
     // swiftlint:disable function_parameter_count
 
     /// Tests all properties of a NumericTypes case.
