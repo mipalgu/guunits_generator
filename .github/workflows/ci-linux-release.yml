@@ -36,5 +36,5 @@ jobs:
         run: swift build -c release
 
       - name: Release Test
-        run: swift test -c release -Xswiftc -DRELEASE_BUILD
+        run: ulimit -n 65000 && swift test -c release -Xswiftc -DRELEASE_BUILD
 
