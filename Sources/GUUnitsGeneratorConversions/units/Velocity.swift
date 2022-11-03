@@ -100,8 +100,14 @@ extension Velocity: OperationalTestable {
                             .replacingOccurrences(of: "\(v0)", with: s0Limits.0)
                         let upperCode = operation.swiftCode(sign: operationSign)
                             .replacingOccurrences(of: "\(v0)", with: s0Limits.1)
-                        let lowerOutput = s1.numericType < s0.numericType ? s0Limits.0 : s1Limits.0
-                        let upperOutput = s1.numericType > s0.numericType ? s0Limits.1 : s1Limits.1
+                        let lowerOutput: String
+                        if !s0.numericType.isSigned {
+                            lowerOutput = operationSign.isFloatingPoint ? "(\(lowerCode)).rounded()" :
+                                lowerCode
+                        } else {
+                            lowerOutput = s1Limits.0
+                        }
+                        let upperOutput = s1Limits.1
                         params[metaData] = [
                             TestParameters(input: s0Limits.0, output: "\(otherType)(\(lowerOutput))"),
                             TestParameters(input: s0Limits.1, output: "\(otherType)(\(upperOutput))")
