@@ -86,11 +86,11 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
         guard sign.numericType.isSigned else {
             return """
                 const \(numericType) unit = ((\(numericType)) (\(unit)));
-                if (overflow_upper_\(sign.rawValue)(unit)) {
+                if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit), 0)) {
                     return \(upperLimit);
                 } else {
                     const \(cSign.numericType.rawValue) result = \(code);
-                    if (overflow_upper_\(cSign.rawValue)(result)) {
+                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
                         return \(upperLimit);
                     } else {
                         return \(call);
@@ -100,15 +100,15 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
         }
         return """
             const \(numericType) unit = ((\(numericType)) (\(unit)));
-            if (overflow_upper_\(sign.rawValue)(unit)) {
+            if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit), 0)) {
                 return \(upperLimit);
-            } else if (overflow_lower_\(sign.rawValue)(unit)) {
+            } else if (__builtin_expect(overflow_lower_\(sign.rawValue)(unit), 0)) {
                 return \(lowerLimit);
             } else {
                 const \(cSign.numericType.rawValue) result = \(code);
-                if (overflow_upper_\(cSign.rawValue)(result)) {
+                if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
                     return \(upperLimit);
-                } else if (overflow_lower_\(cSign.rawValue)(result)) {
+                } else if (__builtin_expect(overflow_lower_\(cSign.rawValue)(result), 0)) {
                     return \(lowerLimit);
                 } else {
                     return \(call);

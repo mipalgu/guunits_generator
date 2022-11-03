@@ -142,6 +142,16 @@ public struct CFileCreator {
         """
         let functionDefs = Signs.allCases.map { sign in
             let type = sign.numericType.rawValue
+            guard sign.numericType.isSigned else {
+                return """
+                \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b);
+                \(type) divide_\(sign.rawValue)(\(type) a, \(type) b);
+                \(type) addition_\(sign.rawValue)(\(type) a, \(type) b);
+                \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b);
+                bool overflow_upper_\(sign.rawValue)(\(type) a);
+                bool overflow_\(sign.rawValue)(\(type) a);
+                """
+            }
             return """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b);
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b);
@@ -186,14 +196,14 @@ public struct CFileCreator {
             multiplication = """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == \(zero) || b == \(zero)) {
+                if (__builtin_expect(a == \(zero) || b == \(zero), 0)) {
                     return \(zero);
                 }
                 const \(type) maxValue = (\(upperLimit)) / a;
                 const \(type) minValue = (\(lowerLimit)) / a;
-                if ((b > maxValue && maxValue > 0) || (b < maxValue && maxValue < 0)) {
+                if (__builtin_expect((b > maxValue && maxValue > 0) || (b < maxValue && maxValue < 0), 0)) {
                     return \(upperLimit);
-                } else if ((b < minValue && minValue < 0) || (b > minValue && minValue > 0)) {
+                } else if (__builtin_expect((b < minValue && minValue < 0) || (b > minValue && minValue > 0), 0)) {
                     return \(lowerLimit);
                 } else {
                     return a * b;
@@ -204,11 +214,11 @@ public struct CFileCreator {
             multiplication = """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == \(zero) || b == \(zero)) {
+                if (__builtin_expect(a == \(zero) || b == \(zero), 0)) {
                     return \(zero);
                 }
                 const \(type) maxValue = (\(upperLimit)) / a;
-                if (b > maxValue) {
+                if (__builtin_expect(b > maxValue, 0)) {
                     return \(upperLimit);
                 } else {
                     return a * b;
@@ -219,29 +229,29 @@ public struct CFileCreator {
             multiplication = """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == \(zero) || b == \(zero)) {
+                if (__builtin_expect(a == \(zero) || b == \(zero), 0)) {
                     return \(zero);
                 }
-                if ((b < \(one) && b > -\(one)) || (a < \(one) && a > -\(one))) {
+                if (__builtin_expect((b < \(one) && b > -\(one)) || (a < \(one) && a > -\(one)), 0)) {
                     return a * b;
                 }
                 if (a < 0 && b > 0) {
                     const \(type) minValue = (\(lowerLimit)) / b;
-                    if (a < minValue) {
+                    if (__builtin_expect(a < minValue, 0)) {
                         return \(lowerLimit);
                     } else {
                         return a * b;
                     }
                 } else if (a > 0 && b < 0) {
                     const \(type) minValue = (\(lowerLimit)) / a;
-                    if (b < minValue) {
+                    if (__builtin_expect(b < minValue, 0)) {
                         return \(lowerLimit);
                     } else {
                         return a * b;
                     }
                 } else {
                     const \(type) maxValue = \(upperLimit) / b;
-                    if (a > maxValue) {
+                    if (__builtin_expect(a > maxValue, 0)) {
                         return \(upperLimit);
                     } else {
                         return a * b;
@@ -255,7 +265,7 @@ public struct CFileCreator {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (b == \(zero)) {
+                if (__builtin_expect(b == \(zero), 0)) {
                     return a < 0 ? \(lowerLimit) : \(upperLimit);
                 } else {
                     return a / b;
@@ -266,7 +276,7 @@ public struct CFileCreator {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (b == \(zero)) {
+                if (__builtin_expect(b == \(zero), 0)) {
                     return \(upperLimit);
                 } else {
                     return a / b;
@@ -277,18 +287,18 @@ public struct CFileCreator {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (b == \(zero)) {
+                if (__builtin_expect(b == \(zero), 0)) {
                     return a < \(zero) ? \(lowerLimit) : \(upperLimit);
-                } else if (b > \(zero) && b < \(one)) {
+                } else if (__builtin_expect(b > \(zero) && b < \(one), 0)) {
                     const \(type) maxValue = (\(upperLimit)) * b;
-                    if (a > maxValue || a < -maxValue) {
+                    if (__builtin_expect(a > maxValue || a < -maxValue, 0)) {
                         return \(upperLimit);
                     } else {
                         return a / b;
                     }
-                } else if (b > -\(one) && b < \(zero)) {
+                } else if (__builtin_expect(b > -\(one) && b < \(zero), 0)) {
                     const \(type) minValue = (\(lowerLimit)) * b;
-                    if (a > minValue || a < -minValue) {
+                    if (__builtin_expect(a > minValue || a < -minValue, 0)) {
                         return \(lowerLimit);
                     } else {
                         return a / b;
@@ -304,18 +314,18 @@ public struct CFileCreator {
             addition = """
             \(type) addition_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if ((a > \(zero) && b < \(zero)) || (a < \(zero) && b > \(zero))) {
+                if (__builtin_expect((a > \(zero) && b < \(zero)) || (a < \(zero) && b > \(zero)), 0)) {
                     return a + b;
                 } else if (a > \(zero) && b > \(zero)) {
                     const \(type) maxValue = (\(upperLimit)) - b;
-                    if (a > maxValue) {
+                    if (__builtin_expect(a > maxValue, 0)) {
                         return \(upperLimit);
                     } else {
                         return a + b;
                     }
                 } else {
                     const \(type) minValue = (\(lowerLimit)) - b;
-                    if (a < minValue) {
+                    if (__builtin_expect(a < minValue, 0)) {
                         return \(lowerLimit);
                     } else {
                         return a + b;
@@ -328,7 +338,7 @@ public struct CFileCreator {
             \(type) addition_\(sign.rawValue)(\(type) a, \(type) b)
             {
                 const \(type) maxValue = (\(upperLimit)) - b;
-                if (a > maxValue) {
+                if (__builtin_expect(a > maxValue, 0)) {
                     return \(upperLimit);
                 } else {
                     return a + b;
@@ -350,14 +360,14 @@ public struct CFileCreator {
             {
                 if (a < \(zero) && b > \(zero)) {
                     const \(type) minValue = (\(lowerLimit)) + b;
-                    if (a < minValue) {
+                    if (__builtin_expect(a < minValue, 0)) {
                         return \(lowerLimit);
                     } else {
                         return a - b;
                     }
                 } else if (a > \(zero) && b < \(zero)) {
                     const \(type) maxValue = (\(upperLimit)) + b;
-                    if (a > maxValue) {
+                    if (__builtin_expect(a > maxValue, 0)) {
                         return \(upperLimit);
                     } else {
                         return a - b;
@@ -375,14 +385,14 @@ public struct CFileCreator {
                     return a - b;
                 } else if (a < \(zero) && b > \(zero)) {
                     const \(type) minValue = (\(lowerLimit)) + b;
-                    if (a < minValue) {
+                    if (__builtin_expect(a < minValue, 0)) {
                         return \(lowerLimit);
                     } else {
                         return a - b;
                     }
                 } else if (a > \(zero) && b < \(zero)) {
                     const \(type) maxValue = (\(upperLimit)) + b;
-                    if (a > maxValue) {
+                    if (__builtin_expect(a > maxValue, 0)) {
                         return \(upperLimit);
                     } else {
                         return a - b;
@@ -393,22 +403,37 @@ public struct CFileCreator {
             }
             """
         }
-        let overflow = """
-        bool overflow_upper_\(sign.rawValue)(\(type) a)
-        {
-            return a == \(upperLimit);
-        }
+        let overflow: String
+        if !sign.numericType.isSigned {
+            overflow = """
+            bool overflow_upper_\(sign.rawValue)(\(type) a)
+            {
+                return a == \(upperLimit);
+            }
 
-        bool overflow_lower_\(sign.rawValue)(\(type) a)
-        {
-            return a == \(lowerLimit);
-        }
+            bool overflow_\(sign.rawValue)(\(type) a)
+            {
+                return overflow_upper_\(sign.rawValue)(a);
+            }
+            """
+        } else {
+            overflow = """
+            bool overflow_upper_\(sign.rawValue)(\(type) a)
+            {
+                return a == \(upperLimit);
+            }
 
-        bool overflow_\(sign.rawValue)(\(type) a)
-        {
-            return overflow_upper_\(sign.rawValue)(a) || overflow_lower_\(sign.rawValue)(a);
+            bool overflow_lower_\(sign.rawValue)(\(type) a)
+            {
+                return a == \(lowerLimit);
+            }
+
+            bool overflow_\(sign.rawValue)(\(type) a)
+            {
+                return overflow_upper_\(sign.rawValue)(a) || overflow_lower_\(sign.rawValue)(a);
+            }
+            """
         }
-        """
         return [multiplication, division, addition, subtraction, overflow].joined(separator: "\n\n")
     }
 
