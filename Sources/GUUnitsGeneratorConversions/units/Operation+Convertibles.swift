@@ -167,8 +167,11 @@ extension Operation {
     func replace(convertibles: [AnyUnit: AnyUnit]) -> Operation {
         switch self {
         case .constant(let unit):
-            guard let newVal = convertibles[unit], newVal == unit else {
+            guard let newVal = convertibles[unit] else {
                 return .literal(declaration: .integer(value: 1))
+            }
+            guard newVal == unit else {
+                return .constant(declaration: newVal)
             }
             return self
         case .division(let lhs, let rhs):
