@@ -58,8 +58,13 @@
 
 import Foundation
 
+// swiftlint:disable file_length
+// swiftlint:disable type_body_length
+
 /// Generates all of the C types and conversion functions.
 public struct CFileCreator {
+
+    // swiftlint:disable closure_body_length
 
     /// The prefix which appears at the top of the file.
     private var prefix: String = {
@@ -166,6 +171,8 @@ public struct CFileCreator {
         return includes + "\n\n" + functionDefs
     }()
 
+    // swiftlint:enable closure_body_length
+
     /// The suffix which appears at the end of the file.
     var suffix: String {
         [NumericTypes.double, NumericTypes.float].flatMap { type in
@@ -176,6 +183,7 @@ public struct CFileCreator {
         .joined(separator: "\n\n") + "\n\n" + mathFunctions
     }
 
+    /// Mathemtical operations that perform clamping on results.
     var mathFunctions: String {
         Signs.allCases.map {
             createOperations(for: $0)
@@ -183,6 +191,47 @@ public struct CFileCreator {
         .joined(separator: "\n\n")
     }
 
+    /// Default init.
+    public init() {}
+
+    /// Standard data initialiser.
+    /// - Parameter prefix: The prefix which appears before the function generation.
+    init(prefix: String) {
+        self.prefix = prefix
+    }
+
+    /// Generate all of the guunits source code.
+    /// - Parameters:
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
+    /// - Returns: A string of all C functions for the supported guunits types.
+    public func generate(generators: [AnyGenerator]) -> String {
+        let content = self.createContent(generators: generators)
+        return self.prefix + "\n\n" + content + "\n\n" + self.suffix + "\n"
+    }
+
+    /// Create the conversion functions for each unit type.
+    /// - Parameters:
+    ///   - generators: The generators that creates the function definitions for their
+    ///                 respective units.
+    /// - Returns: A string containing all of the conversion functions.
+    private func createContent(generators: [AnyGenerator]) -> String {
+        let implementations: [String] = generators.map {
+            guard let imp = $0.implementations else {
+                fatalError("Failed to get implementations")
+            }
+            return imp
+        }
+        return implementations.joined(separator: "\n\n")
+    }
+
+    // swiftlint:disable line_length
+    // swiftlint:disable function_body_length
+
+    /// Create mathematical C operation functions that clamp results. The operations include
+    /// multiplication, division, addition, subtraction and overflow checking functions.
+    /// - Parameter sign: The sign each operation will act on.
+    /// - Returns: The C code that defines these mathematical operations.
     private func createOperations(for sign: Signs) -> String {
         let typeType = sign.numericType
         let type = typeType.rawValue
@@ -272,7 +321,7 @@ public struct CFileCreator {
                 }
             }
             """
-        } else if !sign.isFloatingPoint && !sign.numericType.isSigned  {
+        } else if !sign.isFloatingPoint && !sign.numericType.isSigned {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
@@ -437,39 +486,8 @@ public struct CFileCreator {
         return [multiplication, division, addition, subtraction, overflow].joined(separator: "\n\n")
     }
 
-    /// Default init.
-    public init() {}
-
-    /// Standard data initialiser.
-    /// - Parameter prefix: The prefix which appears before the function generation.
-    init(prefix: String) {
-        self.prefix = prefix
-    }
-
-    /// Generate all of the guunits source code.
-    /// - Parameters:
-    ///   - generators: The generators that creates the function definitions for their
-    ///                 respective units.
-    /// - Returns: A string of all C functions for the supported guunits types.
-    public func generate(generators: [AnyGenerator]) -> String {
-        let content = self.createContent(generators: generators)
-        return self.prefix + "\n\n" + content + "\n\n" + self.suffix + "\n"
-    }
-
-    /// Create the conversion functions for each unit type.
-    /// - Parameters:
-    ///   - generators: The generators that creates the function definitions for their
-    ///                 respective units.
-    /// - Returns: A string containing all of the conversion functions.
-    private func createContent(generators: [AnyGenerator]) -> String {
-        let implementations: [String] = generators.map {
-            guard let imp = $0.implementations else {
-                fatalError("Failed to get implementations")
-            }
-            return imp
-        }
-        return implementations.joined(separator: "\n\n")
-    }
+    // swiftlint:enable line_length
+    // swiftlint:enable function_body_length
 
     /// Create the numeric conversion functions from a floating point type to another numeric type.
     /// - Parameters:
@@ -562,3 +580,6 @@ public struct CFileCreator {
     }
 
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length
