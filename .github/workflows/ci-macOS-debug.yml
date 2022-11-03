@@ -34,5 +34,7 @@ jobs:
         run: swift build -c debug
 
       - name: Debug Test
-        run: ulimit -n 65000 && swift test
+        run: |
+          ulimit -n 65000
+          swift test
 

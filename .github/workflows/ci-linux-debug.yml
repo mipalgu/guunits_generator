@@ -36,5 +36,7 @@ jobs:
         run: swift build -c debug
 
       - name: Debug Test
-        run: ulimit -n 65000 && swift test --enable-code-coverage
+        run: |
+          ulimit -n 65000
+          swift test --enable-code-coverage
 
