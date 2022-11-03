@@ -68,7 +68,7 @@ public struct CFileCreator {
 
     /// The prefix which appears at the top of the file.
     private var prefix: String = {
-        let includes = """
+        """
         /*
         * guunits.c
         * guunits
@@ -145,7 +145,23 @@ public struct CFileCreator {
         #define M_PI 3.14159265358979323846
         #endif
         """
-        let functionDefs = Signs.allCases.map { sign in
+    }()
+
+    // swiftlint:enable closure_body_length
+
+    /// The suffix which appears at the end of the file.
+    var suffix: String {
+        [NumericTypes.double, NumericTypes.float].flatMap { type in
+            NumericTypes.allCases.compactMap { otherType in
+                defineFloatConversion(type.rawValue, from: type, to: otherType)
+            }
+        }
+        .joined(separator: "\n\n") + "\n\n" + mathFunctions
+    }
+
+    /// Function definitions for the math functions.
+    var mathDefinitions: String {
+        Signs.allCases.map { sign in
             let type = sign.numericType.rawValue
             guard sign.numericType.isSigned else {
                 return """
@@ -168,19 +184,6 @@ public struct CFileCreator {
             """
         }
         .joined(separator: "\n\n")
-        return includes + "\n\n" + functionDefs
-    }()
-
-    // swiftlint:enable closure_body_length
-
-    /// The suffix which appears at the end of the file.
-    var suffix: String {
-        [NumericTypes.double, NumericTypes.float].flatMap { type in
-            NumericTypes.allCases.compactMap { otherType in
-                defineFloatConversion(type.rawValue, from: type, to: otherType)
-            }
-        }
-        .joined(separator: "\n\n") + "\n\n" + mathFunctions
     }
 
     /// Mathemtical operations that perform clamping on results.
@@ -207,7 +210,7 @@ public struct CFileCreator {
     /// - Returns: A string of all C functions for the supported guunits types.
     public func generate(generators: [AnyGenerator]) -> String {
         let content = self.createContent(generators: generators)
-        return self.prefix + "\n\n" + content + "\n\n" + self.suffix + "\n"
+        return self.prefix + "\n\n" + mathDefinitions + "\n\n" + content + "\n\n" + self.suffix + "\n"
     }
 
     /// Create the conversion functions for each unit type.
