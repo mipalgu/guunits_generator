@@ -72,6 +72,7 @@ final class OperationTests: XCTestCase {
     /// Test the abbreviation is correct.
     func testAbbreviation() {
         XCTAssertEqual(operation.abbreviation, "m_per_s_sq")
+        XCTAssertEqual(operation.description, "metres_per_seconds_sq")
     }
 
     /// test abbreviation of huge operation.
@@ -94,6 +95,10 @@ final class OperationTests: XCTestCase {
         XCTAssertEqual(
             hugeOperation.abbreviation,
             "m__degC_per_A__per_s_cub"
+        )
+        XCTAssertEqual(
+            hugeOperation.description,
+            "metres__celsius_per_amperes__per_seconds_cub"
         )
     }
 
@@ -118,6 +123,10 @@ final class OperationTests: XCTestCase {
             hugeOperation2.abbreviation,
             "m__degC_per_A__per_s_pwr_4"
         )
+        XCTAssertEqual(
+            hugeOperation2.description,
+            "metres__celsius_per_amperes__per_seconds_pwr_4"
+        )
     }
 
     /// test abbreviation of huge operation.
@@ -141,6 +150,10 @@ final class OperationTests: XCTestCase {
             hugeOperation3.abbreviation,
             "m__degC_per_A__per_s_pwr_neg4"
         )
+        XCTAssertEqual(
+            hugeOperation3.description,
+            "metres__celsius_per_amperes__per_seconds_pwr_neg4"
+        )
     }
 
     /// Test the abbreviation is correct.
@@ -153,6 +166,7 @@ final class OperationTests: XCTestCase {
             )
         )
         XCTAssertEqual(operation.abbreviation, "m")
+        XCTAssertEqual(operation.description, "metres")
     }
 
     /// Test the abbreviation is correct.
@@ -165,6 +179,7 @@ final class OperationTests: XCTestCase {
             )
         )
         XCTAssertEqual(operation.abbreviation, "m_per_s")
+        XCTAssertEqual(operation.description, "metres_per_seconds")
     }
 
     /// Test the abbreviation of the case where the unit is an inverse.
@@ -174,6 +189,7 @@ final class OperationTests: XCTestCase {
             rhs: Operation.constant(declaration: AnyUnit(TimeUnits.seconds))
         )
         XCTAssertEqual(operation.abbreviation, "s_pwr_neg1")
+        XCTAssertEqual(operation.description, "seconds_pwr_neg1")
     }
 
     /// Test the abbreviation of the case where the unit is a product.
@@ -183,6 +199,7 @@ final class OperationTests: XCTestCase {
             rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
         )
         XCTAssertEqual(operation.abbreviation, "m_s")
+        XCTAssertEqual(operation.description, "metres_seconds")
     }
 
     /// Test allCases property.

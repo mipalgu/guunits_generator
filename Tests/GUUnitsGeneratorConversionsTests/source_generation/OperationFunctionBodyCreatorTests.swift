@@ -54,68 +54,78 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-// import Foundation
-// @testable import GUUnitsGeneratorConversions
-// import XCTest
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-// final class OperationFunctionBodyCreatorTests: XCTestCase {
+/// Test class for ``OperationFunctionBodyCreator``.
+final class OperationFunctionBodyCreatorTests: XCTestCase {
 
-//     let velocity = Velocity(unit: Velocity.baseUnit)
+    /// Helper velocity unit.
+    let v1 = Velocity(
+        unit: .division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+    )
 
-//     let creator = OperationalFunctionBodyCreator<MassUnits>()
+    /// Helper velocity unit.
+    let v2 = Velocity(
+        unit: .division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+    )
 
-//     func testMassConversions() {
-//         // let conversions = MassUnits.allCases.flatMap { mass in
-//         //     Signs.allCases.flatMap { s0 in
-//         //         Signs.allCases.map { s1 in
-//         //             creator.createFunction(unit: .gram, to: mass, sign: s0, otherSign: s1)
-//         //         }
-//         //     }
-//         // }
-//         // print(conversions.joined(separator: "\n\n"))
-//         // fflush(stdout)
-//     }
+    /// Creator under test.
+    let creator = OperationalFunctionBodyCreator<Velocity>()
 
-//     func testVelocityConversions() {
-//         // let creator = OperationalFunctionBodyCreator<Velocity>()
-//         // let conversions = Velocity.allCases.flatMap { velocity in
-//         //     Signs.allCases.flatMap { s0 in
-//         //         Signs.allCases.map { s1 -> String in
-//         //             let unit = Velocity(
-//         //                 unit: .division(
-//         //                     lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
-//         //                     rhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds))
-//         //                 )
-//         //             )
-//         //             return creator.createFunction(
-//         //                 unit: unit, to: velocity, sign: s0, otherSign: s1
-//         //             )
-//         //         }
-//         //     }
-//         // }
-//         // print(conversions.joined(separator: "\n\n"))
-//         // fflush(stdout)
-//     }
+    /// Test standard signed conversion.
+    func testSignedConversion() {
+        let result = creator.createFunction(unit: v1, to: v2, sign: .t, otherSign: .d)
+        let signType = Signs.t.numericType.rawValue
+        let otherSignLimits = Signs.d.numericType.limits
+        let code = v1.conversion(to: v2).cCode(sign: .d)
+        let expected = """
+            const \(signType) unit = ((\(signType)) (metres_per_seconds));
+            if (__builtin_expect(overflow_upper_t(unit), 0)) {
+                return \(otherSignLimits.1);
+            } else if (__builtin_expect(overflow_lower_t(unit), 0)) {
+                return \(otherSignLimits.0);
+            } else {
+                const double result = \(code);
+                if (__builtin_expect(overflow_upper_d(result), 0)) {
+                    return \(otherSignLimits.1);
+                } else if (__builtin_expect(overflow_lower_d(result), 0)) {
+                    return \(otherSignLimits.0);
+                } else {
+                    return ((centimetres_per_seconds_d) (result));
+                }
+            }
+        """
+        XCTAssertEqual(result, expected)
+    }
 
-//     func testAngularVelocityConversions() {
-//         // let creator = OperationalFunctionBodyCreator<AngularVelocity>()
-//         // let conversions = AngularVelocity.allCases.flatMap { velocity in
-//         //     Signs.allCases.flatMap { s0 in
-//         //         Signs.allCases.map { s1 -> String in
-//         //             let unit = AngularVelocity(
-//         //                 unit: .division(
-//         //                     lhs: .constant(declaration: AnyUnit(AngleUnits.degrees)),
-//         //                     rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
-//         //                 )
-//         //             )
-//         //             return creator.createFunction(
-//         //                 unit: unit, to: velocity, sign: s0, otherSign: s1
-//         //             )
-//         //         }
-//         //     }
-//         // }
-//         // print(conversions.joined(separator: "\n\n"))
-//         // fflush(stdout)
-//     }
+    /// Test integer unsigned conversion.
+    func testUnsignedConversion() {
+        let result = creator.createFunction(unit: v1, to: v2, sign: .u, otherSign: .t)
+        let signType = Signs.u.numericType.rawValue
+        let otherSignLimits = Signs.t.numericType.limits
+        let code = v1.conversion(to: v2).cCode(sign: .u)
+        let minString = "MIN(((\(signType)) (\(Signs.t.numericType.limits.1))), result)"
+        let expected = """
+            const \(signType) unit = ((\(signType)) (metres_per_seconds));
+            if (__builtin_expect(overflow_upper_u(unit), 0)) {
+                return \(otherSignLimits.1);
+            } else {
+                const \(signType) result = \(code);
+                if (__builtin_expect(overflow_upper_u(result), 0)) {
+                    return \(otherSignLimits.1);
+                } else {
+                    return ((centimetres_per_seconds_t) (\(minString)));
+                }
+            }
+        """
+        XCTAssertEqual(result, expected)
+    }
 
-// }
+}

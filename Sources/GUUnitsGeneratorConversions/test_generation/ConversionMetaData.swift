@@ -1,4 +1,4 @@
-// AngularVelocity.swift 
+// ConversionMetaData.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,37 +54,25 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit for describing rotational velocity. This unit uses the SI unit
-/// radians per second (rad/s) as the base unit.
-public struct AngularVelocity: CompositeUnit, UnitsConvertible {
+/// A struct for storing information about a unit conversion within the same
+/// category.
+public struct ConversionMetaData<Unit>: Hashable, CustomStringConvertible where Unit: UnitProtocol {
 
-    /// The base unit of Angular Velocity is radians per second (rad/s).
-    public static let baseUnit: Operation = .division(
-        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
-        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
-    )
+    /// The original unit.
+    public let unit: Unit
 
-    /// The unit instance of this category.
-    public var unit: Operation
+    /// The sign of the original unit.
+    public let sign: Signs
 
-    /// Instantiate the category from an instance of a unit.
-    /// - Parameter unit: The unit instance of this category. This unit should
-    /// be a derivation of the `baseUnit`.
-    public init(unit: Operation) {
-        self.unit = unit
+    /// The unit to convert to.
+    public let otherUnit: Unit
+
+    /// The sign of the unit to convert to.
+    public let otherSign: Signs
+
+    /// A print-friendly description of this conversion.
+    public var description: String {
+        "\(unit)_\(sign) -> \(otherUnit)_\(otherSign)"
     }
-
-}
-
-/// Hashable conformance.
-extension AngularVelocity: Hashable {}
-
-/// ``OperationalTestable`` conformance.
-extension AngularVelocity: OperationalTestable {
-
-    /// The test parameters for this unit category.
-    public static let testParameters: [
-        ConversionMetaData<AngularVelocity>: [TestParameters]
-    ] = defaultParameters
 
 }

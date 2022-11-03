@@ -155,9 +155,13 @@ final class CFileCreatorTests: XCTestCase {
         let expected = """
         prefix
 
+        \(creator.mathDefinitions)
+
         \(generator.magicString)
 
         \(suffix)
+
+        \(creator.mathFunctions)
 
         """
         XCTAssertEqual(result, expected)

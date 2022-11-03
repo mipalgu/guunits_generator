@@ -56,16 +56,23 @@
  *
  */
 
-import GUUnitsGeneratorConversions
+@testable import GUUnitsGeneratorConversions
 
 /// Fake unit type that is used for testing.
-enum FakeUnit: String, UnitProtocol {
+enum FakeUnit: String, UnitProtocol, OperationalTestable {
 
     /// The first unit.
     case first
 
     /// The second unit.
     case second
+
+    /// Some test parameters.
+    static let testParameters: [ConversionMetaData<FakeUnit>: [TestParameters]] = [
+        ConversionMetaData<FakeUnit>(unit: .first, sign: .f, otherUnit: .first, otherSign: .d): [
+            TestParameters(input: "1.0", output: "1.0")
+        ]
+    ]
 
     /// The abbreviation of the unit.
     var abbreviation: String {

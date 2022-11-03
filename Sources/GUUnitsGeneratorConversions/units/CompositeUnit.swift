@@ -57,7 +57,7 @@
 /// Defines a category that is created from relationships of other units. This protocol
 /// defines a class of unit that uses different `UnitProtocol` types
 /// in it's definition.
-public protocol CompositeUnit: UnitProtocol {
+public protocol CompositeUnit: UnitProtocol, RawRepresentable where RawValue == String {
 
     /// The base operation of this unit.
     static var baseUnit: Operation { get }
@@ -103,6 +103,19 @@ public extension CompositeUnit {
             return unit.description
         }
         return name.description
+    }
+
+    /// The rawValue is the Operation rawValue by default.
+    var rawValue: RawValue {
+        guard let name = Self.namedUnit[unit] else {
+            return unit.description
+        }
+        return name.description
+    }
+
+    /// Initialiser for `RawRepresentable` conformance. Not implemented yet.
+    init?(rawValue: RawValue) {
+        fatalError("Invalid call, Not yet implemented.")
     }
 
 }

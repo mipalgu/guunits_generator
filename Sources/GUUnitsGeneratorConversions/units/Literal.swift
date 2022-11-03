@@ -56,7 +56,7 @@
 
 /// Enumeration for representating different types of primitive values. These types represent
 /// different real and rational numbers with differing precision.
-public enum Literal: Hashable {
+public enum Literal: Hashable, CustomStringConvertible {
 
     /// An integer.
     case integer(value: Int)
@@ -103,6 +103,11 @@ public enum Literal: Hashable {
         case .decimal(let value):
             return "\(value)"
         }
+    }
+
+    /// The description of this literal.
+    public var description: String {
+        asString
     }
 
     /// True when the underlying value is a floating point number. False otherwise.

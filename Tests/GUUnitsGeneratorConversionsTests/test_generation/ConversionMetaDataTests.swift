@@ -1,4 +1,4 @@
-// AngularVelocity.swift 
+// ConversionMetaDataTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,37 +54,21 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit for describing rotational velocity. This unit uses the SI unit
-/// radians per second (rad/s) as the base unit.
-public struct AngularVelocity: CompositeUnit, UnitsConvertible {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// The base unit of Angular Velocity is radians per second (rad/s).
-    public static let baseUnit: Operation = .division(
-        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
-        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
-    )
+/// Test class for ``ConversionMetaData``.
+final class ConversionMetaDataTests: XCTestCase {
 
-    /// The unit instance of this category.
-    public var unit: Operation
-
-    /// Instantiate the category from an instance of a unit.
-    /// - Parameter unit: The unit instance of this category. This unit should
-    /// be a derivation of the `baseUnit`.
-    public init(unit: Operation) {
-        self.unit = unit
+    /// Test init sets stored properties correctly.
+    func testInit() {
+        let data = ConversionMetaData(
+            unit: DistanceUnits.metres, sign: .d, otherUnit: DistanceUnits.centimetres, otherSign: .f
+        )
+        XCTAssertEqual(data.unit, .metres)
+        XCTAssertEqual(data.sign, .d)
+        XCTAssertEqual(data.otherUnit, .centimetres)
+        XCTAssertEqual(data.otherSign, .f)
     }
-
-}
-
-/// Hashable conformance.
-extension AngularVelocity: Hashable {}
-
-/// ``OperationalTestable`` conformance.
-extension AngularVelocity: OperationalTestable {
-
-    /// The test parameters for this unit category.
-    public static let testParameters: [
-        ConversionMetaData<AngularVelocity>: [TestParameters]
-    ] = defaultParameters
 
 }

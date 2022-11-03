@@ -64,6 +64,8 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
     /// Default initialiser.
     public init() {}
 
+    // swiftlint:disable function_body_length
+
     /// Create the C code to convert one unit with sign into another unit with sign.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -79,8 +81,44 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
         let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
         let cSign = needsDouble ? Signs.d : sign
         let code = conversion.cCode(sign: cSign)
-        return "    return " +
-            converter.convert(code, from: cSign.numericType, to: otherUnit, sign: otherSign) + ";"
+        let upperLimit = otherSign.numericType.limits.1
+        let lowerLimit = otherSign.numericType.limits.0
+        let numericType = sign.numericType.rawValue
+        let call = converter.convert("result", from: cSign.numericType, to: otherUnit, sign: otherSign)
+        guard sign.numericType.isSigned else {
+            return """
+                const \(numericType) unit = ((\(numericType)) (\(unit)));
+                if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit), 0)) {
+                    return \(upperLimit);
+                } else {
+                    const \(cSign.numericType.rawValue) result = \(code);
+                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return \(call);
+                    }
+                }
+            """
+        }
+        return """
+            const \(numericType) unit = ((\(numericType)) (\(unit)));
+            if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit), 0)) {
+                return \(upperLimit);
+            } else if (__builtin_expect(overflow_lower_\(sign.rawValue)(unit), 0)) {
+                return \(lowerLimit);
+            } else {
+                const \(cSign.numericType.rawValue) result = \(code);
+                if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
+                    return \(upperLimit);
+                } else if (__builtin_expect(overflow_lower_\(cSign.rawValue)(result), 0)) {
+                    return \(lowerLimit);
+                } else {
+                    return \(call);
+                }
+            }
+        """
     }
+
+    // swiftlint:enable function_body_length
 
 }

@@ -1,4 +1,4 @@
-// AngularVelocity.swift 
+// OperationalTestGeneratorTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,37 +54,44 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit for describing rotational velocity. This unit uses the SI unit
-/// radians per second (rad/s) as the base unit.
-public struct AngularVelocity: CompositeUnit, UnitsConvertible {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// The base unit of Angular Velocity is radians per second (rad/s).
-    public static let baseUnit: Operation = .division(
-        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
-        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+/// Test class for ``OperationalTestGenerator``.
+final class OperationalTestGeneratorTests: XCTestCase {
+
+    /// Helper velocity unit.
+    let v1 = Velocity(
+        unit: .division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
     )
 
-    /// The unit instance of this category.
-    public var unit: Operation
+    /// Helper velocity unit.
+    let v2 = Velocity(
+        unit: .division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
+            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        )
+    )
 
-    /// Instantiate the category from an instance of a unit.
-    /// - Parameter unit: The unit instance of this category. This unit should
-    /// be a derivation of the `baseUnit`.
-    public init(unit: Operation) {
-        self.unit = unit
+    /// The generator under test.
+    let generator = OperationalTestGenerator<Velocity>()
+
+    /// Verify that the testParameters function returns parameters stored in testParameters dictionary.
+    func testParameters() {
+        let conversion = ConversionMetaData(unit: v1, sign: .t, otherUnit: v2, otherSign: .u)
+        XCTAssertEqual(
+            generator.testParameters(from: v1, with: .t, to: v2, with: .u),
+            Velocity.testParameters[conversion]
+        )
     }
 
-}
-
-/// Hashable conformance.
-extension AngularVelocity: Hashable {}
-
-/// ``OperationalTestable`` conformance.
-extension AngularVelocity: OperationalTestable {
-
-    /// The test parameters for this unit category.
-    public static let testParameters: [
-        ConversionMetaData<AngularVelocity>: [TestParameters]
-    ] = defaultParameters
+    /// Test testParameters function returns empty array for conversion that is not present in testParameters
+    /// dictionary.
+    func testParametersForNilCase() {
+        XCTAssertTrue(generator.testParameters(from: v1, with: .t, to: v1, with: .t).isEmpty)
+    }
 
 }

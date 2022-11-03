@@ -1,4 +1,4 @@
-// AngularVelocity.swift 
+// OperationUnitsconvertibleTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,37 +54,38 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit for describing rotational velocity. This unit uses the SI unit
-/// radians per second (rad/s) as the base unit.
-public struct AngularVelocity: CompositeUnit, UnitsConvertible {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// The base unit of Angular Velocity is radians per second (rad/s).
-    public static let baseUnit: Operation = .division(
-        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
+/// Test class for ``Operation`` ``UnitsConvertible`` conformance.
+final class OperationUnitsConvertibleTests: XCTestCase {
+
+    /// Operation under test.
+    let operation = Operation.division(
+        lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+        rhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds))
+    )
+
+    /// Operation to convert into.
+    let otherUnit = Operation.division(
+        lhs: .constant(declaration: AnyUnit(DistanceUnits.centimetres)),
         rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
     )
 
-    /// The unit instance of this category.
-    public var unit: Operation
-
-    /// Instantiate the category from an instance of a unit.
-    /// - Parameter unit: The unit instance of this category. This unit should
-    /// be a derivation of the `baseUnit`.
-    public init(unit: Operation) {
-        self.unit = unit
+    /// Test conversion function produces correct result.
+    func testConversion() {
+        let conversion = operation.conversion(to: otherUnit)
+        let expected = Operation.division(
+            lhs: .multiplication(
+                lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: .literal(declaration: .integer(value: 100))
+            ),
+            rhs: .division(
+                lhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds)),
+                rhs: .literal(declaration: .integer(value: 1000))
+            )
+        )
+        XCTAssertEqual(conversion, expected)
     }
-
-}
-
-/// Hashable conformance.
-extension AngularVelocity: Hashable {}
-
-/// ``OperationalTestable`` conformance.
-extension AngularVelocity: OperationalTestable {
-
-    /// The test parameters for this unit category.
-    public static let testParameters: [
-        ConversionMetaData<AngularVelocity>: [TestParameters]
-    ] = defaultParameters
 
 }

@@ -1,4 +1,4 @@
-// AngularVelocity.swift 
+// OperationalTestGenerator.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,37 +54,51 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit for describing rotational velocity. This unit uses the SI unit
-/// radians per second (rad/s) as the base unit.
-public struct AngularVelocity: CompositeUnit, UnitsConvertible {
+/// A ``TestGenerator`` that uses the parameters specified in ``OperationalTestable``.
+public struct OperationalTestGenerator<UnitType>: TestGenerator where
+    UnitType: OperationalTestable,
+    UnitType: RawRepresentable,
+    UnitType.RawValue == String {
 
-    /// The base unit of Angular Velocity is radians per second (rad/s).
-    public static let baseUnit: Operation = .division(
-        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
-        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
-    )
-
-    /// The unit instance of this category.
-    public var unit: Operation
-
-    /// Instantiate the category from an instance of a unit.
-    /// - Parameter unit: The unit instance of this category. This unit should
-    /// be a derivation of the `baseUnit`.
-    public init(unit: Operation) {
-        self.unit = unit
+    /// Generate the test parameters for a unit to unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: the sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    /// - Returns: An array of test parameters suitable for testing this conversion function.
+    public func testParameters(
+        from unit: UnitType, with sign: Signs, to otherUnit: UnitType, with otherSign: Signs
+    ) -> [TestParameters] {
+        guard unit != otherUnit || sign != otherSign else {
+            return []
+        }
+        let metaData = ConversionMetaData(unit: unit, sign: sign, otherUnit: otherUnit, otherSign: otherSign)
+        return (UnitType.testParameters[metaData] ?? [])
     }
 
-}
+    /// Generate test parameters for a unit to numeric conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric type to convert to.
+    /// - Returns: The test parameters for test functions using this conversion.
+    public func testParameters(
+        from unit: UnitType, with sign: Signs, to numeric: NumericTypes
+    ) -> [TestParameters] {
+        defaultParameters(from: unit, with: sign, to: numeric)
+    }
 
-/// Hashable conformance.
-extension AngularVelocity: Hashable {}
-
-/// ``OperationalTestable`` conformance.
-extension AngularVelocity: OperationalTestable {
-
-    /// The test parameters for this unit category.
-    public static let testParameters: [
-        ConversionMetaData<AngularVelocity>: [TestParameters]
-    ] = defaultParameters
+    /// Generate test parameters for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric type to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    /// - Returns: Test parameters which are used to create new test functions.
+    public func testParameters(
+        from numeric: NumericTypes, to unit: UnitType, with sign: Signs
+    ) -> [TestParameters] {
+        defaultParameters(from: numeric, to: unit, with: sign)
+    }
 
 }
