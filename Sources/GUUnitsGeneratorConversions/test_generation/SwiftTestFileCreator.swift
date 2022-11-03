@@ -106,12 +106,12 @@ public struct SwiftTestFileCreator {
                             with: sign,
                             to: otherUnit,
                             with: otherSign,
-                            category: T.category.capitalized
+                            category: T.category
                         )
                     }
                     .filter { !$0.isEmpty }
                 } + categoryTests(
-                    from: unit, with: sign.rawValue, category: T.category.capitalized
+                    from: unit, with: sign.rawValue, category: T.category
                 )
             }
             .group(size: 30)
@@ -208,8 +208,8 @@ public struct SwiftTestFileCreator {
                 """
                     func test\(type)\(category)\($0)Init() {
                         let raw = \(type)(\($0)(5))
-                        let category = \(category.capitalized)(raw)
-                        let expected = \(category.capitalized)(rawValue: .\(type.lowercased())(raw))
+                        let category = \(category)(raw)
+                        let expected = \(category)(rawValue: .\(type.lowercased())(raw))
                         XCTAssertEqual(category, expected)
                     }
                 """
@@ -232,11 +232,11 @@ public struct SwiftTestFileCreator {
     ) -> [String] where T: UnitProtocol {
         let type = unit.description.capitalized + "_" + sign.rawValue
         let otherType = otherUnit.description.capitalized + "_" + otherSign.rawValue
-        let category = category.capitalized
+        let category = category
         let ctype2 = "\(unit.abbreviation)_\(sign)_to_\(otherUnit.abbreviation)_\(otherSign)(ctype1)"
         return [
             """
-                func test\(type)To\(otherType)\(category.capitalized)Conversions() {
+                func test\(type)To\(otherType)\(category)Conversions() {
                     let original = \(type)(5)
                     let category = \(category)(original)
                     let other = category.\(otherUnit)_\(otherSign)
@@ -861,7 +861,7 @@ public struct SwiftTestFileCreator {
             """
         }
         let tolerance = creator.sanitiseLiteral(literal: "1", sign: otherSign)
-        let categoryConversion = "\(T.category.capitalized)(unit).\(otherUnit.rawValue)_\(otherSign)"
+        let categoryConversion = "\(T.category)(unit).\(otherUnit.rawValue)_\(otherSign)"
         return """
             func \(fnTestName)() {
                 let unit = \(unit)
