@@ -171,7 +171,7 @@ public indirect enum Operation: Hashable {
             if lhsDescription == "1" {
                 return Operation.exponentiate(
                     base: rhs, power: .literal(declaration: .integer(value: -1))
-                ).abbreviation
+                ).description
             }
             return lhsDescription + "_per_" + rhsDescription
         case .precedence(let operation):
