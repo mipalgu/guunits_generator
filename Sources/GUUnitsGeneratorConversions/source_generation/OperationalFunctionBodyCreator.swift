@@ -64,6 +64,8 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
     /// Default initialiser.
     public init() {}
 
+    // swiftlint:disable function_body_length
+
     /// Create the C code to convert one unit with sign into another unit with sign.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -116,5 +118,7 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
             }
         """
     }
+
+    // swiftlint:enable function_body_length
 
 }
