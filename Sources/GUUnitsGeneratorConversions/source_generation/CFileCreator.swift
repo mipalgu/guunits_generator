@@ -62,7 +62,8 @@ import Foundation
 public struct CFileCreator {
 
     /// The prefix which appears at the top of the file.
-    private var prefix = """
+    private var prefix: String = {
+        let includes = """
         /*
         * guunits.c
         * guunits
@@ -125,6 +126,8 @@ public struct CFileCreator {
         \("")
         #include <math.h>
         \("")
+        #include <stdbool.h>
+        \("")
         #ifndef MAX
         #define MAX(a, b) ((a) > (b) ? (a) : (b))
         #endif
@@ -137,6 +140,31 @@ public struct CFileCreator {
         #define M_PI 3.14159265358979323846
         #endif
         """
+        let functionDefs = Signs.allCases.map { sign in
+            let type = sign.numericType.rawValue
+            guard sign.numericType.isSigned else {
+                return """
+                \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b);
+                \(type) divide_\(sign.rawValue)(\(type) a, \(type) b);
+                \(type) addition_\(sign.rawValue)(\(type) a, \(type) b);
+                \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b);
+                bool overflow_upper_\(sign.rawValue)(\(type) a);
+                bool overflow_\(sign.rawValue)(\(type) a);
+                """
+            }
+            return """
+            \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b);
+            \(type) divide_\(sign.rawValue)(\(type) a, \(type) b);
+            \(type) addition_\(sign.rawValue)(\(type) a, \(type) b);
+            \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b);
+            bool overflow_upper_\(sign.rawValue)(\(type) a);
+            bool overflow_lower_\(sign.rawValue)(\(type) a);
+            bool overflow_\(sign.rawValue)(\(type) a);
+            """
+        }
+        .joined(separator: "\n\n")
+        return includes + "\n\n" + functionDefs
+    }()
 
     /// The suffix which appears at the end of the file.
     var suffix: String {
@@ -145,7 +173,268 @@ public struct CFileCreator {
                 defineFloatConversion(type.rawValue, from: type, to: otherType)
             }
         }
+        .joined(separator: "\n\n") + "\n\n" + mathFunctions
+    }
+
+    var mathFunctions: String {
+        Signs.allCases.map {
+            createOperations(for: $0)
+        }
         .joined(separator: "\n\n")
+    }
+
+    private func createOperations(for sign: Signs) -> String {
+        let typeType = sign.numericType
+        let type = typeType.rawValue
+        let limits = typeType.limits
+        let upperLimit = limits.1
+        let lowerLimit = limits.0
+        let zero = sign.isFloatingPoint ? sanitise(literal: "0.0", to: sign.numericType) : "0"
+        let one = sign.isFloatingPoint ? sanitise(literal: "1.0", to: sign.numericType) : "1"
+        let multiplication: String
+        if !sign.isFloatingPoint && sign.numericType.isSigned {
+            multiplication = """
+            \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect(a == \(zero) || b == \(zero), 0)) {
+                    return \(zero);
+                }
+                const \(type) maxValue = (\(upperLimit)) / a;
+                const \(type) minValue = (\(lowerLimit)) / a;
+                if (__builtin_expect((b > maxValue && maxValue > 0) || (b < maxValue && maxValue < 0), 0)) {
+                    return \(upperLimit);
+                } else if (__builtin_expect((b < minValue && minValue < 0) || (b > minValue && minValue > 0), 0)) {
+                    return \(lowerLimit);
+                } else {
+                    return a * b;
+                }
+            }
+            """
+        } else if !sign.isFloatingPoint && !sign.numericType.isSigned {
+            multiplication = """
+            \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect(a == \(zero) || b == \(zero), 0)) {
+                    return \(zero);
+                }
+                const \(type) maxValue = (\(upperLimit)) / a;
+                if (__builtin_expect(b > maxValue, 0)) {
+                    return \(upperLimit);
+                } else {
+                    return a * b;
+                }
+            }
+            """
+        } else {
+            multiplication = """
+            \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect(a == \(zero) || b == \(zero), 0)) {
+                    return \(zero);
+                }
+                if (__builtin_expect((b < \(one) && b > -\(one)) || (a < \(one) && a > -\(one)), 0)) {
+                    return a * b;
+                }
+                if (a < 0 && b > 0) {
+                    const \(type) minValue = (\(lowerLimit)) / b;
+                    if (__builtin_expect(a < minValue, 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return a * b;
+                    }
+                } else if (a > 0 && b < 0) {
+                    const \(type) minValue = (\(lowerLimit)) / a;
+                    if (__builtin_expect(b < minValue, 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return a * b;
+                    }
+                } else {
+                    const \(type) maxValue = \(upperLimit) / b;
+                    if (__builtin_expect(a > maxValue, 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return a * b;
+                    }
+                }
+            }
+            """
+        }
+        let division: String
+        if !sign.isFloatingPoint && sign.numericType.isSigned {
+            division = """
+            \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect(b == \(zero), 0)) {
+                    return a < 0 ? \(lowerLimit) : \(upperLimit);
+                } else {
+                    return a / b;
+                }
+            }
+            """
+        } else if !sign.isFloatingPoint && !sign.numericType.isSigned  {
+            division = """
+            \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect(b == \(zero), 0)) {
+                    return \(upperLimit);
+                } else {
+                    return a / b;
+                }
+            }
+            """
+        } else {
+            division = """
+            \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect(b == \(zero), 0)) {
+                    return a < \(zero) ? \(lowerLimit) : \(upperLimit);
+                } else if (__builtin_expect(b > \(zero) && b < \(one), 0)) {
+                    const \(type) maxValue = (\(upperLimit)) * b;
+                    if (__builtin_expect(a > maxValue || a < -maxValue, 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return a / b;
+                    }
+                } else if (__builtin_expect(b > -\(one) && b < \(zero), 0)) {
+                    const \(type) minValue = (\(lowerLimit)) * b;
+                    if (__builtin_expect(a > minValue || a < -minValue, 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return a / b;
+                    }
+                } else {
+                    return a / b;
+                }
+            }
+            """
+        }
+        let addition: String
+        if sign.numericType.isSigned {
+            addition = """
+            \(type) addition_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (__builtin_expect((a > \(zero) && b < \(zero)) || (a < \(zero) && b > \(zero)), 0)) {
+                    return a + b;
+                } else if (a > \(zero) && b > \(zero)) {
+                    const \(type) maxValue = (\(upperLimit)) - b;
+                    if (__builtin_expect(a > maxValue, 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return a + b;
+                    }
+                } else {
+                    const \(type) minValue = (\(lowerLimit)) - b;
+                    if (__builtin_expect(a < minValue, 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return a + b;
+                    }
+                }
+            }
+            """
+        } else {
+            addition = """
+            \(type) addition_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                const \(type) maxValue = (\(upperLimit)) - b;
+                if (__builtin_expect(a > maxValue, 0)) {
+                    return \(upperLimit);
+                } else {
+                    return a + b;
+                }
+            }
+            """
+        }
+        let subtraction: String
+        if !sign.numericType.isSigned {
+            subtraction = """
+            \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                return a >= b ? a - b : \(lowerLimit);
+            }
+            """
+        } else if !sign.isFloatingPoint && sign.numericType.isSigned {
+            subtraction = """
+            \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if (a < \(zero) && b > \(zero)) {
+                    const \(type) minValue = (\(lowerLimit)) + b;
+                    if (__builtin_expect(a < minValue, 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return a - b;
+                    }
+                } else if (a > \(zero) && b < \(zero)) {
+                    const \(type) maxValue = (\(upperLimit)) + b;
+                    if (__builtin_expect(a > maxValue, 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return a - b;
+                    }
+                } else {
+                    return a - b;
+                }
+            }
+            """
+        } else {
+            subtraction = """
+            \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b)
+            {
+                if ((a > \(zero) && b > \(zero)) || (a < \(zero) && b < \(zero))) {
+                    return a - b;
+                } else if (a < \(zero) && b > \(zero)) {
+                    const \(type) minValue = (\(lowerLimit)) + b;
+                    if (__builtin_expect(a < minValue, 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return a - b;
+                    }
+                } else if (a > \(zero) && b < \(zero)) {
+                    const \(type) maxValue = (\(upperLimit)) + b;
+                    if (__builtin_expect(a > maxValue, 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return a - b;
+                    }
+                } else {
+                    return a - b;
+                }
+            }
+            """
+        }
+        let overflow: String
+        if !sign.numericType.isSigned {
+            overflow = """
+            bool overflow_upper_\(sign.rawValue)(\(type) a)
+            {
+                return a == \(upperLimit);
+            }
+
+            bool overflow_\(sign.rawValue)(\(type) a)
+            {
+                return overflow_upper_\(sign.rawValue)(a);
+            }
+            """
+        } else {
+            overflow = """
+            bool overflow_upper_\(sign.rawValue)(\(type) a)
+            {
+                return a == \(upperLimit);
+            }
+
+            bool overflow_lower_\(sign.rawValue)(\(type) a)
+            {
+                return a == \(lowerLimit);
+            }
+
+            bool overflow_\(sign.rawValue)(\(type) a)
+            {
+                return overflow_upper_\(sign.rawValue)(a) || overflow_lower_\(sign.rawValue)(a);
+            }
+            """
+        }
+        return [multiplication, division, addition, subtraction, overflow].joined(separator: "\n\n")
     }
 
     /// Default init.

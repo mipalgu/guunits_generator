@@ -78,3 +78,11 @@ public struct AngularVelocity: CompositeUnit, UnitsConvertible {
 
 /// Hashable conformance.
 extension AngularVelocity: Hashable {}
+
+extension AngularVelocity: OperationalTestable {
+
+    public static let testParameters: [
+        ConversionMetaData<AngularVelocity>: [TestParameters]
+    ] = defaultParameters
+
+}

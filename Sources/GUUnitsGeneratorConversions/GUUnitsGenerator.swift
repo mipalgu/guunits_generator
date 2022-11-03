@@ -305,6 +305,14 @@ public struct GUUnitsGenerator {
             at: path,
             with: velocityFileCreator.tests(generator: velocityGenerator, imports: "import CGUUnits")
         )
+        let angularVelocityGenerator = OperationalTestGenerator<AngularVelocity>()
+        let angularVelocityFileCreator = TestFileCreator<OperationalTestGenerator<AngularVelocity>>()
+        createTestFiles(
+            at: path,
+            with: angularVelocityFileCreator.tests(
+                generator: angularVelocityGenerator, imports: "import CGUUnits"
+            )
+        )
         print("Done!")
         fflush(stdout)
     }
@@ -413,6 +421,9 @@ public struct GUUnitsGenerator {
             )
         )
         createTestFiles(at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<Velocity>()))
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<AngularVelocity>())
+        )
         print("Done!")
         fflush(stdout)
     }
