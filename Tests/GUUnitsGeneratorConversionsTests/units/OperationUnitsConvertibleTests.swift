@@ -63,7 +63,7 @@ final class OperationUnitsConvertibleTests: XCTestCase {
     /// Operation under test.
     let operation = Operation.division(
         lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
-        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+        rhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds))
     )
 
     /// Operation to convert into.
@@ -80,7 +80,10 @@ final class OperationUnitsConvertibleTests: XCTestCase {
                 lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
                 rhs: .literal(declaration: .integer(value: 100))
             ),
-            rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+            rhs: .division(
+                lhs: .constant(declaration: AnyUnit(TimeUnits.milliseconds)),
+                rhs: .literal(declaration: .integer(value: 1000))
+            )
         )
         XCTAssertEqual(conversion, expected)
     }
