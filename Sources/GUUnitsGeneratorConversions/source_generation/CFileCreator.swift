@@ -126,6 +126,8 @@ public struct CFileCreator {
         \("")
         #include <math.h>
         \("")
+        #include <stdbool.h>
+        \("")
         #ifndef MAX
         #define MAX(a, b) ((a) > (b) ? (a) : (b))
         #endif
@@ -145,6 +147,9 @@ public struct CFileCreator {
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b);
             \(type) addition_\(sign.rawValue)(\(type) a, \(type) b);
             \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b);
+            bool overflow_upper_\(sign.rawValue)(\(type) a);
+            bool overflow_lower_\(sign.rawValue)(\(type) a);
+            bool overflow_\(sign.rawValue)(\(type) a);
             """
         }
         .joined(separator: "\n\n")
@@ -181,12 +186,6 @@ public struct CFileCreator {
             multiplication = """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if (a == \(zero) || b == \(zero)) {
                     return \(zero);
                 }
@@ -205,12 +204,6 @@ public struct CFileCreator {
             multiplication = """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit))) {
-                    return b;
-                }
                 if (a == \(zero) || b == \(zero)) {
                     return \(zero);
                 }
@@ -226,12 +219,6 @@ public struct CFileCreator {
             multiplication = """
             \(type) multiply_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if (a == \(zero) || b == \(zero)) {
                     return \(zero);
                 }
@@ -268,12 +255,6 @@ public struct CFileCreator {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if (b == \(zero)) {
                     return a < 0 ? \(lowerLimit) : \(upperLimit);
                 } else {
@@ -285,12 +266,6 @@ public struct CFileCreator {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit))) {
-                    return b;
-                }
                 if (b == \(zero)) {
                     return \(upperLimit);
                 } else {
@@ -302,12 +277,6 @@ public struct CFileCreator {
             division = """
             \(type) divide_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if (b == \(zero)) {
                     return a < \(zero) ? \(lowerLimit) : \(upperLimit);
                 } else if (b > \(zero) && b < \(one)) {
@@ -335,12 +304,6 @@ public struct CFileCreator {
             addition = """
             \(type) addition_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if ((a > \(zero) && b < \(zero)) || (a < \(zero) && b > \(zero))) {
                     return a + b;
                 } else if (a > \(zero) && b > \(zero)) {
@@ -364,12 +327,6 @@ public struct CFileCreator {
             addition = """
             \(type) addition_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit))) {
-                    return b;
-                }
                 const \(type) maxValue = (\(upperLimit)) - b;
                 if (a > maxValue) {
                     return \(upperLimit);
@@ -384,12 +341,6 @@ public struct CFileCreator {
             subtraction = """
             \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 return a >= b ? a - b : \(lowerLimit);
             }
             """
@@ -397,12 +348,6 @@ public struct CFileCreator {
             subtraction = """
             \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if (a < \(zero) && b > \(zero)) {
                     const \(type) minValue = (\(lowerLimit)) + b;
                     if (a < minValue) {
@@ -426,12 +371,6 @@ public struct CFileCreator {
             subtraction = """
             \(type) subtraction_\(sign.rawValue)(\(type) a, \(type) b)
             {
-                if (a == (\(upperLimit)) || a == (\(lowerLimit))) {
-                    return a;
-                }
-                if (b == (\(upperLimit)) || b == (\(lowerLimit))) {
-                    return b;
-                }
                 if ((a > \(zero) && b > \(zero)) || (a < \(zero) && b < \(zero))) {
                     return a - b;
                 } else if (a < \(zero) && b > \(zero)) {
@@ -454,7 +393,23 @@ public struct CFileCreator {
             }
             """
         }
-        return [multiplication, division, addition, subtraction].joined(separator: "\n\n")
+        let overflow = """
+        bool overflow_upper_\(sign.rawValue)(\(type) a)
+        {
+            return a == \(upperLimit);
+        }
+
+        bool overflow_lower_\(sign.rawValue)(\(type) a)
+        {
+            return a == \(lowerLimit);
+        }
+
+        bool overflow_\(sign.rawValue)(\(type) a)
+        {
+            return overflow_upper_\(sign.rawValue)(a) || overflow_lower_\(sign.rawValue)(a);
+        }
+        """
+        return [multiplication, division, addition, subtraction, overflow].joined(separator: "\n\n")
     }
 
     /// Default init.

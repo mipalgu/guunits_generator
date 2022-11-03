@@ -100,43 +100,8 @@ extension Velocity: OperationalTestable {
                             .replacingOccurrences(of: "\(v0)", with: s0Limits.0)
                         let upperCode = operation.swiftCode(sign: operationSign)
                             .replacingOccurrences(of: "\(v0)", with: s0Limits.1)
-                        let lowerOutput: String
-                        let upperOutput: String
-                        let increasingParams = [AnyUnit(v0)]
-                        if operation.isIncreasing(parameters: increasingParams) {
-                            if s1.numericType > s0.numericType {
-                                let signDifference = s1.numericType.swiftType.max /
-                                    s0.numericType.swiftType.max
-                                let difference = operation.increasingDifference(parameters: increasingParams)
-                                if abs(difference) > abs(signDifference) {
-                                    upperOutput = s1Limits.1
-                                } else {
-                                    upperOutput = upperCode
-                                }
-                            } else {
-                                upperOutput = s1Limits.1
-                            }
-                        } else {
-                            upperOutput = s1.numericType >= s0.numericType ? upperCode : s1Limits.1
-                        }
-                        if operation.isIncreasingNegative(parameters: increasingParams) {
-                            lowerOutput = s1.numericType <= s0.numericType ? lowerCode : s1Limits.0
-                        } else {
-                            if s1.numericType < s0.numericType {
-                                let signDifference = s1.numericType.swiftType.min /
-                                    s0.numericType.swiftType.min
-                                let difference = operation.increasingDifferenceNegative(
-                                    parameters: increasingParams
-                                )
-                                if abs(difference) > abs(signDifference) {
-                                    lowerOutput = s1Limits.0
-                                } else {
-                                    lowerOutput = lowerCode
-                                }
-                            } else {
-                                lowerOutput = s1Limits.0
-                            }
-                        }
+                        let lowerOutput = s1.numericType < s0.numericType ? s0Limits.0 : s1Limits.0
+                        let upperOutput = s1.numericType > s0.numericType ? s0Limits.1 : s1Limits.1
                         params[metaData] = [
                             TestParameters(input: s0Limits.0, output: "\(otherType)(\(lowerOutput))"),
                             TestParameters(input: s0Limits.1, output: "\(otherType)(\(upperOutput))")

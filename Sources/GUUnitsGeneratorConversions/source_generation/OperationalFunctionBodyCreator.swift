@@ -79,8 +79,42 @@ public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
         let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
         let cSign = needsDouble ? Signs.d : sign
         let code = conversion.cCode(sign: cSign)
-        return "    return " +
-            converter.convert(code, from: cSign.numericType, to: otherUnit, sign: otherSign) + ";"
+        let upperLimit = otherSign.numericType.limits.1
+        let lowerLimit = otherSign.numericType.limits.0
+        let numericType = sign.numericType.rawValue
+        let call = converter.convert("result", from: cSign.numericType, to: otherUnit, sign: otherSign)
+        guard sign.numericType.isSigned else {
+            return """
+                const \(numericType) unit = ((\(numericType)) (\(unit)));
+                if (overflow_upper_\(sign.rawValue)(unit)) {
+                    return \(upperLimit);
+                } else {
+                    const \(cSign.numericType.rawValue) result = \(code);
+                    if (overflow_upper_\(cSign.rawValue)(result)) {
+                        return \(upperLimit);
+                    } else {
+                        return \(call);
+                    }
+                }
+            """
+        }
+        return """
+            const \(numericType) unit = ((\(numericType)) (\(unit)));
+            if (overflow_upper_\(sign.rawValue)(unit)) {
+                return \(upperLimit);
+            } else if (overflow_lower_\(sign.rawValue)(unit)) {
+                return \(lowerLimit);
+            } else {
+                const \(cSign.numericType.rawValue) result = \(code);
+                if (overflow_upper_\(cSign.rawValue)(result)) {
+                    return \(upperLimit);
+                } else if (overflow_lower_\(cSign.rawValue)(result)) {
+                    return \(lowerLimit);
+                } else {
+                    return \(call);
+                }
+            }
+        """
     }
 
 }
