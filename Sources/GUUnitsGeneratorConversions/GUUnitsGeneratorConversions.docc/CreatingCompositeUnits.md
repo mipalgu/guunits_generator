@@ -376,11 +376,55 @@ public struct HeaderCreator {
 }
 ```
 
-### C Test Files TBD
+### C Test Generation
 
-## Swift Source Generation
+As our units work off a ``Operation``, we may automatically generate the test code by inspecting the
+structure of the categories `baseUnit` property. This process is automatically handled by conforming to
+a protocol called ``OperationalTestable`` and using the ``OperationalTestGenerator``.
 
-Finally, we must follow a similar procedure to add the swift sources.
+```swift
+extension Velocity: OperationalTestable {
+
+    public static let testParameters: [ConversionMetaData<Velocity>: [TestParameters]] = defaultParameters
+
+}
+```
+
+You can see in the code above, that we have conformed to ``OperationalTestable`` by creating a static stored
+property called `testParameters`. This property uses an underlying computed property called `defaultParameters`
+that is provided by ``OperationalTestable`` as part of it's default implementation. Using this property
+will create tests for a number of pre-defined values and edge cases. If you would like to add more custom
+tests, then you may add then to `testParameters` yourself. The ``ConversionMetaData`` type simply stores
+the conversion information, i.e. the type converting from and the type converting to.
+
+We may now follow the same process for adding tests as normal units, but instead we may use the ``OperationalTestGenerator``.
+Our test generation code in `GUUnitsGenerator.swift` will now contain the following lines for velocity:
+
+```swift
+public struct GUUnitsGenerator {
+
+    // ...
+
+    public func generateCTests(in path: URL) {
+        // ...
+        let velocityGenerator = OperationalTestGenerator<Velocity>()
+        let velocityFileCreator = TestFileCreator<OperationalTestGenerator<Velocity>>()
+        createTestFiles(
+            at: path,
+            with: velocityFileCreator.tests(generator: velocityGenerator, imports: "import CGUUnits")
+        )
+        // ...
+    }
+
+    // ...
+
+}
+
+```
+
+### Swift Source and Test Generation
+
+Finally, we must follow a similar procedure to add the swift sources and tests.
 
 ```swift
 public struct GUUnitsGenerator {
@@ -390,6 +434,14 @@ public struct GUUnitsGenerator {
     public func generateSwiftFiles(in path: URL) {
         // ...
         writeFile(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
+        // ...
+    }
+
+    /// Generate files that test the swift layer of guunits.
+    /// - Parameter path: The folder containing the test files.
+    public func generateSwiftTests(in path: URL) {
+        // ...
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<Velocity>()))
         // ...
     }
 

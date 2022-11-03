@@ -67,6 +67,9 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``TestFileCreator``
 - ``TestGenerator``
 - ``TestParameters``
+- ``OperationalTestable``
+- ``OperationalTestGenerator``
+- ``ConversionMetaData``
 
 ### Swift Test Generation
 - ``SwiftTestFileCreator``
