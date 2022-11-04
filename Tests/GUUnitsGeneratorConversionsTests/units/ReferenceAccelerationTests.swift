@@ -65,7 +65,7 @@ final class ReferenceAccelerationTests: XCTestCase, UnitsTestable {
         assert(
             value: ReferenceAcceleration.earthG,
             rawValue: "earthG",
-            abbreviation: "g",
+            abbreviation: "gs",
             description: "earthG"
         )
     }

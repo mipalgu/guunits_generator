@@ -69,7 +69,7 @@ extension ReferenceAcceleration: UnitProtocol {
     public var abbreviation: String {
         switch self {
         case .earthG:
-            return "g"
+            return "gs"
         }
     }
 
@@ -96,7 +96,7 @@ extension ReferenceAcceleration: UnitsConvertible {
 extension ReferenceAcceleration: UnitRelatable {
 
     /// The relationships that define conversions to other units within other categories.
-    static var relationships: [Relation] {
+    public static var relationships: [Relation] {
         [
             Relation(
                 source: AnyUnit(Self.earthG),
