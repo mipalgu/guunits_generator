@@ -173,7 +173,12 @@ public struct GUUnitsGenerator {
         let temperatureGenerator = AnyGenerator(
             generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
         )
-        let accelerationGenerator = AnyGenerator(generating: Acceleration.self, using: OperationalGenerator())
+        let accelerationGenerator = AnyGenerator(
+            generating: Acceleration.self, using: RelatableOperationalGenerator()
+        )
+        let referenceAccelerationGenerator = AnyGenerator(
+            generating: ReferenceAcceleration.self, using: RelatableOperationalGenerator()
+        )
         let massGenerator = AnyGenerator(
             generating: MassUnits.self, using: MassUnitsGenerator(unitDifference: [
                 .microgram: 1000,
@@ -196,6 +201,7 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
+                referenceAccelerationGenerator,
                 massGenerator,
                 velocityGenerator,
                 angularVelocityGenerator
@@ -217,6 +223,7 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
+                referenceAccelerationGenerator,
                 massGenerator,
                 velocityGenerator,
                 angularVelocityGenerator

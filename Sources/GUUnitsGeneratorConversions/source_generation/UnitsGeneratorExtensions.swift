@@ -100,38 +100,6 @@ extension UnitsGenerator where
 
 }
 
-/// Acceleration initialiser for C conversions.
-extension UnitsGenerator where
-    Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<Acceleration>,
-    CFunctionDefinitionCreator<Acceleration>, NumericTypeConverter> {
-
-    /// Initialise using Acceleration and c conversions.
-    public init() {
-        self.init(creator: CompositeFunctionCreator(
-            bodyCreator: OperationalFunctionBodyCreator(),
-            definitionCreator: CFunctionDefinitionCreator(),
-            numericConverter: NumericTypeConverter()
-        ))
-    }
-
-}
-
-/// Acceleration initialiser for CPP conversions.
-extension UnitsGenerator where
-    Creator == CompositeFunctionCreator<OperationalFunctionBodyCreator<Acceleration>,
-    CPPFunctionDefinitionCreator<Acceleration>, NumericTypeConverter> {
-
-    /// Initialise using Acceleration and cpp conversions.
-    public init() {
-        self.init(creator: CompositeFunctionCreator(
-            bodyCreator: OperationalFunctionBodyCreator(),
-            definitionCreator: CPPFunctionDefinitionCreator(),
-            numericConverter: NumericTypeConverter()
-        ))
-    }
-
-}
-
 /// MassUnits initialiser for C conversions.
 extension UnitsGenerator where
     Creator == CompositeFunctionCreator<GradualFunctionCreator<MassUnits>,
