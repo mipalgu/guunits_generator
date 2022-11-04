@@ -57,29 +57,31 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+/// Test class for ``Acceleration``.
+final class AccelerationTests: XCTestCase {
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
+    /// Test the base unit matches the Acceleration SI unit.
+    func testBaseUnit() {
+        let result = Acceleration.baseUnit
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .exponentiate(
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: .literal(declaration: .integer(value: 2))
+            )
         )
+        XCTAssertEqual(result, expected)
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
+    /// Test that the test parameters match the default parameters.
+    func testTestParameters() {
+        XCTAssertEqual(Acceleration.testParameters, Acceleration.defaultParameters)
     }
 
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// Test init sets properties correctly.
+    func testInit() {
+        let acceleration = Acceleration(unit: Acceleration.baseUnit)
+        XCTAssertEqual(acceleration.unit, Acceleration.baseUnit)
     }
 
 }
