@@ -57,6 +57,7 @@
 /// A unit that represents accelerations.
 public struct Acceleration: CompositeUnit {
 
+    /// The base unit is SI metres per second squared (m/s^2).
     public static let baseUnit: Operation = .division(
         lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
         rhs: .exponentiate(
@@ -65,18 +66,24 @@ public struct Acceleration: CompositeUnit {
         )
     )
 
+    /// The unit instance of this category.
     public var unit: Operation
 
+    /// Initialise the acceleration from an acceleration unit.
+    /// - Parameter unit: The acceleration unit represented as distance divided by time squared.
     public init(unit: Operation) {
         self.unit = unit
     }
 
 }
 
+/// Hashable conformance.
 extension Acceleration: Hashable {}
 
+/// ``UnitsConvertible`` and ``OperationalTestable`` conformance.
 extension Acceleration: UnitsConvertible, OperationalTestable {
 
+    /// The test parameters for this category.
     public static let testParameters: [ConversionMetaData<Acceleration>: [TestParameters]] = defaultParameters
 
 }
