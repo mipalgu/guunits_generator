@@ -107,7 +107,7 @@ extension Acceleration: UnitRelatable {
     }
 
     /// The related types that this category can convert into.
-    static var relationships: [Relation] {
+    public static var relationships: [Relation] {
         [
             Relation(
                 source: Acceleration.metresPerSecond2,

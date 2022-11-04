@@ -55,7 +55,7 @@
 // 
 
 /// Provides a mechanism for units to define conversion functions to units in other categories.
-protocol UnitRelatable {
+public protocol UnitRelatable {
 
     /// The related unit to units within this category.
     static var relationships: [Relation] { get }
