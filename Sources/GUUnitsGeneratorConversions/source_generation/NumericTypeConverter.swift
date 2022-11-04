@@ -71,12 +71,12 @@ public struct NumericTypeConverter: NumericConverterProtocol {
     ///   - unit: The unit type to convert into.
     ///   - sign: The sign of the new unit type.
     /// - Returns: Generated C-code that converts str into the new unit.
-    public func convert<Unit: UnitProtocol>(
+    public func convert<Unit>(
         _ str: String,
         from type: NumericTypes,
         to unit: Unit,
         sign: Signs
-    ) -> String {
+    ) -> String where Unit: CustomStringConvertible {
         self.convert(
             str,
             from: type,
