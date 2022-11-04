@@ -1,5 +1,5 @@
 /// Generator used for ``CompositeUnit`` types.
-public typealias OperationalGenerator<Unit: CompositeUnit> = UnitsGenerator<
+public typealias OperationalGenerator<Unit: UnitProtocol> = UnitsGenerator<
     CompositeFunctionCreator<
         OperationalFunctionBodyCreator<Unit>,
         CFunctionDefinitionCreator<Unit>,
