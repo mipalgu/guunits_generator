@@ -1,4 +1,4 @@
-// AccelerationUnits.swift 
+// Acceleration.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -55,32 +55,28 @@
 // 
 
 /// A unit that represents accelerations.
-public enum AccelerationUnits: String {
+public struct Acceleration: CompositeUnit {
 
-    /// Metres per second squared. (m/(s^2))
-    case metresPerSecond2
+    public static let baseUnit: Operation = .division(
+        lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+        rhs: .exponentiate(
+            base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+            power: .literal(declaration: .integer(value: 2))
+        )
+    )
 
-    /// g's. Acceleration normalised to Earths gravitational acceleration (9.807 m/(s^2))
-    case gs
+    public var unit: Operation
+
+    public init(unit: Operation) {
+        self.unit = unit
+    }
 
 }
 
-/// UnitProtocol conformance.
-extension AccelerationUnits: UnitProtocol {
+extension Acceleration: Hashable {}
 
-    /// The abbreviation of the unit.
-    public var abbreviation: String {
-        switch self {
-        case .metresPerSecond2:
-            return "mps2"
-        case .gs:
-            return "gs"
-        }
-    }
+extension Acceleration: UnitsConvertible, OperationalTestable {
 
-    /// The description of the unit.
-    public var description: String {
-        rawValue
-    }
+    public static let testParameters: [ConversionMetaData<Acceleration>: [TestParameters]] = defaultParameters
 
 }
