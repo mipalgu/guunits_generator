@@ -113,17 +113,21 @@ extension OperationalTestable where Self: UnitsConvertible {
                                     "(\(otherSign.numericType.swiftType.limits.1))"
                                 let min = "\(swiftSign.numericType.swiftType)" +
                                     "(\(otherSign.numericType.swiftType.limits.0))"
-                                code = "max(\(min), min(\(max), \(conversion)))"
+                                if swiftSign.isFloatingPoint {
+                                    let maxLimit = otherSign.numericType.swiftType.limits.1
+                                    let minLimit = otherSign.numericType.swiftType.limits.0
+                                    code = "((\(conversion)).rounded()) > (\(max)).nextDown ? (\(maxLimit))" +
+                                        " : ((((\(conversion)).rounded()) < (\(min)).nextUp) ? (\(minLimit)" +
+                                        ") : \(otherSign.numericType.swiftType)((\(conversion)).rounded()))"
+                                } else {
+                                    code = "max(\(min), min(\(max), \(conversion)))"
+                                }
                             } else {
                                 code = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
                             }
-                            guard swiftSign.isFloatingPoint && !otherSign.isFloatingPoint else {
-                                return TestParameters(
-                                    input: input, output: "\(otherUnit)_\(otherSign)(\(code))"
-                                )
-                            }
-                            let output = "\(otherUnit)_\(otherSign)((\(code)).rounded())"
-                            return TestParameters(input: input, output: output)
+                            return TestParameters(
+                                input: input, output: "\(otherUnit)_\(otherSign)(\(code))"
+                            )
                         }
                         parameters[data] = testParams
                     }
