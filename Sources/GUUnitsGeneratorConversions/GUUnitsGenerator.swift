@@ -173,9 +173,7 @@ public struct GUUnitsGenerator {
         let temperatureGenerator = AnyGenerator(
             generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
         )
-        let accelerationGenerator = AnyGenerator(
-            generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
-        )
+        let accelerationGenerator = AnyGenerator(generating: Acceleration.self, using: OperationalGenerator())
         let massGenerator = AnyGenerator(
             generating: MassUnits.self, using: MassUnitsGenerator(unitDifference: [
                 .microgram: 1000,
@@ -293,8 +291,8 @@ public struct GUUnitsGenerator {
         createTestFiles(
             at: path, with: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
         )
-        let accelerationGenerator = AccelerationTestGenerator()
-        let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
+        let accelerationGenerator = OperationalTestGenerator<Acceleration>()
+        let accelerationFileCreator = TestFileCreator<OperationalTestGenerator<Acceleration>>()
         createTestFiles(
             at: path,
             with: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
@@ -353,8 +351,8 @@ public struct GUUnitsGenerator {
         )
         writeFile(
             at: path,
-            with: AccelerationUnits.category,
-            and: swiftFileCreator.generate(for: AccelerationUnits.self)
+            with: Acceleration.category,
+            and: swiftFileCreator.generate(for: Acceleration.self)
         )
         writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
         writeFile(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
@@ -406,7 +404,9 @@ public struct GUUnitsGenerator {
             at: path, with: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
         )
         createTestFiles(at: path, with: swiftFileCreator.generate(with: TemperatureTestGenerator()))
-        createTestFiles(at: path, with: swiftFileCreator.generate(with: AccelerationTestGenerator()))
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<Acceleration>())
+        )
         createTestFiles(
             at: path,
             with: swiftFileCreator.generate(

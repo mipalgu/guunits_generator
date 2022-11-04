@@ -171,7 +171,7 @@ public struct HeaderCreator {
             ("// Image Units.", Array(ImageUnits.allCases)),
             ("// Percent Units.", Array(PercentUnits.allCases)),
             ("// Temperature Units.", Array(TemperatureUnits.allCases)),
-            ("// Acceleration Units.", Array(AccelerationUnits.allCases)),
+            ("// Acceleration Units.", Array(Acceleration.allCases)),
             ("// Mass Units.", Array(MassUnits.allCases)),
             ("// Velocity Units.", Array(Velocity.allCases)),
             ("// Angular Velocity Units.", Array(AngularVelocity.allCases))
