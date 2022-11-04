@@ -87,3 +87,37 @@ extension Acceleration: UnitsConvertible, OperationalTestable {
     public static let testParameters: [ConversionMetaData<Acceleration>: [TestParameters]] = defaultParameters
 
 }
+
+/// ``UnitRelatable`` conformance.
+extension Acceleration: UnitRelatable {
+
+    /// Add metresPerSecond static property for convenience.
+    static var metresPerSecond2: AnyUnit {
+        AnyUnit(
+            Acceleration(
+                unit: .division(
+                    lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                    rhs: .exponentiate(
+                        base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                        power: .literal(declaration: .integer(value: 2))
+                    )
+                )
+            )
+        )
+    }
+
+    /// The related types that this category can convert into.
+    static var relationships: [Relation] {
+        [
+            Relation(
+                source: Acceleration.metresPerSecond2,
+                target: AnyUnit(ReferenceAcceleration.earthG),
+                operation: .division(
+                    lhs: .constant(declaration: Acceleration.metresPerSecond2),
+                    rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
+                )
+            )
+        ]
+    }
+
+}

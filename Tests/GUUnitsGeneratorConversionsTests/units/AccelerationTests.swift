@@ -84,4 +84,37 @@ final class AccelerationTests: XCTestCase {
         XCTAssertEqual(acceleration.unit, Acceleration.baseUnit)
     }
 
+    /// Test metresPerSecond2 is set correctly.
+    func testMetresPerSecond2() {
+        let result = Acceleration.metresPerSecond2
+        let expected = AnyUnit(
+            Acceleration(
+                unit: .division(
+                    lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                    rhs: .exponentiate(
+                        base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                        power: .literal(declaration: .integer(value: 2))
+                    )
+                )
+            )
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test relationships contain the operation to Earth G.
+    func testRelationships() {
+        let result = Acceleration.relationships
+        let expected = [
+            Relation(
+                source: Acceleration.metresPerSecond2,
+                target: AnyUnit(ReferenceAcceleration.earthG),
+                operation: .division(
+                    lhs: .constant(declaration: Acceleration.metresPerSecond2),
+                    rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
+                )
+            )
+        ]
+        XCTAssertEqual(result, expected)
+    }
+
 }
