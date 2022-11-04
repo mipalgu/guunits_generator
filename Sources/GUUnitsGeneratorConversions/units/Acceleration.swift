@@ -54,7 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit that represents accelerations.
+/// A unit that represents Acceleration in SI units.
 public struct Acceleration: CompositeUnit {
 
     /// The base unit is SI metres per second squared (m/s^2).
