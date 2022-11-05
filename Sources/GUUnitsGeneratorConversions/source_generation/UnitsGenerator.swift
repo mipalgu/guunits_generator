@@ -110,6 +110,11 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         return functionImplementations + "\n\n" + relationImplementations
     }
 
+    /// Generates the function definitions for conversions outside of a unit category. This functions
+    /// inspects the contents of the `relationships` static property inside the unit.
+    /// - Parameter unit: The type of the source unit to generate conversion functions for.
+    /// - Returns: A string of function definitions containing a comment and separated
+    /// by `\n\n` characters.
     private func generateRelationDeclarations(forUnit unit: Unit.Type) -> String {
         let declarations: [String] = unit.relationships.flatMap { relationship in
             Signs.allCases.flatMap { sign in
@@ -132,6 +137,11 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         return declarations.joined(separator: "\n\n")
     }
 
+    /// Generates the function implementations for conversions to units outside of a units category.
+    /// This function inspects the contents of the `relationships` static property inside the unit.
+    /// - Parameter unit: The source type to generate the conversion for.
+    /// - Returns: A string of function implementations containing a comment and separated
+    /// by `\n\n` characters.
     private func generateRelationImplementation(forUnit unit: Unit.Type) -> String {
         let implementations: [String] = unit.relationships.flatMap { relationship in
             Signs.allCases.flatMap { sign in
@@ -143,6 +153,14 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         return implementations.joined(separator: "\n\n")
     }
 
+    // swiftlint:disable function_body_length
+
+    /// Generate the function body for a conversion to a unit outside of a units category.
+    /// - Parameters:
+    ///   - relationship: The conversion to generate.
+    ///   - sign: The sign of the source unit.
+    ///   - otherSign: The sign of the target unit.
+    /// - Returns: A string containing the C code to perform the conversion.
     private func implementation(for relationship: Relation, sign: Signs, otherSign: Signs) -> String {
         let source = relationship.source.description
         let sourceType = "\(source)_\(sign.rawValue)"
@@ -207,6 +225,8 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         }
         """
     }
+
+    // swiftlint:enable function_body_length
 
     /// Generates the conversion function definitions for the given units.
     /// - Parameters:
