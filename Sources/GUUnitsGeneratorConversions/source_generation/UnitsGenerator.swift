@@ -119,22 +119,7 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         let declarations: [String] = unit.relationships.flatMap { relationship in
             Signs.allCases.flatMap { sign in
                 Signs.allCases.map { otherSign in
-                    let parameters = relationship.operation.units.map {
-                        "\($0)_\(sign.rawValue) \($0)"
-                    }
-                    .joined(separator: ", ")
-                    let source = relationship.source.description
-                    let sourceType = "\(source)_\(sign.rawValue)"
-                    let returnType = relationship.target.description + "_\(otherSign.rawValue)"
-                    let name = relationship.source.abbreviation + "_\(sign.rawValue)_to_" +
-                        relationship.target.abbreviation + "_\(otherSign.rawValue)"
-                    let comment = """
-                    /**
-                    * Convert \(sourceType) to \(returnType).
-                    */
-                    """
-                    let definition = "\(returnType) \(name)(\(parameters))"
-                    return comment + "\n" + definition + ";"
+                    relationship.definition(sign: sign, otherSign: otherSign)
                 }
             }
         }
@@ -150,105 +135,12 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         let implementations: [String] = unit.relationships.flatMap { relationship in
             Signs.allCases.flatMap { sign in
                 Signs.allCases.map { otherSign in
-                    self.implementation(for: relationship, sign: sign, otherSign: otherSign)
+                    relationship.implementation(sign: sign, otherSign: otherSign)
                 }
             }
         }
         return implementations.joined(separator: "\n\n")
     }
-
-    // swiftlint:disable function_body_length
-
-    /// Generate the function body for a conversion to a unit outside of a units category.
-    /// - Parameters:
-    ///   - relationship: The conversion to generate.
-    ///   - sign: The sign of the source unit.
-    ///   - otherSign: The sign of the target unit.
-    /// - Returns: A string containing the C code to perform the conversion.
-    private func implementation(for relationship: Relation, sign: Signs, otherSign: Signs) -> String {
-        let inputs = relationship.operation.units
-        let parameters = inputs.map {
-            "\($0)_\(sign.rawValue) \($0)"
-        }
-        .joined(separator: ", ")
-        let source = relationship.source.description
-        let sourceType = "\(source)_\(sign.rawValue)"
-        let returnType = relationship.target.description + "_\(otherSign.rawValue)"
-        let name = relationship.source.abbreviation + "_\(sign.rawValue)_to_" +
-            relationship.target.abbreviation + "_\(otherSign.rawValue)"
-        let comment = """
-        /**
-        * Convert \(sourceType) to \(returnType).
-        */
-        """
-        let definition = "\(returnType) \(name)(\(parameters))"
-        let numericType = sign.numericType.rawValue
-        let unitDefs = inputs.enumerated()
-        .map {
-            "    const \(numericType) unit\($0) = ((\(numericType)) (\($1)));"
-        }
-        .joined(separator: "\n")
-        let upperOverflow = inputs.indices.map {
-            "overflow_upper_\(sign.rawValue)(unit\($0))"
-        }
-        .joined(separator: " || ")
-        let lowerOverflow = inputs.indices.map {
-            "overflow_lower_\(sign.rawValue)(unit\($0))"
-        }
-        .joined(separator: " || ")
-        let conversion = relationship.operation
-        let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
-        let cSign = needsDouble ? Signs.d : sign
-        let code = conversion.cCode(sign: cSign)
-        let upperLimit = otherSign.numericType.limits.1
-        let lowerLimit = otherSign.numericType.limits.0
-        let call = converter.convert(
-            "result", from: cSign.numericType, to: relationship.target, sign: otherSign
-        )
-        let implementation: String
-        if !sign.numericType.isSigned {
-            implementation = """
-            \(unitDefs)
-                if (__builtin_expect((\(upperOverflow)), 0)) {
-                    return \(upperLimit);
-                } else {
-                    const \(cSign.numericType.rawValue) result = \(code);
-                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
-                        return \(upperLimit);
-                    } else {
-                        return \(call);
-                    }
-                }
-            """
-        } else {
-            implementation = """
-            \(unitDefs)
-                if (__builtin_expect(\(upperOverflow), 0)) {
-                    return \(upperLimit);
-                } else if (__builtin_expect((\(lowerOverflow)), 0)) {
-                    return \(lowerLimit);
-                } else {
-                    const \(cSign.numericType.rawValue) result = \(code);
-                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
-                        return \(upperLimit);
-                    } else if (__builtin_expect(overflow_lower_\(cSign.rawValue)(result), 0)) {
-                        return \(lowerLimit);
-                    } else {
-                        return \(call);
-                    }
-                }
-            """
-        }
-        return """
-        \(comment)
-        \(definition)
-        {
-        \(implementation)
-        }
-        """
-    }
-
-    // swiftlint:enable function_body_length
 
     /// Generates the conversion function definitions for the given units.
     /// - Parameters:

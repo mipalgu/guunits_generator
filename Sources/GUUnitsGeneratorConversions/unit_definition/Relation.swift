@@ -86,4 +86,134 @@ public struct Relation {
 }
 
 /// Equatable conformance.
-extension Relation: Equatable {}
+extension Relation: Hashable {}
+
+extension Relation {
+
+    /// Defines the C function definition for the Relation.
+    /// - Parameters:
+    ///   - sign: The sign of the source unit.
+    ///   - otherSign: The sign of the target unit.
+    /// - Returns: The C function definition.
+    func definition(sign: Signs, otherSign: Signs) -> String {
+        let parameters = self.operation.units.map {
+            "\($0)_\(sign.rawValue) \($0)"
+        }
+        .joined(separator: ", ")
+        let source = self.source.description
+        let sourceType = "\(source)_\(sign.rawValue)"
+        let returnType = self.target.description + "_\(otherSign.rawValue)"
+        let name = name(sign: sign, otherSign: otherSign)
+        let comment = """
+        /**
+        * Convert \(sourceType) to \(returnType).
+        */
+        """
+        let definition = "\(returnType) \(name)(\(parameters))"
+        return comment + "\n" + definition + ";"
+    }
+
+    // swiftlint:disable function_body_length
+
+    /// Generate the function body for a conversion to a unit outside of a units category.
+    /// - Parameters:
+    ///   - relationship: The conversion to generate.
+    ///   - sign: The sign of the source unit.
+    ///   - otherSign: The sign of the target unit.
+    /// - Returns: A string containing the C code to perform the conversion.
+    func implementation(sign: Signs, otherSign: Signs) -> String {
+        let converter = NumericTypeConverter()
+        let inputs = self.operation.units
+        let parameters = inputs.map {
+            "\($0)_\(sign.rawValue) \($0)"
+        }
+        .joined(separator: ", ")
+        let source = self.source.description
+        let sourceType = "\(source)_\(sign.rawValue)"
+        let returnType = self.target.description + "_\(otherSign.rawValue)"
+        let name = name(sign: sign, otherSign: otherSign)
+        let comment = """
+        /**
+        * Convert \(sourceType) to \(returnType).
+        */
+        """
+        let definition = "\(returnType) \(name)(\(parameters))"
+        let numericType = sign.numericType.rawValue
+        let unitDefs = inputs.enumerated()
+        .map {
+            "    const \(numericType) unit\($0) = ((\(numericType)) (\($1)));"
+        }
+        .joined(separator: "\n")
+        let upperOverflow = inputs.indices.map {
+            "overflow_upper_\(sign.rawValue)(unit\($0))"
+        }
+        .joined(separator: " || ")
+        let lowerOverflow = inputs.indices.map {
+            "overflow_lower_\(sign.rawValue)(unit\($0))"
+        }
+        .joined(separator: " || ")
+        let conversion = self.operation
+        let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
+        let cSign = needsDouble ? Signs.d : sign
+        let code = conversion.cCode(sign: cSign)
+        let upperLimit = otherSign.numericType.limits.1
+        let lowerLimit = otherSign.numericType.limits.0
+        let call = converter.convert(
+            "result", from: cSign.numericType, to: self.target, sign: otherSign
+        )
+        let implementation: String
+        if !sign.numericType.isSigned {
+            implementation = """
+            \(unitDefs)
+                if (__builtin_expect((\(upperOverflow)), 0)) {
+                    return \(upperLimit);
+                } else {
+                    const \(cSign.numericType.rawValue) result = \(code);
+                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return \(call);
+                    }
+                }
+            """
+        } else {
+            implementation = """
+            \(unitDefs)
+                if (__builtin_expect(\(upperOverflow), 0)) {
+                    return \(upperLimit);
+                } else if (__builtin_expect((\(lowerOverflow)), 0)) {
+                    return \(lowerLimit);
+                } else {
+                    const \(cSign.numericType.rawValue) result = \(code);
+                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
+                        return \(upperLimit);
+                    } else if (__builtin_expect(overflow_lower_\(cSign.rawValue)(result), 0)) {
+                        return \(lowerLimit);
+                    } else {
+                        return \(call);
+                    }
+                }
+            """
+        }
+        return """
+        \(comment)
+        \(definition)
+        {
+        \(implementation)
+        }
+        """
+    }
+
+    // swiftlint:enable function_body_length
+
+    /// The C function name for this conversion.
+    /// - Parameters:
+    ///   - sign: The sign of the source type.
+    ///   - otherSign: The sign of the target type.
+    /// - Returns: The C function name of this conversion.
+    func name(sign: Signs, otherSign: Signs) -> String {
+        self.source.abbreviation + "_\(sign.rawValue)_to_" +
+            self.target.abbreviation + "_\(otherSign.rawValue)"
+    }
+
+}

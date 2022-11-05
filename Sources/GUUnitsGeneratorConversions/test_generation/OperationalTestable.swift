@@ -61,6 +61,87 @@ public protocol OperationalTestable where Self: UnitProtocol {
     /// The ``TestParameters`` for each conversion.
     static var testParameters: [ConversionMetaData<Self>: [TestParameters]] { get }
 
+    static var relationTests: [UnitConversion: [TestParameters]] { get }
+
+}
+
+private extension Relation {
+
+    init<Unit>(metaData: ConversionMetaData<Unit>) where Unit: UnitsConvertible {
+        self.source = AnyUnit(metaData.unit)
+        self.target = AnyUnit(metaData.otherUnit)
+        self.operation = metaData.unit.conversion(to: metaData.otherUnit)
+    }
+
+}
+
+extension OperationalTestable {
+
+    public static var relationTests: [UnitConversion: [TestParameters]] {
+        Dictionary(uniqueKeysWithValues: Self.relationships.flatMap { relationship in
+            Signs.allCases.flatMap { sign in
+                Signs.allCases.map { otherSign in
+                    (
+                        UnitConversion(relation: relationship, sourceSign: sign, targetSign: otherSign),
+                        [-5_000_000, 0, 5_000_000].compactMap { value in
+                            guard
+                                sign.numericType.isSigned || (!sign.numericType.isSigned && value >= 0)
+                            else {
+                                return nil
+                            }
+                            return self.toTestParameter(
+                                relationship: relationship, sign: sign, otherSign: otherSign, value: value
+                            )
+                        }
+                    )
+                }
+            }
+        })
+    }
+
+    fileprivate static func toTestParameter(
+        relationship: Relation, sign: Signs, otherSign: Signs, value: Int
+    ) -> TestParameters {
+        let input = "\(value)"
+        let conversion = relationship.operation
+        let unit = relationship.source
+        let otherUnit = relationship.target
+        let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint ||
+            conversion.hasFloatOperation
+        let simplifiedConversion = conversion.replace(
+            convertibles: [
+                unit: Operation.literal(declaration: .integer(value: value))
+            ]
+        )
+        let swiftSign = needsDouble ? Signs.d : sign
+        let code: String
+        if swiftSign != .d && swiftSign != .f && !sign.isFloatingPoint &&
+            !otherSign.isFloatingPoint {
+            code = "\(otherSign.numericType.swiftType.rawValue)" +
+                "(clamping: \(simplifiedConversion.swiftCode(sign: swiftSign)))"
+        } else if !otherSign.isFloatingPoint {
+            let conversion = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
+            let max = "\(swiftSign.numericType.swiftType)" +
+                "(\(otherSign.numericType.swiftType.limits.1))"
+            let min = "\(swiftSign.numericType.swiftType)" +
+                "(\(otherSign.numericType.swiftType.limits.0))"
+            if swiftSign.isFloatingPoint {
+                let maxLimit = otherSign.numericType.swiftType.limits.1
+                let minLimit = otherSign.numericType.swiftType.limits.0
+                code = "((\(conversion)).rounded()) > (\(max)).nextDown ? (\(maxLimit))" +
+                    " : ((((\(conversion)).rounded()) < (\(min)).nextUp) ? (\(minLimit)" +
+                    ") : \(otherSign.numericType.swiftType)((\(conversion)).rounded()))"
+            } else {
+                code = "max(\(min), min(\(max), \(conversion)))"
+            }
+        } else {
+            code = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
+        }
+        return TestParameters(
+            input: input, output: "\(otherUnit)_\(otherSign)(\(code))"
+        )
+    }
+
 }
 
 /// Helper static variables providing default test parameters for convertible units.
@@ -92,41 +173,11 @@ extension OperationalTestable where Self: UnitsConvertible {
                             ($0 < 0 && sign != .u) || $0 >= 0
                         }
                         .map {
-                            let input = "\($0)"
-                            let conversion = unit.conversion(to: otherUnit)
-                            let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint ||
-                                conversion.hasFloatOperation
-                            let simplifiedConversion = conversion.replace(
-                                convertibles: [
-                                    AnyUnit(unit): Operation.literal(declaration: .integer(value: $0))
-                                ]
-                            )
-                            let swiftSign = needsDouble ? Signs.d : sign
-                            let code: String
-                            if swiftSign != .d && swiftSign != .f && !sign.isFloatingPoint &&
-                                !otherSign.isFloatingPoint {
-                                code = "\(otherSign.numericType.swiftType.rawValue)" +
-                                    "(clamping: \(simplifiedConversion.swiftCode(sign: swiftSign)))"
-                            } else if !otherSign.isFloatingPoint {
-                                let conversion = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
-                                let max = "\(swiftSign.numericType.swiftType)" +
-                                    "(\(otherSign.numericType.swiftType.limits.1))"
-                                let min = "\(swiftSign.numericType.swiftType)" +
-                                    "(\(otherSign.numericType.swiftType.limits.0))"
-                                if swiftSign.isFloatingPoint {
-                                    let maxLimit = otherSign.numericType.swiftType.limits.1
-                                    let minLimit = otherSign.numericType.swiftType.limits.0
-                                    code = "((\(conversion)).rounded()) > (\(max)).nextDown ? (\(maxLimit))" +
-                                        " : ((((\(conversion)).rounded()) < (\(min)).nextUp) ? (\(minLimit)" +
-                                        ") : \(otherSign.numericType.swiftType)((\(conversion)).rounded()))"
-                                } else {
-                                    code = "max(\(min), min(\(max), \(conversion)))"
-                                }
-                            } else {
-                                code = "\(simplifiedConversion.swiftCode(sign: swiftSign))"
-                            }
-                            return TestParameters(
-                                input: input, output: "\(otherUnit)_\(otherSign)(\(code))"
+                            self.toTestParameter(
+                                relationship: Relation(metaData: data),
+                                sign: sign,
+                                otherSign: otherSign,
+                                value: $0
                             )
                         }
                         parameters[data] = testParams
