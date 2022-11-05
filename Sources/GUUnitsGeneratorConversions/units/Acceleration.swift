@@ -119,9 +119,9 @@ extension Acceleration: UnitRelatable {
             lhs: .constant(declaration: Acceleration.metresPerSecond2),
             rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
         )
+        let target = AnyUnit(ReferenceAcceleration.earthG)
         return Self.allCases.map {
             let unit = AnyUnit($0)
-            let target = AnyUnit(ReferenceAcceleration.earthG)
             guard unit != Acceleration.metresPerSecond2 else {
                 return Relation(
                     source: unit, target: target, operation: operation
