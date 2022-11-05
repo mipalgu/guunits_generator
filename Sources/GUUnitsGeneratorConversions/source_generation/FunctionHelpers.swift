@@ -215,6 +215,21 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
         )
     }
 
+    func testFunctionName(
+        from unit: AnyUnit,
+        with sign: Signs,
+        to otherUnit: AnyUnit,
+        with otherSign: Signs,
+        using parameters: TestParameters
+    ) -> String {
+        doTestFunctionName(
+            from: "\(unit.description)_\(sign.rawValue)",
+            to: "\(otherUnit.description)_\(otherSign.rawValue)",
+            with: "\(parameters.input)",
+            expecting: "\(parameters.output)"
+        )
+    }
+
     /// Create the name of a function that test a conversion function.
     /// - Parameters:
     ///   - unit: The unit to convert from.
