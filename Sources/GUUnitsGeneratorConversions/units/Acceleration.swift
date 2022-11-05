@@ -108,16 +108,30 @@ extension Acceleration: UnitRelatable {
 
     /// The related types that this category can convert into.
     public static var relationships: [Relation] {
-        [
-            Relation(
-                source: Acceleration.metresPerSecond2,
-                target: AnyUnit(ReferenceAcceleration.earthG),
-                operation: .division(
-                    lhs: .constant(declaration: Acceleration.metresPerSecond2),
-                    rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
-                )
+        let mps2 = Operation.division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+            rhs: .exponentiate(
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                power: .literal(declaration: .integer(value: 2))
             )
-        ]
+        )
+        let operation = Operation.division(
+            lhs: .constant(declaration: Acceleration.metresPerSecond2),
+            rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
+        )
+        return Self.allCases.map {
+            let unit = AnyUnit($0)
+            let target = AnyUnit(ReferenceAcceleration.earthG)
+            guard unit != Acceleration.metresPerSecond2 else {
+                return Relation(
+                    source: unit, target: target, operation: operation
+                )
+            }
+            let newOperation = operation.replace(
+                convertibles: [Acceleration.metresPerSecond2: $0.conversion(to: Acceleration(unit: mps2))]
+            )
+            return Relation(source: unit, target: target, operation: newOperation)
+        }
     }
 
 }
