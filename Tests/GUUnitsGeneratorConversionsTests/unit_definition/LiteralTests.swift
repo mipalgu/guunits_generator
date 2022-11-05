@@ -98,4 +98,28 @@ final class LiteralTests: XCTestCase {
         XCTAssertTrue(doubleLiteral.isFloat)
     }
 
+    /// Test isZero property.
+    func testIsZero() {
+        let literal = Literal.integer(value: 0)
+        let literal2 = Literal.decimal(value: 0.0)
+        let literal3 = Literal.integer(value: 1)
+        let literal4 = Literal.decimal(value: 1.0)
+        XCTAssertTrue(literal.isZero)
+        XCTAssertTrue(literal2.isZero)
+        XCTAssertFalse(literal3.isZero)
+        XCTAssertFalse(literal4.isZero)
+    }
+
+    /// Test isOne property.
+    func testIsOne() {
+        let literal = Literal.integer(value: 0)
+        let literal2 = Literal.decimal(value: 0.0)
+        let literal3 = Literal.integer(value: 1)
+        let literal4 = Literal.decimal(value: 1.0)
+        XCTAssertFalse(literal.isOne)
+        XCTAssertFalse(literal2.isOne)
+        XCTAssertTrue(literal3.isOne)
+        XCTAssertTrue(literal4.isOne)
+    }
+
 }

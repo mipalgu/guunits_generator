@@ -120,6 +120,7 @@ public enum Literal: Hashable, CustomStringConvertible {
         }
     }
 
+    /// Check whether `self` is equal to 0.
     var isZero: Bool {
         switch self {
         case .integer(let value):
@@ -129,6 +130,7 @@ public enum Literal: Hashable, CustomStringConvertible {
         }
     }
 
+    /// Check whether `self` is equal to 1.
     var isOne: Bool {
         switch self {
         case .integer(let value):
