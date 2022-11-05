@@ -69,6 +69,11 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
     /// The body creator for generating test function code.
     private let bodyCreator = TestFunctionBodyCreator<Unit>()
 
+    /// Converts the generated test parameters into test classes.
+    /// - Parameters:
+    ///   - generator: The generator creating the test parameters.
+    ///   - imports: Imports that are placed at the top of this file.
+    /// - Returns: An array of tuples containing the name of the files and the class definitions.
     private func doTests(generator: TestGeneratorType, imports: String) -> [(String, String)] {
         let head = "\(imports)\nimport Foundation\nimport XCTest"
         let unitTests: [(String, [[String]])] = Unit.allCases.flatMap { unit in
