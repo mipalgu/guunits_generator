@@ -1,4 +1,4 @@
-# ``GUUnitsGeneratorConversions``
+# GUUnitsGeneratorConversions
 
 A target for generating the GUUnits package.
 
@@ -35,6 +35,7 @@ Usage: guunits_generator [-h] [-d <directory>]
 - <doc:CreatingNewUnits>
 - <doc:UsingCustomCodeGeneration>
 - <doc:CreatingCompositeUnits>
+- <doc:ConvertingBetweenCategories>
 
 ### C Source Generation
 - ``AccelerationFunctionCreator``
@@ -70,6 +71,7 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``OperationalTestable``
 - ``OperationalTestGenerator``
 - ``ConversionMetaData``
+- ``UnitConversion``
 
 ### Swift Test Generation
 - ``SwiftTestFileCreator``
@@ -81,13 +83,15 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``NamedUnit``
 - ``NumericTypes``
 - ``Operation``
+- ``Relation``
 - ``Signs``
 - ``SwiftNumericTypes``
 - ``UnitProtocol``
+- ``UnitRelatable``
 - ``UnitsConvertible``
 
 ### Supported Units
-- ``AccelerationUnits``
+- ``Acceleration``
 - ``AngleUnits``
 - ``AngularVelocity``
 - ``CurrentUnits``
@@ -95,6 +99,7 @@ Usage: guunits_generator [-h] [-d <directory>]
 - ``ImageUnits``
 - ``MassUnits``
 - ``PercentUnits``
+- ``ReferenceAcceleration``
 - ``TemperatureUnits``
 - ``TimeUnits``
 - ``Velocity``
