@@ -60,6 +60,9 @@ import XCTest
 /// Test class for ``Operation`` code generation functions.
 final class OperationConvertiblesTests: XCTestCase {
 
+    /// A one literal.
+    let one = Operation.literal(declaration: .integer(value: 1))
+
     /// The operaiton under test. SI Newton.
     let operation = Operation.division(
         lhs: .multiplication(
@@ -177,6 +180,62 @@ final class OperationConvertiblesTests: XCTestCase {
         )
         let result = operation.simplify
         let expected = Operation.literal(declaration: .integer(value: 2))
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test simplify does nothing for simplist form of division.
+    func testSimplistDivide() {
+        let operation = Operation.division(
+            lhs: .literal(declaration: .integer(value: 3)), rhs: .literal(declaration: .integer(value: 2))
+        )
+        let result = operation.simplify
+        XCTAssertEqual(result, operation)
+    }
+
+    /// Test multiplying 1 with 1 reduces to literal 1.
+    func testSimplifyMultiplication1And1() {
+        let operation = Operation.multiplication(lhs: one, rhs: one)
+        let result = operation.simplify
+        XCTAssertEqual(result, one)
+    }
+
+    /// Test multiplying with lhs = 1 reduces to rhs.
+    func testSimplifyMultiplyLHSIs1() {
+        let operation = Operation.multiplication(lhs: one, rhs: .literal(declaration: .integer(value: 2)))
+        let result = operation.simplify
+        XCTAssertEqual(result, .literal(declaration: .integer(value: 2)))
+    }
+
+    /// Test multiplying with rhs = 1 reduces to lhs.
+    func testSimplifyMultiplyRHSIs1() {
+        let operation = Operation.multiplication(lhs: .literal(declaration: .integer(value: 2)), rhs: one)
+        let result = operation.simplify
+        XCTAssertEqual(result, .literal(declaration: .integer(value: 2)))
+    }
+
+    /// Test remove redundent multiply.
+    func testSimplifyInMultiplyWhereLHSIs1OverSomething() {
+        let operation = Operation.multiplication(
+            lhs: .division(lhs: one, rhs: .literal(declaration: .integer(value: 2))),
+            rhs: .literal(declaration: .integer(value: 3))
+        )
+        let result = operation.simplify
+        let expected = Operation.division(
+            lhs: .literal(declaration: .integer(value: 3)), rhs: .literal(declaration: .integer(value: 2))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test remove other situation with redundent multiply.
+    func testSimplifyInMultiplyWhereRHSIs1OverSomething() {
+        let operation = Operation.multiplication(
+            lhs: .literal(declaration: .integer(value: 2)),
+            rhs: .division(lhs: one, rhs: .literal(declaration: .integer(value: 3)))
+        )
+        let result = operation.simplify
+        let expected = Operation.division(
+            lhs: .literal(declaration: .integer(value: 2)), rhs: .literal(declaration: .integer(value: 3))
+        )
         XCTAssertEqual(result, expected)
     }
 
