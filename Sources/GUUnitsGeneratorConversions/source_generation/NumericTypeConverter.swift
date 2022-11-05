@@ -241,7 +241,7 @@ public struct NumericTypeConverter: NumericConverterProtocol {
     /// - Returns: The sanitised literal.
     private func sanitise(literal: String, to type: NumericTypes) -> String {
         guard
-            nil == literal.first(where: {
+            !literal.contains(where: {
                 guard let scalar = Unicode.Scalar(String($0)) else {
                     return true
                 }

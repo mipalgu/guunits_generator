@@ -226,7 +226,7 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
                 """
             let definition = self.creator
                 .functionDefinition(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
-            if false == includeImplementation {
+            if !includeImplementation {
                 return comment + "\n" + definition + ";"
             }
             let body = self.creator
@@ -250,7 +250,7 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
                  */
                 """
             let definition = self.creator.functionDefinition(forUnit: unit, sign: sign, to: type)
-            if false == includeImplementation {
+            if !includeImplementation {
                 return comment + "\n" + definition + ";"
             }
             let body = self.creator.convert("\(unit)", from: unit, sign: sign, to: type)
@@ -273,7 +273,7 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
              */
             """
             let definition = self.creator.functionDefinition(from: type, to: unit, sign: sign)
-            if false == includeImplementation {
+            if !includeImplementation {
                 return comment + "\n" + definition + ";"
             }
             let body = self.creator.convert("\(unit)", from: type, to: unit, sign: sign)
