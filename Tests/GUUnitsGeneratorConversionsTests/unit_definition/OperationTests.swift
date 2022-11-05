@@ -279,4 +279,11 @@ final class OperationTests: XCTestCase {
         XCTAssertFalse(operation3.hasFloatOperation)
     }
 
+    /// Test units property returns all units in the Operation.
+    func testUnits() {
+        let units = operation.units
+        let expected = [AnyUnit(DistanceUnits.metres), AnyUnit(TimeUnits.seconds)]
+        XCTAssertEqual(units, expected)
+    }
+
 }

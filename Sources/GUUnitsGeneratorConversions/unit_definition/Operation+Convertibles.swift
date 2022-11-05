@@ -84,6 +84,7 @@ extension Operation {
         }
     }
 
+    /// Tries to reduce the Operation into less operations where applicable.
     var simplify: Operation {
         switch self {
         case .constant, .literal:
@@ -92,13 +93,6 @@ extension Operation {
             let newLhs = lhs.simplify
             let newRhs = rhs.simplify
             if newLhs == newRhs {
-                return .literal(declaration: .integer(value: 1))
-            }
-            if
-                case .literal(let value1) = newLhs,
-                case .literal(let value2) = newRhs,
-                value1.isOne && value2.isOne
-            {
                 return .literal(declaration: .integer(value: 1))
             }
             if case .literal(let value) = newRhs, value.isOne {

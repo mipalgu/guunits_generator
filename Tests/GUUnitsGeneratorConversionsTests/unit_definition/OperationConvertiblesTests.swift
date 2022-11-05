@@ -150,4 +150,34 @@ final class OperationConvertiblesTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test dividing by self creates literal 1.
+    func testSimplifyEqualDivide() {
+        let operation = Operation.division(
+            lhs: .literal(declaration: .integer(value: 2)), rhs: .literal(declaration: .integer(value: 2))
+        )
+        let result = operation.simplify
+        let expected = Operation.literal(declaration: .integer(value: 1))
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test numerator and denominator are 1 produce literal 1.
+    func testSimplifyDivideNumeratorAndDenominatorIs1() {
+        let operation = Operation.division(
+            lhs: .literal(declaration: .integer(value: 1)), rhs: .literal(declaration: .integer(value: 1))
+        )
+        let result = operation.simplify
+        let expected = Operation.literal(declaration: .integer(value: 1))
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Dividing by 1 returns the numerator.
+    func testSimplifyDivideBy1() {
+        let operation = Operation.division(
+            lhs: .literal(declaration: .integer(value: 2)), rhs: .literal(declaration: .integer(value: 1))
+        )
+        let result = operation.simplify
+        let expected = Operation.literal(declaration: .integer(value: 2))
+        XCTAssertEqual(result, expected)
+    }
+
 }
