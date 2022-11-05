@@ -174,10 +174,10 @@ public struct GUUnitsGenerator {
             generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
         )
         let accelerationGenerator = AnyGenerator(
-            generating: Acceleration.self, using: RelatableOperationalGenerator()
+            generating: Acceleration.self, using: OperationalGenerator()
         )
         let referenceAccelerationGenerator = AnyGenerator(
-            generating: ReferenceAcceleration.self, using: RelatableOperationalGenerator()
+            generating: ReferenceAcceleration.self, using: OperationalGenerator()
         )
         let massGenerator = AnyGenerator(
             generating: MassUnits.self, using: MassUnitsGenerator(unitDifference: [

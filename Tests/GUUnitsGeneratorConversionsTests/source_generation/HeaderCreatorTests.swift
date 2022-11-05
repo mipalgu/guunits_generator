@@ -105,7 +105,7 @@ final class HeaderCreatorTests: XCTestCase {
 
     /// The acceleration generator.
     let accelerationGenerator = AnyGenerator(
-        generating: Acceleration.self, using: RelatableOperationalGenerator()
+        generating: Acceleration.self, using: OperationalGenerator()
     )
 
     /// The header of the file.

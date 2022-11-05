@@ -61,3 +61,13 @@ public protocol UnitRelatable {
     static var relationships: [Relation] { get }
 
 }
+
+/// Default implementation.
+extension UnitRelatable {
+
+    /// A unit has no relationships by default.
+    public static var relationships: [Relation] {
+        []
+    }
+
+}
