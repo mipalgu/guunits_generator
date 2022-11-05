@@ -120,6 +120,24 @@ public enum Literal: Hashable, CustomStringConvertible {
         }
     }
 
+    var isZero: Bool {
+        switch self {
+        case .integer(let value):
+            return value == 0
+        case .decimal(let value):
+            return value.isZero
+        }
+    }
+
+    var isOne: Bool {
+        switch self {
+        case .integer(let value):
+            return value == 1
+        case .decimal(let value):
+            return value == 1.0
+        }
+    }
+
 }
 
 /// Add abbreviation to Int.

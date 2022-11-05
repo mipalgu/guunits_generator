@@ -84,6 +84,106 @@ extension Operation {
         }
     }
 
+    var simplify: Operation {
+        switch self {
+        case .constant, .literal:
+            return self
+        case .division(let lhs, let rhs):
+            let newLhs = lhs.simplify
+            let newRhs = rhs.simplify
+            if newLhs == newRhs {
+                return .literal(declaration: .integer(value: 1))
+            }
+            if
+                case .literal(let value1) = newLhs,
+                case .literal(let value2) = newRhs,
+                value1.isOne && value2.isOne
+            {
+                return .literal(declaration: .integer(value: 1))
+            }
+            if case .literal(let value) = newRhs, value.isOne {
+                return newLhs.simplify
+            }
+            return .division(lhs: newLhs, rhs: newRhs)
+        case .multiplication(let lhs, let rhs):
+            let newLhs = lhs.simplify
+            let newRhs = rhs.simplify
+            if
+                case .literal(let value1) = newLhs,
+                case .literal(let value2) = newRhs,
+                value1.isOne && value2.isOne
+            {
+                return .literal(declaration: .integer(value: 1))
+            }
+            if case .literal(let value) = newLhs, value.isOne {
+                return newRhs.simplify
+            }
+            if case .literal(let value) = newRhs, value.isOne {
+                return newLhs.simplify
+            }
+            if
+                case .division(let divLhs, let divRhs) = newRhs,
+                case .literal(let value2) = divLhs, value2.isOne
+            {
+                return .division(lhs: newLhs.simplify, rhs: divRhs.simplify)
+            }
+            if
+                case .division(let divLhs, let divRhs) = newLhs,
+                case .literal(let value2) = divLhs, value2.isOne
+            {
+                return .division(lhs: newRhs.simplify, rhs: divRhs.simplify)
+            }
+            return .multiplication(lhs: newLhs, rhs: newRhs)
+        case .exponentiate(let base, let power):
+            let newBase = base.simplify
+            let newPower = power.simplify
+            if case .literal(let value) = newBase, value.isOne {
+                return .literal(declaration: .integer(value: 1))
+            }
+            if case .literal(let value) = newPower {
+                if value.isZero {
+                    return .literal(declaration: .integer(value: 1))
+                }
+                if value.isZero {
+                    return newBase.simplify
+                }
+            }
+            return .exponentiate(base: newBase, power: newPower)
+        case .addition(let lhs, let rhs):
+            let newLhs = lhs.simplify
+            let newRhs = rhs.simplify
+            if
+                case .literal(let value) = newLhs, value.isZero,
+                case .literal(let value2) = newRhs, value2.isZero
+            {
+                return .literal(declaration: .integer(value: 0))
+            }
+            if case .literal(let value) = newLhs, value.isZero {
+                return newRhs.simplify
+            }
+            if case .literal(let value2) = newRhs, value2.isZero {
+                return newLhs.simplify
+            }
+            return .addition(lhs: lhs.simplify, rhs: rhs.simplify)
+        case .precedence(let operation):
+            let newOperation = operation.simplify
+            if case .literal = operation {
+                return newOperation.simplify
+            }
+            if case .constant = operation {
+                return newOperation.simplify
+            }
+            return .precedence(operation: newOperation)
+        case .subtraction(let lhs, let rhs):
+            let newLhs = lhs.simplify
+            let newRhs = rhs.simplify
+            if case .literal(let value) = newRhs, value.isZero {
+                return newLhs.simplify
+            }
+            return .subtraction(lhs: newLhs, rhs: newRhs)
+        }
+    }
+
     /// Finds all units within the ``Operation``.
     var units: [AnyUnit] {
         switch self {
@@ -110,7 +210,8 @@ extension Operation {
     /// - Parameter sign: The sign of the units in the operation.
     /// - Returns: A String of C code representing this operation.
     func cCode(sign: Signs) -> String {
-        switch self {
+        let operation = self.simplify
+        switch operation {
         case .constant(let unit):
             return "((\(sign.numericType.rawValue)) (\(unit)))"
         case .division(let lhs, let rhs):
@@ -187,62 +288,16 @@ extension Operation {
     /// - Parameter convertibles: The units to convert in this operation.
     /// - Returns: The new operation with the units converted.
     func replace(convertibles: [AnyUnit: AnyUnit]) -> Operation {
-        switch self {
-        case .constant(let unit):
-            guard let newVal = convertibles[unit] else {
-                return .literal(declaration: .integer(value: 1))
-            }
-            guard newVal == unit else {
-                return .constant(declaration: newVal)
-            }
-            return self
-        case .division(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            if case .literal(let value) = rhs, value == .integer(value: 1) || value == .decimal(value: 1.0) {
-                return lhs
-            }
-            return .division(lhs: lhs, rhs: rhs)
-        case .exponentiate(let base, let power):
-            let base = base.replace(convertibles: convertibles)
-            let power = power.replace(convertibles: convertibles)
-            return .exponentiate(base: base, power: power)
-        case .literal:
-            return self
-        case .multiplication(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            if case .literal(let value) = lhs, value == .integer(value: 1) || value == .decimal(value: 1.0) {
-                return rhs
-            }
-            if case .literal(let value) = rhs, value == .integer(value: 1) || value == .decimal(value: 1.0) {
-                return lhs
-            }
-            if
-                case .division(let rhsLhs, let rhsRhs) = rhs,
-                case .literal(let value) = rhsLhs,
-                value == .integer(value: 1) || value == .decimal(value: 1.0)
-            {
-                return .division(lhs: lhs, rhs: rhsRhs)
-            }
-            return .multiplication(lhs: lhs, rhs: rhs)
-        case .precedence(let operation):
-            let operation = operation.replace(convertibles: convertibles)
-            return .precedence(operation: operation)
-        case .addition(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return .addition(lhs: lhs, rhs: rhs)
-        case .subtraction(let lhs, let rhs):
-            let lhs = lhs.replace(convertibles: convertibles)
-            let rhs = rhs.replace(convertibles: convertibles)
-            return .subtraction(lhs: lhs, rhs: rhs)
-        }
+        let newConvertibles = Dictionary(uniqueKeysWithValues: convertibles.map {
+            ($0, Operation.constant(declaration: $1))
+        })
+        return replace(convertibles: newConvertibles)
     }
 
     /// See replace.
     func replace(convertibles: [AnyUnit: Operation]) -> Operation {
-        switch self {
+        let newOperation = self.simplify
+        switch newOperation {
         case .constant(let unit):
             guard let newVal = convertibles[unit] else {
                 return .literal(declaration: .integer(value: 1))
@@ -254,8 +309,17 @@ extension Operation {
         case .division(let lhs, let rhs):
             let lhs = lhs.replace(convertibles: convertibles)
             let rhs = rhs.replace(convertibles: convertibles)
-            if case .literal(let value) = rhs, value == .integer(value: 1) || value == .decimal(value: 1.0) {
+            if case .literal(let value) = rhs, value.isOne {
                 return lhs
+            }
+            if
+                case .literal(let value) = lhs,
+                value.isOne,
+                case .division(let lhs2, let rhs2) = rhs,
+                case .literal(let value2) = lhs2,
+                value2.isOne
+            {
+                return rhs2
             }
             return .division(lhs: lhs, rhs: rhs)
         case .exponentiate(let base, let power):
@@ -267,18 +331,21 @@ extension Operation {
         case .multiplication(let lhs, let rhs):
             let lhs = lhs.replace(convertibles: convertibles)
             let rhs = rhs.replace(convertibles: convertibles)
-            if case .literal(let value) = lhs, value == .integer(value: 1) || value == .decimal(value: 1.0) {
-                return rhs
-            }
-            if case .literal(let value) = rhs, value == .integer(value: 1) || value == .decimal(value: 1.0) {
-                return lhs
-            }
             if
                 case .division(let rhsLhs, let rhsRhs) = rhs,
                 case .literal(let value) = rhsLhs,
-                value == .integer(value: 1) || value == .decimal(value: 1.0)
+                value.isOne
             {
                 return .division(lhs: lhs, rhs: rhsRhs)
+            }
+            if case .literal(let value) = lhs, case .literal(let value2) = rhs, value.isOne && value2.isOne {
+                return .literal(declaration: .integer(value: 1))
+            }
+            if case .literal(let value) = lhs, value.isOne {
+                return rhs
+            }
+            if case .literal(let value) = rhs, value.isOne {
+                return lhs
             }
             return .multiplication(lhs: lhs, rhs: rhs)
         case .precedence(let operation):
