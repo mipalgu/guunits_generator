@@ -61,12 +61,17 @@ public protocol OperationalTestable where Self: UnitProtocol {
     /// The ``TestParameters`` for each conversion.
     static var testParameters: [ConversionMetaData<Self>: [TestParameters]] { get }
 
+    /// The ``TestParameters`` for each relation defined in `relationships`.
     static var relationTests: [UnitConversion: [TestParameters]] { get }
 
 }
 
+/// Add init for ``ConversionMetaData``.
 private extension Relation {
 
+    /// Construct a Relation from a ``ConversionMetaData``
+    /// - Warning: This init breaks the contract that Relations should be conversion
+    /// between categories, and not units within the same category.
     init<Unit>(metaData: ConversionMetaData<Unit>) where Unit: UnitsConvertible {
         self.source = AnyUnit(metaData.unit)
         self.target = AnyUnit(metaData.otherUnit)
@@ -75,8 +80,10 @@ private extension Relation {
 
 }
 
+/// Default implementation.
 extension OperationalTestable {
 
+    /// The default tests for the conversions within the `relations` array.
     public static var relationTests: [UnitConversion: [TestParameters]] {
         Dictionary(uniqueKeysWithValues: Self.relationships.flatMap { relationship in
             Signs.allCases.flatMap { sign in
@@ -99,6 +106,13 @@ extension OperationalTestable {
         })
     }
 
+    /// Helper function for creating C code the performs a ``Relation`` conversion.
+    /// - Parameters:
+    ///   - relationship: The relation to convert.
+    ///   - sign: The sign of the source unit in the relation.
+    ///   - otherSign: The sign of the target unit in the relation.
+    ///   - value: The input parameter to the test. This is the test case.
+    /// - Returns: The C code that performs the test.
     fileprivate static func toTestParameter(
         relationship: Relation, sign: Signs, otherSign: Signs, value: Int
     ) -> TestParameters {
