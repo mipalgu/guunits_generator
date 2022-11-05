@@ -239,4 +239,13 @@ final class OperationConvertiblesTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test simplify does nothing for simplist multiplication.
+    func testSimplifyInSimplistMultiplication() {
+        let operation = Operation.multiplication(
+            lhs: .literal(declaration: .integer(value: 2)), rhs: .literal(declaration: .integer(value: 3))
+        )
+        let result = operation.simplify
+        XCTAssertEqual(result, operation)
+    }
+
 }
