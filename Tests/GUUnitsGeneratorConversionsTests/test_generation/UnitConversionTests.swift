@@ -1,5 +1,5 @@
-// UnitConversion.swift 
-// guunits_generator 
+// UnitConversionTests.swift
+// guunits_generator
 // 
 // Created by Morgan McColl.
 // Copyright © 2022 Morgan McColl. All rights reserved.
@@ -54,17 +54,23 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A struct for storing conversion information for conversions between different unit
-/// categories.
-public struct UnitConversion: Hashable {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// The conversion that is being performed.
-    public let relation: Relation
+/// Test class for ``UnitConversion``.
+final class UnitConversionTests: XCTestCase {
 
-    /// The sign of the source unit.
-    public let sourceSign: Signs
-
-    /// The sign of the target unit.
-    public let targetSign: Signs
+    /// Test init sets properties correctly.
+    func testInit() {
+        let relation = Relation(
+            source: Acceleration.metresPerSecond2,
+            target: AnyUnit(MassUnits.kilogram),
+            operation: .literal(declaration: .integer(value: 1))
+        )
+        let conversion = UnitConversion(relation: relation, sourceSign: .t, targetSign: .u)
+        XCTAssertEqual(conversion.relation, relation)
+        XCTAssertEqual(conversion.sourceSign, .t)
+        XCTAssertEqual(conversion.targetSign, .u)
+    }
 
 }
