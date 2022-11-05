@@ -75,7 +75,7 @@ extension OperationalTestable where Self: UnitsConvertible {
     /// underflows. If an overflow occurs, then these tests will make sure that it is detected
     /// and corrected.
     static var defaultParameters: [ConversionMetaData<Self>: [TestParameters]] {
-        let inputs = [-50000, -5000, -500, -50, -5, 0, 5, 50, 500, 5000, 50000]
+        let inputs = [-5_000_000, 0, 5_000_000]
         var params: [ConversionMetaData<Self>: [TestParameters]] = Self.allCases.reduce(
             into: [:]
         ) { parameters, unit in
