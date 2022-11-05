@@ -84,6 +84,28 @@ extension Operation {
         }
     }
 
+    /// Finds all units within the ``Operation``.
+    var units: [AnyUnit] {
+        switch self {
+        case .constant(let unit):
+            return [unit]
+        case .division(let lhs, let rhs):
+            return lhs.units + rhs.units
+        case .exponentiate(let base, let power):
+            return base.units + power.units
+        case .literal:
+            return []
+        case .multiplication(let lhs, let rhs):
+            return lhs.units + rhs.units
+        case .precedence(let value):
+            return value.units
+        case .addition(let lhs, let rhs):
+            return lhs.units + rhs.units
+        case .subtraction(let lhs, let rhs):
+            return lhs.units + rhs.units
+        }
+    }
+
     /// Generate the C code for this operation.
     /// - Parameter sign: The sign of the units in the operation.
     /// - Returns: A String of C code representing this operation.

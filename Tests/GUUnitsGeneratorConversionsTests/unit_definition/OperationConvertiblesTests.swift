@@ -137,4 +137,17 @@ final class OperationConvertiblesTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test units computed property.
+    func testUnits() {
+        let result = operation.units.sorted {
+            $0.description < $1.description
+        }
+        let expected = [
+            AnyUnit(MassUnits.kilogram),
+            AnyUnit(DistanceUnits.metres),
+            AnyUnit(TimeUnits.seconds)
+        ]
+        XCTAssertEqual(result, expected)
+    }
+
 }
