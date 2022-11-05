@@ -215,6 +215,14 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
         )
     }
 
+    /// Create the name of a function that test a conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: The test parameters.
+    /// - Returns: The name of a suitable test function.
     func testFunctionName(
         from unit: AnyUnit,
         with sign: Signs,

@@ -88,4 +88,20 @@ final class FunctionHelpersTests: XCTestCase {
         XCTAssertEqual(result, expected)
     }
 
+    /// Test type-erased version of testFunctionName is the same as the non-type-erased version.
+    func testGetTypeErasedTestFunctionName() {
+        let test = TestParameters(input: "0", output: "273.15")
+        let original = helper.testFunctionName(
+            from: TemperatureUnits.kelvin, with: .t, to: TemperatureUnits.celsius, with: .f, using: test
+        )
+        let typeErased = helper.testFunctionName(
+            from: AnyUnit(TemperatureUnits.kelvin),
+            with: .t,
+            to: AnyUnit(TemperatureUnits.celsius),
+            with: .f,
+            using: test
+        )
+        XCTAssertEqual(original, typeErased)
+    }
+
 }
