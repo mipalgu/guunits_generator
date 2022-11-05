@@ -183,7 +183,8 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
         """
         let definition = "\(returnType) \(name)(\(parameters))"
         let numericType = sign.numericType.rawValue
-        let unitDefs = inputs.enumerated().map {
+        let unitDefs = inputs.enumerated()
+        .map {
             "    const \(numericType) unit\($0) = ((\(numericType)) (\($1)));"
         }
         .joined(separator: "\n")
