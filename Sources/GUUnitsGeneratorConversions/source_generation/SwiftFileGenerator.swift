@@ -69,11 +69,100 @@ public struct SwiftFileCreator {
     /// - Parameter type: The type to generate.
     /// - Returns: A string of the file contents.
     public func generate<T: UnitProtocol>(for type: T.Type) -> String {
-        doGenerate(for: type)
+        let structGeneration = doGenerate(for: type)
+        guard let relationshipGeneration = createRelationExtensions(for: type) else {
+            return structGeneration + "\n"
+        }
+        return structGeneration + "\n\n" + relationshipGeneration + "\n"
     }
 
-    public func generate<T: UnitProtocol>(for type: T.Type) -> String where T: UnitsConvertible {
-        doGenerate(for: type)
+    private func createRelationExtensions<T: UnitProtocol>(for type: T.Type) -> String? {
+        let relations = T.relationships
+        guard !relations.isEmpty else {
+            return nil
+        }
+        var targetsCompleted: Set<AnyUnit> = []
+        let extensions: [String] = relations.lazy.compactMap { relation -> [String]? in
+            let target = relation.target
+            guard !targetsCompleted.contains(target) else {
+                return nil
+            }
+            let targetRelations = relations.filter {
+                $0.target == target
+            }
+            targetsCompleted.insert(target)
+            return Signs.allCases.compactMap { sign in
+                createRelationExtension(relations: targetRelations, targetSign: sign)
+            }
+        }
+        .flatMap { $0 }
+        return extensions.joined(separator: "\n\n")
+    }
+
+    private func createRelationExtension(relations: [Relation], targetSign: Signs) -> String? {
+        guard let target = relations.first?.target else {
+            return nil
+        }
+        let inits: String = relations.flatMap { relation -> [String] in
+            Signs.allCases.compactMap { sourceSign -> String? in
+                toConversionInit(
+                    conversion: UnitConversion(
+                        relation: relation, sourceSign: sourceSign, targetSign: targetSign
+                    )
+                )
+            }
+        }
+        .joined(separator: "\n\n")
+        return """
+        public extension \(target.description.capitalized)_\(targetSign.rawValue) {
+
+        \(inits)
+
+        }
+        """
+    }
+
+    private func toConversionInit(conversion: UnitConversion) -> String? {
+        let relation = conversion.relation
+        let parameters = relation.operation.units
+        let conversionName = relation.name(sign: conversion.sourceSign, otherSign: conversion.targetSign)
+        guard parameters.count > 1 else {
+            guard let value = parameters.first else {
+                return nil
+            }
+            let comment = "/// Create a `\(relation.target.description.capitalized)" +
+                "_\(conversion.targetSign.rawValue)` from a `\(value.description.capitalized)" +
+                "_\(conversion.sourceSign.rawValue)`."
+            return """
+                \(comment)
+                init(_ value: \(value.description.capitalized)_\(conversion.sourceSign.rawValue)) {
+                    self.init(rawValue: \(conversionName)(value.rawValue))
+                }
+            """
+        }
+        let sortedParams = parameters.sorted {
+            $0.description < $1.description
+        }
+        let functionParameters: String = sortedParams.map {
+            "\($0.description): \($0.description.capitalized)_\(conversion.sourceSign.rawValue)"
+        }
+        .joined(separator: ", ")
+        let functionValues = sortedParams.map {
+            "\($0.description).rawValue"
+        }
+        .joined(separator: ", ")
+        let parametersTypes = sortedParams.map {
+            "`\($0.description.capitalized)_\(conversion.sourceSign.rawValue)`"
+        }
+        .joined(separator: ", ")
+        let comment = "/// Create a `\(relation.target.description.capitalized)_" +
+                "\(conversion.targetSign.rawValue)` from \(parametersTypes)."
+        return """
+            \(comment)
+            init(\(functionParameters)) {
+                self.init(rawValue: \(conversionName)(\(functionValues)))
+            }
+        """
     }
 
     private func doGenerate<T: UnitProtocol>(for type: T.Type) -> String {
@@ -85,41 +174,7 @@ public struct SwiftFileCreator {
         let unitStruct = self.createMultiple(for: type.allCases) {
             self.generateUnit(for: $0)
         }
-        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct + "\n"
-    }
-
-    private func doGenerate<T: UnitProtocol>(for type: T.Type) -> String where T: UnitsConvertible {
-        let prefix = self.prefix(name: type.category)
-        let categoryStruct = self.generateCategoryStruct(for: type)
-        let categoryExtensions = self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
-            self.generateCategoryExtension(for: $0.rawValue, from: type)
-        }
-        let unitStruct = self.createMultiple(for: type.allCases) {
-            self.generateUnit(for: $0)
-        }
-        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct + "\n"
-    }
-
-    /// Creates the swift file contents for a given case of a unit type.
-    /// - Parameter type: The case to generate.
-    /// - Returns: A string of the file contents.
-    private func generateUnit<T: UnitProtocol>(for value: T) -> String where T: UnitsConvertible {
-        let anyValue = AnyUnit(value)
-        let relations = T.relationships.filter { $0.source == anyValue }
-        let unitStruct = Signs.allCases.reduce(into: "") {
-            $0 = $0 + "\n\n" + self.generateUnitStruct(
-                for: value,
-                $1,
-                allCases: Set(T.allCases)
-                    .subtracting(Set([value]))
-                    .sorted { $0.description < $1.description },
-                relations: relations
-            )
-        }
-        let extensionDef = SwiftNumericTypes.uniqueTypes.reduce(into: "") {
-            $0 = $0 + "\n\n" + self.generateNumericExtension(for: $1, from: value)
-        }
-        return unitStruct + extensionDef + "\n"
+        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct
     }
 
     /// Creates the swift file contents for a given case of a unit type.
@@ -529,9 +584,7 @@ public struct SwiftFileCreator {
     }
 
     /// Creates a struct for a particular case of a unit.
-    private func generateUnitStruct<T: UnitProtocol>(
-        for type: T, _ sign: Signs, allCases: [T], relations: [Relation] = []
-    ) -> String {
+    private func generateUnitStruct<T: UnitProtocol>(for type: T, _ sign: Signs, allCases: [T]) -> String {
         let signComment: String
         switch sign {
         case .d:
@@ -560,7 +613,7 @@ public struct SwiftFileCreator {
                 + self.indent(self.createConversionInits(for: type, sign, allCases: allCases))
         }
         let selfConversions = self.indent(self.createSelfConversionInits(for: type, sign))
-        let structDef = comment + "\n" + def
+        return comment + "\n" + def
             + "\n\n" + "// MARK: - Converting Between The Underlying guunits C Type"
             + "\n\n" + rawValueProperty
             + "\n\n" + rawInit
@@ -568,50 +621,7 @@ public struct SwiftFileCreator {
             + "\n\n" + numericInits
             + conversionInits
             + "\n\n" + "// MARK: - Converting From Other Precisions"
-            + "\n\n" + selfConversions
-        let relationFunctions = relations.flatMap { rel in
-            Signs.allCases.map { otherSign in
-                let conversion = UnitConversion(relation: rel, sourceSign: sign, targetSign: otherSign)
-                return toConversionFunction(conversion: conversion)
-            }
-        }
-        .joined(separator: "\n\n")
-        let fullStruct = relations.isEmpty ? structDef : structDef + "\n\n" + relationFunctions
-        return fullStruct + "\n\n" + endef
-    }
-
-    private func toConversionFunction(conversion: UnitConversion) -> String {
-        let relation = conversion.relation
-        let sign = conversion.sourceSign
-        let otherSign = conversion.targetSign
-        let parameters = relation.operation.units.filter { $0 != relation.source }
-        let name = "\(relation.target.description)_\(otherSign.rawValue)"
-        let typeName = "\(relation.target.description.capitalized)_\(otherSign.rawValue)"
-        let comment = "/// Convert from \(relation.source.description.capitalized)_\(sign.rawValue) to " +
-            "\(typeName)"
-        guard !parameters.isEmpty else {
-            return """
-                \(comment)
-                public var \(name): \(typeName) {
-                    \(typeName)(rawValue: \(relation.name(sign: sign, otherSign: otherSign))(self.rawValue))
-                }
-            """
-        }
-        let fnParameters = parameters.map {
-            "\($0.description): \(typeName)"
-        }
-        .joined(separator: ", ")
-        let fnValues = (
-            ["self.rawValue"] + parameters.map {
-                "\($0.description).rawValue"
-            }
-        ).joined(separator: ", ")
-        return """
-            \(comment)
-            public func \(name)(\(fnParameters)) -> \(typeName) {
-                \(typeName)(rawValue: \(relation.name(sign: sign, otherSign: otherSign))(\(fnValues)))
-            }
-        """
+            + "\n\n" + selfConversions + "\n\n" + endef
     }
 
     /// Generate a property that creates the underlying C-type.
