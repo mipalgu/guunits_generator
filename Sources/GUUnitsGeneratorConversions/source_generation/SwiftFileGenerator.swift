@@ -76,6 +76,10 @@ public struct SwiftFileCreator {
         return structGeneration + "\n\n" + relationshipGeneration + "\n"
     }
 
+    /// Creates the extensions required for the relation operations defined in the `relationships`
+    /// property of the unit.
+    /// - Parameter type: The unit that defines the relationships.
+    /// - Returns: A string containing the extensions to related units.
     private func createRelationExtensions<T: UnitProtocol>(for type: T.Type) -> String? {
         let relations = T.relationships
         guard !relations.isEmpty else {
@@ -91,7 +95,7 @@ public struct SwiftFileCreator {
                 $0.target == target
             }
             targetsCompleted.insert(target)
-            return Signs.allCases.compactMap { sign in
+            return Signs.allCases.map { sign in
                 createRelationExtension(relations: targetRelations, targetSign: sign)
             }
         }
@@ -99,9 +103,19 @@ public struct SwiftFileCreator {
         return extensions.joined(separator: "\n\n")
     }
 
-    private func createRelationExtension(relations: [Relation], targetSign: Signs) -> String? {
-        guard let target = relations.first?.target else {
-            return nil
+    /// Create a single extension for a group of related relations. These relations must contain
+    /// a target type that is the same.
+    /// - Parameters:
+    ///   - relations: The relations that generate a chosen target.
+    ///   - targetSign: The sign of the chosen target.
+    /// - Returns: A string containing the extension of the target type that can be initialised
+    /// using the relations.
+    private func createRelationExtension(relations: [Relation], targetSign: Signs) -> String {
+        guard
+            let target = relations.first?.target,
+            relations.allSatisfy({ $0.target == target })
+        else {
+            fatalError("Invalid relations.")
         }
         let inits: String = relations.flatMap { relation -> [String] in
             Signs.allCases.compactMap { sourceSign -> String? in
@@ -122,6 +136,9 @@ public struct SwiftFileCreator {
         """
     }
 
+    /// Creates an initialiser for a conversion function.
+    /// - Parameter conversion: The conversion function.
+    /// - Returns: The initialiser implementing the conversion function.
     private func toConversionInit(conversion: UnitConversion) -> String? {
         let relation = conversion.relation
         let parameters = relation.operation.units
@@ -165,6 +182,10 @@ public struct SwiftFileCreator {
         """
     }
 
+    /// Generates the core source code the the category and units. This generates everything except
+    /// the relationships.
+    /// - Parameter type: The category to generate.
+    /// - Returns: A string containing the swift source code.
     private func doGenerate<T: UnitProtocol>(for type: T.Type) -> String {
         let prefix = self.prefix(name: type.category)
         let categoryStruct = self.generateCategoryStruct(for: type)
