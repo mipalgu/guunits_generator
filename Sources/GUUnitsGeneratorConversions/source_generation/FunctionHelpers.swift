@@ -302,7 +302,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     /// Remove all characters after an invalid character is found.
     /// - Parameter string: The string to santise.
     /// - Returns: The sanitised string.
-    private func sanitise(string: String) -> String {
+    func sanitise(string: String) -> String {
         guard !string.isEmpty else {
             return string
         }
