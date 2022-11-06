@@ -361,6 +361,11 @@ public struct GUUnitsGenerator {
             with: Acceleration.category,
             and: swiftFileCreator.generate(for: Acceleration.self)
         )
+        writeFile(
+            at: path,
+            with: ReferenceAcceleration.category,
+            and: swiftFileCreator.generate(for: ReferenceAcceleration.self)
+        )
         writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
         writeFile(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
         writeFile(
