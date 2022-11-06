@@ -38,7 +38,6 @@ Usage: guunits_generator [-h] [-d <directory>]
 - <doc:ConvertingBetweenCategories>
 
 ### C Source Generation
-- ``AccelerationFunctionCreator``
 - ``AngleFunctionCreator``
 - ``AnyGenerator``
 - ``CFileCreator``
