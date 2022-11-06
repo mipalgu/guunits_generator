@@ -608,7 +608,7 @@ public struct SwiftFileCreator {
         ).joined(separator: ", ")
         return """
             \(comment)
-            func \(name)(\(fnParameters)) {
+            func \(name)(\(fnParameters)) -> \(typeName) {
                 \(typeName)(rawValue: \(relation.name(sign: sign, otherSign: otherSign))(\(fnValues)))
             }
         """
