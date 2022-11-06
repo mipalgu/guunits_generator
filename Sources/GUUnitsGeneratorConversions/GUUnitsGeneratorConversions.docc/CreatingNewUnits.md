@@ -419,8 +419,7 @@ Since there is a lot of generated code in the C layer, we will only show the fun
 functions are also generated for the remaining unit types.
 
 #### Header
-
-```c
+```h
 // Mass Units.
 typedef int64_t microgram_t;
 typedef uint64_t microgram_u;
@@ -444,783 +443,783 @@ typedef float megagram_f;
 typedef double megagram_d;
 
 /**
- * Convert double to gram_d.
- */
+* Convert double to gram_d.
+*/
 gram_d d_to_g_d(double gram);
 
 /**
- * Convert double to gram_f.
- */
+* Convert double to gram_f.
+*/
 gram_f d_to_g_f(double gram);
 
 /**
- * Convert double to gram_t.
- */
+* Convert double to gram_t.
+*/
 gram_t d_to_g_t(double gram);
 
 /**
- * Convert double to gram_u.
- */
+* Convert double to gram_u.
+*/
 gram_u d_to_g_u(double gram);
 
 /**
- * Convert float to gram_d.
- */
+* Convert float to gram_d.
+*/
 gram_d f_to_g_d(float gram);
 
 /**
- * Convert float to gram_f.
- */
+* Convert float to gram_f.
+*/
 gram_f f_to_g_f(float gram);
 
 /**
- * Convert float to gram_t.
- */
+* Convert float to gram_t.
+*/
 gram_t f_to_g_t(float gram);
 
 /**
- * Convert float to gram_u.
- */
+* Convert float to gram_u.
+*/
 gram_u f_to_g_u(float gram);
 
 /**
- * Convert gram_d to double.
- */
+* Convert gram_d to double.
+*/
 double g_d_to_d(gram_d gram);
 
 /**
- * Convert gram_d to float.
- */
+* Convert gram_d to float.
+*/
 float g_d_to_f(gram_d gram);
 
 /**
- * Convert gram_d to gram_f.
- */
+* Convert gram_d to gram_f.
+*/
 gram_f g_d_to_g_f(gram_d gram);
 
 /**
- * Convert gram_d to gram_t.
- */
+* Convert gram_d to gram_t.
+*/
 gram_t g_d_to_g_t(gram_d gram);
 
 /**
- * Convert gram_d to gram_u.
- */
+* Convert gram_d to gram_u.
+*/
 gram_u g_d_to_g_u(gram_d gram);
 
 /**
- * Convert gram_d to int16_t.
- */
+* Convert gram_d to int16_t.
+*/
 int16_t g_d_to_i16(gram_d gram);
 
 /**
- * Convert gram_d to int32_t.
- */
+* Convert gram_d to int32_t.
+*/
 int32_t g_d_to_i32(gram_d gram);
 
 /**
- * Convert gram_d to int64_t.
- */
+* Convert gram_d to int64_t.
+*/
 int64_t g_d_to_i64(gram_d gram);
 
 /**
- * Convert gram_d to int8_t.
- */
+* Convert gram_d to int8_t.
+*/
 int8_t g_d_to_i8(gram_d gram);
 
 /**
- * Convert gram_d to kilogram_d.
- */
+* Convert gram_d to kilogram_d.
+*/
 kilogram_d g_d_to_kg_d(gram_d gram);
 
 /**
- * Convert gram_d to kilogram_f.
- */
+* Convert gram_d to kilogram_f.
+*/
 kilogram_f g_d_to_kg_f(gram_d gram);
 
 /**
- * Convert gram_d to kilogram_t.
- */
+* Convert gram_d to kilogram_t.
+*/
 kilogram_t g_d_to_kg_t(gram_d gram);
 
 /**
- * Convert gram_d to kilogram_u.
- */
+* Convert gram_d to kilogram_u.
+*/
 kilogram_u g_d_to_kg_u(gram_d gram);
 
 /**
- * Convert gram_d to megagram_d.
- */
+* Convert gram_d to megagram_d.
+*/
 megagram_d g_d_to_Mg_d(gram_d gram);
 
 /**
- * Convert gram_d to megagram_f.
- */
+* Convert gram_d to megagram_f.
+*/
 megagram_f g_d_to_Mg_f(gram_d gram);
 
 /**
- * Convert gram_d to megagram_t.
- */
+* Convert gram_d to megagram_t.
+*/
 megagram_t g_d_to_Mg_t(gram_d gram);
 
 /**
- * Convert gram_d to megagram_u.
- */
+* Convert gram_d to megagram_u.
+*/
 megagram_u g_d_to_Mg_u(gram_d gram);
 
 /**
- * Convert gram_d to microgram_d.
- */
+* Convert gram_d to microgram_d.
+*/
 microgram_d g_d_to_ug_d(gram_d gram);
 
 /**
- * Convert gram_d to microgram_f.
- */
+* Convert gram_d to microgram_f.
+*/
 microgram_f g_d_to_ug_f(gram_d gram);
 
 /**
- * Convert gram_d to microgram_t.
- */
+* Convert gram_d to microgram_t.
+*/
 microgram_t g_d_to_ug_t(gram_d gram);
 
 /**
- * Convert gram_d to microgram_u.
- */
+* Convert gram_d to microgram_u.
+*/
 microgram_u g_d_to_ug_u(gram_d gram);
 
 /**
- * Convert gram_d to milligram_d.
- */
+* Convert gram_d to milligram_d.
+*/
 milligram_d g_d_to_mg_d(gram_d gram);
 
 /**
- * Convert gram_d to milligram_f.
- */
+* Convert gram_d to milligram_f.
+*/
 milligram_f g_d_to_mg_f(gram_d gram);
 
 /**
- * Convert gram_d to milligram_t.
- */
+* Convert gram_d to milligram_t.
+*/
 milligram_t g_d_to_mg_t(gram_d gram);
 
 /**
- * Convert gram_d to milligram_u.
- */
+* Convert gram_d to milligram_u.
+*/
 milligram_u g_d_to_mg_u(gram_d gram);
 
 /**
- * Convert gram_d to uint16_t.
- */
+* Convert gram_d to uint16_t.
+*/
 uint16_t g_d_to_u16(gram_d gram);
 
 /**
- * Convert gram_d to uint32_t.
- */
+* Convert gram_d to uint32_t.
+*/
 uint32_t g_d_to_u32(gram_d gram);
 
 /**
- * Convert gram_d to uint64_t.
- */
+* Convert gram_d to uint64_t.
+*/
 uint64_t g_d_to_u64(gram_d gram);
 
 /**
- * Convert gram_d to uint8_t.
- */
+* Convert gram_d to uint8_t.
+*/
 uint8_t g_d_to_u8(gram_d gram);
 
 /**
- * Convert gram_f to double.
- */
+* Convert gram_f to double.
+*/
 double g_f_to_d(gram_f gram);
 
 /**
- * Convert gram_f to float.
- */
+* Convert gram_f to float.
+*/
 float g_f_to_f(gram_f gram);
 
 /**
- * Convert gram_f to gram_d.
- */
+* Convert gram_f to gram_d.
+*/
 gram_d g_f_to_g_d(gram_f gram);
 
 /**
- * Convert gram_f to gram_t.
- */
+* Convert gram_f to gram_t.
+*/
 gram_t g_f_to_g_t(gram_f gram);
 
 /**
- * Convert gram_f to gram_u.
- */
+* Convert gram_f to gram_u.
+*/
 gram_u g_f_to_g_u(gram_f gram);
 
 /**
- * Convert gram_f to int16_t.
- */
+* Convert gram_f to int16_t.
+*/
 int16_t g_f_to_i16(gram_f gram);
 
 /**
- * Convert gram_f to int32_t.
- */
+* Convert gram_f to int32_t.
+*/
 int32_t g_f_to_i32(gram_f gram);
 
 /**
- * Convert gram_f to int64_t.
- */
+* Convert gram_f to int64_t.
+*/
 int64_t g_f_to_i64(gram_f gram);
 
 /**
- * Convert gram_f to int8_t.
- */
+* Convert gram_f to int8_t.
+*/
 int8_t g_f_to_i8(gram_f gram);
 
 /**
- * Convert gram_f to kilogram_d.
- */
+* Convert gram_f to kilogram_d.
+*/
 kilogram_d g_f_to_kg_d(gram_f gram);
 
 /**
- * Convert gram_f to kilogram_f.
- */
+* Convert gram_f to kilogram_f.
+*/
 kilogram_f g_f_to_kg_f(gram_f gram);
 
 /**
- * Convert gram_f to kilogram_t.
- */
+* Convert gram_f to kilogram_t.
+*/
 kilogram_t g_f_to_kg_t(gram_f gram);
 
 /**
- * Convert gram_f to kilogram_u.
- */
+* Convert gram_f to kilogram_u.
+*/
 kilogram_u g_f_to_kg_u(gram_f gram);
 
 /**
- * Convert gram_f to megagram_d.
- */
+* Convert gram_f to megagram_d.
+*/
 megagram_d g_f_to_Mg_d(gram_f gram);
 
 /**
- * Convert gram_f to megagram_f.
- */
+* Convert gram_f to megagram_f.
+*/
 megagram_f g_f_to_Mg_f(gram_f gram);
 
 /**
- * Convert gram_f to megagram_t.
- */
+* Convert gram_f to megagram_t.
+*/
 megagram_t g_f_to_Mg_t(gram_f gram);
 
 /**
- * Convert gram_f to megagram_u.
- */
+* Convert gram_f to megagram_u.
+*/
 megagram_u g_f_to_Mg_u(gram_f gram);
 
 /**
- * Convert gram_f to microgram_d.
- */
+* Convert gram_f to microgram_d.
+*/
 microgram_d g_f_to_ug_d(gram_f gram);
 
 /**
- * Convert gram_f to microgram_f.
- */
+* Convert gram_f to microgram_f.
+*/
 microgram_f g_f_to_ug_f(gram_f gram);
 
 /**
- * Convert gram_f to microgram_t.
- */
+* Convert gram_f to microgram_t.
+*/
 microgram_t g_f_to_ug_t(gram_f gram);
 
 /**
- * Convert gram_f to microgram_u.
- */
+* Convert gram_f to microgram_u.
+*/
 microgram_u g_f_to_ug_u(gram_f gram);
 
 /**
- * Convert gram_f to milligram_d.
- */
+* Convert gram_f to milligram_d.
+*/
 milligram_d g_f_to_mg_d(gram_f gram);
 
 /**
- * Convert gram_f to milligram_f.
- */
+* Convert gram_f to milligram_f.
+*/
 milligram_f g_f_to_mg_f(gram_f gram);
 
 /**
- * Convert gram_f to milligram_t.
- */
+* Convert gram_f to milligram_t.
+*/
 milligram_t g_f_to_mg_t(gram_f gram);
 
 /**
- * Convert gram_f to milligram_u.
- */
+* Convert gram_f to milligram_u.
+*/
 milligram_u g_f_to_mg_u(gram_f gram);
 
 /**
- * Convert gram_f to uint16_t.
- */
+* Convert gram_f to uint16_t.
+*/
 uint16_t g_f_to_u16(gram_f gram);
 
 /**
- * Convert gram_f to uint32_t.
- */
+* Convert gram_f to uint32_t.
+*/
 uint32_t g_f_to_u32(gram_f gram);
 
 /**
- * Convert gram_f to uint64_t.
- */
+* Convert gram_f to uint64_t.
+*/
 uint64_t g_f_to_u64(gram_f gram);
 
 /**
- * Convert gram_f to uint8_t.
- */
+* Convert gram_f to uint8_t.
+*/
 uint8_t g_f_to_u8(gram_f gram);
 
 /**
- * Convert gram_t to double.
- */
+* Convert gram_t to double.
+*/
 double g_t_to_d(gram_t gram);
 
 /**
- * Convert gram_t to float.
- */
+* Convert gram_t to float.
+*/
 float g_t_to_f(gram_t gram);
 
 /**
- * Convert gram_t to gram_d.
- */
+* Convert gram_t to gram_d.
+*/
 gram_d g_t_to_g_d(gram_t gram);
 
 /**
- * Convert gram_t to gram_f.
- */
+* Convert gram_t to gram_f.
+*/
 gram_f g_t_to_g_f(gram_t gram);
 
 /**
- * Convert gram_t to gram_u.
- */
+* Convert gram_t to gram_u.
+*/
 gram_u g_t_to_g_u(gram_t gram);
 
 /**
- * Convert gram_t to int16_t.
- */
+* Convert gram_t to int16_t.
+*/
 int16_t g_t_to_i16(gram_t gram);
 
 /**
- * Convert gram_t to int32_t.
- */
+* Convert gram_t to int32_t.
+*/
 int32_t g_t_to_i32(gram_t gram);
 
 /**
- * Convert gram_t to int64_t.
- */
+* Convert gram_t to int64_t.
+*/
 int64_t g_t_to_i64(gram_t gram);
 
 /**
- * Convert gram_t to int8_t.
- */
+* Convert gram_t to int8_t.
+*/
 int8_t g_t_to_i8(gram_t gram);
 
 /**
- * Convert gram_t to kilogram_d.
- */
+* Convert gram_t to kilogram_d.
+*/
 kilogram_d g_t_to_kg_d(gram_t gram);
 
 /**
- * Convert gram_t to kilogram_f.
- */
+* Convert gram_t to kilogram_f.
+*/
 kilogram_f g_t_to_kg_f(gram_t gram);
 
 /**
- * Convert gram_t to kilogram_t.
- */
+* Convert gram_t to kilogram_t.
+*/
 kilogram_t g_t_to_kg_t(gram_t gram);
 
 /**
- * Convert gram_t to kilogram_u.
- */
+* Convert gram_t to kilogram_u.
+*/
 kilogram_u g_t_to_kg_u(gram_t gram);
 
 /**
- * Convert gram_t to megagram_d.
- */
+* Convert gram_t to megagram_d.
+*/
 megagram_d g_t_to_Mg_d(gram_t gram);
 
 /**
- * Convert gram_t to megagram_f.
- */
+* Convert gram_t to megagram_f.
+*/
 megagram_f g_t_to_Mg_f(gram_t gram);
 
 /**
- * Convert gram_t to megagram_t.
- */
+* Convert gram_t to megagram_t.
+*/
 megagram_t g_t_to_Mg_t(gram_t gram);
 
 /**
- * Convert gram_t to megagram_u.
- */
+* Convert gram_t to megagram_u.
+*/
 megagram_u g_t_to_Mg_u(gram_t gram);
 
 /**
- * Convert gram_t to microgram_d.
- */
+* Convert gram_t to microgram_d.
+*/
 microgram_d g_t_to_ug_d(gram_t gram);
 
 /**
- * Convert gram_t to microgram_f.
- */
+* Convert gram_t to microgram_f.
+*/
 microgram_f g_t_to_ug_f(gram_t gram);
 
 /**
- * Convert gram_t to microgram_t.
- */
+* Convert gram_t to microgram_t.
+*/
 microgram_t g_t_to_ug_t(gram_t gram);
 
 /**
- * Convert gram_t to microgram_u.
- */
+* Convert gram_t to microgram_u.
+*/
 microgram_u g_t_to_ug_u(gram_t gram);
 
 /**
- * Convert gram_t to milligram_d.
- */
+* Convert gram_t to milligram_d.
+*/
 milligram_d g_t_to_mg_d(gram_t gram);
 
 /**
- * Convert gram_t to milligram_f.
- */
+* Convert gram_t to milligram_f.
+*/
 milligram_f g_t_to_mg_f(gram_t gram);
 
 /**
- * Convert gram_t to milligram_t.
- */
+* Convert gram_t to milligram_t.
+*/
 milligram_t g_t_to_mg_t(gram_t gram);
 
 /**
- * Convert gram_t to milligram_u.
- */
+* Convert gram_t to milligram_u.
+*/
 milligram_u g_t_to_mg_u(gram_t gram);
 
 /**
- * Convert gram_t to uint16_t.
- */
+* Convert gram_t to uint16_t.
+*/
 uint16_t g_t_to_u16(gram_t gram);
 
 /**
- * Convert gram_t to uint32_t.
- */
+* Convert gram_t to uint32_t.
+*/
 uint32_t g_t_to_u32(gram_t gram);
 
 /**
- * Convert gram_t to uint64_t.
- */
+* Convert gram_t to uint64_t.
+*/
 uint64_t g_t_to_u64(gram_t gram);
 
 /**
- * Convert gram_t to uint8_t.
- */
+* Convert gram_t to uint8_t.
+*/
 uint8_t g_t_to_u8(gram_t gram);
 
 /**
- * Convert gram_u to double.
- */
+* Convert gram_u to double.
+*/
 double g_u_to_d(gram_u gram);
 
 /**
- * Convert gram_u to float.
- */
+* Convert gram_u to float.
+*/
 float g_u_to_f(gram_u gram);
 
 /**
- * Convert gram_u to gram_d.
- */
+* Convert gram_u to gram_d.
+*/
 gram_d g_u_to_g_d(gram_u gram);
 
 /**
- * Convert gram_u to gram_f.
- */
+* Convert gram_u to gram_f.
+*/
 gram_f g_u_to_g_f(gram_u gram);
 
 /**
- * Convert gram_u to gram_t.
- */
+* Convert gram_u to gram_t.
+*/
 gram_t g_u_to_g_t(gram_u gram);
 
 /**
- * Convert gram_u to int16_t.
- */
+* Convert gram_u to int16_t.
+*/
 int16_t g_u_to_i16(gram_u gram);
 
 /**
- * Convert gram_u to int32_t.
- */
+* Convert gram_u to int32_t.
+*/
 int32_t g_u_to_i32(gram_u gram);
 
 /**
- * Convert gram_u to int64_t.
- */
+* Convert gram_u to int64_t.
+*/
 int64_t g_u_to_i64(gram_u gram);
 
 /**
- * Convert gram_u to int8_t.
- */
+* Convert gram_u to int8_t.
+*/
 int8_t g_u_to_i8(gram_u gram);
 
 /**
- * Convert gram_u to kilogram_d.
- */
+* Convert gram_u to kilogram_d.
+*/
 kilogram_d g_u_to_kg_d(gram_u gram);
 
 /**
- * Convert gram_u to kilogram_f.
- */
+* Convert gram_u to kilogram_f.
+*/
 kilogram_f g_u_to_kg_f(gram_u gram);
 
 /**
- * Convert gram_u to kilogram_t.
- */
+* Convert gram_u to kilogram_t.
+*/
 kilogram_t g_u_to_kg_t(gram_u gram);
 
 /**
- * Convert gram_u to kilogram_u.
- */
+* Convert gram_u to kilogram_u.
+*/
 kilogram_u g_u_to_kg_u(gram_u gram);
 
 /**
- * Convert gram_u to megagram_d.
- */
+* Convert gram_u to megagram_d.
+*/
 megagram_d g_u_to_Mg_d(gram_u gram);
 
 /**
- * Convert gram_u to megagram_f.
- */
+* Convert gram_u to megagram_f.
+*/
 megagram_f g_u_to_Mg_f(gram_u gram);
 
 /**
- * Convert gram_u to megagram_t.
- */
+* Convert gram_u to megagram_t.
+*/
 megagram_t g_u_to_Mg_t(gram_u gram);
 
 /**
- * Convert gram_u to megagram_u.
- */
+* Convert gram_u to megagram_u.
+*/
 megagram_u g_u_to_Mg_u(gram_u gram);
 
 /**
- * Convert gram_u to microgram_d.
- */
+* Convert gram_u to microgram_d.
+*/
 microgram_d g_u_to_ug_d(gram_u gram);
 
 /**
- * Convert gram_u to microgram_f.
- */
+* Convert gram_u to microgram_f.
+*/
 microgram_f g_u_to_ug_f(gram_u gram);
 
 /**
- * Convert gram_u to microgram_t.
- */
+* Convert gram_u to microgram_t.
+*/
 microgram_t g_u_to_ug_t(gram_u gram);
 
 /**
- * Convert gram_u to microgram_u.
- */
+* Convert gram_u to microgram_u.
+*/
 microgram_u g_u_to_ug_u(gram_u gram);
 
 /**
- * Convert gram_u to milligram_d.
- */
+* Convert gram_u to milligram_d.
+*/
 milligram_d g_u_to_mg_d(gram_u gram);
 
 /**
- * Convert gram_u to milligram_f.
- */
+* Convert gram_u to milligram_f.
+*/
 milligram_f g_u_to_mg_f(gram_u gram);
 
 /**
- * Convert gram_u to milligram_t.
- */
+* Convert gram_u to milligram_t.
+*/
 milligram_t g_u_to_mg_t(gram_u gram);
 
 /**
- * Convert gram_u to milligram_u.
- */
+* Convert gram_u to milligram_u.
+*/
 milligram_u g_u_to_mg_u(gram_u gram);
 
 /**
- * Convert gram_u to uint16_t.
- */
+* Convert gram_u to uint16_t.
+*/
 uint16_t g_u_to_u16(gram_u gram);
 
 /**
- * Convert gram_u to uint32_t.
- */
+* Convert gram_u to uint32_t.
+*/
 uint32_t g_u_to_u32(gram_u gram);
 
 /**
- * Convert gram_u to uint64_t.
- */
+* Convert gram_u to uint64_t.
+*/
 uint64_t g_u_to_u64(gram_u gram);
 
 /**
- * Convert gram_u to uint8_t.
- */
+* Convert gram_u to uint8_t.
+*/
 uint8_t g_u_to_u8(gram_u gram);
 
 /**
- * Convert int16_t to gram_d.
- */
+* Convert int16_t to gram_d.
+*/
 gram_d i16_to_g_d(int16_t gram);
 
 /**
- * Convert int16_t to gram_f.
- */
+* Convert int16_t to gram_f.
+*/
 gram_f i16_to_g_f(int16_t gram);
 
 /**
- * Convert int16_t to gram_t.
- */
+* Convert int16_t to gram_t.
+*/
 gram_t i16_to_g_t(int16_t gram);
 
 /**
- * Convert int16_t to gram_u.
- */
+* Convert int16_t to gram_u.
+*/
 gram_u i16_to_g_u(int16_t gram);
 
 /**
- * Convert int32_t to gram_d.
- */
+* Convert int32_t to gram_d.
+*/
 gram_d i32_to_g_d(int32_t gram);
 
 /**
- * Convert int32_t to gram_f.
- */
+* Convert int32_t to gram_f.
+*/
 gram_f i32_to_g_f(int32_t gram);
 
 /**
- * Convert int32_t to gram_t.
- */
+* Convert int32_t to gram_t.
+*/
 gram_t i32_to_g_t(int32_t gram);
 
 /**
- * Convert int32_t to gram_u.
- */
+* Convert int32_t to gram_u.
+*/
 gram_u i32_to_g_u(int32_t gram);
 
 /**
- * Convert int64_t to gram_d.
- */
+* Convert int64_t to gram_d.
+*/
 gram_d i64_to_g_d(int64_t gram);
 
 /**
- * Convert int64_t to gram_f.
- */
+* Convert int64_t to gram_f.
+*/
 gram_f i64_to_g_f(int64_t gram);
 
 /**
- * Convert int64_t to gram_t.
- */
+* Convert int64_t to gram_t.
+*/
 gram_t i64_to_g_t(int64_t gram);
 
 /**
- * Convert int64_t to gram_u.
- */
+* Convert int64_t to gram_u.
+*/
 gram_u i64_to_g_u(int64_t gram);
 
 /**
- * Convert int8_t to gram_d.
- */
+* Convert int8_t to gram_d.
+*/
 gram_d i8_to_g_d(int8_t gram);
 
 /**
- * Convert int8_t to gram_f.
- */
+* Convert int8_t to gram_f.
+*/
 gram_f i8_to_g_f(int8_t gram);
 
 /**
- * Convert int8_t to gram_t.
- */
+* Convert int8_t to gram_t.
+*/
 gram_t i8_to_g_t(int8_t gram);
 
 /**
- * Convert int8_t to gram_u.
- */
+* Convert int8_t to gram_u.
+*/
 gram_u i8_to_g_u(int8_t gram);
 
 /**
- * Convert uint16_t to gram_d.
- */
+* Convert uint16_t to gram_d.
+*/
 gram_d u16_to_g_d(uint16_t gram);
 
 /**
- * Convert uint16_t to gram_f.
- */
+* Convert uint16_t to gram_f.
+*/
 gram_f u16_to_g_f(uint16_t gram);
 
 /**
- * Convert uint16_t to gram_t.
- */
+* Convert uint16_t to gram_t.
+*/
 gram_t u16_to_g_t(uint16_t gram);
 
 /**
- * Convert uint16_t to gram_u.
- */
+* Convert uint16_t to gram_u.
+*/
 gram_u u16_to_g_u(uint16_t gram);
 
 /**
- * Convert uint32_t to gram_d.
- */
+* Convert uint32_t to gram_d.
+*/
 gram_d u32_to_g_d(uint32_t gram);
 
 /**
- * Convert uint32_t to gram_f.
- */
+* Convert uint32_t to gram_f.
+*/
 gram_f u32_to_g_f(uint32_t gram);
 
 /**
- * Convert uint32_t to gram_t.
- */
+* Convert uint32_t to gram_t.
+*/
 gram_t u32_to_g_t(uint32_t gram);
 
 /**
- * Convert uint32_t to gram_u.
- */
+* Convert uint32_t to gram_u.
+*/
 gram_u u32_to_g_u(uint32_t gram);
 
 /**
- * Convert uint64_t to gram_d.
- */
+* Convert uint64_t to gram_d.
+*/
 gram_d u64_to_g_d(uint64_t gram);
 
 /**
- * Convert uint64_t to gram_f.
- */
+* Convert uint64_t to gram_f.
+*/
 gram_f u64_to_g_f(uint64_t gram);
 
 /**
- * Convert uint64_t to gram_t.
- */
+* Convert uint64_t to gram_t.
+*/
 gram_t u64_to_g_t(uint64_t gram);
 
 /**
- * Convert uint64_t to gram_u.
- */
+* Convert uint64_t to gram_u.
+*/
 gram_u u64_to_g_u(uint64_t gram);
 
 /**
- * Convert uint8_t to gram_d.
- */
+* Convert uint8_t to gram_d.
+*/
 gram_d u8_to_g_d(uint8_t gram);
 
 /**
- * Convert uint8_t to gram_f.
- */
+* Convert uint8_t to gram_f.
+*/
 gram_f u8_to_g_f(uint8_t gram);
 
 /**
- * Convert uint8_t to gram_t.
- */
+* Convert uint8_t to gram_t.
+*/
 gram_t u8_to_g_t(uint8_t gram);
 
 /**
- * Convert uint8_t to gram_u.
- */
+* Convert uint8_t to gram_u.
+*/
 gram_u u8_to_g_u(uint8_t gram);
 ```
 
