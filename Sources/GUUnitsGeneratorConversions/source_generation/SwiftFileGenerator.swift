@@ -592,7 +592,7 @@ public struct SwiftFileCreator {
         guard !parameters.isEmpty else {
             return """
                 \(comment)
-                var \(name): \(typeName) {
+                public var \(name): \(typeName) {
                     \(typeName)(rawValue: \(relation.name(sign: sign, otherSign: otherSign))(self.rawValue))
                 }
             """
@@ -608,7 +608,7 @@ public struct SwiftFileCreator {
         ).joined(separator: ", ")
         return """
             \(comment)
-            func \(name)(\(fnParameters)) -> \(typeName) {
+            public func \(name)(\(fnParameters)) -> \(typeName) {
                 \(typeName)(rawValue: \(relation.name(sign: sign, otherSign: otherSign))(\(fnValues)))
             }
         """
