@@ -218,6 +218,29 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     /// Create the name of a function that test a conversion function.
     /// - Parameters:
     ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit to convert from.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: The test parameters.
+    /// - Returns: The name of a suitable test function.
+    func testFunctionName(
+        from unit: AnyUnit,
+        with sign: Signs,
+        to otherUnit: AnyUnit,
+        with otherSign: Signs,
+        using parameters: TestParameters
+    ) -> String {
+        doTestFunctionName(
+            from: "\(unit.description)_\(sign.rawValue)",
+            to: "\(otherUnit.description)_\(otherSign.rawValue)",
+            with: "\(parameters.input)",
+            expecting: "\(parameters.output)"
+        )
+    }
+
+    /// Create the name of a function that test a conversion function.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
     ///   - sign: The sign of the unit.
     ///   - other: The numeric type to convert to.
     ///   - parameters: The parameters to test in the function.
@@ -279,7 +302,7 @@ public struct FunctionHelpers<Unit: UnitProtocol> {
     /// Remove all characters after an invalid character is found.
     /// - Parameter string: The string to santise.
     /// - Returns: The sanitised string.
-    private func sanitise(string: String) -> String {
+    func sanitise(string: String) -> String {
         guard !string.isEmpty else {
             return string
         }

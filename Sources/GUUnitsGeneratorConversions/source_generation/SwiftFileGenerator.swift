@@ -69,6 +69,124 @@ public struct SwiftFileCreator {
     /// - Parameter type: The type to generate.
     /// - Returns: A string of the file contents.
     public func generate<T: UnitProtocol>(for type: T.Type) -> String {
+        let structGeneration = doGenerate(for: type)
+        guard let relationshipGeneration = createRelationExtensions(for: type) else {
+            return structGeneration + "\n"
+        }
+        return structGeneration + "\n\n" + relationshipGeneration + "\n"
+    }
+
+    /// Creates the extensions required for the relation operations defined in the `relationships`
+    /// property of the unit.
+    /// - Parameter type: The unit that defines the relationships.
+    /// - Returns: A string containing the extensions to related units.
+    private func createRelationExtensions<T: UnitProtocol>(for type: T.Type) -> String? {
+        let relations = T.relationships
+        guard !relations.isEmpty else {
+            return nil
+        }
+        var targetsCompleted: Set<AnyUnit> = []
+        let extensions: [String] = relations.lazy.compactMap { relation -> [String]? in
+            let target = relation.target
+            guard !targetsCompleted.contains(target) else {
+                return nil
+            }
+            let targetRelations = relations.filter {
+                $0.target == target
+            }
+            targetsCompleted.insert(target)
+            return Signs.allCases.map { sign in
+                createRelationExtension(relations: targetRelations, targetSign: sign)
+            }
+        }
+        .flatMap { $0 }
+        return extensions.joined(separator: "\n\n")
+    }
+
+    /// Create a single extension for a group of related relations. These relations must contain
+    /// a target type that is the same.
+    /// - Parameters:
+    ///   - relations: The relations that generate a chosen target.
+    ///   - targetSign: The sign of the chosen target.
+    /// - Returns: A string containing the extension of the target type that can be initialised
+    /// using the relations.
+    private func createRelationExtension(relations: [Relation], targetSign: Signs) -> String {
+        guard
+            let target = relations.first?.target,
+            relations.allSatisfy({ $0.target == target })
+        else {
+            fatalError("Invalid relations.")
+        }
+        let inits: String = relations.flatMap { relation -> [String] in
+            Signs.allCases.compactMap { sourceSign -> String? in
+                toConversionInit(
+                    conversion: UnitConversion(
+                        relation: relation, sourceSign: sourceSign, targetSign: targetSign
+                    )
+                )
+            }
+        }
+        .joined(separator: "\n\n")
+        return """
+        public extension \(target.description.capitalized)_\(targetSign.rawValue) {
+
+        \(inits)
+
+        }
+        """
+    }
+
+    /// Creates an initialiser for a conversion function.
+    /// - Parameter conversion: The conversion function.
+    /// - Returns: The initialiser implementing the conversion function.
+    private func toConversionInit(conversion: UnitConversion) -> String? {
+        let relation = conversion.relation
+        let parameters = relation.operation.units
+        let conversionName = relation.name(sign: conversion.sourceSign, otherSign: conversion.targetSign)
+        guard parameters.count > 1 else {
+            guard let value = parameters.first else {
+                return nil
+            }
+            let comment = "/// Create a `\(relation.target.description.capitalized)" +
+                "_\(conversion.targetSign.rawValue)` from a `\(value.description.capitalized)" +
+                "_\(conversion.sourceSign.rawValue)`."
+            return """
+                \(comment)
+                init(_ value: \(value.description.capitalized)_\(conversion.sourceSign.rawValue)) {
+                    self.init(rawValue: \(conversionName)(value.rawValue))
+                }
+            """
+        }
+        let sortedParams = parameters.sorted {
+            $0.description < $1.description
+        }
+        let functionParameters: String = sortedParams.map {
+            "\($0.description): \($0.description.capitalized)_\(conversion.sourceSign.rawValue)"
+        }
+        .joined(separator: ", ")
+        let functionValues = sortedParams.map {
+            "\($0.description).rawValue"
+        }
+        .joined(separator: ", ")
+        let parametersTypes = sortedParams.map {
+            "`\($0.description.capitalized)_\(conversion.sourceSign.rawValue)`"
+        }
+        .joined(separator: ", ")
+        let comment = "/// Create a `\(relation.target.description.capitalized)_" +
+                "\(conversion.targetSign.rawValue)` from \(parametersTypes)."
+        return """
+            \(comment)
+            init(\(functionParameters)) {
+                self.init(rawValue: \(conversionName)(\(functionValues)))
+            }
+        """
+    }
+
+    /// Generates the core source code the the category and units. This generates everything except
+    /// the relationships.
+    /// - Parameter type: The category to generate.
+    /// - Returns: A string containing the swift source code.
+    private func doGenerate<T: UnitProtocol>(for type: T.Type) -> String {
         let prefix = self.prefix(name: type.category)
         let categoryStruct = self.generateCategoryStruct(for: type)
         let categoryExtensions = self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
@@ -77,7 +195,7 @@ public struct SwiftFileCreator {
         let unitStruct = self.createMultiple(for: type.allCases) {
             self.generateUnit(for: $0)
         }
-        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct + "\n"
+        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct
     }
 
     /// Creates the swift file contents for a given case of a unit type.
@@ -524,8 +642,7 @@ public struct SwiftFileCreator {
             + "\n\n" + numericInits
             + conversionInits
             + "\n\n" + "// MARK: - Converting From Other Precisions"
-            + "\n\n" + selfConversions
-            + "\n\n" + endef
+            + "\n\n" + selfConversions + "\n\n" + endef
     }
 
     /// Generate a property that creates the underlying C-type.

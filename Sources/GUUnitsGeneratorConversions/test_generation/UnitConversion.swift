@@ -1,4 +1,4 @@
-// AccelerationTestGeneratorNumTests.swift 
+// UnitConversion.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,17 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A struct for storing conversion information for conversions between different unit
+/// categories.
+public struct UnitConversion: Hashable {
 
-/// Test class for AccelerationTestGenerator numeric conversions.
-final class AccelerationTestGeneratorNumTests: XCTestCase,
-    TestParameterTestable, TestGeneratorNumericTestable {
+    /// The conversion that is being performed.
+    public let relation: Relation
 
-    /// The generator under test.
-    let generator = AccelerationTestGenerator()
+    /// The sign of the source unit.
+    public let sourceSign: Signs
 
-    /// Test the same unit conversion returns the correct test cases.
-    func testUnitTypes() {
-        AccelerationUnits.allCases.forEach { unit in
-            [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
-                self.unitTest(unit: unit, sign: sign)
-            }
-        }
-    }
-
-    /// Test unit to numeric and numeric to unit conversion tests.
-    func testUnitToNumericTypes() {
-        AccelerationUnits.allCases.forEach { unit in
-            [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
-                self.numericTest(unit: unit, sign: sign)
-            }
-        }
-    }
+    /// The sign of the target unit.
+    public let targetSign: Signs
 
 }

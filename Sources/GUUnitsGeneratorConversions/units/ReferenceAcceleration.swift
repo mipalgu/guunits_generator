@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// ReferenceAcceleration.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,59 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// Provides non-SI acceleration units.
+public enum ReferenceAcceleration: String {
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+    /// The acceleration from earth gravity.
+    case earthG
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
-        )
+}
+
+/// ``UnitProtocol`` conformance.
+extension ReferenceAcceleration: UnitProtocol {
+
+    /// The abbreviation of the unit.
+    public var abbreviation: String {
+        switch self {
+        case .earthG:
+            return "gs"
+        }
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
+    /// The description of the unit.
+    public var description: String {
+        self.rawValue
     }
 
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+}
+
+/// ``UnitsConvertible`` conformance.
+extension ReferenceAcceleration: UnitsConvertible {
+
+    /// Convert this unit to another unit within the same category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: The operation converting `self` to `unit`.
+    public func conversion(to unit: ReferenceAcceleration) -> Operation {
+        .constant(declaration: AnyUnit(self))
+    }
+
+}
+
+/// ``UnitRelatable`` conformance.
+extension ReferenceAcceleration: UnitRelatable {
+
+    /// The relationships that define conversions to other units within other categories.
+    public static var relationships: [Relation] {
+        [
+            Relation(
+                source: AnyUnit(Self.earthG),
+                target: Acceleration.metresPerSecond2,
+                operation: .multiplication(
+                    lhs: .constant(declaration: AnyUnit(Self.earthG)),
+                    rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
+                )
+            )
+        ]
     }
 
 }

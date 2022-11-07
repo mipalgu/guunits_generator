@@ -66,15 +66,11 @@ public struct SwiftTestFileCreator {
     /// Generate the contents for a test file by using a given test generator.
     /// - Parameter generator: The generator creating the test parameters.
     /// - Returns: The contents of the test file.
-    func generate<T: TestGenerator>(with generator: T) -> [(String, String)] {
+    func generate<T: TestGenerator>(
+        with generator: T
+    ) -> [(String, String)] where T.UnitType: OperationalTestable {
         let prefix = prefix(name: "\(T.UnitType.category)Tests")
-        let valueTests = T.UnitType.allCases.flatMap { unit in
-            Signs.allCases.flatMap { sign in
-                createTestClass(from: unit, with: sign, using: generator)
-            }
-        }
-        let allTests = typeTests(category: T.UnitType.self) + typeConversionTests(category: T.UnitType.self) +
-            valueTests
+        let allTests = standardTests(with: generator) + relationTests(for: T.UnitType.self)
         return allTests.map {
             (
                 $0,
@@ -87,8 +83,98 @@ public struct SwiftTestFileCreator {
         }
     }
 
+    /// Generate the contents for a test file by using a given test generator.
+    /// - Parameter generator: The generator creating the test parameters.
+    /// - Returns: The contents of the test file.
+    func generate<T: TestGenerator>(with generator: T) -> [(String, String)] {
+        let prefix = prefix(name: "\(T.UnitType.category)Tests")
+        let allTests = standardTests(with: generator)
+        return allTests.map {
+            (
+                $0,
+                """
+                \(prefix)
+
+                \($1)
+                """
+            )
+        }
+    }
+
+    /// Generate the tests for all conversion functions within the same category.
+    /// - Parameter generator: The generator that creates the conversion functions.
+    /// - Returns: An array of tuples containing the file name and the code within that file.
+    private func standardTests<T: TestGenerator>(with generator: T) -> [(String, String)] {
+        let valueTests = T.UnitType.allCases.flatMap { unit in
+            Signs.allCases.flatMap { sign in
+                createTestClass(from: unit, with: sign, using: generator)
+            }
+        }
+        return typeTests(category: T.UnitType.self) + typeConversionTests(category: T.UnitType.self) +
+            valueTests
+    }
+
     // swiftlint:disable function_body_length
     // swiftlint:disable closure_body_length
+
+    /// Create the tests for the relationships within a type. This function will generate the test code
+    /// for conversion between different category types.
+    /// - Parameter type: The type containing the relationships.
+    /// - Returns: An array of tuples containing the file name and the code that is within that file.
+    private func relationTests<T: OperationalTestable>(for type: T.Type) -> [(String, String)] {
+        let tests = T.relationTests
+        guard !tests.isEmpty else {
+            return []
+        }
+        let helper = FunctionHelpers<T>()
+        return tests.flatMap { conversion, parameters -> [String] in
+            let relation: Relation = conversion.relation
+            let sourceSign = conversion.sourceSign
+            let target = relation.target
+            let targetSign = conversion.targetSign
+            let functionName = relation.name(sign: sourceSign, otherSign: targetSign)
+            return parameters.map {
+                let units = relation.operation.units.sorted {
+                    $0.description < $1.description
+                }
+                guard !units.isEmpty else {
+                    fatalError("Invalid relation.")
+                }
+                let input = $0.input
+                let inputs: String
+                if units.count == 1, let firstUnit = units.first {
+                    let typeName = "\(firstUnit.description.capitalized)_\(sourceSign.rawValue)"
+                    inputs = "\(typeName)(\(input))"
+                } else {
+                    inputs = units.map { unit in
+                        let typeName = "\(unit.description.capitalized)_\(sourceSign.rawValue)"
+                        return "\(unit.description): \(typeName)(\(input))"
+                    }
+                    .joined(separator: ", ")
+                }
+                return """
+                    func test\(functionName)Using\(helper.sanitise(string: $0.input))() {
+                        let result = \(target.description.capitalized)_\(targetSign.rawValue)(\(inputs))
+                        let expected = \(functionName)(\($0.input))
+                        XCTAssertEqual(result.rawValue, expected)
+                    }
+                """
+            }
+        }
+        .group(size: 30)
+        .enumerated()
+        .map { index, unitTests in
+            let fileName = "\(T.category)RelationTests\(index)"
+            let classDefinition = """
+            final class \(fileName): XCTestCase {
+
+            \(unitTests.joined(separator: "\n\n"))
+
+            }
+            """
+            return (fileName, classDefinition)
+        }
+    }
 
     /// Provides additional tests for particular properties and method in the swift types of GUUnits.
     /// - Parameter category: The category under test.

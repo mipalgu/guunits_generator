@@ -1,4 +1,4 @@
-// Literal.swift 
+// ReferenceAccelerationTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,96 +54,53 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Enumeration for representating different types of primitive values. These types represent
-/// different real and rational numbers with differing precision.
-public enum Literal: Hashable, CustomStringConvertible {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// An integer.
-    case integer(value: Int)
+/// Test class for ``ReferenceAcceleration``.
+final class ReferenceAccelerationTests: XCTestCase, UnitsTestable {
 
-    /// A decimal number that would contain a decimal point. This value is approximated
-    /// as a `Double`.
-    case decimal(value: Double)
-
-    /// A concise string representation of the underlying value.
-    var abbreviation: String {
-        switch self {
-        case .integer(let value):
-            return value.abbreviation
-        case .decimal(let value):
-            return value.abbreviation
-        }
+    /// Test earthG case.
+    func testEarthG() {
+        assert(
+            value: ReferenceAcceleration.earthG,
+            rawValue: "earthG",
+            abbreviation: "gs",
+            description: "earthG"
+        )
     }
 
-    /// The underlying value represented as a `Double` type.
-    var asDouble: Double {
-        switch self {
-        case .integer(let value):
-            return Double(value)
-        case .decimal(let value):
-            return value
-        }
+    /// Test ``UnitProtocol`` static properties.
+    func testStaticProperties() {
+        XCTAssertEqual(ReferenceAcceleration.category, "ReferenceAcceleration")
+        XCTAssertEqual(ReferenceAcceleration.highestPrecision, .earthG)
+        XCTAssertTrue(ReferenceAcceleration.sameZeroPoint)
+        XCTAssertEqual(ReferenceAcceleration.allCases, [.earthG])
     }
 
-    /// The underlying value represented as an `Int` type.
-    var asInteger: Int {
-        switch self {
-        case .integer(let value):
-            return value
-        case .decimal(let value):
-            return Int(value.rounded())
-        }
+    /// Test conversion function is correct.
+    func testConversion() {
+        let result = ReferenceAcceleration.earthG.conversion(to: .earthG)
+        let expected = GUUnitsGeneratorConversions.Operation.constant(
+            declaration: AnyUnit(ReferenceAcceleration.earthG)
+        )
+        XCTAssertEqual(result, expected)
     }
 
-    /// The underlying value represented as a `String`.
-    var asString: String {
-        switch self {
-        case .integer(let value):
-            return "\(value)"
-        case .decimal(let value):
-            return "\(value)"
-        }
-    }
-
-    /// The description of this literal.
-    public var description: String {
-        asString
-    }
-
-    /// True when the underlying value is a floating point number. False otherwise.
-    var isFloat: Bool {
-        switch self {
-        case .integer:
-            return false
-        case .decimal:
-            return true
-        }
-    }
-
-}
-
-/// Add abbreviation to Int.
-private extension Int {
-
-    /// The abbreviation of the Int.
-    var abbreviation: String {
-        guard self > 0 else {
-            return "neg" + abs(self).abbreviation
-        }
-        return "\(self)"
-    }
-
-}
-
-/// Add abbreviation to Double.
-private extension Double {
-
-    /// An small string representation of a Double value.
-    var abbreviation: String {
-        guard self > 0 else {
-            return "neg" + abs(self).abbreviation
-        }
-        return String(format: "%.2f", arguments: [self]).replacingOccurrences(of: ".", with: "_")
+    /// Test relationships array is correct.
+    func testRelationships() {
+        let result = ReferenceAcceleration.relationships
+        let expected = [
+            Relation(
+                source: AnyUnit(ReferenceAcceleration.earthG),
+                target: Acceleration.metresPerSecond2,
+                operation: .multiplication(
+                    lhs: .constant(declaration: AnyUnit(ReferenceAcceleration.earthG)),
+                    rhs: .literal(declaration: .decimal(value: .earthAcceleration))
+                )
+            )
+        ]
+        XCTAssertEqual(result, expected)
     }
 
 }

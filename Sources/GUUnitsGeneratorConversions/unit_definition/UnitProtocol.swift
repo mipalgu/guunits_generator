@@ -61,7 +61,7 @@
 /// units. Examples include Distance, Time, Angles, etc. Conforming types might
 /// contain many units for a category, e.g. Distance can have metres, centimetres,
 /// millimetres, etc.
-public protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
+public protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible, UnitRelatable {
 
     /// The category the unit belong to. Eg. radians belongs to the Angle category.
     static var category: String { get }

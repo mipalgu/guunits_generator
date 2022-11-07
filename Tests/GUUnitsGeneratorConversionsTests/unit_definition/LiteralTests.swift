@@ -1,4 +1,4 @@
-// AccelerationUnits.swift 
+// LiteralTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,33 +54,72 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit that represents accelerations.
-public enum AccelerationUnits: String {
+@testable import GUUnitsGeneratorConversions
+import XCTest
 
-    /// Metres per second squared. (m/(s^2))
-    case metresPerSecond2
+/// Test class for ``Literal``.
+final class LiteralTests: XCTestCase {
 
-    /// g's. Acceleration normalised to Earths gravitational acceleration (9.807 m/(s^2))
-    case gs
+    /// Int literal under test.
+    let intLiteral = Literal.integer(value: 5)
 
-}
+    /// Double Literal under test.
+    let doubleLiteral = Literal.decimal(value: 12.3456)
 
-/// UnitProtocol conformance.
-extension AccelerationUnits: UnitProtocol {
-
-    /// The abbreviation of the unit.
-    public var abbreviation: String {
-        switch self {
-        case .metresPerSecond2:
-            return "mps2"
-        case .gs:
-            return "gs"
-        }
+    /// Test abbreviation is correct.
+    func testAbbreviation() {
+        XCTAssertEqual(intLiteral.abbreviation, "5")
+        XCTAssertEqual(doubleLiteral.abbreviation, "12_35")
     }
 
-    /// The description of the unit.
-    public var description: String {
-        rawValue
+    /// Test double conversion is correct.
+    func testAsDouble() {
+        XCTAssertEqual(5.0, intLiteral.asDouble)
+        XCTAssertEqual(12.3456, doubleLiteral.asDouble)
+    }
+
+    /// Test integer conversion is correct.
+    func testAsInteger() {
+        XCTAssertEqual(5, intLiteral.asInteger)
+        XCTAssertEqual(12, doubleLiteral.asInteger)
+        let literal3 = Literal.decimal(value: 7.6)
+        XCTAssertEqual(8, literal3.asInteger)
+    }
+
+    /// Test string representation maintains the underlying values.
+    func testAsString() {
+        XCTAssertEqual("5", intLiteral.asString)
+        XCTAssertEqual("12.3456", doubleLiteral.asString)
+    }
+
+    /// Test isFloat is correct.
+    func testIsFloat() {
+        XCTAssertFalse(intLiteral.isFloat)
+        XCTAssertTrue(doubleLiteral.isFloat)
+    }
+
+    /// Test isZero property.
+    func testIsZero() {
+        let literal = Literal.integer(value: 0)
+        let literal2 = Literal.decimal(value: 0.0)
+        let literal3 = Literal.integer(value: 1)
+        let literal4 = Literal.decimal(value: 1.0)
+        XCTAssertTrue(literal.isZero)
+        XCTAssertTrue(literal2.isZero)
+        XCTAssertFalse(literal3.isZero)
+        XCTAssertFalse(literal4.isZero)
+    }
+
+    /// Test isOne property.
+    func testIsOne() {
+        let literal = Literal.integer(value: 0)
+        let literal2 = Literal.decimal(value: 0.0)
+        let literal3 = Literal.integer(value: 1)
+        let literal4 = Literal.decimal(value: 1.0)
+        XCTAssertFalse(literal.isOne)
+        XCTAssertFalse(literal2.isOne)
+        XCTAssertTrue(literal3.isOne)
+        XCTAssertTrue(literal4.isOne)
     }
 
 }

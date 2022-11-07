@@ -1,4 +1,4 @@
-// OperationConvertiblesTests.swift 
+// AccelerationUnitsTests.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -57,83 +57,77 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
-/// Test class for ``Operation`` code generation functions.
-final class OperationConvertiblesTests: XCTestCase {
+/// Test class for ``Acceleration``.
+final class AccelerationTests: XCTestCase {
 
-    /// The operaiton under test. SI Newton.
-    let operation = Operation.division(
-        lhs: .multiplication(
-            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)),
-            rhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(DistanceUnits.metres)),
-                power: .literal(declaration: .integer(value: 2))
-            )
-        ),
-        rhs: .exponentiate(
-            base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
-            power: .literal(declaration: .integer(value: 2))
-        )
-    )
-
-    /// Test cCode generation for .d Sign.
-    func testCCode_d() {
-        let code = operation.cCode(sign: .d)
-        let type = Signs.d.numericType.rawValue
-        let seconds = "((\(type)) (seconds))"
-        let metres = "((\(type)) (metres))"
-        let kilogram = "((\(type)) (kilogram))"
-        let expected = "divide_d((multiply_d((\(kilogram)), (multiply_d((\(metres)), (\(metres))))))," +
-            " (multiply_d((\(seconds)), (\(seconds)))))"
-        XCTAssertEqual(code, expected)
-    }
-
-    /// Test swift code generation for .d sign
-    func testSwiftCode_d() {
-        let code = operation.swiftCode(sign: .d)
-        let type = Signs.d.numericType.swiftType.rawValue
-        let seconds = "\(type)(seconds)"
-        let metres = "\(type)(metres)"
-        let kilogram = "\(type)(kilogram)"
-        let expected = "((\(kilogram)) * ((\(metres)) * (\(metres)))) /" +
-            " ((\(seconds)) * (\(seconds)))"
-        XCTAssertEqual(code, expected)
-    }
-
-    /// Test replace metres with metres.
-    func testReplaceMetres() {
-        let convertible: [AnyUnit: AnyUnit] = [
-            AnyUnit(DistanceUnits.metres): AnyUnit(DistanceUnits.metres)
-        ]
-        let result = operation.replace(convertibles: convertible)
+    /// Test the base unit matches the Acceleration SI unit.
+    func testBaseUnit() {
+        let result = Acceleration.baseUnit
         let expected = Operation.division(
-            lhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(DistanceUnits.metres)),
-                power: .literal(declaration: .integer(value: 2))
-            ),
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: .exponentiate(
-                base: .literal(declaration: .integer(value: 1)),
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
                 power: .literal(declaration: .integer(value: 2))
             )
         )
         XCTAssertEqual(result, expected)
     }
 
-    /// Test replace metres with metres.
-    func testReplaceMetresOperation() {
-        let convertible: [AnyUnit: GUUnitsGeneratorConversions.Operation] = [
-            AnyUnit(DistanceUnits.metres): Operation.constant(declaration: AnyUnit(DistanceUnits.metres))
-        ]
-        let result = operation.replace(convertibles: convertible)
-        let expected = Operation.division(
-            lhs: .exponentiate(
-                base: .constant(declaration: AnyUnit(DistanceUnits.metres)),
-                power: .literal(declaration: .integer(value: 2))
-            ),
+    /// Test that the test parameters match the default parameters.
+    func testTestParameters() {
+        XCTAssertEqual(Acceleration.testParameters, Acceleration.defaultParameters)
+    }
+
+    /// Test init sets properties correctly.
+    func testInit() {
+        let acceleration = Acceleration(unit: Acceleration.baseUnit)
+        XCTAssertEqual(acceleration.unit, Acceleration.baseUnit)
+    }
+
+    /// Test metresPerSecond2 is set correctly.
+    func testMetresPerSecond2() {
+        let result = Acceleration.metresPerSecond2
+        let expected = AnyUnit(
+            Acceleration(
+                unit: .division(
+                    lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                    rhs: .exponentiate(
+                        base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                        power: .literal(declaration: .integer(value: 2))
+                    )
+                )
+            )
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test relationships contain the operation to Earth G.
+    func testRelationships() {
+        let result = Acceleration.relationships
+        let mps2 = Operation.division(
+            lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
             rhs: .exponentiate(
-                base: .literal(declaration: .integer(value: 1)),
+                base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
                 power: .literal(declaration: .integer(value: 2))
             )
         )
+        let operation = Operation.division(
+            lhs: .constant(declaration: Acceleration.metresPerSecond2),
+            rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
+        )
+        let target = AnyUnit(ReferenceAcceleration.earthG)
+        let expected = Acceleration.allCases.map {
+            let unit = AnyUnit($0)
+            guard unit != Acceleration.metresPerSecond2 else {
+                return Relation(
+                    source: unit, target: target, operation: operation
+                )
+            }
+            let newOperation = operation.replace(
+                convertibles: [Acceleration.metresPerSecond2: $0.conversion(to: Acceleration(unit: mps2))]
+            )
+            return Relation(source: unit, target: target, operation: newOperation)
+        }
         XCTAssertEqual(result, expected)
     }
 
