@@ -60,6 +60,34 @@ import XCTest
 /// Test class for ``ReferenceAcceleration``.
 final class ReferenceAccelerationTests: XCTestCase, UnitsTestable {
 
+    /// The expected relationships for ReferenceAcceleration.
+    private var relationships: [Relation] {
+        let me = AnyUnit(ReferenceAcceleration.earthG)
+        let mps2 = Acceleration(
+            unit: .division(
+                lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: .exponentiate(
+                    base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                    power: .literal(declaration: .integer(value: 2))
+                )
+            )
+        )
+        let operation = Operation.multiplication(
+            lhs: .literal(declaration: .decimal(value: .earthAcceleration)),
+            rhs: .constant(declaration: AnyUnit(ReferenceAcceleration.earthG))
+        )
+        return Acceleration.allCases.map {
+            let unit = AnyUnit($0)
+            guard $0 != mps2 else {
+                return Relation(source: me, target: unit, operation: operation)
+            }
+            let newOperation = mps2.conversion(to: $0)
+                .replace(convertibles: [AnyUnit(mps2): operation])
+                .simplify
+            return Relation(source: me, target: unit, operation: newOperation)
+        }
+    }
+
     /// Test earthG case.
     func testEarthG() {
         assert(
@@ -90,17 +118,7 @@ final class ReferenceAccelerationTests: XCTestCase, UnitsTestable {
     /// Test relationships array is correct.
     func testRelationships() {
         let result = ReferenceAcceleration.relationships
-        let expected = [
-            Relation(
-                source: AnyUnit(ReferenceAcceleration.earthG),
-                target: Acceleration.metresPerSecond2,
-                operation: .multiplication(
-                    lhs: .constant(declaration: AnyUnit(ReferenceAcceleration.earthG)),
-                    rhs: .literal(declaration: .decimal(value: .earthAcceleration))
-                )
-            )
-        ]
-        XCTAssertEqual(result, expected)
+        XCTAssertEqual(result, relationships)
     }
 
 }
