@@ -101,6 +101,9 @@ public struct SwiftTestFileCreator {
         }
     }
 
+    /// Generate the tests for all conversion functions within the same category.
+    /// - Parameter generator: The generator that creates the conversion functions.
+    /// - Returns: An array of tuples containing the file name and the code within that file.
     private func standardTests<T: TestGenerator>(with generator: T) -> [(String, String)] {
         let valueTests = T.UnitType.allCases.flatMap { unit in
             Signs.allCases.flatMap { sign in
@@ -111,15 +114,20 @@ public struct SwiftTestFileCreator {
             valueTests
     }
 
-    private func relationTests<T: UnitProtocol>(
-        for type: T.Type
-    ) -> [(String, String)] where T: OperationalTestable {
+    // swiftlint:disable function_body_length
+    // swiftlint:disable closure_body_length
+
+    /// Create the tests for the relationships within a type. This function will generate the test code
+    /// for conversion between different category types.
+    /// - Parameter type: The type containing the relationships.
+    /// - Returns: An array of tuples containing the file name and the code that is within that file.
+    private func relationTests<T: OperationalTestable>(for type: T.Type) -> [(String, String)] {
         let tests = T.relationTests
         guard !tests.isEmpty else {
             return []
         }
         let helper = FunctionHelpers<T>()
-        return tests.flatMap { conversion, parameters in
+        return tests.flatMap { conversion, parameters -> [String] in
             let relation: Relation = conversion.relation
             let sourceSign = conversion.sourceSign
             let target = relation.target
@@ -167,9 +175,6 @@ public struct SwiftTestFileCreator {
             return (fileName, classDefinition)
         }
     }
-
-    // swiftlint:disable function_body_length
-    // swiftlint:disable closure_body_length
 
     /// Provides additional tests for particular properties and method in the swift types of GUUnits.
     /// - Parameter category: The category under test.
