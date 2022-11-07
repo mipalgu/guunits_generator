@@ -304,6 +304,16 @@ public struct GUUnitsGenerator {
             at: path,
             with: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
         )
+        let referenceAccelerationGenerator = OperationalTestGenerator<ReferenceAcceleration>()
+        let referenceAccelerationFileCreator = TestFileCreator<
+            OperationalTestGenerator<ReferenceAcceleration>
+        >()
+        createTestFiles(
+            at: path,
+            with: referenceAccelerationFileCreator.tests(
+                generator: referenceAccelerationGenerator, imports: "import CGUUnits"
+            )
+        )
         let velocityGenerator = OperationalTestGenerator<Velocity>()
         let velocityFileCreator = TestFileCreator<OperationalTestGenerator<Velocity>>()
         createTestFiles(
@@ -321,8 +331,6 @@ public struct GUUnitsGenerator {
         print("Done!")
         fflush(stdout)
     }
-
-    // swiftlint:enable function_body_length
 
     /// Generate the swift source files for guunits.
     /// - Parameter path: The path to the directory containing the new files.
@@ -420,6 +428,9 @@ public struct GUUnitsGenerator {
             at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<Acceleration>())
         )
         createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<ReferenceAcceleration>())
+        )
+        createTestFiles(
             at: path,
             with: swiftFileCreator.generate(
                 with: GradualTestGenerator<MassUnits>(
@@ -439,6 +450,8 @@ public struct GUUnitsGenerator {
         print("Done!")
         fflush(stdout)
     }
+
+    // swiftlint:enable function_body_length
 
     /// Writes the test files to the correct path.
     /// - Parameters:

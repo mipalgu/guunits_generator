@@ -97,16 +97,40 @@ extension ReferenceAcceleration: UnitRelatable {
 
     /// The relationships that define conversions to other units within other categories.
     public static var relationships: [Relation] {
-        [
-            Relation(
-                source: AnyUnit(Self.earthG),
-                target: Acceleration.metresPerSecond2,
-                operation: .multiplication(
-                    lhs: .constant(declaration: AnyUnit(Self.earthG)),
-                    rhs: .literal(declaration: .decimal(value: Double.earthAcceleration))
+        let me = AnyUnit(self.earthG)
+        let mps2 = Acceleration(
+            unit: .division(
+                lhs: .constant(declaration: AnyUnit(DistanceUnits.metres)),
+                rhs: .exponentiate(
+                    base: .constant(declaration: AnyUnit(TimeUnits.seconds)),
+                    power: .literal(declaration: .integer(value: 2))
                 )
             )
-        ]
+        )
+        let operation = Operation.multiplication(
+            lhs: .literal(declaration: .decimal(value: .earthAcceleration)),
+            rhs: .constant(declaration: AnyUnit(self.earthG))
+        )
+        return Acceleration.allCases.map {
+            let unit = AnyUnit($0)
+            guard unit != Acceleration.metresPerSecond2 else {
+                return Relation(source: me, target: unit, operation: operation)
+            }
+            let newOperation = mps2.conversion(to: $0)
+                .replace(convertibles: [Acceleration.metresPerSecond2: operation])
+                .simplify
+            return Relation(source: me, target: unit, operation: newOperation)
+        }
     }
+
+}
+
+/// ``OperationalTestable`` conformance.
+extension ReferenceAcceleration: OperationalTestable {
+
+    /// The tests for the unit conversions.
+    public static let testParameters: [
+        ConversionMetaData<ReferenceAcceleration>: [TestParameters]
+    ] = defaultParameters
 
 }
