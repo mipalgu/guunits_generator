@@ -174,7 +174,10 @@ public struct GUUnitsGenerator {
             generating: TemperatureUnits.self, using: TemperatureUnitsGenerator()
         )
         let accelerationGenerator = AnyGenerator(
-            generating: AccelerationUnits.self, using: AccelerationUnitsGenerator()
+            generating: Acceleration.self, using: OperationalGenerator()
+        )
+        let referenceAccelerationGenerator = AnyGenerator(
+            generating: ReferenceAcceleration.self, using: OperationalGenerator()
         )
         let massGenerator = AnyGenerator(
             generating: MassUnits.self, using: MassUnitsGenerator(unitDifference: [
@@ -183,6 +186,10 @@ public struct GUUnitsGenerator {
                 .gram: 1000,
                 .kilogram: 1000
             ])
+        )
+        let velocityGenerator = AnyGenerator(generating: Velocity.self, using: OperationalGenerator())
+        let angularVelocityGenerator = AnyGenerator(
+            generating: AngularVelocity.self, using: OperationalGenerator()
         )
         let fileContents = HeaderCreator().generate(
             generators: [
@@ -194,7 +201,10 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
-                massGenerator
+                referenceAccelerationGenerator,
+                massGenerator,
+                velocityGenerator,
+                angularVelocityGenerator
             ]
         )
         .data(using: .utf8)
@@ -213,7 +223,10 @@ public struct GUUnitsGenerator {
                 percentGenerator,
                 temperatureGenerator,
                 accelerationGenerator,
-                massGenerator
+                referenceAccelerationGenerator,
+                massGenerator,
+                velocityGenerator,
+                angularVelocityGenerator
             ]
         )
         .data(using: .utf8)
@@ -285,17 +298,39 @@ public struct GUUnitsGenerator {
         createTestFiles(
             at: path, with: angleFileCreator.tests(generator: angleGenerator, imports: "import CGUUnits")
         )
-        let accelerationGenerator = AccelerationTestGenerator()
-        let accelerationFileCreator = TestFileCreator<AccelerationTestGenerator>()
+        let accelerationGenerator = OperationalTestGenerator<Acceleration>()
+        let accelerationFileCreator = TestFileCreator<OperationalTestGenerator<Acceleration>>()
         createTestFiles(
             at: path,
             with: accelerationFileCreator.tests(generator: accelerationGenerator, imports: "import CGUUnits")
         )
+        let referenceAccelerationGenerator = OperationalTestGenerator<ReferenceAcceleration>()
+        let referenceAccelerationFileCreator = TestFileCreator<
+            OperationalTestGenerator<ReferenceAcceleration>
+        >()
+        createTestFiles(
+            at: path,
+            with: referenceAccelerationFileCreator.tests(
+                generator: referenceAccelerationGenerator, imports: "import CGUUnits"
+            )
+        )
+        let velocityGenerator = OperationalTestGenerator<Velocity>()
+        let velocityFileCreator = TestFileCreator<OperationalTestGenerator<Velocity>>()
+        createTestFiles(
+            at: path,
+            with: velocityFileCreator.tests(generator: velocityGenerator, imports: "import CGUUnits")
+        )
+        let angularVelocityGenerator = OperationalTestGenerator<AngularVelocity>()
+        let angularVelocityFileCreator = TestFileCreator<OperationalTestGenerator<AngularVelocity>>()
+        createTestFiles(
+            at: path,
+            with: angularVelocityFileCreator.tests(
+                generator: angularVelocityGenerator, imports: "import CGUUnits"
+            )
+        )
         print("Done!")
         fflush(stdout)
     }
-
-    // swiftlint:enable function_body_length
 
     /// Generate the swift source files for guunits.
     /// - Parameter path: The path to the directory containing the new files.
@@ -331,10 +366,21 @@ public struct GUUnitsGenerator {
         )
         writeFile(
             at: path,
-            with: AccelerationUnits.category,
-            and: swiftFileCreator.generate(for: AccelerationUnits.self)
+            with: Acceleration.category,
+            and: swiftFileCreator.generate(for: Acceleration.self)
+        )
+        writeFile(
+            at: path,
+            with: ReferenceAcceleration.category,
+            and: swiftFileCreator.generate(for: ReferenceAcceleration.self)
         )
         writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
+        writeFile(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
+        writeFile(
+            at: path,
+            with: AngularVelocity.category,
+            and: swiftFileCreator.generate(for: AngularVelocity.self)
+        )
         writeFile(at: path, with: "GUUnitsFloat", and: GUUnitsPrimitiveHelpers.float)
         writeFile(at: path, with: "GUUnitsInteger", and: GUUnitsPrimitiveHelpers.integer)
         writeFile(at: path, with: "GUUnitsType", and: GUUnitsPrimitiveHelpers.type)
@@ -378,7 +424,12 @@ public struct GUUnitsGenerator {
             at: path, with: swiftFileCreator.generate(with: SameUnitTestGenerator<PercentUnits>())
         )
         createTestFiles(at: path, with: swiftFileCreator.generate(with: TemperatureTestGenerator()))
-        createTestFiles(at: path, with: swiftFileCreator.generate(with: AccelerationTestGenerator()))
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<Acceleration>())
+        )
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<ReferenceAcceleration>())
+        )
         createTestFiles(
             at: path,
             with: swiftFileCreator.generate(
@@ -392,9 +443,15 @@ public struct GUUnitsGenerator {
                 )
             )
         )
+        createTestFiles(at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<Velocity>()))
+        createTestFiles(
+            at: path, with: swiftFileCreator.generate(with: OperationalTestGenerator<AngularVelocity>())
+        )
         print("Done!")
         fflush(stdout)
     }
+
+    // swiftlint:enable function_body_length
 
     /// Writes the test files to the correct path.
     /// - Parameters:

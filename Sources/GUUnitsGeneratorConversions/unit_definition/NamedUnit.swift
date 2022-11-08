@@ -1,4 +1,4 @@
-// AccelerationUnitsTests.swift 
+// NamedUnit.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,27 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A struct containing the data for a named unit.
+public struct NamedUnit: CustomStringConvertible {
 
-/// Test class for AccelerationUnits.
-final class AccelerationUnitsTests: XCTestCase, UnitsTestable {
+    /// The name of the unit.
+    public let name: String
 
-    /// Test mps2.
-    func testMps2() {
-        assert(
-            value: AccelerationUnits.metresPerSecond2,
-            rawValue: "metresPerSecond2",
-            abbreviation: "mps2",
-            description: "metresPerSecond2"
-        )
+    /// The abbreviation of the unit.
+    public let abbreviation: String
+
+    /// The description of the named unit.
+    public var description: String {
+        name
     }
 
-    /// Test g's.
-    func testGs() {
-        assert(value: AccelerationUnits.gs, rawValue: "gs", abbreviation: "gs", description: "gs")
-    }
-
-    /// Test static vars.
-    func testStaticVars() {
-        XCTAssertEqual(AccelerationUnits.category, "Acceleration")
-        XCTAssertEqual(AccelerationUnits.highestPrecision, .metresPerSecond2)
-        XCTAssertTrue(AccelerationUnits.sameZeroPoint)
+    /// Initialise this data with a name and abbreviation.
+    /// - Parameters:
+    ///   - name: The name of the unit.
+    ///   - abbreviation: The abbreviation of the unit.
+    public init(name: String, abbreviation: String) {
+        self.name = name
+        self.abbreviation = abbreviation
     }
 
 }

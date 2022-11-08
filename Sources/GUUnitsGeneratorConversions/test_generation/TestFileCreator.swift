@@ -69,14 +69,12 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
     /// The body creator for generating test function code.
     private let bodyCreator = TestFunctionBodyCreator<Unit>()
 
-    /// Create all of the tests for a Unit category. This function produces an array of test files
-    /// for the unit category.
+    /// Converts the generated test parameters into test classes.
     /// - Parameters:
-    ///   - generator: A test generator for creating the test parameters for different test functions.
-    ///   - imports: Any additional imports required in the test file. XCTest, Foundation and CGUUnits
-    ///              are included by default.
-    /// - Returns: All of the test code as an array of tuples containing the file name and contents.
-    func tests(generator: TestGeneratorType, imports: String) -> [(String, String)] {
+    ///   - generator: The generator creating the test parameters.
+    ///   - imports: Imports that are placed at the top of this file.
+    /// - Returns: An array of tuples containing the name of the files and the class definitions.
+    private func doTests(generator: TestGeneratorType, imports: String) -> [(String, String)] {
         let head = "\(imports)\nimport Foundation\nimport XCTest"
         let unitTests: [(String, [[String]])] = Unit.allCases.flatMap { unit in
             Signs.allCases.map { sign in
@@ -248,6 +246,76 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
             .map { "        " + $0 }
             .joined(separator: "\n")
         return "    func \(name)() {\n\(formattedBody)\n    }"
+    }
+
+}
+
+extension TestFileCreator {
+
+    /// Create all of the tests for a Unit category. This function produces an array of test files
+    /// for the unit category.
+    /// - Parameters:
+    ///   - generator: A test generator for creating the test parameters for different test functions.
+    ///   - imports: Any additional imports required in the test file. XCTest, Foundation and CGUUnits
+    ///              are included by default.
+    /// - Returns: All of the test code as an array of tuples containing the file name and contents.
+    func tests(generator: TestGeneratorType, imports: String) -> [(String, String)] {
+        doTests(generator: generator, imports: imports)
+    }
+
+}
+
+extension TestFileCreator where Unit: OperationalTestable {
+
+    /// Create all of the tests for a Unit category. This function produces an array of test files
+    /// for the unit category.
+    /// - Parameters:
+    ///   - generator: A test generator for creating the test parameters for different test functions.
+    ///   - imports: Any additional imports required in the test file. XCTest, Foundation and CGUUnits
+    ///              are included by default.
+    /// - Returns: All of the test code as an array of tuples containing the file name and contents.
+    func tests(generator: TestGeneratorType, imports: String) -> [(String, String)] {
+        let head = "\(imports)\nimport Foundation\nimport XCTest"
+        let conversionTests = doTests(generator: generator, imports: imports)
+        let relations = Unit.relationTests
+        guard !relations.isEmpty else {
+            return conversionTests
+        }
+        let testCode = relations.flatMap { conversion, parameters -> [String] in
+            let relation = conversion.relation
+            let source = relation.source
+            let target = relation.target
+            let sign = conversion.sourceSign
+            let otherSign = conversion.targetSign
+            return parameters.map { param in
+                let functionName = helper.testFunctionName(
+                    from: source, with: sign, to: target, with: otherSign, using: param
+                )
+                let body = bodyCreator.relationTest(conversion: conversion, parameter: param)
+                let formattedBody = body.components(separatedBy: .newlines)
+                    .map { "        " + $0 }
+                    .joined(separator: "\n")
+                return "    func \(functionName)() {\n\(formattedBody)\n    }"
+            }
+        }
+        .group(size: 30)
+        let relationFiles = testCode.enumerated().map { index, params -> (String, String) in
+            let name = "\(Unit.category)RelationTests\(index)"
+            return (
+                name,
+                """
+                \(head)
+
+                final class \(name): XCTestCase {
+
+                \(params.joined(separator: "\n\n"))
+
+                }
+
+                """
+            )
+        }
+        return conversionTests + relationFiles
     }
 
 }

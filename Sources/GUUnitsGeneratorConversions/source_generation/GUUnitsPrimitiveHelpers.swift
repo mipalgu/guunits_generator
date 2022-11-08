@@ -481,6 +481,8 @@ enum GUUnitsPrimitiveHelpers {
 
         extension GUUnitsInteger {
 
+            public typealias Magnitude = RawValue.Magnitude
+
             public static func < (lhs: Self, rhs: Self) -> Bool {
                 return lhs.rawValue < rhs.rawValue
             }

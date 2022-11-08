@@ -111,7 +111,7 @@ final class CFileCreatorTests: XCTestCase {
     /// - Returns: The sanitised literal.
     private func sanitise(literal: String, to type: NumericTypes) -> String {
         guard
-            nil == literal.first(where: {
+            !literal.contains(where: {
                 guard let scalar = Unicode.Scalar(String($0)) else {
                     return true
                 }
@@ -155,9 +155,13 @@ final class CFileCreatorTests: XCTestCase {
         let expected = """
         prefix
 
+        \(creator.mathDefinitions)
+
         \(generator.magicString)
 
         \(suffix)
+
+        \(creator.mathFunctions)
 
         """
         XCTAssertEqual(result, expected)

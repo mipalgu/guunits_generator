@@ -239,3 +239,19 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
     }
 
 }
+
+extension TestFunctionBodyCreator where Unit: OperationalTestable {
+
+    func relationTest(
+        conversion: UnitConversion, parameter: TestParameters
+    ) -> String {
+        let relation = conversion.relation
+        let name = relation.name(sign: conversion.sourceSign, otherSign: conversion.targetSign)
+        guard !conversion.targetSign.isFloatingPoint else {
+            let otherType = "\(relation.target.description)_\(conversion.targetSign.rawValue)"
+            return floatAssert(body: name, parameters: parameter, conversion: otherType)
+        }
+        return assert(body: name, parameters: parameter)
+    }
+
+}

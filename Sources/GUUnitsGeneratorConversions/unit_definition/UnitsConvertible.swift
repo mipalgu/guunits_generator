@@ -1,4 +1,4 @@
-// AccelerationUnits.swift 
+// UnitsConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,33 +54,47 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// A unit that represents accelerations.
-public enum AccelerationUnits: String {
+/// This protocol provides conversion functions for units within the same category.
+/// The conversion functions produce an ``Operation`` that will define the function required
+/// to perform the conversion.
+/// - SeeAlso: ``Operation``.
+public protocol UnitsConvertible {
 
-    /// Metres per second squared. (m/(s^2))
-    case metresPerSecond2
+    /// Convert from a unit within the same category to `self`.
+    /// - Parameter unit: The unit to convert from.
+    /// - Returns: An ``Operation`` that converts `unit` to `self`.
+    func conversion(from unit: Self) -> Operation
 
-    /// g's. Acceleration normalised to Earths gravitational acceleration (9.807 m/(s^2))
-    case gs
+    /// Convert to a unit within the same category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: An ``Operation`` converting `unit` to `self`.
+    func conversion(to unit: Self) -> Operation
 
 }
 
-/// UnitProtocol conformance.
-extension AccelerationUnits: UnitProtocol {
+/// Default implementation.
+public extension UnitsConvertible {
 
-    /// The abbreviation of the unit.
-    public var abbreviation: String {
-        switch self {
-        case .metresPerSecond2:
-            return "mps2"
-        case .gs:
-            return "gs"
-        }
+    /// Default implementation simply calls conversion(to:) using passed unit.
+    /// - Parameter unit: The unit to convert from.
+    /// - Returns: An operation converting `unit` to `self`.
+    func conversion(from unit: Self) -> Operation {
+        unit.conversion(to: self)
     }
 
-    /// The description of the unit.
-    public var description: String {
-        rawValue
+}
+
+/// Default implementation when the conforming type is also a ``CompositeUnit``.
+public extension UnitsConvertible where Self: CompositeUnit {
+
+    /// Convert to a unit within the same category.
+    /// - Parameter unit: The unit to convert to.
+    /// - Returns: An ``Operation`` converting `unit` to `self`.
+    func conversion(to unit: Self) -> Operation {
+        .multiplication(
+            lhs: .constant(declaration: AnyUnit(self)), rhs: self.unit.conversion(to: unit.unit)
+        )
+        .replace(convertibles: [AnyUnit(self): AnyUnit(self)])
     }
 
 }

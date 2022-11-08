@@ -113,8 +113,6 @@ public struct CompositeFunctionCreator<
         numericConverter.convert(str, from: unit, sign: sign, to: type)
     }
 
-    // swiftlint:disable force_cast
-
     /// Generate a function body that converts a unit into another unit.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -124,14 +122,12 @@ public struct CompositeFunctionCreator<
     /// - Returns: The function body which converts the unit.
     public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
         bodyCreator.createFunction(
-            unit: unit as! BodyCreator.Unit,
-            to: otherUnit as! BodyCreator.Unit,
+            unit: unit,
+            to: otherUnit,
             sign: sign,
             otherSign: otherSign
         )
     }
-
-    // swiftlint:enable force_cast
 
     /// Generate a function definition for a function that converts a unit into another unit.
     /// - Parameters:

@@ -1,9 +1,9 @@
 /*
- * UnitProtocol.swift
- * guunits_generator
+ * FakeUnit.swift 
+ * guunits_generator 
  *
- * Created by Callum McColl on 15/6/19.
- * Copyright © 2019 Callum McColl. All rights reserved.
+ * Created by Morgan McColl.
+ * Copyright © 2022 Morgan McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,7 +20,7 @@
  * 3. All advertising materials mentioning features or use of this
  *    software must display the following acknowledgement:
  *
- *        This product includes software developed by Callum McColl.
+ *        This product includes software developed by Morgan McColl.
  *
  * 4. Neither the name of the author nor the names of contributors
  *    may be used to endorse or promote products derived from this
@@ -56,58 +56,37 @@
  *
  */
 
-/// A protocol for representing unit types that exist within a unit category.
-/// A unit category represents a type of data that can be expressed with different
-/// units. Examples include Distance, Time, Angles, etc. Conforming types might
-/// contain many units for a category, e.g. Distance can have metres, centimetres,
-/// millimetres, etc.
-public protocol UnitProtocol: Hashable, CaseIterable, CustomStringConvertible {
+@testable import GUUnitsGeneratorConversions
 
-    /// The category the unit belong to. Eg. radians belongs to the Angle category.
-    static var category: String { get }
+/// Fake unit type that is used for testing.
+enum FakeUnit: String, UnitProtocol, OperationalTestable {
 
-    /// The unit in the category with the highest precision.
-    static var highestPrecision: Self { get }
+    /// The first unit.
+    case first
 
-    /// Whether the units in the category all share the same zero point. An example of this
-    /// would be distance where 0m, 0cm, and 0mm all represent the same point. Whereas a
-    /// contrary example would be Temperature values 0C and 0F which represent different points.
-    static var sameZeroPoint: Bool { get }
+    /// The second unit.
+    case second
 
-    /// The abbreviation of the unit. Eg. seconds is abbreviated as s.
-    var abbreviation: String { get }
+    /// Some test parameters.
+    static let testParameters: [ConversionMetaData<FakeUnit>: [TestParameters]] = [
+        ConversionMetaData<FakeUnit>(unit: .first, sign: .f, otherUnit: .first, otherSign: .d): [
+            TestParameters(input: "1.0", output: "1.0")
+        ]
+    ]
 
-}
-
-/// Default Implementation of UnitProtocol
-extension UnitProtocol {
-
-    /// By default, the unit category is equal to the conforming type name.
-    /// without a Units suffix.
-    public static var category: String {
-        let name = "\(Self.self)"
-        if name.hasSuffix("Units") {
-            return String(name.dropLast(5))
+    /// The abbreviation of the unit.
+    var abbreviation: String {
+        switch self {
+        case .first:
+            return "ft"
+        case .second:
+            return "snd"
         }
-        return name
     }
 
-    // swiftlint:disable force_unwrapping
-
-    /// By default, the highest precision is the first unit defined.
-    /// by conforming types.
-    /// - Warning: This default implementation assumes that atleast one unit is defined in the conforming
-    ///            type. If this is not the case, then you will encounter runtime errors.
-    public static var highestPrecision: Self {
-        allCases.first!
-    }
-
-    // swiftlint:enable force_unwrapping
-
-    /// By default, it is assumed that all units in this category share
-    /// the same zero point.
-    public static var sameZeroPoint: Bool {
-        true
+    /// The description of the unit.
+    var description: String {
+        rawValue
     }
 
 }

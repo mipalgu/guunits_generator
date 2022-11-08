@@ -41,4 +41,14 @@ final class DistanceUnitsTests: XCTestCase, UnitsTestable {
         XCTAssertTrue(DistanceUnits.sameZeroPoint)
     }
 
+    /// Test exponents static constant is correct.
+    func testExponents() {
+        let expected: [DistanceUnits: Int] = [
+            .millimetres: -3,
+            .centimetres: -2,
+            .metres: 0
+        ]
+        XCTAssertEqual(DistanceUnits.exponents, expected)
+    }
+
 }

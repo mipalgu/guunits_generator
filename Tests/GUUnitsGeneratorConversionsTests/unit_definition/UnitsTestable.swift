@@ -37,6 +37,7 @@ extension UnitsTestable {
         XCTAssertEqual(value.rawValue, rawValue)
         XCTAssertEqual(value.abbreviation, abbreviation)
         XCTAssertEqual(value.description, description)
+        XCTAssertEqual(value, Unit(description: value.description))
     }
 
 }

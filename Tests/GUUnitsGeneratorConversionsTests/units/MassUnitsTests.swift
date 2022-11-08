@@ -95,4 +95,80 @@ final class MassUnitsTests: XCTestCase, UnitsTestable {
         )
     }
 
+    /// Test allCases.
+    func testAllCases() {
+        XCTAssertEqual(
+            MassUnits.allCases,
+            [
+                .microgram,
+                .milligram,
+                .gram,
+                .kilogram,
+                .megagram
+            ]
+        )
+    }
+
+    /// Test conversion function is correct.
+    func testConversionToGreaterUnit() {
+        let result = MassUnits.milligram.conversion(to: .kilogram)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(MassUnits.milligram)),
+            rhs: .literal(declaration: .integer(value: 1000000))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test conversion function is correct.
+    func testConversionToSmallerUnit() {
+        let result = MassUnits.kilogram.conversion(to: .milligram)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)),
+            rhs: .literal(declaration: .integer(value: 1000000))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test conversion function is correct.
+    func testConversionFromSmallerUnit() {
+        let result = MassUnits.kilogram.conversion(from: .milligram)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(MassUnits.milligram)),
+            rhs: .literal(declaration: .integer(value: 1000000))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test conversion function is correct.
+    func testConversionFromGreaterUnit() {
+        let result = MassUnits.milligram.conversion(from: .kilogram)
+        let expected = Operation.multiplication(
+            lhs: .constant(declaration: AnyUnit(MassUnits.kilogram)),
+            rhs: .literal(declaration: .integer(value: 1000000))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test conversion function is correct.
+    func testConversionFromMicrogramToMegaGram() {
+        let result = MassUnits.microgram.conversion(to: .megagram)
+        let expected = Operation.division(
+            lhs: .constant(declaration: AnyUnit(MassUnits.microgram)),
+            rhs: .literal(declaration: .integer(value: 1_000_000_000_000))
+        )
+        XCTAssertEqual(result, expected)
+    }
+
+    /// Test exponents are correct.
+    func testExponents() {
+        let expected: [MassUnits: Int] = [
+            .microgram: -6,
+            .milligram: -3,
+            .gram: 0,
+            .kilogram: 3,
+            .megagram: 6
+        ]
+        XCTAssertEqual(MassUnits.exponents, expected)
+    }
+
 }

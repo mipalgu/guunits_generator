@@ -1,4 +1,4 @@
-// AccelerationTestGeneratorNumTests.swift 
+// AngularVelocity.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,32 +54,37 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import GUUnitsGeneratorConversions
-import XCTest
+/// A unit for describing rotational velocity. This unit uses the SI unit
+/// radians per second (rad/s) as the base unit.
+public struct AngularVelocity: CompositeUnit, UnitsConvertible {
 
-/// Test class for AccelerationTestGenerator numeric conversions.
-final class AccelerationTestGeneratorNumTests: XCTestCase,
-    TestParameterTestable, TestGeneratorNumericTestable {
+    /// The base unit of Angular Velocity is radians per second (rad/s).
+    public static let baseUnit: Operation = .division(
+        lhs: .constant(declaration: AnyUnit(AngleUnits.radians)),
+        rhs: .constant(declaration: AnyUnit(TimeUnits.seconds))
+    )
 
-    /// The generator under test.
-    let generator = AccelerationTestGenerator()
+    /// The unit instance of this category.
+    public var unit: Operation
 
-    /// Test the same unit conversion returns the correct test cases.
-    func testUnitTypes() {
-        AccelerationUnits.allCases.forEach { unit in
-            [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
-                self.unitTest(unit: unit, sign: sign)
-            }
-        }
+    /// Instantiate the category from an instance of a unit.
+    /// - Parameter unit: The unit instance of this category. This unit should
+    /// be a derivation of the `baseUnit`.
+    public init(unit: Operation) {
+        self.unit = unit
     }
 
-    /// Test unit to numeric and numeric to unit conversion tests.
-    func testUnitToNumericTypes() {
-        AccelerationUnits.allCases.forEach { unit in
-            [Signs.t, Signs.u, Signs.f, Signs.d].forEach { sign in
-                self.numericTest(unit: unit, sign: sign)
-            }
-        }
-    }
+}
+
+/// Hashable conformance.
+extension AngularVelocity: Hashable {}
+
+/// ``OperationalTestable`` conformance.
+extension AngularVelocity: OperationalTestable {
+
+    /// The test parameters for this unit category.
+    public static let testParameters: [
+        ConversionMetaData<AngularVelocity>: [TestParameters]
+    ] = defaultParameters
 
 }

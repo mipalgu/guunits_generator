@@ -1,4 +1,4 @@
-// AccelerationFunctionCreator.swift 
+// Operation+CConvertible.swift 
 // guunits_generator 
 // 
 // Created by Morgan McColl.
@@ -54,73 +54,69 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Struct that creates conversion functions between acceleration units.
-public struct AccelerationFunctionCreator: FunctionBodyCreator {
+/// A ``FunctionBodyCreator`` that works with ``UnitsConvertible`` types.
+public struct OperationalFunctionBodyCreator<Unit>: FunctionBodyCreator where
+    Unit: UnitProtocol, Unit: UnitsConvertible {
 
-    /// Helper object used to create sign conversion functions.
-    private let signConverter = SignConverter()
+    /// A helper converter.
+    let converter = NumericTypeConverter()
 
-    /// Default init.
+    /// Default initialiser.
     public init() {}
 
     // swiftlint:disable function_body_length
 
-    /// Generates C-code that will perform a cast between different acceleration units.
+    /// Create the C code to convert one unit with sign into another unit with sign.
     /// - Parameters:
     ///   - unit: The unit to convert from.
     ///   - otherUnit: The unit to convert to.
     ///   - sign: The sign of the first unit.
     ///   - otherSign: The sign of the second unit.
-    /// - Returns: Generated C-code that performs the conversion.
-    public func createFunction(
-        unit: AccelerationUnits, to otherUnit: AccelerationUnits, sign: Signs, otherSign: Signs
-    ) -> String {
-        switch(unit, otherUnit) {
-        case (.metresPerSecond2, .gs):
-            guard otherSign != .d else {
-                return "    return ((\(otherUnit)_\(otherSign)) (((double) (\(unit))) / 9.807));"
-            }
-            let max = "((double) (\(otherSign.numericType.limits.1)))"
-            let min = "((double) (\(otherSign.numericType.limits.0)))"
-            let conversion = "value / 9.807"
-            let roundedString = otherSign.isFloatingPoint ? conversion : "round(\(conversion))"
-            return """
-                const double maxValue = \(max) * 9.807;
-                const double minValue = \(min) * 9.807;
-                const double value = ((double) (\(unit)));
-                if (value > maxValue) {
-                    return \(otherSign.numericType.limits.1);
-                }
-                if (value < minValue) {
-                    return \(otherSign.numericType.limits.0);
-                }
-                return ((\(otherUnit)_\(otherSign)) (\(roundedString)));
-            """
-        case (.gs, .metresPerSecond2):
-            if sign != .d && otherSign == .d {
-                return "    return ((\(otherUnit)_\(otherSign)) (((double) (\(unit))) * 9.807));"
-            }
-            let max = "((double) (\(otherSign.numericType.limits.1))) / 9.807"
-            let min = "((double) (\(otherSign.numericType.limits.0))) / 9.807"
-            let roundedString = otherSign.isFloatingPoint ? "value * 9.807" : "round(value * 9.807)"
-            return """
-                const double maxValue = \(max);
-                const double minValue = \(min);
-                const double value = ((double) (\(unit)));
-                if (value > maxValue) {
-                    return \(otherSign.numericType.limits.1);
-                }
-                if (value < minValue) {
-                    return \(otherSign.numericType.limits.0);
-                }
-                return ((\(otherUnit)_\(otherSign)) (\(roundedString)));
-            """
-        default:
-            let conversion = signConverter.convert(
-                unit.rawValue, otherUnit: otherUnit, from: sign, to: otherSign
-            )
-            return "    return \(conversion);"
+    /// - Returns: The C code that converts `unit` with `sign` to `otherUnit` with `otherSign`.
+    public func createFunction(unit: Unit, to otherUnit: Unit, sign: Signs, otherSign: Signs) -> String {
+        guard unit != otherUnit || sign != otherSign else {
+            return "return \(unit);"
         }
+        let conversion = unit.conversion(to: otherUnit)
+        let needsDouble = sign.isFloatingPoint || otherSign.isFloatingPoint || conversion.hasFloatOperation
+        let cSign = needsDouble ? Signs.d : sign
+        let code = conversion.cCode(sign: cSign)
+        let upperLimit = otherSign.numericType.limits.1
+        let lowerLimit = otherSign.numericType.limits.0
+        let numericType = sign.numericType.rawValue
+        let call = converter.convert("result", from: cSign.numericType, to: otherUnit, sign: otherSign)
+        guard sign.numericType.isSigned else {
+            return """
+                const \(numericType) unit = ((\(numericType)) (\(unit)));
+                if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit), 0)) {
+                    return \(upperLimit);
+                } else {
+                    const \(cSign.numericType.rawValue) result = \(code);
+                    if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
+                        return \(upperLimit);
+                    } else {
+                        return \(call);
+                    }
+                }
+            """
+        }
+        return """
+            const \(numericType) unit = ((\(numericType)) (\(unit)));
+            if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit), 0)) {
+                return \(upperLimit);
+            } else if (__builtin_expect(overflow_lower_\(sign.rawValue)(unit), 0)) {
+                return \(lowerLimit);
+            } else {
+                const \(cSign.numericType.rawValue) result = \(code);
+                if (__builtin_expect(overflow_upper_\(cSign.rawValue)(result), 0)) {
+                    return \(upperLimit);
+                } else if (__builtin_expect(overflow_lower_\(cSign.rawValue)(result), 0)) {
+                    return \(lowerLimit);
+                } else {
+                    return \(call);
+                }
+            }
+        """
     }
 
     // swiftlint:enable function_body_length
