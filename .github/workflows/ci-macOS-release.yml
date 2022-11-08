@@ -38,6 +38,7 @@ jobs:
           swift test -c release
 
       - name: Package Release build
+        run: |
           cd Tests/GUUnits
           swift build -c release
 
