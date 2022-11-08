@@ -37,8 +37,9 @@ jobs:
 
       - name: Release Test
         run: |
-          ulimit -n 65000
-          swift test -c release -Xswiftc -DRELEASE_BUILD
-          cd Tests/GUUnits
           swift test -c release
+
+      - name: Package Release build
+          cd Tests/GUUnits
+          swift build -c release
 
