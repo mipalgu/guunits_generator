@@ -38,5 +38,7 @@ jobs:
       - name: Debug Test
         run: |
           ulimit -n 65000
-          swift test --enable-code-coverage
+          swift test
+          cd Tests/GUUnits
+          swift test
 

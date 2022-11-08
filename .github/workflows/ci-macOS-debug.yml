@@ -37,4 +37,6 @@ jobs:
         run: |
           ulimit -n 65000
           swift test
+          cd Tests/GUUnits
+          swift test
 
