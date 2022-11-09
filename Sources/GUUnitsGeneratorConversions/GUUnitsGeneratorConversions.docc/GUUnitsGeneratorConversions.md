@@ -1,4 +1,4 @@
-# GUUnitsGeneratorConversions
+# ``GUUnitsGeneratorConversions``
 
 A target for generating the GUUnits package.
 
