@@ -139,9 +139,9 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         using generator: TestGeneratorType
     ) -> [String] {
         generator.testParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
-            .group(size: 10)
-            .enumerated()
-            .map {
+        .group(size: 10)
+        .enumerated()
+        .compactMap {
             self.createTestFunction(
                 from: unit, with: sign, to: otherUnit, with: otherSign, with: $0.1, index: $0.0
             )
@@ -161,7 +161,10 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         to numeric: NumericTypes,
         using generator: TestGeneratorType
     ) -> [String] {
-        generator.testParameters(from: unit, with: sign, to: numeric).group(size: 10).enumerated().map {
+        generator.testParameters(from: unit, with: sign, to: numeric)
+        .group(size: 10)
+        .enumerated()
+        .compactMap {
             self.createTestFunction(from: unit, with: sign, to: numeric, with: $0.1, index: $0.0)
         }
     }
@@ -179,7 +182,10 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         with sign: Signs,
         using generator: TestGeneratorType
     ) -> [String] {
-        generator.testParameters(from: numeric, to: unit, with: sign).group(size: 10).enumerated().map {
+        generator.testParameters(from: numeric, to: unit, with: sign)
+        .group(size: 10)
+        .enumerated()
+        .compactMap {
             self.createTestFunction(from: numeric, to: unit, with: sign, with: $0.1, index: $0.0)
         }
     }
@@ -199,9 +205,13 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         with otherSign: Signs,
         with parameters: [TestParameters],
         index: Int
-    ) -> String {
+    ) -> String? {
+        guard !parameters.isEmpty else {
+            return nil
+        }
+        let indexStr = index == 0 ? "" : "\(index)"
         let name = "test\(unit.description)_\(sign.rawValue)_to_\(otherUnit.description)_" +
-            "\(otherSign.rawValue)Tests\(index)"
+            "\(otherSign.rawValue)\(indexStr)"
         let body = bodyCreator.generateFunction(
             from: unit, with: sign, to: otherUnit, with: otherSign, using: parameters
         )
@@ -224,8 +234,12 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         to numeric: NumericTypes,
         with parameters: [TestParameters],
         index: Int
-    ) -> String {
-        let name = "test\(unit.description)_\(sign.rawValue)_to_\(numeric.rawValue)\(index)"
+    ) -> String? {
+        guard !parameters.isEmpty else {
+            return nil
+        }
+        let indexStr = index == 0 ? "" : "\(index)"
+        let name = "test\(unit.description)_\(sign.rawValue)_to_\(numeric.rawValue)\(indexStr)"
         let body = bodyCreator.generateFunction(from: unit, with: sign, to: numeric, using: parameters)
         let formattedBody = body.components(separatedBy: .newlines)
             .map { "        " + $0 }
@@ -246,8 +260,12 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         with sign: Signs,
         with parameters: [TestParameters],
         index: Int
-    ) -> String {
-        let name = "test\(numeric.rawValue)_to_\(unit.description)_\(sign.rawValue)\(index)"
+    ) -> String? {
+        guard !parameters.isEmpty else {
+            return nil
+        }
+        let indexStr = index == 0 ? "" : "\(index)"
+        let name = "test\(numeric.rawValue)_to_\(unit.description)_\(sign.rawValue)\(indexStr)"
         let body = bodyCreator.generateFunction(from: numeric, to: unit, with: sign, using: parameters)
         let formattedBody = body.components(separatedBy: .newlines)
             .map { "        " + $0 }
@@ -295,8 +313,9 @@ extension TestFileCreator where Unit: OperationalTestable {
             let sign = conversion.sourceSign
             let otherSign = conversion.targetSign
             return parameters.group(size: 10).enumerated().map { index, param in
+                let indexStr = index == 0 ? "" : "\(index)"
                 let functionName = "test\(source.description)_\(sign.rawValue)To" +
-                    "\(target.description)_\(otherSign.rawValue)Relation\(index)"
+                    "\(target.description)_\(otherSign.rawValue)Relation\(indexStr)"
                 let body = bodyCreator.relationTest(conversion: conversion, parameter: param)
                 let formattedBody = body.components(separatedBy: .newlines)
                     .map { "        " + $0 }

@@ -300,14 +300,15 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
     private func floatAssert(
         body: String, parameters: TestParameters, conversion: String, index: Int
     ) -> String {
-        """
-        let result\(index) = \(body)(\(parameters.input))
-        let expected\(index): \(conversion) = \(parameters.output)
-        let tolerance\(index): \(conversion) = 0.99
-        if result\(index) > expected\(index) {
-            XCTAssertLessThanOrEqual(result\(index) - expected\(index), tolerance\(index))
+        let indexStr = index == 0 ? "" : "\(index)"
+        return """
+        let result\(indexStr) = \(body)(\(parameters.input))
+        let expected\(indexStr): \(conversion) = \(parameters.output)
+        let tolerance\(indexStr): \(conversion) = 0.99
+        if result\(indexStr) > expected\(indexStr) {
+            XCTAssertLessThanOrEqual(result\(indexStr) - expected\(indexStr), tolerance\(indexStr))
         } else {
-            XCTAssertLessThanOrEqual(expected\(index) - result\(index), tolerance\(index))
+            XCTAssertLessThanOrEqual(expected\(indexStr) - result\(indexStr), tolerance\(indexStr))
         }
         """
     }
