@@ -78,12 +78,38 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         with sign: Signs,
         to otherUnit: Unit,
         with otherSign: Signs,
-        using parameters: TestParameters
+        using parameters: [TestParameters]
+    ) -> String {
+        parameters
+        .enumerated()
+        .map {
+            self.doGenerateFunction(
+                from: unit, with: sign, to: otherUnit, with: otherSign, using: $0.1, index: $0.0
+            )
+        }
+        .joined(separator: "\n")
+    }
+
+    /// Generate the test function body for a unit to unit conversion.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - otherUnit: The unit to convert to.
+    ///   - otherSign: The sign of the unit to convert to.
+    ///   - parameters: The test parameters.
+    /// - Returns: The function body which performs that test.
+    private func doGenerateFunction(
+        from unit: Unit,
+        with sign: Signs,
+        to otherUnit: Unit,
+        with otherSign: Signs,
+        using parameters: TestParameters,
+        index: Int
     ) -> String {
         let fn = helper.functionName(forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign)
         guard !otherSign.numericType.isFloat else {
             let conversion = "\(otherUnit.rawValue)_\(otherSign.rawValue)"
-            return floatAssert(body: fn, parameters: parameters, conversion: conversion)
+            return floatAssert(body: fn, parameters: parameters, conversion: conversion, index: index)
         }
         return assert(body: fn, parameters: parameters)
     }
@@ -99,11 +125,35 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         from unit: Unit,
         with sign: Signs,
         to numeric: NumericTypes,
-        using parameters: TestParameters
+        using parameters: [TestParameters]
+    ) -> String {
+        parameters
+        .enumerated()
+        .map {
+            self.doGenerateFunction(from: unit, with: sign, to: numeric, using: $0.1, index: $0.0)
+        }
+        .joined(separator: "\n")
+    }
+
+    /// Generate a test function body for a unit to numeric conversion test.
+    /// - Parameters:
+    ///   - unit: The unit to convert from.
+    ///   - sign: The sign of the unit.
+    ///   - numeric: The numeric to convert to.
+    ///   - parameters: The test parameters.
+    /// - Returns: The function body which implements the test.
+    private func doGenerateFunction(
+        from unit: Unit,
+        with sign: Signs,
+        to numeric: NumericTypes,
+        using parameters: TestParameters,
+        index: Int
     ) -> String {
         let fn = helper.functionName(forUnit: unit, sign: sign, to: numeric)
         guard !numeric.isFloat else {
-            return floatAssert(body: fn, parameters: parameters, conversion: numeric.swiftType.rawValue)
+            return floatAssert(
+                body: fn, parameters: parameters, conversion: numeric.swiftType.rawValue, index: index
+            )
         }
         return assert(body: fn, parameters: parameters)
     }
@@ -116,12 +166,34 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
     ///   - parameters: The test parameters.
     /// - Returns: The test implementation which tests the conversion function.
     func generateFunction(
-        from numeric: NumericTypes, to unit: Unit, with sign: Signs, using parameters: TestParameters
+        from numeric: NumericTypes, to unit: Unit, with sign: Signs, using parameters: [TestParameters]
+    ) -> String {
+        parameters
+        .enumerated()
+        .map {
+            self.doGenerateFunction(from: numeric, to: unit, with: sign, using: $0.1, index: $0.0)
+        }
+        .joined(separator: "\n")
+    }
+
+    /// Generate a test function body for a numeric to unit conversion.
+    /// - Parameters:
+    ///   - numeric: The numeric to convert from.
+    ///   - unit: The unit to convert to.
+    ///   - sign: The sign of the unit.
+    ///   - parameters: The test parameters.
+    /// - Returns: The test implementation which tests the conversion function.
+    private func doGenerateFunction(
+        from numeric: NumericTypes,
+        to unit: Unit,
+        with sign: Signs,
+        using parameters: TestParameters,
+        index: Int
     ) -> String {
         let fn = helper.functionName(from: numeric, to: unit, sign: sign)
         guard !sign.numericType.isFloat else {
             let conversion = "\(unit.rawValue)_\(sign.rawValue)"
-            return floatAssert(body: fn, parameters: parameters, conversion: conversion)
+            return floatAssert(body: fn, parameters: parameters, conversion: conversion, index: index)
         }
         return assert(body: fn, parameters: parameters)
     }
@@ -225,15 +297,17 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
     ///   - parameters: The parameters to use in the test.
     ///   - conversion: The type of the converted output.
     /// - Returns: The test code for asserting that the operation was successful.
-    private func floatAssert(body: String, parameters: TestParameters, conversion: String) -> String {
+    private func floatAssert(
+        body: String, parameters: TestParameters, conversion: String, index: Int
+    ) -> String {
         """
-        let result = \(body)(\(parameters.input))
-        let expected: \(conversion) = \(parameters.output)
-        let tolerance: \(conversion) = 0.99
-        if result > expected {
-            XCTAssertLessThanOrEqual(result - expected, tolerance)
+        let result\(index) = \(body)(\(parameters.input))
+        let expected\(index): \(conversion) = \(parameters.output)
+        let tolerance\(index): \(conversion) = 0.99
+        if result\(index) > expected\(index) {
+            XCTAssertLessThanOrEqual(result\(index) - expected\(index), tolerance\(index))
         } else {
-            XCTAssertLessThanOrEqual(expected - result, tolerance)
+            XCTAssertLessThanOrEqual(expected\(index) - result\(index), tolerance\(index))
         }
         """
     }
@@ -243,13 +317,24 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
 extension TestFunctionBodyCreator where Unit: OperationalTestable {
 
     func relationTest(
-        conversion: UnitConversion, parameter: TestParameters
+        conversion: UnitConversion, parameter: [TestParameters]
+    ) -> String {
+        parameter
+        .enumerated()
+        .map {
+            doRelationTest(conversion: conversion, parameter: $0.1, index: $0.0)
+        }
+        .joined(separator: "\n")
+    }
+
+    private func doRelationTest(
+        conversion: UnitConversion, parameter: TestParameters, index: Int
     ) -> String {
         let relation = conversion.relation
         let name = relation.name(sign: conversion.sourceSign, otherSign: conversion.targetSign)
         guard !conversion.targetSign.isFloatingPoint else {
             let otherType = "\(relation.target.description)_\(conversion.targetSign.rawValue)"
-            return floatAssert(body: name, parameters: parameter, conversion: otherType)
+            return floatAssert(body: name, parameters: parameter, conversion: otherType, index: index)
         }
         return assert(body: name, parameters: parameter)
     }

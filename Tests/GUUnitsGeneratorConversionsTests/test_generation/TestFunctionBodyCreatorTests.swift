@@ -72,7 +72,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
             with: .f,
             to: .centimetres,
             with: .u,
-            using: TestParameters(input: "53.0", output: "53")
+            using: [TestParameters(input: "53.0", output: "53")]
         )
         let expected = "XCTAssertEqual(cm_f_to_cm_u(53.0), 53)"
         XCTAssertEqual(result, expected)
@@ -81,7 +81,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
     /// Test generate function for unit to numeric conversion.
     func testGenerateFunctionUnitsToNumeric() {
         let result = creator.generateFunction(
-            from: .centimetres, with: .t, to: .float, using: TestParameters(input: "10", output: "10.0")
+            from: .centimetres, with: .t, to: .float, using: [TestParameters(input: "10", output: "10.0")]
         )
         let expected = """
         let result = cm_t_to_f(10)
@@ -99,7 +99,7 @@ final class TestFunctionBodyCreatorTests: XCTestCase {
     /// Test generate function for numeric to unit conversion.
     func testGenerateFunctionNumericToUnits() {
         let result = creator.generateFunction(
-            from: .int16, to: .millimetres, with: .u, using: TestParameters(input: "125", output: "125")
+            from: .int16, to: .millimetres, with: .u, using: [TestParameters(input: "125", output: "125")]
         )
         let expected = "XCTAssertEqual(i16_to_mm_u(125), 125)"
         XCTAssertEqual(result, expected)
