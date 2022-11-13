@@ -965,7 +965,7 @@ public struct SwiftTestFileCreator {
         .map {
             let indexStr = $0 > 0 ? "\($0)" : ""
             let unit = "\(unit.rawValue.capitalized)_\(sign)(\($1.input))"
-            let conversion = "\(otherUnit.rawValue.capitalized)_\(otherSign)(unit)"
+            let conversion = "\(otherUnit.rawValue.capitalized)_\(otherSign)(unit\(indexStr))"
             if $1.input == "Double.greatestFiniteMagnitude" ||
                 $1.input == "-Double.greatestFiniteMagnitude" {
                 return """
@@ -976,7 +976,7 @@ public struct SwiftTestFileCreator {
                 """
             }
             let tolerance = creator.sanitiseLiteral(literal: "1", sign: otherSign)
-            let categoryConversion = "\(T.category)(unit).\(otherUnit.rawValue)_\(otherSign)"
+            let categoryConversion = "\(T.category)(unit\(indexStr)).\(otherUnit.rawValue)_\(otherSign)"
             let catResult = "categoryResult\(indexStr)"
             return """
                     let unit\(indexStr) = \(unit)
@@ -1019,7 +1019,8 @@ public struct SwiftTestFileCreator {
         index: Int
     ) -> String where T: RawRepresentable, T.RawValue == String {
         let helper = FunctionHelpers<T>()
-        let fnTestName = "test\(unit.description)_\(sign.rawValue)ToNumeric\(index > 0 ? "\(index)" : "")"
+        let fnTestName = "test\(unit.description)_\(sign.rawValue)To" +
+            "\(numeric.swiftType)\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(forUnit: unit, sign: sign, to: numeric, unique: true)
         let body = parameters
         .enumerated()
@@ -1055,7 +1056,8 @@ public struct SwiftTestFileCreator {
         index: Int
     ) -> String where T: RawRepresentable, T.RawValue == String {
         let helper = FunctionHelpers<T>()
-        let fnTestName = "testNumericTo\(unit.description)_\(sign.rawValue)\(index > 0 ? "\(index)" : "")"
+        let fnTestName = "test\(numeric.swiftType)To\(unit.description)_\(sign.rawValue)" +
+            "\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(from: numeric, to: unit, sign: sign, unique: true)
         let unitType = "\(unit.rawValue.capitalized)_\(sign.rawValue)"
         let body = parameters
