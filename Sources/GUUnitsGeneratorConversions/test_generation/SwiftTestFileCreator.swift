@@ -880,20 +880,28 @@ public struct SwiftTestFileCreator {
                 guard (sign != otherSign) || (unit != otherUnit) else {
                     return []
                 }
-                let tests = generator.testParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
-                return tests.map { test in
-                    createTest(from: unit, with: sign, to: otherUnit, with: otherSign, and: test)
+                let tests = generator
+                    .testParameters(from: unit, with: sign, to: otherUnit, with: otherSign)
+                    .group(size: 10)
+                return tests.enumerated().map { index, test in
+                    createTest(
+                        from: unit, with: sign, to: otherUnit, with: otherSign, and: test, index: index
+                    )
                 }
             }
             .filter { !$0.isEmpty }
         }
         let numericTests: [String] = NumericTypes.allCases.flatMap { numeric -> [String] in
             generator.testParameters(from: unit, with: sign, to: numeric)
-            .map { toTest in
-                createTest(from: unit, with: sign, to: numeric, and: toTest)
+            .group(size: 10)
+            .enumerated()
+            .map { index, toTest in
+                createTest(from: unit, with: sign, to: numeric, and: toTest, index: index)
             } + generator.testParameters(from: numeric, to: unit, with: sign)
-            .map { fromTest in
-                createTest(from: numeric, to: unit, with: sign, and: fromTest)
+            .group(size: 10)
+            .enumerated()
+            .map { index, fromTest in
+                createTest(from: numeric, to: unit, with: sign, and: fromTest, index: index)
             }
         }
         return (testCases + numericTests).group(size: 30).enumerated().map { index, group in
@@ -923,44 +931,54 @@ public struct SwiftTestFileCreator {
     ///   - parameters: The parameters used in the test.
     /// - Returns: The swift code performing the test.
     private func createTest<T: UnitProtocol>(
-        from unit: T, with sign: Signs, to otherUnit: T, with otherSign: Signs, and parameters: TestParameters
+        from unit: T,
+        with sign: Signs,
+        to otherUnit: T,
+        with otherSign: Signs,
+        and parameters: [TestParameters],
+        index: Int
     ) -> String where T: RawRepresentable, T.RawValue == String {
         let creator = TestFunctionBodyCreator<T>()
         let helper = FunctionHelpers<T>()
-        let fnTestName = helper.testFunctionName(
-            from: unit, with: sign, to: otherUnit, with: otherSign, using: parameters
-        )
+        let fnTestName = "test\(unit.description)_\(sign.rawValue)To" +
+            "\(otherUnit.description)_\(otherSign.rawValue)\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(
             forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: true
         )
-        let unit = "\(unit.rawValue.capitalized)_\(sign)(\(parameters.input))"
-        let conversion = "\(otherUnit.rawValue.capitalized)_\(otherSign)(unit)"
-        if parameters.input == "Double.greatestFiniteMagnitude" ||
-            parameters.input == "-Double.greatestFiniteMagnitude" {
+        let body = parameters.enumerated().map {
+            let indexStr = $0 > 0 ? "\($0)" : ""
+            let unit = "\(unit.rawValue.capitalized)_\(sign)(\($1.input))"
+            let conversion = "\(otherUnit.rawValue.capitalized)_\(otherSign)(unit)"
+            if $1.input == "Double.greatestFiniteMagnitude" ||
+                $1.input == "-Double.greatestFiniteMagnitude" {
+                return """
+                        let unit\(indexStr) = \(unit)
+                        let expected\(indexStr) = \(fnName)(\($1.input))
+                        let result\(indexStr) = \(conversion).rawValue
+                        XCTAssertEqual(expected\(indexStr), result\(indexStr))
+                """
+            }
+            let tolerance = creator.sanitiseLiteral(literal: "1", sign: otherSign)
+            let categoryConversion = "\(T.category)(unit).\(otherUnit.rawValue)_\(otherSign)"
+            let catResult = "categoryResult\(indexStr)"
             return """
-                func \(fnTestName)() {
-                    let unit = \(unit)
-                    let expected = \(fnName)(\(parameters.input))
-                    let result = \(conversion).rawValue
-                    XCTAssertEqual(expected, result)
-                }
+                    let unit\(indexStr) = \(unit)
+                    let expected\(indexStr) = \(fnName)(\($1.input))
+                    let result\(indexStr) = \(conversion).rawValue
+                    XCTAssertEqual(expected\(indexStr), result\(indexStr))
+                    let tolerance\(indexStr): \(otherUnit.rawValue)_\(otherSign) = \(tolerance)
+                    let categoryResult\(indexStr) = \(categoryConversion).rawValue
+                    if \(catResult) > expected\(indexStr) {
+                        XCTAssertLessThanOrEqual(\(catResult) - expected\(indexStr), tolerance\(indexStr))
+                    } else {
+                        XCTAssertLessThanOrEqual(expected\(indexStr) - \(catResult), tolerance\(indexStr))
+                    }
             """
         }
-        let tolerance = creator.sanitiseLiteral(literal: "1", sign: otherSign)
-        let categoryConversion = "\(T.category)(unit).\(otherUnit.rawValue)_\(otherSign)"
+        .joined(separator: "\n")
         return """
             func \(fnTestName)() {
-                let unit = \(unit)
-                let expected = \(fnName)(\(parameters.input))
-                let result = \(conversion).rawValue
-                XCTAssertEqual(expected, result)
-                let tolerance: \(otherUnit.rawValue)_\(otherSign) = \(tolerance)
-                let categoryResult = \(categoryConversion).rawValue
-                if categoryResult > expected {
-                    XCTAssertLessThanOrEqual(categoryResult - expected, tolerance)
-                } else {
-                    XCTAssertLessThanOrEqual(expected - categoryResult, tolerance)
-                }
+        \(body)
             }
         """
     }
@@ -973,17 +991,28 @@ public struct SwiftTestFileCreator {
     ///   - parameters: The parameters used in the test.
     /// - Returns: The swift code enacting the test.
     private func createTest<T: UnitProtocol>(
-        from unit: T, with sign: Signs, to numeric: NumericTypes, and parameters: TestParameters
+        from unit: T,
+        with sign: Signs,
+        to numeric: NumericTypes,
+        and parameters: [TestParameters],
+        index: Int
     ) -> String where T: RawRepresentable, T.RawValue == String {
         let helper = FunctionHelpers<T>()
-        let fnTestName = helper.testFunctionName(from: unit, with: sign, to: numeric, using: parameters)
+        let fnTestName = "test\(unit.description)_\(sign.rawValue)ToNumeric\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(forUnit: unit, sign: sign, to: numeric, unique: true)
-        let initialiser = "\(unit.rawValue.capitalized)_\(sign.rawValue)(\(parameters.input))"
+        let body = parameters.enumerated().map {
+            let indexStr = $0 > 0 ? "\($0)" : ""
+            let initialiser = "\(unit.rawValue.capitalized)_\(sign.rawValue)(\($1.input))"
+            return """
+                    let expected\(indexStr) = \(fnName)(\($1.input))
+                    let result\(indexStr) = \(numeric.swiftType)(\(initialiser))
+                    XCTAssertEqual(expected\(indexStr), result\(indexStr))
+            """
+        }
+        .joined(separator: "\n")
         return """
             func \(fnTestName)() {
-                let expected = \(fnName)(\(parameters.input))
-                let result = \(numeric.swiftType)(\(initialiser))
-                XCTAssertEqual(expected, result)
+        \(body)
             }
         """
     }
@@ -996,18 +1025,29 @@ public struct SwiftTestFileCreator {
     ///   - parameters: The parameters used in the test.
     /// - Returns: The swift code enacting the unit test.
     private func createTest<T: UnitProtocol>(
-        from numeric: NumericTypes, to unit: T, with sign: Signs, and parameters: TestParameters
+        from numeric: NumericTypes,
+        to unit: T,
+        with sign: Signs,
+        and parameters: [TestParameters],
+        index: Int
     ) -> String where T: RawRepresentable, T.RawValue == String {
         let helper = FunctionHelpers<T>()
-        let fnTestName = helper.testFunctionName(from: numeric, to: unit, with: sign, using: parameters)
+        let fnTestName = "testNumericTo\(unit.description)_\(sign.rawValue)\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(from: numeric, to: unit, sign: sign, unique: true)
         let unitType = "\(unit.rawValue.capitalized)_\(sign.rawValue)"
-        let initialiser = "\(unitType)(\(numeric.swiftType)(\(parameters.input)))"
+        let body = parameters.enumerated().map {
+            let indexStr = $0 > 0 ? "\($0)" : ""
+            let initialiser = "\(unitType)(\(numeric.swiftType)(\($1.input)))"
+            return """
+                    let expected\(indexStr) = \(fnName)(\($1.input))
+                    let result\(indexStr) = \(initialiser).rawValue
+                    XCTAssertEqual(expected\(indexStr), result\(indexStr))
+            """
+        }
+        .joined(separator: "\n")
         return """
             func \(fnTestName)() {
-                let expected = \(fnName)(\(parameters.input))
-                let result = \(initialiser).rawValue
-                XCTAssertEqual(expected, result)
+        \(body)
             }
         """
     }
