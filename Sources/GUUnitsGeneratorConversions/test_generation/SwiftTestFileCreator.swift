@@ -132,14 +132,18 @@ public struct SwiftTestFileCreator {
             let target = relation.target
             let targetSign = conversion.targetSign
             let functionName = relation.name(sign: sourceSign, otherSign: targetSign)
-            return parameters.group(size: 10).enumerated().map { index, tests in
+            return parameters.group(size: 10)
+            .enumerated()
+            .map { index, tests in
                 let units = relation.operation.units.sorted {
                     $0.description < $1.description
                 }
                 guard !units.isEmpty else {
                     fatalError("Invalid relation.")
                 }
-                let body = tests.enumerated().map {
+                let body = tests
+                .enumerated()
+                .map {
                     let indexStr = $0 > 0 ? "\($0)" : ""
                     let input = $1.input
                     let inputs: String
@@ -929,6 +933,10 @@ public struct SwiftTestFileCreator {
         }
     }
 
+    // swiftlint:disable function_parameter_count
+    // swiftlint:disable function_body_length
+    // swiftlint:disable closure_body_length
+
     /// Create a test case for a unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -952,7 +960,9 @@ public struct SwiftTestFileCreator {
         let fnName = helper.functionName(
             forUnit: unit, to: otherUnit, sign: sign, otherSign: otherSign, unique: true
         )
-        let body = parameters.enumerated().map {
+        let body = parameters
+        .enumerated()
+        .map {
             let indexStr = $0 > 0 ? "\($0)" : ""
             let unit = "\(unit.rawValue.capitalized)_\(sign)(\($1.input))"
             let conversion = "\(otherUnit.rawValue.capitalized)_\(otherSign)(unit)"
@@ -990,6 +1000,10 @@ public struct SwiftTestFileCreator {
         """
     }
 
+    // swiftlint:enable function_parameter_count
+    // swiftlint:enable function_body_length
+    // swiftlint:enable closure_body_length
+
     /// Create a unit test for a unit to numeric conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -1007,7 +1021,9 @@ public struct SwiftTestFileCreator {
         let helper = FunctionHelpers<T>()
         let fnTestName = "test\(unit.description)_\(sign.rawValue)ToNumeric\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(forUnit: unit, sign: sign, to: numeric, unique: true)
-        let body = parameters.enumerated().map {
+        let body = parameters
+        .enumerated()
+        .map {
             let indexStr = $0 > 0 ? "\($0)" : ""
             let initialiser = "\(unit.rawValue.capitalized)_\(sign.rawValue)(\($1.input))"
             return """
@@ -1042,7 +1058,9 @@ public struct SwiftTestFileCreator {
         let fnTestName = "testNumericTo\(unit.description)_\(sign.rawValue)\(index > 0 ? "\(index)" : "")"
         let fnName = helper.functionName(from: numeric, to: unit, sign: sign, unique: true)
         let unitType = "\(unit.rawValue.capitalized)_\(sign.rawValue)"
-        let body = parameters.enumerated().map {
+        let body = parameters
+        .enumerated()
+        .map {
             let indexStr = $0 > 0 ? "\($0)" : ""
             let initialiser = "\(unitType)(\(numeric.swiftType)(\($1.input)))"
             return """

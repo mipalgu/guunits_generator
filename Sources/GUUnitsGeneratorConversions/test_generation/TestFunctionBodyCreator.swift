@@ -90,6 +90,8 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         .joined(separator: "\n")
     }
 
+    // swiftlint:disable function_parameter_count
+
     /// Generate the test function body for a unit to unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -113,6 +115,8 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
         }
         return assert(body: fn, parameters: parameters)
     }
+
+    // swiftlint:enable function_parameter_count
 
     /// Generate a test function body for a unit to numeric conversion test.
     /// - Parameters:
@@ -315,8 +319,14 @@ struct TestFunctionBodyCreator<Unit: UnitProtocol> where Unit: RawRepresentable,
 
 }
 
+/// Add relation tests.
 extension TestFunctionBodyCreator where Unit: OperationalTestable {
 
+    /// Create the code for the relation tests originating from a unit.
+    /// - Parameters:
+    ///   - conversion: The relation to convert.
+    ///   - parameter: The parameters to test against.
+    /// - Returns: A string of XCTest code testing the conversion using the parameters.
     func relationTest(
         conversion: UnitConversion, parameter: [TestParameters]
     ) -> String {
@@ -328,6 +338,12 @@ extension TestFunctionBodyCreator where Unit: OperationalTestable {
         .joined(separator: "\n")
     }
 
+    /// Convert a single relation test into swift code.
+    /// - Parameters:
+    ///   - conversion: The conversion to convert to test code.
+    ///   - parameter: The parameters used in the test.
+    ///   - index: The index of the test parameter being used.
+    /// - Returns: Swift code that performs the test.
     private func doRelationTest(
         conversion: UnitConversion, parameter: TestParameters, index: Int
     ) -> String {

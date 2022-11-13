@@ -190,6 +190,8 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
         }
     }
 
+    // swiftlint:disable function_parameter_count
+
     /// Creates a test function for a unit to unit conversion.
     /// - Parameters:
     ///   - unit: The unit to convert from.
@@ -220,6 +222,8 @@ public struct TestFileCreator<TestGeneratorType: TestGenerator> {
             .joined(separator: "\n")
         return "    func \(name)() {\n\(formattedBody)\n    }"
     }
+
+    // swiftlint:enable function_parameter_count
 
     /// Create a test function for a unit to numeric conversion.
     /// - Parameters:
