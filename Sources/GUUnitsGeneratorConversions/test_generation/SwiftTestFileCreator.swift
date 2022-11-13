@@ -126,37 +126,44 @@ public struct SwiftTestFileCreator {
         guard !tests.isEmpty else {
             return []
         }
-        let helper = FunctionHelpers<T>()
         return tests.flatMap { conversion, parameters -> [String] in
             let relation: Relation = conversion.relation
             let sourceSign = conversion.sourceSign
             let target = relation.target
             let targetSign = conversion.targetSign
             let functionName = relation.name(sign: sourceSign, otherSign: targetSign)
-            return parameters.map {
+            return parameters.group(size: 10).enumerated().map { index, tests in
                 let units = relation.operation.units.sorted {
                     $0.description < $1.description
                 }
                 guard !units.isEmpty else {
                     fatalError("Invalid relation.")
                 }
-                let input = $0.input
-                let inputs: String
-                if units.count == 1, let firstUnit = units.first {
-                    let typeName = "\(firstUnit.description.capitalized)_\(sourceSign.rawValue)"
-                    inputs = "\(typeName)(\(input))"
-                } else {
-                    inputs = units.map { unit in
-                        let typeName = "\(unit.description.capitalized)_\(sourceSign.rawValue)"
-                        return "\(unit.description): \(typeName)(\(input))"
+                let body = tests.enumerated().map {
+                    let indexStr = $0 > 0 ? "\($0)" : ""
+                    let input = $1.input
+                    let inputs: String
+                    if units.count == 1, let firstUnit = units.first {
+                        let typeName = "\(firstUnit.description.capitalized)_\(sourceSign.rawValue)"
+                        inputs = "\(typeName)(\(input))"
+                    } else {
+                        inputs = units.map { unit in
+                            let typeName = "\(unit.description.capitalized)_\(sourceSign.rawValue)"
+                            return "\(unit.description): \(typeName)(\(input))"
+                        }
+                        .joined(separator: ", ")
                     }
-                    .joined(separator: ", ")
+                    let res = "\(target.description.capitalized)_\(targetSign.rawValue)(\(inputs))"
+                    return """
+                            let result\(indexStr) = \(res)
+                            let expected\(indexStr) = \(functionName)(\($1.input))
+                            XCTAssertEqual(result\(indexStr).rawValue, expected\(indexStr))
+                    """
                 }
+                .joined(separator: "\n")
                 return """
-                    func test\(functionName)Using\(helper.sanitise(string: $0.input))() {
-                        let result = \(target.description.capitalized)_\(targetSign.rawValue)(\(inputs))
-                        let expected = \(functionName)(\($0.input))
-                        XCTAssertEqual(result.rawValue, expected)
+                    func test\(functionName)\(index > 0 ? "\(index)" : "")() {
+                \(body)
                     }
                 """
             }
