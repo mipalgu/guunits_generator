@@ -366,4 +366,78 @@ final class OperationTests: XCTestCase {
         XCTAssertEqual(result, "\(metres.abbreviation)_minus_\(seconds.abbreviation)")
     }
 
+    /// Test description for constant operation.
+    func testConstantDescription() {
+        let result = Operation.constant(declaration: metres)
+        XCTAssertEqual(result.description, metres.description)
+    }
+
+    /// Test description for multiplication operation.
+    func testMultiplicationDescription() {
+        let result = Operation.multiplication(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_\(seconds.description)")
+    }
+
+    /// Test description for division operation.
+    func testDivisionDescription() {
+        let result = Operation.division(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_per_\(seconds.description)")
+    }
+
+    /// Test description for precedence operation.
+    func testPrecedenceDescription() {
+        let result = Operation.precedence(operation: .constant(declaration: metres)).description
+        XCTAssertEqual(result, "_\(metres.description)_")
+    }
+
+    /// Test description for exponentiate operation.
+    func testExponentiateDescription() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_pwr_\(seconds.description)")
+    }
+
+    /// Test description for exponentiate operation with a power of 2.
+    func testSquareDescription() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 2))
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_sq")
+    }
+
+    /// Test description for exponentiate operation with a power of 3.
+    func testCubedDescription() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 3))
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_cub")
+    }
+
+    /// Test literal description calls Literal description property.
+    func testLiteralDescription() {
+        let result = Operation.literal(declaration: .integer(value: 2)).description
+        XCTAssertEqual(result, Operation.literal(declaration: .integer(value: 2)).description)
+    }
+
+    /// Test description for addition operation.
+    func testAdditionDescription() {
+        let result = Operation.addition(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_plus_\(seconds.description)")
+    }
+
+    /// Test description for subtraction operation.
+    func testSubtractionDescription() {
+        let result = Operation.subtraction(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_minus_\(seconds.description)")
+    }
+
 }
