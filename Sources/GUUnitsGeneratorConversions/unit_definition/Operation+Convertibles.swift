@@ -138,7 +138,7 @@ extension Operation {
                 if value.isZero {
                     return .literal(declaration: .integer(value: 1))
                 }
-                if value.isZero {
+                if value.isOne {
                     return newBase.simplify
                 }
             }
