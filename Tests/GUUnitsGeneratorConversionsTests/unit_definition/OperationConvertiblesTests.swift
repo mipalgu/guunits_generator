@@ -350,7 +350,7 @@ final class OperationConvertiblesTests: XCTestCase {
     // swiftlint:disable opening_brace
     // swiftlint:disable function_body_length
 
-    /// Test c code is valid for generation.
+    /// Test c code is valid for all operation.
     func testCCodeGeneration() {
         let cases: [(GUUnitsGeneratorConversions.Operation, (Signs) -> String)] = [
             (Operation.constant(declaration: metres), { "((\($0.numericType.rawValue)) (metres))" }),
