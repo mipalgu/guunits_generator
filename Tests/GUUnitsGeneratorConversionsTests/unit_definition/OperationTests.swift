@@ -440,4 +440,12 @@ final class OperationTests: XCTestCase {
         XCTAssertEqual(result, "\(metres.description)_minus_\(seconds.description)")
     }
 
+    /// Test allCases for a constant value returns all the units cases.
+    func testConstantAllCases() {
+        let result = Operation.constant(declaration: metres).allCases
+        let distanceDescriptions = DistanceUnits.allCases.map(\.description)
+        XCTAssertEqual(Set(distanceDescriptions).count, distanceDescriptions.count)
+        XCTAssertEqual(result.map(\.description).sorted(), distanceDescriptions.sorted())
+    }
+
 }
