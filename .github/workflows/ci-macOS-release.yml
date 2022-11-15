@@ -9,20 +9,11 @@ on:
 jobs:
 
   exec-mac-ci-release:
-    runs-on: macos-12
+    runs-on: [self-hosted, macOS, macStudio] 
 
     steps:
-      - uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: "5.7"
-
       #- name: Install guunits
       #  uses: mipalgu/install-guunits@main
-
-      - name: Setup SSH Key
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.WORKFLOWS_SSH_PRIVATE_KEY }} 
 
       - name: Checkout repo
         uses: actions/checkout@v2
