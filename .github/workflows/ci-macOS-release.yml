@@ -9,7 +9,7 @@ on:
 jobs:
 
   exec-mac-ci-release:
-    runs-on: [self-hosted, macOS, macStudio] 
+    runs-on: [self-hosted] 
 
     steps:
       #- name: Install guunits
