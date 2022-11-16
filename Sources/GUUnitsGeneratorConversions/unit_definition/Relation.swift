@@ -165,7 +165,7 @@ extension Relation {
         if !sign.numericType.isSigned {
             implementation = """
             \(unitDefs)
-                if (__builtin_expect((\(upperOverflow)), 0)) {
+                if (__builtin_expect(\(upperOverflow), 0)) {
                     return \(upperLimit);
                 } else {
                     const \(cSign.numericType.rawValue) result = \(code);
