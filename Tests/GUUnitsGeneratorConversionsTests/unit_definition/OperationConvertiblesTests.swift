@@ -438,6 +438,109 @@ final class OperationConvertiblesTests: XCTestCase {
         }
     }
 
+    /// Test constant doesn't require a float operation.
+    func testHasFloatConstant() {
+        XCTAssertFalse(GUUnitsGeneratorConversions.Operation.constant(declaration: metres).hasFloatOperation)
+    }
+
+    /// Test exponentiate function requires float operation.
+    func testHasFloatExponential() {
+        XCTAssertTrue(
+            GUUnitsGeneratorConversions.Operation.exponentiate(
+                base: .constant(declaration: metres), power: .constant(declaration: seconds)
+            )
+            .hasFloatOperation
+        )
+    }
+
+    /// Test integer does not require float operation.
+    func testHasFloatInteger() {
+        XCTAssertFalse(Operation.literal(declaration: .integer(value: 1)).hasFloatOperation)
+    }
+
+    /// Test decimal does require float operation.
+    func testHasFloatDecimal() {
+        XCTAssertTrue(Operation.literal(declaration: .decimal(value: 1.0)).hasFloatOperation)
+    }
+
+    /// Test has float for multiplication operation.
+    func testHasFloatMultiplication() {
+        XCTAssertFalse(
+            Operation.multiplication(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.multiplication(
+                lhs: .exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                rhs: .literal(declaration: .integer(value: 1))
+            ).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for division operation.
+    func testHasFloatDivision() {
+        XCTAssertFalse(
+            Operation.division(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.division(
+                lhs: .literal(declaration: .decimal(value: 1.0)), rhs: .constant(declaration: metres)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.division(
+                lhs: .literal(declaration: .integer(value: 1)), rhs: .constant(declaration: metres)
+            ).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for precedence operation.
+    func testHasFloatPrecedence() {
+        XCTAssertFalse(Operation.precedence(operation: .constant(declaration: metres)).hasFloatOperation)
+        XCTAssertTrue(
+            Operation.precedence(operation: .literal(declaration: .decimal(value: 1.0))).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for addition operation.
+    func testHasFloatAddition() {
+        XCTAssertFalse(
+            Operation.addition(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.addition(
+                lhs: .exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                rhs: .literal(declaration: .integer(value: 1))
+            ).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for subtraction operation.
+    func testFloatSubtraction() {
+        XCTAssertFalse(
+            Operation.subtraction(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.subtraction(
+                lhs: .exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                rhs: .literal(declaration: .integer(value: 1))
+            ).hasFloatOperation
+        )
+    }
+
     // swiftlint:enable opening_brace
     // swiftlint:enable function_body_length
 
