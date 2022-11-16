@@ -88,30 +88,6 @@ final class OperationConvertiblesTests: XCTestCase {
         )
     )
 
-    /// Test cCode generation for .d Sign.
-    func testCCode_d() {
-        let code = operation.cCode(sign: .d)
-        let type = Signs.d.numericType.rawValue
-        let seconds = "((\(type)) (seconds))"
-        let metres = "((\(type)) (metres))"
-        let kilogram = "((\(type)) (kilogram))"
-        let expected = "divide_d((multiply_d((\(kilogram)), (multiply_d((\(metres)), (\(metres))))))," +
-            " (multiply_d((\(seconds)), (\(seconds)))))"
-        XCTAssertEqual(code, expected)
-    }
-
-    /// Test swift code generation for .d sign
-    func testSwiftCode_d() {
-        let code = operation.swiftCode(sign: .d)
-        let type = Signs.d.numericType.swiftType.rawValue
-        let seconds = "\(type)(seconds)"
-        let metres = "\(type)(metres)"
-        let kilogram = "\(type)(kilogram)"
-        let expected = "((\(kilogram)) * ((\(metres)) * (\(metres)))) /" +
-            " ((\(seconds)) * (\(seconds)))"
-        XCTAssertEqual(code, expected)
-    }
-
     /// Test replace metres with metres.
     func testReplaceMetres() {
         let convertible: [AnyUnit: AnyUnit] = [
@@ -347,185 +323,6 @@ final class OperationConvertiblesTests: XCTestCase {
         XCTAssertEqual(original.simplify, original)
     }
 
-    // swiftlint:disable opening_brace
-    // swiftlint:disable function_body_length
-
-    /// Test c code is valid for all operations.
-    func testCCodeGeneration() {
-        let cases: [(GUUnitsGeneratorConversions.Operation, (Signs) -> String)] = [
-            (Operation.constant(declaration: metres), { "((\($0.numericType.rawValue)) (metres))" }),
-            (one, { "((\($0.numericType.rawValue)) (1))" }),
-            (
-                Operation.division(lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)),
-                {
-                    "divide_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(((\($0.numericType.rawValue)) (seconds))))"
-                }
-            ),
-            (
-                Operation.multiplication(
-                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
-                ),
-                {
-                    "multiply_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(((\($0.numericType.rawValue)) (seconds))))"
-                }
-            ),
-            (
-                Operation.exponentiate(
-                    base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 2))
-                ),
-                {
-                    "multiply_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(((\($0.numericType.rawValue)) (metres))))"
-                }
-            ),
-            (
-                Operation.exponentiate(
-                    base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 3))
-                ),
-                {
-                    "multiply_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(multiply_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(((\($0.numericType.rawValue)) (metres))))))"
-                }
-            ),
-            (
-                Operation.exponentiate(
-                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
-                ),
-                {
-                    "(pow(((\($0.numericType.rawValue)) (metres)), " +
-                        "((\($0.numericType.rawValue)) (seconds))))"
-                }
-            ),
-            (one, { "((\($0.numericType.rawValue)) (1))" }),
-            (
-                Operation.literal(declaration: .decimal(value: 1.0)),
-                { "((\($0.numericType.rawValue)) (1.0))" }
-            ),
-            (
-                Operation.addition(
-                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
-                ),
-                {
-                    "addition_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(((\($0.numericType.rawValue)) (seconds))))"
-                }
-            ),
-            (
-                Operation.subtraction(
-                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
-                ),
-                {
-                    "subtraction_\($0.rawValue)((((\($0.numericType.rawValue)) (metres))), " +
-                        "(((\($0.numericType.rawValue)) (seconds))))"
-                }
-            )
-        ]
-        cases.forEach { operation, expected in
-            guard isValidCCode(for: operation, expected: expected) else {
-                XCTFail("\(operation) does not produce valid C code.")
-                Signs.allCases.forEach {
-                    print("C Code: ")
-                    print(operation.cCode(sign: $0))
-                    print("Expected: ")
-                    print(expected($0))
-                }
-                fflush(stdout)
-                return
-            }
-        }
-    }
-
-    /// Test swift code is valid for all operations.
-    func testSwiftCodeGeneration() {
-        let cases: [(GUUnitsGeneratorConversions.Operation, (Signs) -> String)] = [
-            (Operation.constant(declaration: metres), { "\($0.numericType.swiftType.rawValue)(metres)" }),
-            (one, { "\($0.numericType.swiftType.rawValue)(1)" }),
-            (
-                Operation.division(lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)),
-                {
-                    "(\($0.numericType.swiftType.rawValue)(metres)) / " +
-                        "(\($0.numericType.swiftType.rawValue)(seconds))"
-                }
-            ),
-            (
-                Operation.multiplication(
-                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
-                ),
-                {
-                    "(\($0.numericType.swiftType.rawValue)(metres)) * " +
-                        "(\($0.numericType.swiftType.rawValue)(seconds))"
-                }
-            ),
-            (
-                Operation.exponentiate(
-                    base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 2))
-                ),
-                {
-                    "(\($0.numericType.swiftType.rawValue)(metres)) * " +
-                        "(\($0.numericType.swiftType.rawValue)(metres))"
-                }
-            ),
-            (
-                Operation.exponentiate(
-                    base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 3))
-                ),
-                {
-                    "(\($0.numericType.swiftType.rawValue)(metres)) * " +
-                        "((\($0.numericType.swiftType.rawValue)(metres)) * " +
-                        "(\($0.numericType.swiftType.rawValue)(metres)))"
-                }
-            ),
-            (
-                Operation.exponentiate(
-                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
-                ),
-                {
-                    "(pow(\($0.numericType.swiftType.rawValue)(metres), " +
-                        "\($0.numericType.swiftType.rawValue)(seconds)))"
-                }
-            ),
-            (one, { "\($0.numericType.swiftType.rawValue)(1)" }),
-            (
-                Operation.literal(declaration: .decimal(value: 1.0)),
-                { "\($0.numericType.swiftType.rawValue)(1.0)" }
-            ),
-            (
-                Operation.addition(
-                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
-                ),
-                {
-                    "(\($0.numericType.swiftType.rawValue)(metres)) + " +
-                        "(\($0.numericType.swiftType.rawValue)(seconds))"
-                }
-            ),
-            (
-                Operation.subtraction(
-                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
-                ),
-                {
-                    "(\($0.numericType.swiftType.rawValue)(metres)) - " +
-                        "(\($0.numericType.swiftType.rawValue)(seconds))"
-                }
-            )
-        ]
-        cases.forEach { operation, expected in
-            guard isValidSwiftCode(for: operation, expected: expected) else {
-                XCTFail("\(operation) does not produce valid swift code.")
-                Signs.allCases.forEach {
-                    print("Swift Code: ")
-                    print(operation.swiftCode(sign: $0))
-                    print("Expected: ")
-                    print(expected($0))
-                }
-                fflush(stdout)
-                return
-            }
-        }
-    }
-
     /// Test constant doesn't require a float operation.
     func testHasFloatConstant() {
         XCTAssertFalse(GUUnitsGeneratorConversions.Operation.constant(declaration: metres).hasFloatOperation)
@@ -613,7 +410,7 @@ final class OperationConvertiblesTests: XCTestCase {
     }
 
     /// Test hasFloat for subtraction operation.
-    func testFloatSubtraction() {
+    func testHasFloatSubtraction() {
         XCTAssertFalse(
             Operation.subtraction(
                 lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
@@ -627,47 +424,6 @@ final class OperationConvertiblesTests: XCTestCase {
                 rhs: .literal(declaration: .integer(value: 1))
             ).hasFloatOperation
         )
-    }
-
-    // swiftlint:enable opening_brace
-    // swiftlint:enable function_body_length
-
-    /// Helper function for checking C code.
-    /// - Parameters:
-    ///   - operation: The operation to check.
-    ///   - expected: The expected C code from the operation.
-    /// - Returns: Whether the expected C code matches the actual C code in the operation.
-    private func isValidCCode(
-        for operation: GUUnitsGeneratorConversions.Operation, expected: (Signs) -> String
-    ) -> Bool {
-        isValidCode(for: operation, codeFn: { $0.cCode(sign: $1) }, expected: expected)
-    }
-
-    /// Helper function for checking Swift code.
-    /// - Parameters:
-    ///   - operation: The operation to check.
-    ///   - expected: The expected Swift code from the operation.
-    /// - Returns: Whether the expected Swift code matches the actual Swift code in the operation.
-    private func isValidSwiftCode(
-        for operation: GUUnitsGeneratorConversions.Operation, expected: (Signs) -> String
-    ) -> Bool {
-        isValidCode(for: operation, codeFn: { $0.swiftCode(sign: $1) }, expected: expected)
-    }
-
-    /// Checks a code generation function in an operation.
-    /// - Parameters:
-    ///   - operation: The operation to check.
-    ///   - codeFn: The function to generate the code.
-    ///   - expected: The expected code.
-    /// - Returns: Whether the generated code matches the expected code.
-    private func isValidCode(
-        for operation: GUUnitsGeneratorConversions.Operation,
-        codeFn: (GUUnitsGeneratorConversions.Operation, Signs) -> String,
-        expected: (Signs) -> String
-    ) -> Bool {
-        Signs.allCases.allSatisfy {
-            expected($0) == codeFn(operation, $0)
-        }
     }
 
 }
