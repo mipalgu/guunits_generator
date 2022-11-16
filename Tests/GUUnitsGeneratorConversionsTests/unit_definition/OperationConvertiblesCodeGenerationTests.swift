@@ -54,6 +54,7 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
