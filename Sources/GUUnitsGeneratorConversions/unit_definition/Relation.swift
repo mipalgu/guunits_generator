@@ -181,7 +181,7 @@ extension Relation {
             \(unitDefs)
                 if (__builtin_expect(\(upperOverflow), 0)) {
                     return \(upperLimit);
-                } else if (__builtin_expect((\(lowerOverflow)), 0)) {
+                } else if (__builtin_expect(\(lowerOverflow), 0)) {
                     return \(lowerLimit);
                 } else {
                     const \(cSign.numericType.rawValue) result = \(code);
