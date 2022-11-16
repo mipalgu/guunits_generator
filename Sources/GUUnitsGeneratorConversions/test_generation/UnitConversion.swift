@@ -68,3 +68,13 @@ public struct UnitConversion: Hashable {
     public let targetSign: Signs
 
 }
+
+/// `CustomStringConvertible` conformance.
+extension UnitConversion: CustomStringConvertible {
+
+    /// The description of this conversion.
+    public var description: String {
+        "\(relation.name(sign: sourceSign, otherSign: targetSign))_using_\(relation.operation.description)"
+    }
+
+}

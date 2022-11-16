@@ -73,4 +73,17 @@ final class UnitConversionTests: XCTestCase {
         XCTAssertEqual(conversion.targetSign, .u)
     }
 
+    /// Test description property matches expected string.
+    func testDescription() {
+        let relation = Relation(
+            source: Acceleration.metresPerSecond2,
+            target: AnyUnit(MassUnits.kilogram),
+            operation: .literal(declaration: .integer(value: 1))
+        )
+        let conversion = UnitConversion(relation: relation, sourceSign: .t, targetSign: .u)
+        let result = conversion.description
+        let expected = "m_per_s_sq_t_to_kg_u_using_1"
+        XCTAssertEqual(result, expected)
+    }
+
 }
