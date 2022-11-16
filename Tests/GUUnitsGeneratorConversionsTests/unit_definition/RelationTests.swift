@@ -156,4 +156,43 @@ final class RelationTests: XCTestCase {
         XCTAssertEqual(implementation, expected)
     }
 
+    /// Test implementation for unsigned to signed relation with a single parameter.
+    func testSingleParameterImplementationUnSignedToSigned() {
+        let converter = NumericTypeConverter()
+        let sign = Signs.u
+        let otherSign = Signs.t
+        let implementation = singleRelation.implementation(sign: sign, otherSign: otherSign)
+        let comment = """
+        /**
+        * Convert \(metres)_\(sign.rawValue) to \(seconds)_\(otherSign.rawValue).
+        */
+        """
+        let fnName = singleRelation.name(sign: sign, otherSign: otherSign)
+        let parameters = "\(metres)_\(sign.rawValue) \(metres)"
+        let functionDef = comment + "\n" + "\(seconds)_\(otherSign.rawValue) \(fnName)(\(parameters))"
+        let cast = converter.convert(
+            "result", from: sign.numericType, to: singleRelation.target, sign: otherSign
+        )
+        let body = """
+            const \(sign.numericType.rawValue) unit0 = ((\(sign.numericType.rawValue)) (metres));
+            if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit0), 0)) {
+                return \(otherSign.numericType.limits.1);
+            } else {
+                const \(sign.numericType.rawValue) result = \(singleRelation.operation.cCode(sign: sign));
+                if (__builtin_expect(overflow_upper_\(sign.rawValue)(result), 0)) {
+                    return \(otherSign.numericType.limits.1);
+                } else {
+                    return \(cast);
+                }
+            }
+        """
+        let expected = """
+        \(functionDef)
+        {
+        \(body)
+        }
+        """
+        XCTAssertEqual(implementation, expected)
+    }
+
 }
