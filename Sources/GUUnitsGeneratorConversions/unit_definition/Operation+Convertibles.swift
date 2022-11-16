@@ -138,7 +138,7 @@ extension Operation {
                 if value.isZero {
                     return .literal(declaration: .integer(value: 1))
                 }
-                if value.isZero {
+                if value.isOne {
                     return newBase.simplify
                 }
             }
@@ -268,7 +268,7 @@ extension Operation {
         case .addition(let lhs, let rhs):
             return "(\(lhs.swiftCode(sign: sign))) + (\(rhs.swiftCode(sign: sign)))"
         case .subtraction(let lhs, let rhs):
-            return "(\(lhs.swiftCode(sign: sign))) + (\(rhs.swiftCode(sign: sign)))"
+            return "(\(lhs.swiftCode(sign: sign))) - (\(rhs.swiftCode(sign: sign)))"
         }
     }
 

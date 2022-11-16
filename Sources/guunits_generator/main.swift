@@ -47,47 +47,43 @@ try CPPFileCreator().generate(
 
 /// Generate the source code for the guunits package.
 /// - Parameter directory: The folder to create the package in.
-private func generate(directory: URL? = URL(string: FileManager().currentDirectoryPath)) throws {
-    guard let directory = directory else {
-        fatalError("Failed to find current directory.")
+private func generate(directory: URL? = nil) throws {
+    let fileManager = FileManager()
+    let directory = directory ?? URL(fileURLWithPath: fileManager.currentDirectoryPath, isDirectory: true)
+    guard directory.hasDirectoryPath else {
+        fatalError("Path is an invalid directory.")
     }
     let generator = GUUnitsGenerator()
-    let sources = directory.appendingPathComponent("Sources")
-    let tests = directory.appendingPathComponent("Tests")
-    try generator.generateCFiles(in: sources.appendingPathComponent("CGUUnits"))
-    generator.generateSwiftFiles(in: sources.appendingPathComponent("GUUnits"))
-    generator.generateSwiftTests(in: tests.appendingPathComponent("GUUnitsTests"))
-    generator.generateCTests(in: tests.appendingPathComponent("CGUUnitsTests"))
-    generator.generatePackageSwift(in: directory)
+    let sources = directory.appendingPathComponent("Sources", isDirectory: true)
+    let tests = directory.appendingPathComponent("Tests", isDirectory: true)
+    try fileManager.removeItem(at: tests)
+    try fileManager.removeItem(at: sources)
+    try fileManager.createDirectory(atPath: tests.path, withIntermediateDirectories: true)
+    try fileManager.createDirectory(atPath: sources.path, withIntermediateDirectories: true)
+    try generator.generateCFiles(in: sources.appendingPathComponent("CGUUnits", isDirectory: true))
+    try generator.generateSwiftFiles(in: sources.appendingPathComponent("GUUnits", isDirectory: true))
+    try generator.generateCTests(in: tests.appendingPathComponent("CGUUnitsTests", isDirectory: true))
+    try generator.generateSwiftTests(in: tests.appendingPathComponent("GUUnitsTests", isDirectory: true))
+    try generator.generatePackageSwift(in: directory)
 }
 
 /// Main method for generating the guunits sources.
 private func main() throws {
-    var path: String?
     let argc = CommandLine.argc
     let arguments = CommandLine.arguments
-    if argc == 2 && arguments.count > 1 && arguments[1] == "-h" || arguments[1] == "--help" {
-        print("guunits_generator\n\nUsage: guunits_generator [-h] [-d <directory>]")
-        return
-    }
-    guard argc > 1 else {
+    guard argc == 2, arguments.count > 1, arguments[1] == "-h" || arguments[1] == "--help" else {
         try generate()
         return
     }
-    arguments.indices.forEach {
-        let argument = arguments[$0]
-        guard $0 < argc - 1 else {
-            return
-        }
-        if argument == "-d" || argument == "--directory" {
-            path = arguments[$0 + 1]
-        }
-    }
-    guard let unwrappedPath = path, let url = URL(string: unwrappedPath) else {
-        try generate()
-        return
-    }
-    try generate(directory: url)
+    let helpText = """
+    guunits_generator
+
+    Usage:
+    guunits_generator [-h]
+
+    Generate the GUUnits package inside the current directory.
+    """
+    print(helpText)
 }
 
 /// Run main.

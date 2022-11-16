@@ -60,6 +60,12 @@ import XCTest
 /// Test class for `Operation`.
 final class OperationTests: XCTestCase {
 
+    /// A type-erased metres unit that will act as test data.
+    let metres = AnyUnit(DistanceUnits.metres)
+
+    /// A type-erased seconds unit that will act as test data.
+    let seconds = AnyUnit(TimeUnits.seconds)
+
     /// Operation under test.
     let operation = Operation.division(
         lhs: Operation.constant(declaration: AnyUnit(DistanceUnits.metres)),
@@ -284,6 +290,162 @@ final class OperationTests: XCTestCase {
         let units = operation.units
         let expected = [AnyUnit(DistanceUnits.metres), AnyUnit(TimeUnits.seconds)]
         XCTAssertEqual(units, expected)
+    }
+
+    /// Test abbreviation for constant operation.
+    func testConstantAbbreviation() {
+        let result = Operation.constant(declaration: metres)
+        XCTAssertEqual(result.abbreviation, metres.abbreviation)
+    }
+
+    /// Test abbreviation for multiplication operation.
+    func testMultiplicationAbbreviation() {
+        let result = Operation.multiplication(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_\(seconds.abbreviation)")
+    }
+
+    /// Test abbreviation for division operation.
+    func testDivisionAbbreviation() {
+        let result = Operation.division(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_per_\(seconds.abbreviation)")
+    }
+
+    /// Test abbreviation for precedence operation.
+    func testPrecedenceAbbreviation() {
+        let result = Operation.precedence(operation: .constant(declaration: metres)).abbreviation
+        XCTAssertEqual(result, "_\(metres.abbreviation)_")
+    }
+
+    /// Test abbreviation for exponentiate operation.
+    func testExponentiateAbbreviation() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .constant(declaration: seconds)
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_pwr_\(seconds.abbreviation)")
+    }
+
+    /// Test abbreviate for exponentiate operation with a power of 2.
+    func testSquareAbbreviation() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 2))
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_sq")
+    }
+
+    /// Test abbreviate for exponentiate operation with a power of 3.
+    func testCubedAbbreviation() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 3))
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_cub")
+    }
+
+    /// Test literal abbreviation calls Literal abbreviation property.
+    func testLiteralAbbreviation() {
+        let result = Operation.literal(declaration: .integer(value: 2)).abbreviation
+        XCTAssertEqual(result, Operation.literal(declaration: .integer(value: 2)).abbreviation)
+    }
+
+    /// Test abbreviation for addition operation.
+    func testAdditionAbbreviation() {
+        let result = Operation.addition(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_plus_\(seconds.abbreviation)")
+    }
+
+    /// Test abbreviation for subtraction operation.
+    func testSubtractionAbbreviation() {
+        let result = Operation.subtraction(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).abbreviation
+        XCTAssertEqual(result, "\(metres.abbreviation)_minus_\(seconds.abbreviation)")
+    }
+
+    /// Test description for constant operation.
+    func testConstantDescription() {
+        let result = Operation.constant(declaration: metres)
+        XCTAssertEqual(result.description, metres.description)
+    }
+
+    /// Test description for multiplication operation.
+    func testMultiplicationDescription() {
+        let result = Operation.multiplication(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_\(seconds.description)")
+    }
+
+    /// Test description for division operation.
+    func testDivisionDescription() {
+        let result = Operation.division(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_per_\(seconds.description)")
+    }
+
+    /// Test description for precedence operation.
+    func testPrecedenceDescription() {
+        let result = Operation.precedence(operation: .constant(declaration: metres)).description
+        XCTAssertEqual(result, "_\(metres.description)_")
+    }
+
+    /// Test description for exponentiate operation.
+    func testExponentiateDescription() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_pwr_\(seconds.description)")
+    }
+
+    /// Test description for exponentiate operation with a power of 2.
+    func testSquareDescription() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 2))
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_sq")
+    }
+
+    /// Test description for exponentiate operation with a power of 3.
+    func testCubedDescription() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 3))
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_cub")
+    }
+
+    /// Test literal description calls Literal description property.
+    func testLiteralDescription() {
+        let result = Operation.literal(declaration: .integer(value: 2)).description
+        XCTAssertEqual(result, Operation.literal(declaration: .integer(value: 2)).description)
+    }
+
+    /// Test description for addition operation.
+    func testAdditionDescription() {
+        let result = Operation.addition(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_plus_\(seconds.description)")
+    }
+
+    /// Test description for subtraction operation.
+    func testSubtractionDescription() {
+        let result = Operation.subtraction(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        ).description
+        XCTAssertEqual(result, "\(metres.description)_minus_\(seconds.description)")
+    }
+
+    /// Test allCases for a constant value returns all the units cases.
+    func testConstantAllCases() {
+        let result = Operation.constant(declaration: metres).allCases
+        let distanceDescriptions = DistanceUnits.allCases.map(\.description)
+        XCTAssertEqual(Set(distanceDescriptions).count, distanceDescriptions.count)
+        XCTAssertEqual(result.map(\.description).sorted(), distanceDescriptions.sorted())
     }
 
 }

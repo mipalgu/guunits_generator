@@ -54,14 +54,24 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+import Foundation
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
 /// Test class for ``Operation`` code generation functions.
 final class OperationConvertiblesTests: XCTestCase {
 
+    /// A zero literal.
+    let zero = Operation.literal(declaration: .integer(value: 0))
+
     /// A one literal.
     let one = Operation.literal(declaration: .integer(value: 1))
+
+    /// A type-erased metres unit that will act as test data.
+    let metres = AnyUnit(DistanceUnits.metres)
+
+    /// A type-erased seconds unit that will act as test data.
+    let seconds = AnyUnit(TimeUnits.seconds)
 
     /// The operaiton under test. SI Newton.
     let operation = Operation.division(
@@ -77,30 +87,6 @@ final class OperationConvertiblesTests: XCTestCase {
             power: .literal(declaration: .integer(value: 2))
         )
     )
-
-    /// Test cCode generation for .d Sign.
-    func testCCode_d() {
-        let code = operation.cCode(sign: .d)
-        let type = Signs.d.numericType.rawValue
-        let seconds = "((\(type)) (seconds))"
-        let metres = "((\(type)) (metres))"
-        let kilogram = "((\(type)) (kilogram))"
-        let expected = "divide_d((multiply_d((\(kilogram)), (multiply_d((\(metres)), (\(metres))))))," +
-            " (multiply_d((\(seconds)), (\(seconds)))))"
-        XCTAssertEqual(code, expected)
-    }
-
-    /// Test swift code generation for .d sign
-    func testSwiftCode_d() {
-        let code = operation.swiftCode(sign: .d)
-        let type = Signs.d.numericType.swiftType.rawValue
-        let seconds = "\(type)(seconds)"
-        let metres = "\(type)(metres)"
-        let kilogram = "\(type)(kilogram)"
-        let expected = "((\(kilogram)) * ((\(metres)) * (\(metres)))) /" +
-            " ((\(seconds)) * (\(seconds)))"
-        XCTAssertEqual(code, expected)
-    }
 
     /// Test replace metres with metres.
     func testReplaceMetres() {
@@ -246,6 +232,198 @@ final class OperationConvertiblesTests: XCTestCase {
         )
         let result = operation.simplify
         XCTAssertEqual(result, operation)
+    }
+
+    /// Test simplify does nothing for a constant.
+    func testSimplifyConstant() {
+        let original = Operation.constant(declaration: metres)
+        XCTAssertEqual(original.simplify, original)
+    }
+
+    /// Test simplify does nothing for literal.
+    func testSimplifyLiteral() {
+        XCTAssertEqual(one, one.simplify)
+    }
+
+    /// Test simplify returns 1 when 1 is raised to any power.
+    func testSimplifyForExponentBaseOfOne() {
+        let result = Operation.exponentiate(base: one, power: .constant(declaration: metres)).simplify
+        XCTAssertEqual(result, one)
+    }
+
+    /// Test anything to the power of 0 is 1.
+    func testSimplifyForExponentPower0() {
+        let result = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 0))
+        ).simplify
+        XCTAssertEqual(result, .literal(declaration: .integer(value: 1)))
+    }
+
+    /// Test exponent to the power of 1 is just the base.
+    func testSimplifyForExponentPower1() {
+        let result = Operation.exponentiate(base: .constant(declaration: metres), power: one).simplify
+        XCTAssertEqual(result, .constant(declaration: metres))
+    }
+
+    /// Test simplify does nothing for general exponentiate case.
+    func testSimplifyForExponentiateGeneralCase() {
+        let original = Operation.exponentiate(
+            base: .constant(declaration: metres), power: .constant(declaration: seconds)
+        )
+        XCTAssertEqual(original.simplify, original)
+    }
+
+    /// Test simplify reduces to rhs when lhs is 0 in an addition operation.
+    func testSimplifyAdditionWhereLHSIs0() {
+        let rhs = Operation.constant(declaration: metres)
+        let result = Operation.addition(lhs: zero, rhs: rhs)
+        XCTAssertEqual(result.simplify, rhs)
+    }
+
+    /// Test simplify reduces to lhs when rhs is 0 in an addition operation.
+    func testSimplifyAdditionWhereRHSIs0() {
+        let lhs = Operation.constant(declaration: metres)
+        let result = Operation.addition(lhs: lhs, rhs: zero)
+        XCTAssertEqual(result.simplify, lhs)
+    }
+
+    /// Test simplify returns 0 when adding 0 with 0.
+    func testSimplifyAdditionWhenBoth0() {
+        let result = Operation.addition(lhs: zero, rhs: zero).simplify
+        XCTAssertEqual(result, zero)
+    }
+
+    /// Test simplify does nothing for addition operation in simplist form.
+    func testSimplifyAddition() {
+        let original = Operation.addition(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        )
+        XCTAssertEqual(original.simplify, original)
+    }
+
+    /// Test simplify reduces operation to lhs when rhs is 0 in subtraction operation.
+    func testSimplifySubtractionWhereRHSIs0() {
+        let lhs = Operation.constant(declaration: metres)
+        let result = Operation.subtraction(lhs: lhs, rhs: zero).simplify
+        XCTAssertEqual(result, lhs)
+    }
+
+    /// Test simplify does nothing when performing a subtraction operation with lhs == 0.
+    func testSimplifySubtractionWhereLHSIs0() {
+        let rhs = Operation.constant(declaration: metres)
+        let original = Operation.subtraction(lhs: zero, rhs: rhs)
+        XCTAssertEqual(original.simplify, original)
+    }
+
+    /// Test simplify does nothing for subtraction operation in simplist form.
+    func testSimplifySubtraction() {
+        let original = Operation.subtraction(
+            lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+        )
+        XCTAssertEqual(original.simplify, original)
+    }
+
+    /// Test constant doesn't require a float operation.
+    func testHasFloatConstant() {
+        XCTAssertFalse(GUUnitsGeneratorConversions.Operation.constant(declaration: metres).hasFloatOperation)
+    }
+
+    /// Test exponentiate function requires float operation.
+    func testHasFloatExponential() {
+        XCTAssertTrue(
+            GUUnitsGeneratorConversions.Operation.exponentiate(
+                base: .constant(declaration: metres), power: .constant(declaration: seconds)
+            )
+            .hasFloatOperation
+        )
+    }
+
+    /// Test integer does not require float operation.
+    func testHasFloatInteger() {
+        XCTAssertFalse(Operation.literal(declaration: .integer(value: 1)).hasFloatOperation)
+    }
+
+    /// Test decimal does require float operation.
+    func testHasFloatDecimal() {
+        XCTAssertTrue(Operation.literal(declaration: .decimal(value: 1.0)).hasFloatOperation)
+    }
+
+    /// Test has float for multiplication operation.
+    func testHasFloatMultiplication() {
+        XCTAssertFalse(
+            Operation.multiplication(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.multiplication(
+                lhs: .exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                rhs: .literal(declaration: .integer(value: 1))
+            ).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for division operation.
+    func testHasFloatDivision() {
+        XCTAssertFalse(
+            Operation.division(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.division(
+                lhs: .literal(declaration: .decimal(value: 1.0)), rhs: .constant(declaration: metres)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.division(
+                lhs: .literal(declaration: .integer(value: 1)), rhs: .constant(declaration: metres)
+            ).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for precedence operation.
+    func testHasFloatPrecedence() {
+        XCTAssertFalse(Operation.precedence(operation: .constant(declaration: metres)).hasFloatOperation)
+        XCTAssertTrue(
+            Operation.precedence(operation: .literal(declaration: .decimal(value: 1.0))).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for addition operation.
+    func testHasFloatAddition() {
+        XCTAssertFalse(
+            Operation.addition(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.addition(
+                lhs: .exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                rhs: .literal(declaration: .integer(value: 1))
+            ).hasFloatOperation
+        )
+    }
+
+    /// Test hasFloat for subtraction operation.
+    func testHasFloatSubtraction() {
+        XCTAssertFalse(
+            Operation.subtraction(
+                lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+            ).hasFloatOperation
+        )
+        XCTAssertTrue(
+            Operation.subtraction(
+                lhs: .exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                rhs: .literal(declaration: .integer(value: 1))
+            ).hasFloatOperation
+        )
     }
 
 }
