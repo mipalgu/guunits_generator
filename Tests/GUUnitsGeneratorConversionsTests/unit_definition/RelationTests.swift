@@ -113,6 +113,7 @@ final class RelationTests: XCTestCase {
         XCTAssertEqual(definition, expected)
     }
 
+    /// Test implementation for signed to unsigned relation with a single parameter.
     func testSingleParameterImplementationSignedToUnsigned() {
         let converter = NumericTypeConverter()
         let sign = Signs.t
