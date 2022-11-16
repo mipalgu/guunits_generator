@@ -131,9 +131,9 @@ final class GUUnitsGeneratorTests: XCTestCase {
         clearFolder(at: guunitsTests)
         clearFolder(at: swiftGUUnitsTests)
         try generator.generateCFiles(in: guunitsDirectory)
-        generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
-        generator.generateCTests(in: guunitsTests)
-        generator.generateSwiftTests(in: swiftGUUnitsTests)
+        try generator.generateSwiftFiles(in: swiftGUUnitsDirectory)
+        try generator.generateCTests(in: guunitsTests)
+        try generator.generateSwiftTests(in: swiftGUUnitsTests)
     }
 
     /// Creates an empty folder that can contain files ignored by git.

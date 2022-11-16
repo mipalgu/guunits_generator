@@ -58,6 +58,8 @@
 
 import Foundation
 
+// swiftlint:disable type_body_length
+
 /// Create the source files the C and swift targets of guunits.
 public struct GUUnitsGenerator {
 
@@ -122,7 +124,9 @@ public struct GUUnitsGenerator {
 
     /// Creates the Package.swift file in the folder pointed to by path.
     /// - Parameter path: A URL to the folder containing the Package.swift file.
-    public func generatePackageSwift(in path: URL) {
+    public func generatePackageSwift(in path: URL) throws {
+        let packageFile = path.appendingPathComponent("Package.swift", isDirectory: false)
+        try fileManager.removeItem(at: packageFile)
         writeFile(at: path, with: "Package", and: package)
     }
 
@@ -131,9 +135,9 @@ public struct GUUnitsGenerator {
     /// Create all of the C source files at a specific path.
     /// - Parameter path: The path to create files in.
     public func generateCFiles(in path: URL) throws {
-        // guard !path.isFileURL else {
-        //     fatalError("Path is not a valid directory.")
-        // }
+        guard path.hasDirectoryPath else {
+            fatalError("Path is not a valid directory.")
+        }
         var hFile = path
         var cFile = path
         hFile.appendPathComponent("include", isDirectory: true)
@@ -236,12 +240,13 @@ public struct GUUnitsGenerator {
 
     /// Create the C Test files at a specific location.
     /// - Parameter path: The path to the folder that will contain the test files.
-    public func generateCTests(in path: URL) {
-        // guard !path.isFileURL else {
-        //     fatalError("Path is not a valid directory.")
-        // }
+    public func generateCTests(in path: URL) throws {
+        guard path.hasDirectoryPath else {
+            fatalError("Path is not a valid directory.")
+        }
         print("Creating C Test code in path \(path.absoluteString)...")
         fflush(stdout)
+        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         let fileCreator = TestFileCreator<TemperatureTestGenerator>()
         let testGenerator = TemperatureTestGenerator()
         createTestFiles(
@@ -334,12 +339,13 @@ public struct GUUnitsGenerator {
 
     /// Generate the swift source files for guunits.
     /// - Parameter path: The path to the directory containing the new files.
-    public func generateSwiftFiles(in path: URL) {
-        // guard !path.isFileURL else {
-        //     fatalError("Path is not a valid directory.")
-        // }
+    public func generateSwiftFiles(in path: URL) throws {
+        guard path.hasDirectoryPath else {
+            fatalError("Path is not a valid directory.")
+        }
         print("Writing Swift files in path \(path.absoluteString)...")
         fflush(stdout)
+        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         let swiftFileCreator = SwiftFileCreator()
         writeFile(
             at: path, with: DistanceUnits.category, and: swiftFileCreator.generate(for: DistanceUnits.self)
@@ -390,9 +396,13 @@ public struct GUUnitsGenerator {
 
     /// Generate files that test the swift layer of guunits.
     /// - Parameter path: The folder containing the test files.
-    public func generateSwiftTests(in path: URL) {
+    public func generateSwiftTests(in path: URL) throws {
+        guard path.hasDirectoryPath else {
+            fatalError("Path needs to point to a directory.")
+        }
         print("Creating Swift test code in path \(path.absoluteString)...")
         fflush(stdout)
+        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         let swiftFileCreator = SwiftTestFileCreator()
         createTestFiles(at: path, with: swiftFileCreator.generate(
             with: GradualTestGenerator<DistanceUnits>(
@@ -469,10 +479,11 @@ public struct GUUnitsGenerator {
     ///   - name: The name of the file.
     ///   - contents: The contents of the file.
     private func writeFile(at path: URL, with name: String, and contents: String) {
-        fileManager.createFile(
-            atPath: path.appendingPathComponent("\(name).swift", isDirectory: false).path,
-            contents: contents.data(using: .utf8)
-        )
+        let filePath = path.appendingPathComponent("\(name).swift", isDirectory: false).path
+        _ = try? fileManager.removeItem(atPath: filePath)
+        fileManager.createFile(atPath: filePath, contents: contents.data(using: .utf8))
     }
 
 }
+
+// swiftlint:enable type_body_length
