@@ -33,3 +33,9 @@ jobs:
       - name: Release Build
         run: swift build -c release
 
+      - name: Release Test
+        run: |
+          swift test -c release
+          cd Tests/GUUnits
+          swift build -c release
+
