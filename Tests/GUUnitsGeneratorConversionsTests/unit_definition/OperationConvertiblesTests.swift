@@ -350,7 +350,7 @@ final class OperationConvertiblesTests: XCTestCase {
     // swiftlint:disable opening_brace
     // swiftlint:disable function_body_length
 
-    /// Test c code is valid for all operation.
+    /// Test c code is valid for all operations.
     func testCCodeGeneration() {
         let cases: [(GUUnitsGeneratorConversions.Operation, (Signs) -> String)] = [
             (Operation.constant(declaration: metres), { "((\($0.numericType.rawValue)) (metres))" }),
@@ -429,6 +429,94 @@ final class OperationConvertiblesTests: XCTestCase {
                 Signs.allCases.forEach {
                     print("C Code: ")
                     print(operation.cCode(sign: $0))
+                    print("Expected: ")
+                    print(expected($0))
+                }
+                fflush(stdout)
+                return
+            }
+        }
+    }
+
+    /// Test swift code is valid for all operations.
+    func testSwiftCodeGeneration() {
+        let cases: [(GUUnitsGeneratorConversions.Operation, (Signs) -> String)] = [
+            (Operation.constant(declaration: metres), { "\($0.numericType.swiftType.rawValue)(metres)" }),
+            (one, { "\($0.numericType.swiftType.rawValue)(1)" }),
+            (
+                Operation.division(lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)),
+                {
+                    "(\($0.numericType.swiftType.rawValue)(metres)) / " +
+                        "(\($0.numericType.swiftType.rawValue)(seconds))"
+                }
+            ),
+            (
+                Operation.multiplication(
+                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+                ),
+                {
+                    "(\($0.numericType.swiftType.rawValue)(metres)) * " +
+                        "(\($0.numericType.swiftType.rawValue)(seconds))"
+                }
+            ),
+            (
+                Operation.exponentiate(
+                    base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 2))
+                ),
+                {
+                    "(\($0.numericType.swiftType.rawValue)(metres)) * " +
+                        "(\($0.numericType.swiftType.rawValue)(metres))"
+                }
+            ),
+            (
+                Operation.exponentiate(
+                    base: .constant(declaration: metres), power: .literal(declaration: .integer(value: 3))
+                ),
+                {
+                    "(\($0.numericType.swiftType.rawValue)(metres)) * " +
+                        "((\($0.numericType.swiftType.rawValue)(metres)) * " +
+                        "(\($0.numericType.swiftType.rawValue)(metres)))"
+                }
+            ),
+            (
+                Operation.exponentiate(
+                    base: .constant(declaration: metres), power: .constant(declaration: seconds)
+                ),
+                {
+                    "(pow(\($0.numericType.swiftType.rawValue)(metres), " +
+                        "\($0.numericType.swiftType.rawValue)(seconds)))"
+                }
+            ),
+            (one, { "\($0.numericType.swiftType.rawValue)(1)" }),
+            (
+                Operation.literal(declaration: .decimal(value: 1.0)),
+                { "\($0.numericType.swiftType.rawValue)(1.0)" }
+            ),
+            (
+                Operation.addition(
+                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+                ),
+                {
+                    "(\($0.numericType.swiftType.rawValue)(metres)) + " +
+                        "(\($0.numericType.swiftType.rawValue)(seconds))"
+                }
+            ),
+            (
+                Operation.subtraction(
+                    lhs: .constant(declaration: metres), rhs: .constant(declaration: seconds)
+                ),
+                {
+                    "(\($0.numericType.swiftType.rawValue)(metres)) - " +
+                        "(\($0.numericType.swiftType.rawValue)(seconds))"
+                }
+            )
+        ]
+        cases.forEach { operation, expected in
+            guard isValidSwiftCode(for: operation, expected: expected) else {
+                XCTFail("\(operation) does not produce valid swift code.")
+                Signs.allCases.forEach {
+                    print("Swift Code: ")
+                    print(operation.swiftCode(sign: $0))
                     print("Expected: ")
                     print(expected($0))
                 }
