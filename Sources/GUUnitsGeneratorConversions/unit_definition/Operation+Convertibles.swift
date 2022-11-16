@@ -268,7 +268,7 @@ extension Operation {
         case .addition(let lhs, let rhs):
             return "(\(lhs.swiftCode(sign: sign))) + (\(rhs.swiftCode(sign: sign)))"
         case .subtraction(let lhs, let rhs):
-            return "(\(lhs.swiftCode(sign: sign))) + (\(rhs.swiftCode(sign: sign)))"
+            return "(\(lhs.swiftCode(sign: sign))) - (\(rhs.swiftCode(sign: sign)))"
         }
     }
 
