@@ -60,6 +60,19 @@ import XCTest
 /// Test class for ``Relation``.
 final class RelationTests: XCTestCase {
 
+    /// A metres type-erased unit.
+    let metres = AnyUnit(DistanceUnits.metres)
+
+    /// A seconds type-erased unit.
+    let seconds = AnyUnit(TimeUnits.seconds)
+
+    /// A test relation from metres to seconds.
+    let singleRelation = Relation(
+        source: AnyUnit(DistanceUnits.metres),
+        target: AnyUnit(TimeUnits.seconds),
+        operation: .constant(declaration: AnyUnit(DistanceUnits.metres))
+    )
+
     /// Test init sets properties correctly.
     func testInit() {
         let source = Acceleration.metresPerSecond2
@@ -72,6 +85,74 @@ final class RelationTests: XCTestCase {
         XCTAssertEqual(relation.source, source)
         XCTAssertEqual(relation.target, target)
         XCTAssertEqual(relation.operation, operation)
+    }
+
+    /// Test single parameter relations conversion function name.
+    func testSingleParameterFunctionName() {
+        let sign = Signs.t
+        let otherSign = Signs.u
+        let name = singleRelation.name(sign: sign, otherSign: otherSign)
+        let fnName = "\(metres.abbreviation)_\(sign.rawValue)_to_" +
+            "\(seconds.abbreviation)_\(otherSign.rawValue)"
+        XCTAssertEqual(name, fnName)
+    }
+
+    /// Test function definition for single-parameter relation.
+    func testSingleParameterDefinition() {
+        let sign = Signs.t
+        let otherSign = Signs.u
+        let definition = singleRelation.definition(sign: sign, otherSign: otherSign)
+        let comment = """
+        /**
+        * Convert \(metres)_\(sign.rawValue) to \(seconds)_\(otherSign.rawValue).
+        */
+        """
+        let fnName = singleRelation.name(sign: sign, otherSign: otherSign)
+        let parameters = "\(metres)_\(sign.rawValue) \(metres)"
+        let expected = comment + "\n" + "\(seconds)_\(otherSign.rawValue) \(fnName)(\(parameters));"
+        XCTAssertEqual(definition, expected)
+    }
+
+    func testSingleParameterImplementationSignedToUnsigned() {
+        let converter = NumericTypeConverter()
+        let sign = Signs.t
+        let otherSign = Signs.u
+        let implementation = singleRelation.implementation(sign: sign, otherSign: otherSign)
+        let comment = """
+        /**
+        * Convert \(metres)_\(sign.rawValue) to \(seconds)_\(otherSign.rawValue).
+        */
+        """
+        let fnName = singleRelation.name(sign: sign, otherSign: otherSign)
+        let parameters = "\(metres)_\(sign.rawValue) \(metres)"
+        let functionDef = comment + "\n" + "\(seconds)_\(otherSign.rawValue) \(fnName)(\(parameters))"
+        let cast = converter.convert(
+            "result", from: sign.numericType, to: singleRelation.target, sign: otherSign
+        )
+        let body = """
+            const \(sign.numericType.rawValue) unit0 = ((\(sign.numericType.rawValue)) (metres));
+            if (__builtin_expect(overflow_upper_\(sign.rawValue)(unit0), 0)) {
+                return \(otherSign.numericType.limits.1);
+            } else if (__builtin_expect(overflow_lower_\(sign.rawValue)(unit0), 0)) {
+                return \(otherSign.numericType.limits.0);
+            } else {
+                const \(sign.numericType.rawValue) result = \(singleRelation.operation.cCode(sign: sign));
+                if (__builtin_expect(overflow_upper_\(sign.rawValue)(result), 0)) {
+                    return \(otherSign.numericType.limits.1);
+                } else if (__builtin_expect(overflow_lower_\(sign.rawValue)(result), 0)) {
+                    return \(otherSign.numericType.limits.0);
+                } else {
+                    return \(cast);
+                }
+            }
+        """
+        let expected = """
+        \(functionDef)
+        {
+        \(body)
+        }
+        """
+        XCTAssertEqual(implementation, expected)
     }
 
 }
