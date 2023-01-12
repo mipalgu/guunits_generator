@@ -57,6 +57,8 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+// swiftlint:disable type_body_length
+
 /// Test class for `Operation`.
 final class OperationTests: XCTestCase {
 
@@ -449,3 +451,5 @@ final class OperationTests: XCTestCase {
     }
 
 }
+
+// swiftlint:enable type_body_length
