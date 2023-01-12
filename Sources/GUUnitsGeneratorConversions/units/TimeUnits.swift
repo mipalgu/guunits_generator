@@ -61,7 +61,7 @@ public enum TimeUnits: String, UnitProtocol, Base10UnitsConvertible {
 
     /// picoseconds.
     case picoseconds
-    
+
     /// nanoseconds
     case nanoseconds
 

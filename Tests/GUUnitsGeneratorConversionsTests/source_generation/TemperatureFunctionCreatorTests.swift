@@ -59,6 +59,8 @@
 @testable import GUUnitsGeneratorConversions
 import XCTest
 
+// swiftlint:disable type_body_length
+
 /// Test class for TemperatureFunctionCreator.
 final class TemperatureFunctionCreatorTests: XCTestCase {
 
@@ -410,3 +412,5 @@ final class TemperatureFunctionCreatorTests: XCTestCase {
     // swiftlint:enable missing_docs
 
 }
+
+// swiftlint:enable type_body_length
