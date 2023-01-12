@@ -59,17 +59,25 @@
 /// A type for representing different time units.
 public enum TimeUnits: String, UnitProtocol, Base10UnitsConvertible {
 
-    /// Microseconds.
+    /// picoseconds.
+    case picoseconds
+    
+    /// nanoseconds
+    case nanoseconds
+
+    /// microseconds.
     case microseconds
 
-    /// Milliseconds.
+    /// milliseconds.
     case milliseconds
 
-    /// Seconds
+    /// seconds
     case seconds
 
     /// The exponents of the units expressed as base 10.
     public static let exponents: [TimeUnits: Int] = [
+        .picoseconds: -12,
+        .nanoseconds: -9,
         .microseconds: -6,
         .milliseconds: -3,
         .seconds: 0
@@ -78,6 +86,10 @@ public enum TimeUnits: String, UnitProtocol, Base10UnitsConvertible {
     /// The abbreviation of the time unit.
     public var abbreviation: String {
         switch self {
+        case .picoseconds:
+            return "ps"
+        case .nanoseconds:
+            return "ns"
         case .microseconds:
             return "us"
         case .milliseconds:
