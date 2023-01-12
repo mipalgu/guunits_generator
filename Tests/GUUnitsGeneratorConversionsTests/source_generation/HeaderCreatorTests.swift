@@ -80,6 +80,8 @@ final class HeaderCreatorTests: XCTestCase {
     let timeGenerator = AnyGenerator(
         generating: TimeUnits.self,
         using: TimeUnitsGenerator(unitDifference: [
+            .picoseconds: 1000,
+            .nanoseconds: 1000,
             .microseconds: 1000,
             .milliseconds: 1000
         ])

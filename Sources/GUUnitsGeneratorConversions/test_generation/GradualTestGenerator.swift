@@ -55,6 +55,7 @@
 // 
 
 // swiftlint:disable file_length
+// swiftlint:disable type_body_length
 
 /// Struct used to generate test parameters for units that are convertable using
 /// constant factors. e.g. 10 millimetres in a centimetre.
@@ -516,4 +517,5 @@ public struct GradualTestGenerator<Unit>: TestGenerator where
 
 }
 
+// swiftlint:enable type_body_length
 // swiftlint:enable file_length

@@ -126,7 +126,10 @@ public struct SwiftTestFileCreator {
         guard !tests.isEmpty else {
             return []
         }
-        return tests.flatMap { conversion, parameters -> [String] in
+        return tests.sorted {
+            $0.0.description < $1.0.description
+        }
+        .flatMap { conversion, parameters -> [String] in
             let relation: Relation = conversion.relation
             let sourceSign = conversion.sourceSign
             let target = relation.target

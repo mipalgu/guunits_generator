@@ -4,6 +4,26 @@ import XCTest
 /// Test class for TimeUnits
 final class TimeUnitsTests: XCTestCase, UnitsTestable {
 
+    /// Test picoseconds.
+    func testPicoseconds() {
+        assert(
+            value: TimeUnits.picoseconds,
+            rawValue: "picoseconds",
+            abbreviation: "ps",
+            description: "picoseconds"
+        )
+    }
+
+    /// Test nanoseconds.
+    func testNanoseconds() {
+        assert(
+            value: TimeUnits.nanoseconds,
+            rawValue: "nanoseconds",
+            abbreviation: "ns",
+            description: "nanoseconds"
+        )
+    }
+
     /// Test microseconds.
     func testMicroseconds() {
         assert(
@@ -37,13 +57,15 @@ final class TimeUnitsTests: XCTestCase, UnitsTestable {
     /// Test static variables.
     func testStaticVars() {
         XCTAssertEqual(TimeUnits.category, "Time")
-        XCTAssertEqual(TimeUnits.highestPrecision, .microseconds)
+        XCTAssertEqual(TimeUnits.highestPrecision, .picoseconds)
         XCTAssertTrue(TimeUnits.sameZeroPoint)
     }
 
     /// Test exponents is correct.
     func testExponents() {
         let expected: [TimeUnits: Int] = [
+            .picoseconds: -12,
+            .nanoseconds: -9,
             .microseconds: -6,
             .milliseconds: -3,
             .seconds: 0

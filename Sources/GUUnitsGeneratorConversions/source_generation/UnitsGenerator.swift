@@ -167,11 +167,11 @@ public struct UnitsGenerator<Creator: FunctionCreator>: UnitsGeneratable {
             let first = lhs
                 .components(separatedBy: .whitespaces)
                 .dropFirst()
-                .reduce(into: "") { $0 = $0 + $1 }
+                .reduce(into: "") { $0 += $1 }
             let second = rhs
                 .components(separatedBy: .whitespaces)
                 .dropFirst()
-                .reduce(into: "") { $0 = $0 + $1 }
+                .reduce(into: "") { $0 += $1 }
             return first < second
         }
         guard let firstFunction = sorted.first else {

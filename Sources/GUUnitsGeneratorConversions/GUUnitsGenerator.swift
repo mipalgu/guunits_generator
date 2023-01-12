@@ -163,6 +163,8 @@ public struct GUUnitsGenerator {
         let timeGenerator = AnyGenerator(
             generating: TimeUnits.self,
             using: TimeUnitsGenerator(unitDifference: [
+                .picoseconds: 1000,
+                .nanoseconds: 1000,
                 .microseconds: 1000,
                 .milliseconds: 1000
             ])
@@ -291,6 +293,8 @@ public struct GUUnitsGenerator {
             at: path, with: percentFileCreator.tests(generator: percentGenerator, imports: "import CGUUnits")
         )
         let timeGenerator = GradualTestGenerator<TimeUnits>(unitDifference: [
+            .picoseconds: 1000,
+            .nanoseconds: 1000,
             .microseconds: 1000,
             .milliseconds: 1000
         ])
@@ -423,6 +427,8 @@ public struct GUUnitsGenerator {
         createTestFiles(at: path, with: swiftFileCreator.generate(
             with: GradualTestGenerator<TimeUnits>(
                 unitDifference: [
+                    .picoseconds: 1000,
+                    .nanoseconds: 1000,
                     .microseconds: 1000,
                     .milliseconds: 1000
                 ]

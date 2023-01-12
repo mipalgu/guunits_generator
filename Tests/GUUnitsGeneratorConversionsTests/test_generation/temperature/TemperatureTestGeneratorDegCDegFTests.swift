@@ -185,6 +185,8 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
         }
     }
 
+    // swiftlint:disable function_body_length
+
     /// Create default test parameters for a celsius to fahrenheit conversion.
     /// - Parameters:
     ///   - sign: The sign of the celsius parameter.
@@ -247,5 +249,7 @@ final class TemperatureTestGeneratorDegCDegFTests: XCTestCase, TestParameterTest
         }
         return newTests
     }
+
+    // swiftlint:enable function_body_length
 
 }
