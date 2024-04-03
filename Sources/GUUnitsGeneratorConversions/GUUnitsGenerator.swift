@@ -58,6 +58,7 @@
 
 import Foundation
 
+// swiftlint:disable file_length
 // swiftlint:disable type_body_length
 
 /// Create the source files the C and swift targets of guunits.
@@ -351,42 +352,44 @@ public struct GUUnitsGenerator {
         fflush(stdout)
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         let swiftFileCreator = SwiftFileCreator()
-        writeFile(
+        try writeFiles(
             at: path, with: DistanceUnits.category, and: swiftFileCreator.generate(for: DistanceUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path, with: CurrentUnits.category, and: swiftFileCreator.generate(for: CurrentUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path, with: TimeUnits.category, and: swiftFileCreator.generate(for: TimeUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path, with: AngleUnits.category, and: swiftFileCreator.generate(for: AngleUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path, with: ImageUnits.category, and: swiftFileCreator.generate(for: ImageUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path, with: PercentUnits.category, and: swiftFileCreator.generate(for: PercentUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path,
             with: TemperatureUnits.category,
             and: swiftFileCreator.generate(for: TemperatureUnits.self)
         )
-        writeFile(
+        try writeFiles(
             at: path,
             with: Acceleration.category,
             and: swiftFileCreator.generate(for: Acceleration.self)
         )
-        writeFile(
+        try writeFiles(
             at: path,
             with: ReferenceAcceleration.category,
             and: swiftFileCreator.generate(for: ReferenceAcceleration.self)
         )
-        writeFile(at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self))
-        writeFile(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
-        writeFile(
+        try writeFiles(
+            at: path, with: MassUnits.category, and: swiftFileCreator.generate(for: MassUnits.self)
+        )
+        try writeFiles(at: path, with: Velocity.category, and: swiftFileCreator.generate(for: Velocity.self))
+        try writeFiles(
             at: path,
             with: AngularVelocity.category,
             and: swiftFileCreator.generate(for: AngularVelocity.self)
@@ -479,6 +482,15 @@ public struct GUUnitsGenerator {
         }
     }
 
+    /// Create category files.
+    private func writeFiles(at path: URL, with category: String, and files: [String: String]) throws {
+        let categoryPath = path.appendingPathComponent(category, isDirectory: true)
+        try fileManager.createDirectory(at: categoryPath, withIntermediateDirectories: false)
+        files.sorted { $0.0 < $1.0 }.forEach { name, contents in
+            writeFile(at: categoryPath, with: name, and: contents)
+        }
+    }
+
     /// Write a Swift source file to a location.
     /// - Parameters:
     ///   - path: The URL of the source file.
@@ -493,3 +505,4 @@ public struct GUUnitsGenerator {
 }
 
 // swiftlint:enable type_body_length
+// swiftlint:enable file_length

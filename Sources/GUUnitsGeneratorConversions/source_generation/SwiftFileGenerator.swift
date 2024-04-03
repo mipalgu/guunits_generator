@@ -68,12 +68,13 @@ public struct SwiftFileCreator {
     /// Creates the swift file contents for a given unit type.
     /// - Parameter type: The type to generate.
     /// - Returns: A string of the file contents.
-    public func generate<T: UnitProtocol>(for type: T.Type) -> String {
-        let structGeneration = doGenerate(for: type)
+    public func generate<T: UnitProtocol>(for type: T.Type) -> [String: String] {
+        var structGeneration = doGenerate(for: type)
         guard let relationshipGeneration = createRelationExtensions(for: type) else {
-            return structGeneration + "\n"
+            return structGeneration
         }
-        return structGeneration + "\n\n" + relationshipGeneration + "\n"
+        structGeneration["\(type.category)+Relationships"] = relationshipGeneration
+        return structGeneration
     }
 
     /// Creates the extensions required for the relation operations defined in the `relationships`
@@ -100,7 +101,9 @@ public struct SwiftFileCreator {
             }
         }
         .flatMap { $0 }
-        return extensions.joined(separator: "\n\n")
+        return self.prefix(
+            name: "\(type.category.capitalized)+Relationships"
+        ) + "\n\n" + extensions.joined(separator: "\n\n")
     }
 
     /// Create a single extension for a group of related relations. These relations must contain
@@ -186,16 +189,22 @@ public struct SwiftFileCreator {
     /// the relationships.
     /// - Parameter type: The category to generate.
     /// - Returns: A string containing the swift source code.
-    private func doGenerate<T: UnitProtocol>(for type: T.Type) -> String {
+    private func doGenerate<T: UnitProtocol>(for type: T.Type) -> [String: String] {
         let prefix = self.prefix(name: type.category)
         let categoryStruct = self.generateCategoryStruct(for: type)
         let categoryExtensions = self.createMultiple(for: SwiftNumericTypes.uniqueTypes) {
             self.generateCategoryExtension(for: $0.rawValue, from: type)
         }
-        let unitStruct = self.createMultiple(for: type.allCases) {
-            self.generateUnit(for: $0)
-        }
-        return prefix + "\n\n" + categoryStruct + "\n\n" + categoryExtensions + "\n\n" + unitStruct
+        var files = Dictionary(uniqueKeysWithValues: type.allCases.map {
+            let fileName = $0.description.capitalized + "Types"
+            let prefix = self.prefix(name: fileName)
+            return (fileName, prefix + self.generateUnit(for: $0))
+        })
+        files["\(type.category)"] = prefix + "\n\n" + categoryStruct
+        files["\(type.category)+PrimitiveConversions"] = self.prefix(
+            name: "\(type.category)+PrimitiveConversions"
+        ) + "\n\n" + categoryExtensions
+        return files
     }
 
     /// Creates the swift file contents for a given case of a unit type.
