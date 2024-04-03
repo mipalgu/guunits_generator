@@ -76,17 +76,6 @@ public struct CompositeFunctionCreator<
     /// The numeric converter which will generate conversion code.
     var numericConverter: NumericConverter
 
-    /// Initialise the creator with delegate objects.
-    /// - Parameters:
-    ///   - bodyCreator: A delegate body creator.
-    ///   - definitionCreator: A delegate definition creator.
-    ///   - numericConverter: A delegate numeric converter.
-    init(bodyCreator: BodyCreator, definitionCreator: DefinitionCreator, numericConverter: NumericConverter) {
-        self.bodyCreator = bodyCreator
-        self.definitionCreator = definitionCreator
-        self.numericConverter = numericConverter
-    }
-
     /// Generate a statement that converts a numeric typed value to a unit type.
     /// - Parameters:
     ///   - str: The value to convert.

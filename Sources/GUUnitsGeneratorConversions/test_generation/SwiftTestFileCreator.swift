@@ -1153,6 +1153,8 @@ public struct SwiftTestFileCreator {
         """
     }
 
+    // swiftlint:enable function_body_length
+
 }
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length

@@ -71,11 +71,6 @@ final class UnitsConvertibleTests: XCTestCase {
         /// A unit instance.
         let unit: GUUnitsGeneratorConversions.Operation
 
-        /// Default init.
-        init(unit: GUUnitsGeneratorConversions.Operation) {
-            self.unit = unit
-        }
-
     }
 
     /// The unit under test.
